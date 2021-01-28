@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [ main ]
+    paths:
+    - '**.cpp'
+    - '**.h'
+  pull_request:
+    branches: [ main ]
+    paths:
+    - '**.cpp'
+    - '**.h'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install LLVM-8.0.1
+      run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main" && sudo apt-get update && sudo apt-get install -y llvm-8 llvm-8-dev clang-8
+    - uses: actions/checkout@v2
+    - name: Eigen-setup
+      run: |
+        mkdir build && cd build
+        wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz
+        tar -xvzf eigen-3.3.7.tar.gz
+    - name: Build-Eigen
+      run: |
+        cd build
+        mkdir eigen-build
+        cd eigen-build
+        cmake ../eigen-3.3.7
+        make -j4 && cd ..
+    - name: cmake
+      run: cd build && cmake -DEigen3_DIR=./eigen-build ../src
+    - name: make
+      run: cd build && make -j8
+    - name: Run-tests
+      run: cd build && ulimit -s unlimited && make verify-all

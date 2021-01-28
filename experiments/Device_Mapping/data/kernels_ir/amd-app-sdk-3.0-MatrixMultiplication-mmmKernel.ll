@@ -1,0 +1,291 @@
+; ModuleID = 'MatrixMultiplication_Kernels.cl'
+source_filename = "MatrixMultiplication_Kernels.cl"
+target datalayout = "e-m:o-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-apple-macosx10.13.0"
+
+; Function Attrs: nounwind ssp uwtable
+define spir_kernel void @mmmKernel(<4 x float>* nocapture readonly, <4 x float>* nocapture readonly, <4 x float>* nocapture, i32, i32) local_unnamed_addr #0 !kernel_arg_addr_space !4 !kernel_arg_access_qual !5 !kernel_arg_type !6 !kernel_arg_base_type !7 !kernel_arg_type_qual !8 {
+  %6 = tail call i64 @_Z13get_global_idj(i32 0) #3
+  %7 = trunc i64 %6 to i32
+  %8 = tail call i64 @_Z13get_global_idj(i32 1) #3
+  %9 = trunc i64 %8 to i32
+  %10 = lshr i32 %4, 2
+  %11 = icmp eq i32 %3, 0
+  %12 = shl i32 %9, 2
+  br i1 %11, label %13, label %17
+
+; <label>:13:                                     ; preds = %5
+  %14 = or i32 %12, 1
+  %15 = or i32 %12, 2
+  %16 = or i32 %12, 3
+  br label %27
+
+; <label>:17:                                     ; preds = %5
+  %18 = lshr i32 %3, 2
+  %19 = mul i32 %12, %18
+  %20 = or i32 %12, 1
+  %21 = mul i32 %20, %18
+  %22 = or i32 %12, 2
+  %23 = mul i32 %22, %18
+  %24 = or i32 %12, 3
+  %25 = mul i32 %24, %18
+  %26 = zext i32 %3 to i64
+  br label %51
+
+; <label>:27:                                     ; preds = %51, %13
+  %28 = phi i32 [ %16, %13 ], [ %24, %51 ]
+  %29 = phi i32 [ %15, %13 ], [ %22, %51 ]
+  %30 = phi i32 [ %14, %13 ], [ %20, %51 ]
+  %31 = phi <4 x float> [ zeroinitializer, %13 ], [ %245, %51 ]
+  %32 = phi <4 x float> [ zeroinitializer, %13 ], [ %213, %51 ]
+  %33 = phi <4 x float> [ zeroinitializer, %13 ], [ %181, %51 ]
+  %34 = phi <4 x float> [ zeroinitializer, %13 ], [ %149, %51 ]
+  %35 = mul i32 %12, %10
+  %36 = add i32 %35, %7
+  %37 = zext i32 %36 to i64
+  %38 = getelementptr inbounds <4 x float>, <4 x float>* %2, i64 %37
+  store <4 x float> %34, <4 x float>* %38, align 16, !tbaa !9
+  %39 = mul i32 %30, %10
+  %40 = add i32 %39, %7
+  %41 = zext i32 %40 to i64
+  %42 = getelementptr inbounds <4 x float>, <4 x float>* %2, i64 %41
+  store <4 x float> %33, <4 x float>* %42, align 16, !tbaa !9
+  %43 = mul i32 %29, %10
+  %44 = add i32 %43, %7
+  %45 = zext i32 %44 to i64
+  %46 = getelementptr inbounds <4 x float>, <4 x float>* %2, i64 %45
+  store <4 x float> %32, <4 x float>* %46, align 16, !tbaa !9
+  %47 = mul i32 %28, %10
+  %48 = add i32 %47, %7
+  %49 = zext i32 %48 to i64
+  %50 = getelementptr inbounds <4 x float>, <4 x float>* %2, i64 %49
+  store <4 x float> %31, <4 x float>* %50, align 16, !tbaa !9
+  ret void
+
+; <label>:51:                                     ; preds = %17, %51
+  %52 = phi i64 [ 0, %17 ], [ %246, %51 ]
+  %53 = phi <4 x float> [ zeroinitializer, %17 ], [ %149, %51 ]
+  %54 = phi <4 x float> [ zeroinitializer, %17 ], [ %181, %51 ]
+  %55 = phi <4 x float> [ zeroinitializer, %17 ], [ %213, %51 ]
+  %56 = phi <4 x float> [ zeroinitializer, %17 ], [ %245, %51 ]
+  %57 = lshr exact i64 %52, 2
+  %58 = trunc i64 %57 to i32
+  %59 = add i32 %19, %58
+  %60 = zext i32 %59 to i64
+  %61 = getelementptr inbounds <4 x float>, <4 x float>* %0, i64 %60
+  %62 = load <4 x float>, <4 x float>* %61, align 16, !tbaa !9
+  %63 = add i32 %21, %58
+  %64 = zext i32 %63 to i64
+  %65 = getelementptr inbounds <4 x float>, <4 x float>* %0, i64 %64
+  %66 = load <4 x float>, <4 x float>* %65, align 16, !tbaa !9
+  %67 = add i32 %23, %58
+  %68 = zext i32 %67 to i64
+  %69 = getelementptr inbounds <4 x float>, <4 x float>* %0, i64 %68
+  %70 = load <4 x float>, <4 x float>* %69, align 16, !tbaa !9
+  %71 = add i32 %25, %58
+  %72 = zext i32 %71 to i64
+  %73 = getelementptr inbounds <4 x float>, <4 x float>* %0, i64 %72
+  %74 = load <4 x float>, <4 x float>* %73, align 16, !tbaa !9
+  %75 = trunc i64 %52 to i32
+  %76 = mul i32 %10, %75
+  %77 = add i32 %76, %7
+  %78 = zext i32 %77 to i64
+  %79 = getelementptr inbounds <4 x float>, <4 x float>* %1, i64 %78
+  %80 = load <4 x float>, <4 x float>* %79, align 16, !tbaa !9
+  %81 = trunc i64 %52 to i32
+  %82 = or i32 %81, 1
+  %83 = mul i32 %82, %10
+  %84 = add i32 %83, %7
+  %85 = zext i32 %84 to i64
+  %86 = getelementptr inbounds <4 x float>, <4 x float>* %1, i64 %85
+  %87 = load <4 x float>, <4 x float>* %86, align 16, !tbaa !9
+  %88 = trunc i64 %52 to i32
+  %89 = or i32 %88, 2
+  %90 = mul i32 %89, %10
+  %91 = add i32 %90, %7
+  %92 = zext i32 %91 to i64
+  %93 = getelementptr inbounds <4 x float>, <4 x float>* %1, i64 %92
+  %94 = load <4 x float>, <4 x float>* %93, align 16, !tbaa !9
+  %95 = trunc i64 %52 to i32
+  %96 = or i32 %95, 3
+  %97 = mul i32 %96, %10
+  %98 = add i32 %97, %7
+  %99 = zext i32 %98 to i64
+  %100 = getelementptr inbounds <4 x float>, <4 x float>* %1, i64 %99
+  %101 = load <4 x float>, <4 x float>* %100, align 16, !tbaa !9
+  %102 = extractelement <4 x float> %62, i64 0
+  %103 = extractelement <4 x float> %80, i64 0
+  %104 = extractelement <4 x float> %62, i64 1
+  %105 = extractelement <4 x float> %87, i64 0
+  %106 = fmul float %104, %105
+  %107 = tail call float @llvm.fmuladd.f32(float %102, float %103, float %106)
+  %108 = extractelement <4 x float> %62, i64 2
+  %109 = extractelement <4 x float> %94, i64 0
+  %110 = tail call float @llvm.fmuladd.f32(float %108, float %109, float %107)
+  %111 = extractelement <4 x float> %62, i64 3
+  %112 = extractelement <4 x float> %101, i64 0
+  %113 = tail call float @llvm.fmuladd.f32(float %111, float %112, float %110)
+  %114 = extractelement <4 x float> %53, i64 0
+  %115 = fadd float %114, %113
+  %116 = insertelement <4 x float> undef, float %115, i64 0
+  %117 = extractelement <4 x float> %80, i64 1
+  %118 = extractelement <4 x float> %87, i64 1
+  %119 = fmul float %104, %118
+  %120 = tail call float @llvm.fmuladd.f32(float %102, float %117, float %119)
+  %121 = extractelement <4 x float> %94, i64 1
+  %122 = tail call float @llvm.fmuladd.f32(float %108, float %121, float %120)
+  %123 = extractelement <4 x float> %101, i64 1
+  %124 = tail call float @llvm.fmuladd.f32(float %111, float %123, float %122)
+  %125 = extractelement <4 x float> %53, i64 1
+  %126 = fadd float %125, %124
+  %127 = insertelement <4 x float> %116, float %126, i64 1
+  %128 = extractelement <4 x float> %80, i64 2
+  %129 = extractelement <4 x float> %87, i64 2
+  %130 = fmul float %104, %129
+  %131 = tail call float @llvm.fmuladd.f32(float %102, float %128, float %130)
+  %132 = extractelement <4 x float> %94, i64 2
+  %133 = tail call float @llvm.fmuladd.f32(float %108, float %132, float %131)
+  %134 = extractelement <4 x float> %101, i64 2
+  %135 = tail call float @llvm.fmuladd.f32(float %111, float %134, float %133)
+  %136 = extractelement <4 x float> %53, i64 2
+  %137 = fadd float %136, %135
+  %138 = insertelement <4 x float> %127, float %137, i64 2
+  %139 = extractelement <4 x float> %80, i64 3
+  %140 = extractelement <4 x float> %87, i64 3
+  %141 = fmul float %104, %140
+  %142 = tail call float @llvm.fmuladd.f32(float %102, float %139, float %141)
+  %143 = extractelement <4 x float> %94, i64 3
+  %144 = tail call float @llvm.fmuladd.f32(float %108, float %143, float %142)
+  %145 = extractelement <4 x float> %101, i64 3
+  %146 = tail call float @llvm.fmuladd.f32(float %111, float %145, float %144)
+  %147 = extractelement <4 x float> %53, i64 3
+  %148 = fadd float %147, %146
+  %149 = insertelement <4 x float> %138, float %148, i64 3
+  %150 = extractelement <4 x float> %66, i64 0
+  %151 = extractelement <4 x float> %66, i64 1
+  %152 = fmul float %151, %105
+  %153 = tail call float @llvm.fmuladd.f32(float %150, float %103, float %152)
+  %154 = extractelement <4 x float> %66, i64 2
+  %155 = tail call float @llvm.fmuladd.f32(float %154, float %109, float %153)
+  %156 = extractelement <4 x float> %66, i64 3
+  %157 = tail call float @llvm.fmuladd.f32(float %156, float %112, float %155)
+  %158 = extractelement <4 x float> %54, i64 0
+  %159 = fadd float %158, %157
+  %160 = insertelement <4 x float> undef, float %159, i64 0
+  %161 = fmul float %151, %118
+  %162 = tail call float @llvm.fmuladd.f32(float %150, float %117, float %161)
+  %163 = tail call float @llvm.fmuladd.f32(float %154, float %121, float %162)
+  %164 = tail call float @llvm.fmuladd.f32(float %156, float %123, float %163)
+  %165 = extractelement <4 x float> %54, i64 1
+  %166 = fadd float %165, %164
+  %167 = insertelement <4 x float> %160, float %166, i64 1
+  %168 = fmul float %151, %129
+  %169 = tail call float @llvm.fmuladd.f32(float %150, float %128, float %168)
+  %170 = tail call float @llvm.fmuladd.f32(float %154, float %132, float %169)
+  %171 = tail call float @llvm.fmuladd.f32(float %156, float %134, float %170)
+  %172 = extractelement <4 x float> %54, i64 2
+  %173 = fadd float %172, %171
+  %174 = insertelement <4 x float> %167, float %173, i64 2
+  %175 = fmul float %151, %140
+  %176 = tail call float @llvm.fmuladd.f32(float %150, float %139, float %175)
+  %177 = tail call float @llvm.fmuladd.f32(float %154, float %143, float %176)
+  %178 = tail call float @llvm.fmuladd.f32(float %156, float %145, float %177)
+  %179 = extractelement <4 x float> %54, i64 3
+  %180 = fadd float %179, %178
+  %181 = insertelement <4 x float> %174, float %180, i64 3
+  %182 = extractelement <4 x float> %70, i64 0
+  %183 = extractelement <4 x float> %70, i64 1
+  %184 = fmul float %183, %105
+  %185 = tail call float @llvm.fmuladd.f32(float %182, float %103, float %184)
+  %186 = extractelement <4 x float> %70, i64 2
+  %187 = tail call float @llvm.fmuladd.f32(float %186, float %109, float %185)
+  %188 = extractelement <4 x float> %70, i64 3
+  %189 = tail call float @llvm.fmuladd.f32(float %188, float %112, float %187)
+  %190 = extractelement <4 x float> %55, i64 0
+  %191 = fadd float %190, %189
+  %192 = insertelement <4 x float> undef, float %191, i64 0
+  %193 = fmul float %183, %118
+  %194 = tail call float @llvm.fmuladd.f32(float %182, float %117, float %193)
+  %195 = tail call float @llvm.fmuladd.f32(float %186, float %121, float %194)
+  %196 = tail call float @llvm.fmuladd.f32(float %188, float %123, float %195)
+  %197 = extractelement <4 x float> %55, i64 1
+  %198 = fadd float %197, %196
+  %199 = insertelement <4 x float> %192, float %198, i64 1
+  %200 = fmul float %183, %129
+  %201 = tail call float @llvm.fmuladd.f32(float %182, float %128, float %200)
+  %202 = tail call float @llvm.fmuladd.f32(float %186, float %132, float %201)
+  %203 = tail call float @llvm.fmuladd.f32(float %188, float %134, float %202)
+  %204 = extractelement <4 x float> %55, i64 2
+  %205 = fadd float %204, %203
+  %206 = insertelement <4 x float> %199, float %205, i64 2
+  %207 = fmul float %183, %140
+  %208 = tail call float @llvm.fmuladd.f32(float %182, float %139, float %207)
+  %209 = tail call float @llvm.fmuladd.f32(float %186, float %143, float %208)
+  %210 = tail call float @llvm.fmuladd.f32(float %188, float %145, float %209)
+  %211 = extractelement <4 x float> %55, i64 3
+  %212 = fadd float %211, %210
+  %213 = insertelement <4 x float> %206, float %212, i64 3
+  %214 = extractelement <4 x float> %74, i64 0
+  %215 = extractelement <4 x float> %74, i64 1
+  %216 = fmul float %215, %105
+  %217 = tail call float @llvm.fmuladd.f32(float %214, float %103, float %216)
+  %218 = extractelement <4 x float> %74, i64 2
+  %219 = tail call float @llvm.fmuladd.f32(float %218, float %109, float %217)
+  %220 = extractelement <4 x float> %74, i64 3
+  %221 = tail call float @llvm.fmuladd.f32(float %220, float %112, float %219)
+  %222 = extractelement <4 x float> %56, i64 0
+  %223 = fadd float %222, %221
+  %224 = insertelement <4 x float> undef, float %223, i64 0
+  %225 = fmul float %215, %118
+  %226 = tail call float @llvm.fmuladd.f32(float %214, float %117, float %225)
+  %227 = tail call float @llvm.fmuladd.f32(float %218, float %121, float %226)
+  %228 = tail call float @llvm.fmuladd.f32(float %220, float %123, float %227)
+  %229 = extractelement <4 x float> %56, i64 1
+  %230 = fadd float %229, %228
+  %231 = insertelement <4 x float> %224, float %230, i64 1
+  %232 = fmul float %215, %129
+  %233 = tail call float @llvm.fmuladd.f32(float %214, float %128, float %232)
+  %234 = tail call float @llvm.fmuladd.f32(float %218, float %132, float %233)
+  %235 = tail call float @llvm.fmuladd.f32(float %220, float %134, float %234)
+  %236 = extractelement <4 x float> %56, i64 2
+  %237 = fadd float %236, %235
+  %238 = insertelement <4 x float> %231, float %237, i64 2
+  %239 = fmul float %215, %140
+  %240 = tail call float @llvm.fmuladd.f32(float %214, float %139, float %239)
+  %241 = tail call float @llvm.fmuladd.f32(float %218, float %143, float %240)
+  %242 = tail call float @llvm.fmuladd.f32(float %220, float %145, float %241)
+  %243 = extractelement <4 x float> %56, i64 3
+  %244 = fadd float %243, %242
+  %245 = insertelement <4 x float> %238, float %244, i64 3
+  %246 = add nuw nsw i64 %52, 4
+  %247 = icmp ult i64 %246, %26
+  br i1 %247, label %51, label %27
+}
+
+; Function Attrs: nounwind readnone
+declare i64 @_Z13get_global_idj(i32) local_unnamed_addr #1
+
+; Function Attrs: nounwind readnone speculatable
+declare float @llvm.fmuladd.f32(float, float, float) #2
+
+attributes #0 = { nounwind ssp uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+fxsr,+mmx,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { nounwind readnone "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+fxsr,+mmx,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { nounwind readnone speculatable }
+attributes #3 = { nounwind readnone }
+
+!llvm.module.flags = !{!0, !1}
+!opencl.ocl.version = !{!2}
+!llvm.ident = !{!3}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 7, !"PIC Level", i32 2}
+!2 = !{i32 1, i32 0}
+!3 = !{!"Apple LLVM version 9.1.0 (clang-902.0.39.1)"}
+!4 = !{i32 1, i32 1, i32 1, i32 0, i32 0}
+!5 = !{!"none", !"none", !"none", !"none", !"none"}
+!6 = !{!"float4*", !"float4*", !"float4*", !"uint", !"uint"}
+!7 = !{!"float __attribute__((ext_vector_type(4)))*", !"float __attribute__((ext_vector_type(4)))*", !"float __attribute__((ext_vector_type(4)))*", !"uint", !"uint"}
+!8 = !{!"", !"", !"", !"", !""}
+!9 = !{!10, !10, i64 0}
+!10 = !{!"omnipotent char", !11, i64 0}
+!11 = !{!"Simple C/C++ TBAA"}

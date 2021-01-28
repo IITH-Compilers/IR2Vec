@@ -1,0 +1,49 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    paths:
+    - '**.cpp'
+    - '**.h'
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install LLVM-8.0.1
+      run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main" && sudo apt-get update && sudo apt-get install -y llvm-8 llvm-8-dev clang-8
+    - uses: actions/checkout@v2
+    - name: Eigen-setup
+      run: |
+        mkdir build && cd build
+        wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz
+        tar -xvzf eigen-3.3.7.tar.gz
+    - name: Build-Eigen
+      run: |
+        cd build
+        mkdir eigen-build
+        cd eigen-build
+        cmake ../eigen-3.3.7
+        make -j4 && cd ..
+    - name: cmake
+      run: cd build && cmake -DEigen3_DIR=./eigen-build ../src
+    - name: make
+      run: cd build && make -j8
+    - name: moving the binaries
+      run: |
+        mkdir -p binaries && mv build/bin/* ./binaries
+        echo "Binaries committed by GH actions corresponding to the built version of commit $(git rev-parse HEAD)" > ./binaries/README
+    - name: Commit files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add binaries/
+        git commit -m "Pushing binary for $(git rev-parse HEAD)"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
