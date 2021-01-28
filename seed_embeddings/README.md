@@ -48,7 +48,7 @@ Create `conda` environment and install the packages given in [requirements.txt](
 
 #### Preprocessing the triplets
 We preprocess the generated triplets from the [previous step](#step-2-generating-triplets) in a form suitable for training TransE.
-* `cd OpenKE`
+* `cd OpenKE` 
 * `python preprocess.py --tripletFile=<tripletsFilePath>`
     * `--tripletFile` points to the location of the `outputFileName` generated in the [previous step](#step-2-generating-triplets)
     * The processed files `entity2id.txt`, `train2id.txt` and `relation2id.txt` will be generated in the same directory as that of `tripletsFilePath`.
