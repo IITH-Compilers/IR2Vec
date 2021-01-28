@@ -57,6 +57,5 @@ int main(int argc, char **argv) {
     CollectIR cir(M);
     cir.generateTriplets();
   }
-
   return 0;
 }
