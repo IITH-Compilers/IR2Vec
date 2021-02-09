@@ -26,14 +26,11 @@ fi
 
 SEED_VERSION=$2
 
-if [ ${SEED_VERSION} = "llvm10" ]
-then
-    Absolute_path_of_RepresentationFile=./vocabulary/seedEmbeddingVocab-300-llvm10.txt
-elif [ ${SEED_VERSION} = "llvm8" ]
+if [ ${SEED_VERSION} = "llvm8" ]
 then
     Absolute_path_of_RepresentationFile=./vocabulary/seedEmbeddingVocab-300-llvm8.txt
 else
-    echo "Please enter llvm8 or llvm10 for seed version"
+    echo "Please enter llvm8 for seed version"
     exit
 fi
 
