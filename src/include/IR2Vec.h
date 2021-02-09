@@ -18,7 +18,7 @@ namespace IR2Vec {
 
 #define IR2VEC_DEBUG(X)                                                        \
   ({                                                                           \
-    if (debug) {                                                               \
+    if (debug_ir2vec) {                                                               \
       X;                                                                       \
     }                                                                          \
   })
@@ -38,7 +38,7 @@ extern llvm::cl::opt<int> cls;
 extern llvm::cl::opt<float> WO;
 extern llvm::cl::opt<float> WA;
 extern llvm::cl::opt<float> WT;
-extern llvm::cl::opt<bool> debug;
+extern llvm::cl::opt<bool> debug_ir2vec;
 
 std::unique_ptr<llvm::Module> getLLVMIR();
 void printVersion(llvm::raw_ostream &ostream);

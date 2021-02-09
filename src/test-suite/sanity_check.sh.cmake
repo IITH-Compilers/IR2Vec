@@ -29,11 +29,8 @@ SEED_VERSION=$2
 if [ ${SEED_VERSION} = "llvm10" ]
 then
     Absolute_path_of_RepresentationFile=./vocabulary/seedEmbeddingVocab-300-llvm10.txt
-elif [ ${SEED_VERSION} = "llvm8" ]
-then
-    Absolute_path_of_RepresentationFile=./vocabulary/seedEmbeddingVocab-300-llvm8.txt
 else
-    echo "Please enter llvm8 or llvm10 for seed version"
+    echo "Please enter llvm10 for seed version"
     exit
 fi
 
@@ -46,8 +43,6 @@ while IFS= read -r d
 do
 ../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level p -o ${VIR_FILE} ${d} &> /dev/null
 done < index-${SEED_VERSION}.files
-
-TEMP=temp_${EncodingType}_${SEED_VERSION}
 
 TEMP=temp_${EncodingType}_${SEED_VERSION}
 

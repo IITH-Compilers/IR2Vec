@@ -1,5 +1,5 @@
 configure_file(sanity_check.sh.cmake sanity_check.sh @ONLY)
-file(COPY PE-benchmarks-llfiles-llvm8 DESTINATION ./)
+file(COPY PE-benchmarks-llfiles-llvm10 DESTINATION ./)
 file(COPY oracle DESTINATION ./)
 file(COPY ../../vocabulary DESTINATION ./)
-file(COPY index-llvm8.files DESTINATION ./)
+file(COPY index-llvm10.files DESTINATION ./)
