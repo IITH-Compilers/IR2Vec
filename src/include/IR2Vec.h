@@ -18,7 +18,7 @@ namespace IR2Vec {
 
 #define IR2VEC_DEBUG(X)                                                        \
   ({                                                                           \
-    if (debug_ir2vec) {                                                               \
+    if (debug_ir2vec) {                                                        \
       X;                                                                       \
     }                                                                          \
   })

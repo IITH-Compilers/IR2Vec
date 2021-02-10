@@ -52,5 +52,5 @@ add_custom_target(verify-flowaware
  DEPENDS ir2vec
  VERBATIM
  )
-add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
 
+add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
