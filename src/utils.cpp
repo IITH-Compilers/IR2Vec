@@ -58,8 +58,8 @@ cl::opt<float> IR2Vec::WT("wt", cl::Hidden, cl::Optional, cl::init(0.5),
                           cl::cat(IR2Vec::category));
 
 cl::opt<bool> IR2Vec::debug("debug-ir2vec", cl::Optional,
-                                   cl::desc("Diagnostics for debugging"),
-                                   cl::init(false), cl::cat(IR2Vec::category));
+                            cl::desc("Diagnostics for debugging"),
+                            cl::init(false), cl::cat(IR2Vec::category));
 
 std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   SMDiagnostic err;
