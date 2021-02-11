@@ -14,7 +14,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ## Table Of Contents
 * [Requirements](#requirements)
-* [Binaries](#binaries-artifacts)
+* [Binaries](#binaries---artifacts)
 * [Building from Source](#building-from-source)
 * [How to generate IR2Vec program representations?](#how-to-generate-ir2vec-program-representations)
 * [Experiments](#experiments)
