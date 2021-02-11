@@ -33,17 +33,7 @@ jobs:
       run: cd build && cmake -DEigen3_DIR=./eigen-build ../src
     - name: make
       run: cd build && make -j8
-    - name: moving the binaries
-      run: |
-        mkdir -p binaries && mv build/bin/* ./binaries
-        echo "Binaries committed by GH actions corresponding to the built version of commit $(git rev-parse HEAD)" > ./binaries/README
-    - name: Commit files
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add binaries/
-        git commit -m "Pushing binary for $(git rev-parse HEAD)"
-    - name: Push changes
-      uses: ad-m/github-push-action@master
+    - uses: actions/upload-artifact@v2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        name: ir2vec
+        path: build/bin/ir2vec
