@@ -74,7 +74,7 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
 }
 
 void IR2Vec::printVersion(raw_ostream &ostream) {
-  ostream << "IR2Vec Version: 0.1\n\n";
+  ostream << "IR2Vec Version: 0.1.0\n\n";
   cl::PrintVersionMessage();
 }
 
