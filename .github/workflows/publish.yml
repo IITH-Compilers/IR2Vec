@@ -2,9 +2,9 @@ name: Publish
 
 on:
   workflow_dispatch:
-    branches: [ llvm8 ]
+    branches: [ main ]
   push:
-    branches: [ llvm8 ]
+    branches: [ main ]
     paths:
     - '**.cpp'
     - '**.h'
