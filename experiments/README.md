@@ -1,5 +1,8 @@
 # Experiments
 
+## Note
+* `The results mentioned in the experiment's scripts are not updated for this branch. The results menitioned in the scripts as per the release version. The experimental results for this branch would be different compared to the release branch.`
+
 ## Requirements
 * Create a new conda env using the given `exp_requirements.yaml` file
     * `conda env create --file exp_requirements.yaml` for the first time.
