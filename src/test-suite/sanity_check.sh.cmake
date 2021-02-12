@@ -40,8 +40,6 @@ done < index-${SEED_VERSION}.files
 
 TEMP=temp_${EncodingType}_${SEED_VERSION}
 
-TEMP=temp_${EncodingType}_${SEED_VERSION}
-
 if ls *${VIR_FILE} 1> /dev/null 2>&1
 then
     mkdir -p ${TEMP}

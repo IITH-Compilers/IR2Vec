@@ -25,7 +25,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (8.0.1) - [src](https://github.com/llvm/llvm-project/tree/release/8.x), [release](https://releases.llvm.org/download.html#8.0.1)
+* LLVM (10.0.1) - [src](https://github.com/llvm/llvm-project/tree/release/10.x), [release](https://releases.llvm.org/download.html#10.0.1)
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7)
 * Python (3.6.7)
@@ -86,10 +86,10 @@ Please use `--help` for further details.
 >     <function-name> = <Embeddings>
 
 #### Flow-Aware Embeddings
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm8.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm10.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
 
 #### Symbolic Embeddings
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm8.txt -o <output_file> -level <p|f> -class <class-number>  <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm10.txt -o <output_file> -level <p|f> -class <class-number>  <input_ll_file>``
 
 ## Experiments
 * [Device Mapping](./experiments/Device_Mapping)
