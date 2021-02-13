@@ -1,6 +1,6 @@
-#ifndef VERSION_CONFIG_H
-#define VERSION_CONFIG_H
+#ifndef VERSION_H
+#define VERSION_H
 
-#define IR2VEC_VERSION "@IR2VEC_VERSION@"
+#define IR2VEC_VERSION "@PROJECT_VERSION@"
 
-#endif // VERSION_CONFIG_H
+#endif // VERSION_H

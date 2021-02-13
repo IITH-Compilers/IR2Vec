@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(ir2vec)
-
-set (IR2VEC_VERSION_MAJOR 0)
-set (IR2VEC_VERSION_MINOR 1)
-set (IR2VEC_VERSION_PATCH 0)
-set (IR2VEC_VERSION ${IR2VEC_VERSION_MAJOR}.${IR2VEC_VERSION_MINOR}.${IR2VEC_VERSION_PATCH})
+project(ir2vec  VERSION 0.1.0)
 
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
 list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
