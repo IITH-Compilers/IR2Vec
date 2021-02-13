@@ -1,7 +1,7 @@
 # Experiments
 
 ## Note
-* `The results mentioned in the experiment's scripts are not updated for this branch. The results menitioned in the scripts as per the release version. The experimental results for this branch would be different compared to the release branch.`
+<code> The results mentioned in the experiment's scripts/the published version are not updated for this branch. The experimental results for this branch would be different when compared to the published version. For comparison, use the release corresponding to [v0.1.0](https://github.com/IITH-Compilers/IR2Vec/releases/tag/v0.1.0). </code>
 
 ## Requirements
 * Create a new conda env using the given `exp_requirements.yaml` file
