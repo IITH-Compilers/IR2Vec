@@ -92,6 +92,10 @@ Please use `--help` for further details.
  * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm10.txt -o <output_file> -level <p|f> -class <class-number>  <input_ll_file>``
 
 ## Experiments
+
+### Note
+<code> The results mentioned in the experiment's scripts/the published version are not updated for this branch. The experimental results for this branch would be different when compared to the published version. For comparison, use the release corresponding to [v0.1.0](https://github.com/IITH-Compilers/IR2Vec/releases/tag/v0.1.0). </code>
+
 * [Device Mapping](./experiments/Device_Mapping)
 * [Thread Coarsening](./experiments/Thread_Coarsening)
 * [OOV](./experiments/Out_Of_Vocabulary)
