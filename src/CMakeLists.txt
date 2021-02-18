@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(IR2Vec)
+project(ir2vec  VERSION 0.1.0)
 
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
 list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
@@ -16,7 +16,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-include_directories(./include)
+configure_file (./include/version.h.cmake version.h @ONLY)
+include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
 
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "")
 
@@ -31,8 +32,8 @@ file(GLOB IR2VEC_SRC "*.cpp")
 llvm_map_components_to_libnames(llvm_libs support core irreader analysis)
 
 
-add_executable(ir2vec ${IR2VEC_SRC})
-target_link_libraries (ir2vec ${llvm_libs} Eigen3::Eigen)
+add_executable(${PROJECT_NAME} ${IR2VEC_SRC})
+target_link_libraries (${PROJECT_NAME} ${llvm_libs} Eigen3::Eigen)
 
 add_subdirectory(test-suite)
 
@@ -41,7 +42,7 @@ add_custom_target(verify-symbolic
  COMMAND bash ./sanity_check.sh SYM llvm10
  COMMENT "Generating Symbolic IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
- DEPENDS ir2vec
+ DEPENDS ${PROJECT_NAME}
  VERBATIM
  )
 
@@ -49,7 +50,7 @@ add_custom_target(verify-flowaware
  COMMAND bash sanity_check.sh FA llvm10
  COMMENT "Generating Flow-Aware IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
- DEPENDS ir2vec
+ DEPENDS ${PROJECT_NAME}
  VERBATIM
  )
 

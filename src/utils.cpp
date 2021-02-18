@@ -5,6 +5,7 @@
 // file in the top-level directory for more details.
 //
 #include "IR2Vec.h"
+#include "version.h"
 #include <fstream>
 
 using namespace llvm;
@@ -74,7 +75,8 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
 }
 
 void IR2Vec::printVersion(raw_ostream &ostream) {
-  ostream << "IR2Vec Version: 0.1.0\n\n";
+  ostream << "\033[1;35m"
+          << "IR2Vec Version : " << IR2VEC_VERSION << "\033[0m\n";
   cl::PrintVersionMessage();
 }
 
