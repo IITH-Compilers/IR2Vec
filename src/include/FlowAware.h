@@ -7,7 +7,7 @@
 #ifndef __IR2Vec_FA_H__
 #define __IR2Vec_FA_H__
 
-#include "IR2Vec.h"
+#include "utils.h"
 
 #include "llvm/ADT/MapVector.h"
 #include "llvm/Analysis/LoopInfo.h"
@@ -15,64 +15,65 @@
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 
 #include <fstream>
 
-using namespace llvm;
-using namespace IR2Vec;
-
 class IR2Vec_FA {
 
 private:
-  Module &M;
+  llvm::Module &M;
   std::string res;
-  Vector pgmVector;
+  IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
-  std::ofstream o, missCount, cyclicCount;
 
-  SmallDenseMap<StringRef, unsigned> memWriteOps;
-  SmallDenseMap<const Instruction *, Vector> instVecMap;
-  SmallDenseMap<const Instruction *, bool> livelinessMap;
-  SmallDenseMap<StringRef, unsigned> memAccessOps;
+  llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
+  llvm::SmallDenseMap<const llvm::Instruction *, IR2Vec::Vector> instVecMap;
+  llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
+  llvm::SmallDenseMap<llvm::StringRef, unsigned> memAccessOps;
 
-  SmallMapVector<Function *, Vector, 16> funcVecMap;
+  llvm::SmallMapVector<llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
 
-  SmallMapVector<const Instruction *, SmallVector<const Instruction *, 10>, 16>
+  llvm::SmallMapVector<const llvm::Instruction *,
+                       llvm::SmallVector<const llvm::Instruction *, 10>, 16>
       writeDefsMap;
 
-  SmallVector<const Instruction *, 20> instSolvedBySolver;
+  llvm::SmallVector<const llvm::Instruction *, 20> instSolvedBySolver;
 
-  Vector getValue(std::string key);
-  void collectWriteDefsMap(const Module &M);
-  void getTransitiveUse(const Instruction *root, const Instruction *def,
-                        SmallVector<const Instruction *, 100> &visitedList,
-                        SmallVector<const Instruction *, 10> toAppend = {});
-  SmallVector<const Instruction *, 10> getReachingDefs(const Instruction *,
-                                                       unsigned i);
+  IR2Vec::Vector getValue(std::string key);
+  void collectWriteDefsMap(const llvm::Module &M);
+  void getTransitiveUse(
+      const llvm::Instruction *root, const llvm::Instruction *def,
+      llvm::SmallVector<const llvm::Instruction *, 100> &visitedList,
+      llvm::SmallVector<const llvm::Instruction *, 10> toAppend = {});
+  llvm::SmallVector<const llvm::Instruction *, 10>
+  getReachingDefs(const llvm::Instruction *, unsigned i);
 
-  void inst2Vec(const Instruction &I, SmallVector<Function *, 15> &funcStack,
-                SmallMapVector<const Instruction *, Vector, 16> &instValMap);
+  void inst2Vec(const llvm::Instruction &I,
+                llvm::SmallVector<llvm::Function *, 15> &funcStack,
+                llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
+                                     16> &instValMap);
 
-  void bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack);
-  Vector func2Vec(Function &F, SmallVector<Function *, 15> &funcStack);
-  void transitiveKillAndUpdate(Instruction *I, Vector val, bool avg = false);
-  void killAndUpdate(Instruction *I, Vector val);
-  bool isMemOp(StringRef opcode, unsigned &operand,
-               SmallDenseMap<StringRef, unsigned> map);
+  void bb2Vec(llvm::BasicBlock &B,
+              llvm::SmallVector<llvm::Function *, 15> &funcStack);
+  IR2Vec::Vector func2Vec(llvm::Function &F,
+                          llvm::SmallVector<llvm::Function *, 15> &funcStack);
+  void transitiveKillAndUpdate(llvm::Instruction *I, IR2Vec::Vector val,
+                               bool avg = false);
+  void killAndUpdate(llvm::Instruction *I, IR2Vec::Vector val);
+  bool isMemOp(llvm::StringRef opcode, unsigned &operand,
+               llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
   std::string splitAndPipeFunctionName(std::string s);
 
   // For Debugging
-  void print(Vector t, unsigned pos) { outs() << t[pos]; }
+  void print(IR2Vec::Vector t, unsigned pos) { llvm::outs() << t[pos]; }
 
 public:
-  IR2Vec_FA(std::unique_ptr<llvm::Module> &M) : M{*M} {
-    pgmVector = Vector(DIM, 0);
+  IR2Vec_FA(llvm::Module &M) : M{M} {
+    pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
-    o.open(oname, std::ios_base::app);
-    collectDataFromVocab(vocab, opcMap);
+    IR2Vec::collectDataFromVocab(opcMap);
 
     memWriteOps.try_emplace("store", 1);
     memWriteOps.try_emplace("cmpxchg", 0);
@@ -83,14 +84,14 @@ public:
 
     dataMissCounter = 0;
     cyclicCounter = 0;
-    missCount.open("missCount_" + oname, std::ios_base::app);
-    cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
   }
 
-  void generateFlowAwareEncodings();
-  std::map<std::string, Vector> opcMap;
+  void generateFlowAwareEncodings(std::ostream &o, std::ostream &missCount,
+                                  std::ostream &cyclicCount);
+  std::map<std::string, IR2Vec::Vector> opcMap;
 
-  SmallDenseMap<const Instruction *, Vector> getInstVecMap() {
+  llvm::SmallDenseMap<const llvm::Instruction *, IR2Vec::Vector>
+  getInstVecMap() {
     return instVecMap;
   }
 };

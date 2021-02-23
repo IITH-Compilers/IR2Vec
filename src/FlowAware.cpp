@@ -93,7 +93,9 @@ Vector IR2Vec_FA::getValue(std::string key) {
   return vec;
 }
 
-void IR2Vec_FA::generateFlowAwareEncodings() {
+void IR2Vec_FA::generateFlowAwareEncodings(std::ostream &o,
+                                           std::ostream &missCount,
+                                           std::ostream &cyclicCount) {
   collectWriteDefsMap(M);
 
   int noOfFunc = 0;

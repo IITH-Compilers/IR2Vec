@@ -20,6 +20,7 @@
 #include <queue>
 
 using namespace llvm;
+using namespace IR2Vec;
 using abi::__cxa_demangle;
 
 Vector IR2Vec_Symbolic::getValue(std::string key) {
@@ -31,7 +32,7 @@ Vector IR2Vec_Symbolic::getValue(std::string key) {
   return vec;
 }
 
-void IR2Vec_Symbolic::generateSymbolicEncodings() {
+void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream &o) {
   int noOfFunc = 0;
 
   for (auto &f : M) {
