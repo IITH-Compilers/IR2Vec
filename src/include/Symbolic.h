@@ -9,6 +9,7 @@
 
 #include "utils.h"
 
+#include "llvm/ADT/MapVector.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
@@ -29,7 +30,7 @@ private:
   IR2Vec::Vector func2Vec(llvm::Function &F,
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
   std::string res;
-  llvm::SmallDenseMap<llvm::Function *, IR2Vec::Vector> funcVecMap;
+  llvm::SmallMapVector<llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
   std::map<std::string, IR2Vec::Vector> opcMap;
 
 public:
