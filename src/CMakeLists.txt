@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(ir2vec VERSION 0.1.0)
+project(ir2vec VERSION 1.0.0)
 
 set(IR2VEC_LIB "IR2Vec")
 set(IR2VEC_LIB_STATIC "IR2Vec_Static")
