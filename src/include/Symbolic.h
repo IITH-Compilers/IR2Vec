@@ -7,41 +7,39 @@
 #ifndef __IR2Vec_Symbolic_H__
 #define __IR2Vec_Symbolic_H__
 
-#include "IR2Vec.h"
+#include "utils.h"
+
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 
 #include <fstream>
 #include <map>
-using namespace llvm;
-using namespace IR2Vec;
 
 class IR2Vec_Symbolic {
 
 private:
-  Module &M;
-  Vector pgmVector;
+  llvm::Module &M;
+  IR2Vec::Vector pgmVector;
 
-  Vector getValue(std::string key);
-  Vector bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack);
-  Vector func2Vec(Function &F, SmallVector<Function *, 15> &funcStack);
-  std::ofstream o;
+  IR2Vec::Vector getValue(std::string key);
+  IR2Vec::Vector bb2Vec(llvm::BasicBlock &B,
+                        llvm::SmallVector<llvm::Function *, 15> &funcStack);
+  IR2Vec::Vector func2Vec(llvm::Function &F,
+                          llvm::SmallVector<llvm::Function *, 15> &funcStack);
   std::string res;
-  SmallDenseMap<Function *, Vector> funcVecMap;
-  std::map<std::string, Vector> opcMap;
+  llvm::SmallDenseMap<llvm::Function *, IR2Vec::Vector> funcVecMap;
+  std::map<std::string, IR2Vec::Vector> opcMap;
 
 public:
-  IR2Vec_Symbolic(std::unique_ptr<llvm::Module> &M) : M{*M} {
-    pgmVector = Vector(DIM, 0);
+  IR2Vec_Symbolic(llvm::Module &M) : M{M} {
+    pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
-    o.open(oname, std::ios_base::app);
-    collectDataFromVocab(vocab, opcMap);
+    IR2Vec::collectDataFromVocab(opcMap);
   }
 
-  void generateSymbolicEncodings();
+  void generateSymbolicEncodings(std::ostream &o);
 };
 
 #endif

@@ -36,4 +36,6 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: ir2vec
-        path: build/bin/ir2vec
+        path: |
+          build/bin
+          build/lib

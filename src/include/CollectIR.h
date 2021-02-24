@@ -7,36 +7,26 @@
 #ifndef __COLLECT_IR__
 #define __COLLECT_IR__
 
-#include "IR2Vec.h"
+#include "utils.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/Pass.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 #include <fstream>
 #include <map>
-
-using namespace llvm;
-using namespace IR2Vec;
 
 class CollectIR {
 
 private:
   void collectData();
-  std::ofstream out;
   std::string res;
-  Module &M;
+  llvm::Module &M;
 
-  void traverseBasicBlock(BasicBlock &B);
+  void traverseBasicBlock(llvm::BasicBlock &B);
 
 public:
-  CollectIR(std::unique_ptr<llvm::Module> &M) : M{*M} {
-    res = "";
-    out.open(oname, std::ios_base::app);
-  }
+  CollectIR(std::unique_ptr<llvm::Module> &M) : M{*M} { res = ""; }
 
-  ~CollectIR() { out << res; }
-
-  void generateTriplets();
+  void generateTriplets(std::ostream &out);
 };
 
 #endif

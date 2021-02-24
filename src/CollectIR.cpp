@@ -15,10 +15,11 @@
 
 using namespace llvm;
 
-void CollectIR::generateTriplets() {
+void CollectIR::generateTriplets(std::ostream &out) {
   for (Function &F : M)
     for (BasicBlock &B : F)
       traverseBasicBlock(B);
+  out << res;
 }
 
 void CollectIR::traverseBasicBlock(BasicBlock &B) {

@@ -48,7 +48,7 @@ then
     d=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP}/${VIR_FILE}))
     if [ "$d" == "" ]
     then
-        echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version are Indentical.${NC}"
+        echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version are Identical.${NC}"
         exit 0
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version are Different.${NC}"
