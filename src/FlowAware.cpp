@@ -93,9 +93,9 @@ Vector IR2Vec_FA::getValue(std::string key) {
   return vec;
 }
 
-void IR2Vec_FA::generateFlowAwareEncodings(std::ostream &o,
-                                           std::ostream &missCount,
-                                           std::ostream &cyclicCount) {
+void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
+                                           std::ostream *missCount,
+                                           std::ostream *cyclicCount) {
   collectWriteDefsMap(M);
 
   int noOfFunc = 0;
@@ -139,10 +139,10 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream &o,
         noOfFunc++;
       }
 
-      else if (level == 'p') {
-        std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
-                       pgmVector.begin(), std::plus<double>());
-      }
+      // else if (level == 'p') {
+      std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
+                     pgmVector.begin(), std::plus<double>());
+      // }
     }
   }
 
@@ -159,14 +159,18 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream &o,
     res += "\n";
   }
 
-  o << res;
+  if (o)
+    *o << res;
 
-  std::string missEntry =
-      (M.getSourceFileName() + "\t" + std::to_string(dataMissCounter) + "\n");
-  missCount << missEntry;
+  if (missCount) {
+    std::string missEntry =
+        (M.getSourceFileName() + "\t" + std::to_string(dataMissCounter) + "\n");
+    *missCount << missEntry;
+  }
 
-  cyclicCount << (M.getSourceFileName() + "\t" + std::to_string(cyclicCounter) +
-                  "\n");
+  if (cyclicCount)
+    *cyclicCount << (M.getSourceFileName() + "\t" +
+                     std::to_string(cyclicCounter) + "\n");
 }
 
 Vector IR2Vec_FA::func2Vec(Function &F,
@@ -873,7 +877,7 @@ void IR2Vec_FA::inst2Vec(
                           << "\t";
                    xI[i]->print(outs()); outs() << "\nVAL: " << tmp[0] << "\n");
 
-      instVecMap.try_emplace(xI[i], tmp);
+      instVecMap[xI[i]] = tmp;
       livelinessMap.try_emplace(xI[i], true);
 
       instSolvedBySolver.push_back(xI[i]);
@@ -899,7 +903,7 @@ void IR2Vec_FA::inst2Vec(
   }
 
   else {
-    instVecMap.try_emplace(&I, instVector);
+    instVecMap[&I] = instVector;
     livelinessMap.try_emplace(&I, true);
 
     // kill and update

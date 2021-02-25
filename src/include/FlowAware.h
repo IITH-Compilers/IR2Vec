@@ -29,11 +29,12 @@ private:
   unsigned cyclicCounter;
 
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
-  llvm::SmallDenseMap<const llvm::Instruction *, IR2Vec::Vector> instVecMap;
   llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memAccessOps;
 
-  llvm::SmallMapVector<llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
+  llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
+      instVecMap;
+  llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
 
   llvm::SmallMapVector<const llvm::Instruction *,
                        llvm::SmallVector<const llvm::Instruction *, 10>, 16>
@@ -86,14 +87,22 @@ public:
     cyclicCounter = 0;
   }
 
-  void generateFlowAwareEncodings(std::ostream &o, std::ostream &missCount,
-                                  std::ostream &cyclicCount);
+  void generateFlowAwareEncodings(std::ostream *o = nullptr,
+                                  std::ostream *missCount = nullptr,
+                                  std::ostream *cyclicCount = nullptr);
   std::map<std::string, IR2Vec::Vector> opcMap;
 
-  llvm::SmallDenseMap<const llvm::Instruction *, IR2Vec::Vector>
+  llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {
     return instVecMap;
   }
+
+  llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
+  getFuncVecMap() {
+    return funcVecMap;
+  }
+
+  IR2Vec::Vector getProgramVector() { return pgmVector; }
 };
 
 #endif

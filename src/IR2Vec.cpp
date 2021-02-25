@@ -120,14 +120,14 @@ int main(int argc, char **argv) {
     o.open(oname, std::ios_base::app);
     missCount.open("missCount_" + oname, std::ios_base::app);
     cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
-    FA.generateFlowAwareEncodings(o, missCount, cyclicCount);
+    FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
   }
 
   else if (sym) {
     IR2Vec_Symbolic SYM(*M);
     std::ofstream o;
     o.open(oname, std::ios_base::app);
-    SYM.generateSymbolicEncodings(o);
+    SYM.generateSymbolicEncodings(&o);
   }
 
   else if (collectIR) {

@@ -32,7 +32,7 @@ Vector IR2Vec_Symbolic::getValue(std::string key) {
   return vec;
 }
 
-void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream &o) {
+void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
   int noOfFunc = 0;
 
   for (auto &f : M) {
@@ -73,12 +73,14 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream &o) {
         noOfFunc++;
       }
 
-      else if (level == 'p') {
-        std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
-                       pgmVector.begin(), std::plus<double>());
-      }
+      // else if (level == 'p') {
+      std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
+                     pgmVector.begin(), std::plus<double>());
+
+      // }
     }
   }
+
   IR2VEC_DEBUG(errs() << "Number of functions written = " << noOfFunc << "\n");
 
   if (level == 'p') {
@@ -94,7 +96,9 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream &o) {
     res += "\n";
   }
 
-  o << res;
+  if (o)
+    *o << res;
+
   IR2VEC_DEBUG(errs() << "class = " << cls << "\n");
   IR2VEC_DEBUG(errs() << "res = " << res);
 }
@@ -212,6 +216,7 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
 
       std::transform(instVector.begin(), instVector.end(), vec.begin(),
                      instVector.begin(), std::plus<double>());
+      instVecMap[&I] = instVector;
     }
     std::transform(bbVector.begin(), bbVector.end(), instVector.begin(),
                    bbVector.begin(), std::plus<double>());
