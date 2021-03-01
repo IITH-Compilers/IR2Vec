@@ -18,7 +18,7 @@ using Vector = llvm::SmallVector<double, DIM>;
 
 enum IR2VecMode { FlowAware, Symbolic };
 
-class IR2VecTy {
+class Embeddings {
   int generateEncodings(llvm::Module &M, IR2VecMode mode, std::string vocab,
                         char level = '\0', std::ostream *o = nullptr,
                         int cls = -1, float WO = 1, float WA = 0.2,
@@ -29,26 +29,36 @@ class IR2VecTy {
   Vector pgmVector;
 
 public:
-  IR2VecTy(llvm::Module &M, IR2VecMode mode, std::string vocab, float WO = 1,
-           float WA = 0.2, float WT = 0.5) {
+  Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab, float WO = 1,
+             float WA = 0.2, float WT = 0.5) {
     generateEncodings(M, mode, vocab, '\0', nullptr, -1, WO, WA, WT);
   }
 
-  IR2VecTy(llvm::Module &M, IR2VecMode mode, std::string vocab, char level,
-           std::ostream *o, float WO = 1, float WA = 0.2, float WT = 0.5) {
+  // Use this constructor if the representations ought to be written to a file.
+  // Analogous to the command line options that are being used in IR2Vec binary.
+  Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab, char level,
+             std::ostream *o, float WO = 1, float WA = 0.2, float WT = 0.5) {
     generateEncodings(M, mode, vocab, level, o, -1, WO, WA, WT);
   }
 
+  // Returns a map containing instructions and the corresponding vector
+  // representations for a given module corresponding to the IR2VecMode and
+  // other configurations that is set in constructor
   llvm::SmallMapVector<const llvm::Instruction *, Vector, 128> &
   getInstVecMap() {
     return instVecMap;
   }
 
+  // Returns a map containing functions and the corresponding vector
+  // representations for a given module corresponding to the IR2VecMode and
+  // other configurations that is set in constructor
   llvm::SmallMapVector<const llvm::Function *, Vector, 16> &
   getFunctionVecMap() {
     return funcVecMap;
   }
 
+  // Returns the program vector for a module corresponding to the IR2VecMode
+  // and other configurations that is set in constructor
   Vector &getProgramVector() { return pgmVector; }
 };
 

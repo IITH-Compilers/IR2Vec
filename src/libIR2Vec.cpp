@@ -12,11 +12,11 @@
 
 #include "llvm/IR/Module.h"
 
-int IR2Vec::IR2VecTy::generateEncodings(llvm::Module &M,
-                                        IR2Vec::IR2VecMode mode,
-                                        std::string vocab, char level,
-                                        std::ostream *o, int cls, float WO,
-                                        float WA, float WT) {
+int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
+                                          IR2Vec::IR2VecMode mode,
+                                          std::string vocab, char level,
+                                          std::ostream *o, int cls, float WO,
+                                          float WA, float WT) {
   IR2Vec::vocab = vocab;
   IR2Vec::level = level;
   IR2Vec::cls = cls;
