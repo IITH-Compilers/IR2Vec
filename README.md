@@ -115,6 +115,44 @@ target_link_libraries(<your_executable_or_library> PUBLIC ${IR2VEC_INSTALL_DIR}/
 
 And then pass the location of IR2Vec's install prefix to `DIR2VEC_INSTALL_DIR` during cmake.
 
+The following example snippet shows how to query the exposed vector representations.
+
+```c++
+#include "IR2Vec.h"
+
+// Creating object to generate FlowAware representation
+auto ir2vec =
+      IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware,
+                         "./vocabulary/seedEmbeddingVocab-300-llvm10.txt");
+
+// Getting Instruction vectors corresponding to the instructions in <LLVM Module>
+auto instVecMap = ir2vec.getInstVecMap();
+// Access the generated vectors
+for (auto instVec : instVecMap) {
+    outs() << "Instruction : ";
+    instVec.first->print(outs());
+    outs() << ": ";
+
+    for (auto val : instVec.second)
+      outs() << val << "\t";
+}
+
+// Getting vectors corresponding to the functions in <LLVM Module>
+auto funcVecMap = ir2vec.getFunctionVecMap();
+// Access the generated vectors
+for (auto funcVec : funcVecMap) {
+    outs() << "Function : " << funcVec.first->getName() << "\n";
+    for (auto val : funcVec.second)
+      outs() << val << "\t";
+  }
+
+// Getting the program vector
+auto pgmVec = ir2vec.getProgramVector();
+// Access the generated vector
+for (auto val : pgmVec)
+    outs() << val << "\t";
+```
+
 ## Experiments
 
 ### Note
