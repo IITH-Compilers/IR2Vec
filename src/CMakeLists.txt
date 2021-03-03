@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ir2vec VERSION 1.0.0)
+project(ir2vec VERSION 1.0.1)
 
 set(IR2VEC_LIB "IR2Vec")
 set(IR2VEC_LIB_STATIC "IR2Vec_Static")
@@ -27,11 +27,12 @@ set(CMAKE_CXX_STANDARD 14 CACHE STRING "")
 if(NOT LLVM_ENABLE_RTTI)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
-set(CMAKE_CXX_FLAGS " -g")
 
 set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
+
+file(GLOB RESOURCE_FILES ../vocabulary/**.txt)
 
 # llvm_map_components_to_libnames(llvm_libs all)
 llvm_map_components_to_libnames(llvm_libs support core irreader analysis)
@@ -50,13 +51,16 @@ set_target_properties(${IR2VEC_LIB} ${IR2VEC_LIB_STATIC} PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
     PUBLIC_HEADER "./include/IR2Vec.h"
+    RESOURCE ${RESOURCE_FILES}
     OUTPUT_NAME ${IR2VEC_LIB}
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    )
 
 install(TARGETS ${IR2VEC_LIB} ${IR2VEC_LIB_STATIC}
     LIBRARY DESTINATION lib
-    PUBLIC_HEADER DESTINATION include)
+    PUBLIC_HEADER DESTINATION include
+    RESOURCE DESTINATION ./)
 
 add_subdirectory(test-suite)
 
