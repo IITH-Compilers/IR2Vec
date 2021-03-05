@@ -61,7 +61,7 @@ oauthlib=3.1.0=py_0
 openssl=1.1.1h=h516909a_0
 opt_einsum=3.1.0=py_0
 pip=20.2.3=py37_0
-pre-commit=2.10.1=py37h89c1867_0
+pre-commit=2.9.3=py37h89c1867_0
 protobuf=3.13.0=py37hf484d3e_1
 pyasn1=0.4.8=py_0
 pyasn1-modules=0.2.8=py_0
