@@ -581,7 +581,7 @@ void IR2Vec_FA::inst2Vec(
 
   Vector instVector(DIM, 0);
   StringRef opcodeName = I.getOpcodeName();
-  auto vec = getValue(opcodeName);
+  auto vec = getValue(opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
