@@ -30,6 +30,13 @@ if [ -z $4 ]; then
 	exit
 fi
 
+LLVM_BUILD=$5
+
+if [ -z $LLVM_BUILD ]; then
+	echo "5st arg should have a valid Build path"
+	exit
+fi
+
 i=0
 while read p; do
 	let "i++"
@@ -39,8 +46,8 @@ while read p; do
 	OPT_LEVELS=("O0" "O1" "O2" "O3" "Os" "Oz")
 	a=0
 	USED_OPT=()
-	tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXX)
 	while [ "$a" -lt "$NO_OF_OPT_FILES" ]; do # this is loop1
+	    tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXXXXXX)
 		opt_index=$((RANDOM % 6))
 		echo "opt_index from $opt_index"
 		opt=${OPT_LEVELS[$opt_index]}
@@ -57,11 +64,11 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		echo "opt from $opt"
-		opt-8 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
+	    rm "$tmpfile"
 	done &
-	rm "$tmpfile"
 done <$3
 
 wait
