@@ -27,7 +27,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (0) - [src](https://github.com/llvm/llvm-project/tree/release/12.x), [release](https://releases.llvm.org/download.html#10.0.1)
+* LLVM (12.0.0) - [src](https://github.com/llvm/llvm-project/tree/release/12.x), [release](https://releases.llvm.org/download.html#12.0.0)
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7)
 * Python (3.6.7)
