@@ -65,7 +65,7 @@ install(TARGETS ${IR2VEC_LIB} ${IR2VEC_LIB_STATIC}
 add_subdirectory(test-suite)
 
 add_custom_target(verify-symbolic
- COMMAND bash ./sanity_check.sh SYM llvm10
+ COMMAND bash ./sanity_check.sh SYM llvm12
  COMMENT "Generating Symbolic IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
  DEPENDS ${PROJECT_NAME}
@@ -73,7 +73,7 @@ add_custom_target(verify-symbolic
  )
 
 add_custom_target(verify-flowaware
- COMMAND bash sanity_check.sh FA llvm10
+ COMMAND bash sanity_check.sh FA llvm12
  COMMENT "Generating Flow-Aware IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
  DEPENDS ${PROJECT_NAME}

@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install LLVM-10.0.1
-      run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main" && sudo apt-get update && sudo apt-get install -y llvm-10 llvm-10-dev clang-10
+    - name: Install LLVM-12.0.0
+      run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-12 main" && sudo apt-get update && sudo apt-get install -y llvm-12 llvm-12-dev clang-12
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |
