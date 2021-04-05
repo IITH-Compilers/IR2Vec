@@ -17,7 +17,7 @@ import os
 def getEntityDict(config):
     ip = open(str(config.tripletFile), "r")
     content = ip.read()
-    uniqueWords = set(content.split())
+    uniqueWords = sorted(set(content.split()))
     ip.close()
 
     op = open(os.path.join(os.path.dirname(config.tripletFile), "entity2id.txt"), "w")
