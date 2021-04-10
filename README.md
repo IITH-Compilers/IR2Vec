@@ -99,7 +99,7 @@ Please use `--help` for further details.
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
 The interfaces are available in [`IR2Vec.h`](./src/include/IR2Vec.h). External projects that would like to use `IR2Vec` can access the functionality
-using these exposed interfaces on including `IR2Vec.h` from the installed location after linking statically or dynamically.
+using these exposed interfaces on including `IR2Vec.h` from the installed location after linking statically or dynamically. If the `IR2Vec` functionality needs to be used in an in-tree LLVM pass, follow the CMake template [here](https://github.com/IITH-Compilers/IR2Vec/llvm-pass-template).
 
 * If the project does not use LLVM, LLVM dependencies have to be linked and included separately.
 * Please ensure that the IR2Vec libraries are compiled with compatible LLVM.
