@@ -20,7 +20,7 @@ jobs:
     - name: Install LLVM-10.0.1
       run: |
           wget https://apt.llvm.org/llvm.sh
-          bash llvm.sh 10
+          sudo bash llvm.sh 10
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |
