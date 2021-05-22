@@ -40,7 +40,18 @@ private:
                        llvm::SmallVector<const llvm::Instruction *, 10>, 16>
       writeDefsMap;
 
+  llvm::SmallMapVector<const llvm::Instruction *,
+                       llvm::SmallVector<const llvm::Instruction *, 10>, 16>
+      instReachingDefsMap;
+
   llvm::SmallVector<const llvm::Instruction *, 20> instSolvedBySolver;
+
+  llvm::SmallVector<llvm::SmallVector<const llvm::Instruction *, 10>, 10>
+      allSCCs;
+
+
+
+  void getAllSCC();
 
   IR2Vec::Vector getValue(std::string key);
   void collectWriteDefsMap(const llvm::Module &M);
@@ -52,9 +63,17 @@ private:
   getReachingDefs(const llvm::Instruction *, unsigned i);
 
   void inst2Vec(const llvm::Instruction &I,
+                llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
+                                     16> &instValMap);
+
+  void inst2Vec(const llvm::Instruction &I,
                 llvm::SmallVector<llvm::Function *, 15> &funcStack,
                 llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
                                      16> &instValMap);
+
+  void traverseRD(const llvm::Instruction *inst,
+             std::vector<std::pair<const llvm::Instruction *, bool>> &Visited,
+             llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
 
   void bb2Vec(llvm::BasicBlock &B,
               llvm::SmallVector<llvm::Function *, 15> &funcStack);

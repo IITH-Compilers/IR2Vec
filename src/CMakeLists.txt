@@ -4,10 +4,12 @@ project(ir2vec VERSION 1.0.1)
 set(IR2VEC_LIB "IR2Vec")
 set(IR2VEC_LIB_STATIC "IR2Vec_Static")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
 list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
-find_package(LLVM 10.0.1 REQUIRED CONFIG)
+find_package(LLVM 10.0.0 REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
