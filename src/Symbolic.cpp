@@ -247,10 +247,10 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
       Vector vec;
       if (isa<Function>(I.getOperand(i))) {
         vec = getValue("function");
-      } else if (isa<Constant>(I.getOperand(i))) {
-        vec = getValue("constant");
       } else if (isa<PointerType>(I.getOperand(i)->getType())) {
         vec = getValue("pointer");
+      } else if (isa<Constant>(I.getOperand(i))) {
+        vec = getValue("constant");
       } else {
         vec = getValue("variable");
       }
