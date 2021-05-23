@@ -88,6 +88,9 @@ class Config(object):
         self.optimizer = None
         self.test_link_prediction = False
         self.test_triple_classification = False
+        self.early_stopping = (
+            None
+        )  # It expects a tuple of the following: (patience, min_delta)
 
     def init_link_prediction(self):
         r"""
@@ -259,6 +262,9 @@ class Config(object):
     def set_export_steps(self, steps):
         self.export_steps = steps
 
+    def set_early_stopping(self, early_stopping):
+        self.early_stopping = early_stopping
+
     # call C function for sampling
     def sampling(self):
         self.lib.sampling(
@@ -281,7 +287,7 @@ class Config(object):
     def restore_tensorflow(self):
         with self.graph.as_default():
             with self.sess.as_default():
-                self.saver.restore(self.sess, self.importName)
+                self.ckpt.restore(tf.train.latest_checkpoint("./res"))
 
     def export_variables(self, path=None):
         with self.graph.as_default():
@@ -331,7 +337,7 @@ class Config(object):
         with self.graph.as_default():
             with self.sess.as_default():
                 if var_name in self.trainModel.parameter_lists:
-                    self.trainModel.parameter_lists[var_name].assign(tensor).eval()
+                    self.trainModel.parameter_lists[var_name] = tensor
 
     def set_parameters(self, lists):
         for i in lists:
@@ -341,29 +347,40 @@ class Config(object):
         self.model = model
         self.graph = tf.Graph()
         with self.graph.as_default():
-            self.sess = tf.Session()
+            self.sess = tf.compat.v1.Session()
             with self.sess.as_default():
-                initializer = tf.contrib.layers.xavier_initializer(uniform=True)
-                with tf.variable_scope("model", reuse=None, initializer=initializer):
+                initializer = tf.compat.v1.keras.initializers.VarianceScaling(
+                    scale=1.0,
+                    mode="fan_avg",
+                    distribution=("uniform" if True else "truncated_normal"),
+                )
+                with tf.compat.v1.variable_scope(
+                    "model", reuse=None, initializer=initializer
+                ):
                     self.trainModel = self.model(config=self)
                     if self.optimizer != None:
                         pass
                     elif self.opt_method == "Adagrad" or self.opt_method == "adagrad":
-                        self.optimizer = tf.train.AdagradOptimizer(
+                        self.optimizer = tf.keras.optimizers.Adagrad(
                             learning_rate=self.alpha, initial_accumulator_value=1e-20
                         )
                     elif self.opt_method == "Adadelta" or self.opt_method == "adadelta":
-                        self.optimizer = tf.train.AdadeltaOptimizer(self.alpha)
+                        self.optimizer = tf.keras.optimizers.Adadelta(self.alpha)
                     elif self.opt_method == "Adam" or self.opt_method == "adam":
-                        self.optimizer = tf.train.AdamOptimizer(self.alpha)
+                        self.optimizer = tf.keras.optimizers.Adam(self.alpha)
                     else:
-                        self.optimizer = tf.train.GradientDescentOptimizer(self.alpha)
-                    grads_and_vars = self.optimizer.compute_gradients(
-                        self.trainModel.loss
+                        self.optimizer = tf.keras.optimizers.SGD(self.alpha)
+                    grads_and_vars = self.optimizer.get_gradients(
+                        self.trainModel.loss, self.trainModel.trainable_variables
                     )
-                    self.train_op = self.optimizer.apply_gradients(grads_and_vars)
-                self.saver = tf.train.Saver()
-                self.sess.run(tf.initialize_all_variables())
+                    self.train_op = self.optimizer.apply_gradients(
+                        zip(grads_and_vars, self.trainModel.trainable_variables)
+                    )
+                self.saver = tf.compat.v1.train.Saver()
+                self.ckpt = tf.train.Checkpoint(
+                    optimizer=self.optimizer, model=self.trainModel
+                )
+                self.sess.run(tf.compat.v1.global_variables_initializer())
 
     def train_step(self, batch_h, batch_t, batch_r, batch_y):
         feed_dict = {
@@ -387,24 +404,50 @@ class Config(object):
     def run(self):
         with self.graph.as_default():
             with self.sess.as_default():
+
                 if self.importName != None:
                     self.restore_tensorflow()
+                if self.early_stopping is not None:
+                    patience, min_delta = self.early_stopping
+                    best_loss = np.finfo("float32").max
+                    wait_steps = 0
                 for times in range(self.train_times):
-                    res = 0.0
+                    loss = 0.0
+                    t_init = time.time()
+                    step = 0
                     for batch in range(self.nbatches):
+                        step = step + 1
                         self.sampling()
-                        res += self.train_step(
+                        loss += self.train_step(
                             self.batch_h, self.batch_t, self.batch_r, self.batch_y
                         )
+                    t_end = time.time()
                     if self.log_on:
-                        print(times)
-                        print(res)
+                        print(
+                            "Epoch: {}, loss: {}, time: {}".format(
+                                times, loss, (t_end - t_init)
+                            )
+                        )
                     if self.exportName != None and (
                         self.export_steps != 0 and times % self.export_steps == 0
                     ):
                         self.save_tensorflow()
+                    if self.early_stopping is not None:
+                        if loss + min_delta < best_loss:
+                            best_loss = loss
+                            wait_steps = 0
+                        elif wait_steps < patience:
+                            wait_steps += 1
+                        else:
+                            print(
+                                "Early stopping. Losses have not been improved enough in {} times".format(
+                                    patience
+                                )
+                            )
+                            break
                 if self.exportName != None:
                     self.save_tensorflow()
+                    self.ckpt.save(self.exportName + "ckpt")
                 if self.out_path != None:
                     self.save_parameters(self.out_path)
 
