@@ -830,14 +830,13 @@ void IR2Vec_FA::inst2Vec(
     } else if (isa<BasicBlock>(I.getOperand(i))) {
       vecOp = getValue("label");
     } else {
-      if (isa<PointerType>(I.getOperand(i)->getType()))
-        vecOp = getValue("pointer");
-      else
-        vecOp = getValue("variable");
       if (isa<Instruction>(I.getOperand(i))) {
         auto RD = getReachingDefs(&I, i);
         RDList.insert(RDList.end(), RD.begin(), RD.end());
-      }
+      } else if (isa<PointerType>(I.getOperand(i)->getType())) {
+        vecOp = getValue("pointer");
+      } else
+        vecOp = getValue("variable");
     }
 
     std::transform(VecArgs.begin(), VecArgs.end(), vecOp.begin(),
@@ -1005,31 +1004,6 @@ void IR2Vec_FA::inst2Vec(
             IR2VEC_DEBUG(outs() << vec.back() << "\n");
             B.push_back(vec);
           } else {
-            if (isa<PointerType>(inst->getOperand(i)->getType())) {
-              auto svtmp = getValue("pointer");
-              scaleVector(svtmp, WA);
-              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-              std::vector<double> vec = B.back();
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-              B.pop_back();
-              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                             std::plus<double>());
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              B.push_back(vec);
-            } else {
-              auto svtmp = getValue("variable");
-              scaleVector(svtmp, WA);
-              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-              std::vector<double> vec = B.back();
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-              B.pop_back();
-              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                             std::plus<double>());
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              B.push_back(vec);
-            }
             if (isa<Instruction>(inst->getOperand(i))) {
               auto RD = getReachingDefs(inst, i);
               for (auto i : RD) {
@@ -1051,9 +1025,9 @@ void IR2Vec_FA::inst2Vec(
                   auto svtmp = instVecMap[i];
                   scaleVector(svtmp, WA);
                   std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-                  for (auto vecs : vtmp)
-                    outs() << vecs << " ";
-                  outs() << "\n";
+                  // for (auto vecs : vtmp)
+                  //   outs() << vecs << " ";
+                  // outs() << "\n";
                   std::vector<double> vec = B.back();
                   IR2VEC_DEBUG(outs() << vec.back() << "\n");
                   IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
@@ -1064,6 +1038,32 @@ void IR2Vec_FA::inst2Vec(
                   B.push_back(vec);
                 }
               }
+            } else if (isa<PointerType>(I.getOperand(i)->getType())) {
+              auto l = getValue("pointer");
+              auto svtmp = l;
+              scaleVector(svtmp, WA);
+              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+              std::vector<double> vec = B.back();
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+              B.pop_back();
+              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                             std::plus<double>());
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              B.push_back(vec);
+            } else {
+              auto l = getValue("variable");
+              auto svtmp = l;
+              scaleVector(svtmp, WA);
+              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+              std::vector<double> vec = B.back();
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+              B.pop_back();
+              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                             std::plus<double>());
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              B.push_back(vec);
             }
           }
         }
@@ -1254,14 +1254,13 @@ void IR2Vec_FA::inst2Vec(
     } else if (isa<BasicBlock>(I.getOperand(i))) {
       vecOp = getValue("label");
     } else {
-      if (isa<PointerType>(I.getOperand(i)->getType()))
-        vecOp = getValue("pointer");
-      else
-        vecOp = getValue("variable");
       if (isa<Instruction>(I.getOperand(i))) {
         auto RD = getReachingDefs(&I, i);
         RDList.insert(RDList.end(), RD.begin(), RD.end());
-      }
+      } else if (isa<PointerType>(I.getOperand(i)->getType()))
+        vecOp = getValue("pointer");
+      else
+        vecOp = getValue("variable");
     }
 
     std::transform(VecArgs.begin(), VecArgs.end(), vecOp.begin(),
@@ -1414,31 +1413,6 @@ void IR2Vec_FA::inst2Vec(
             IR2VEC_DEBUG(outs() << vec.back() << "\n");
             B.push_back(vec);
           } else {
-            if (isa<PointerType>(inst->getOperand(i)->getType())) {
-              auto svtmp = getValue("pointer");
-              scaleVector(svtmp, WA);
-              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-              std::vector<double> vec = B.back();
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-              B.pop_back();
-              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                             std::plus<double>());
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              B.push_back(vec);
-            } else {
-              auto svtmp = getValue("variable");
-              scaleVector(svtmp, WA);
-              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-              std::vector<double> vec = B.back();
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-              B.pop_back();
-              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                             std::plus<double>());
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              B.push_back(vec);
-            }
             if (isa<Instruction>(inst->getOperand(i))) {
               auto RD = getReachingDefs(inst, i);
               for (auto i : RD) {
@@ -1469,6 +1443,32 @@ void IR2Vec_FA::inst2Vec(
                   B.push_back(vec);
                 }
               }
+            } else if (isa<PointerType>(I.getOperand(i)->getType())) {
+              auto l = getValue("pointer");
+              auto svtmp = l;
+              scaleVector(svtmp, WA);
+              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+              std::vector<double> vec = B.back();
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+              B.pop_back();
+              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                             std::plus<double>());
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              B.push_back(vec);
+            } else {
+              auto l = getValue("variable");
+              auto svtmp = l;
+              scaleVector(svtmp, WA);
+              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+              std::vector<double> vec = B.back();
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+              B.pop_back();
+              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                             std::plus<double>());
+              IR2VEC_DEBUG(outs() << vec.back() << "\n");
+              B.push_back(vec);
             }
           }
         }
