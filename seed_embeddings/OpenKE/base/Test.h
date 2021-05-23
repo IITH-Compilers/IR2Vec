@@ -25,6 +25,27 @@ REAL l3_filter_tot_constrain = 0, l3_tot_constrain = 0, r3_tot_constrain = 0,
      r_filter_tot_constrain = 0, r_filter_rank_constrain = 0,
      r_rank_constrain = 0, r_filter_reci_rank_constrain = 0,
      r_reci_rank_constrain = 0;
+
+extern "C" void initTest() {
+  lastHead = 0;
+  lastTail = 0;
+  l1_filter_tot = 0, l1_tot = 0, r1_tot = 0, r1_filter_tot = 0, l_tot = 0,
+  r_tot = 0, l_filter_rank = 0, l_rank = 0, l_filter_reci_rank = 0,
+  l_reci_rank = 0;
+  l3_filter_tot = 0, l3_tot = 0, r3_tot = 0, r3_filter_tot = 0,
+  l_filter_tot = 0, r_filter_tot = 0, r_filter_rank = 0, r_rank = 0,
+  r_filter_reci_rank = 0, r_reci_rank = 0;
+
+  l1_filter_tot_constrain = 0, l1_tot_constrain = 0, r1_tot_constrain = 0,
+  r1_filter_tot_constrain = 0, l_tot_constrain = 0, r_tot_constrain = 0,
+  l_filter_rank_constrain = 0, l_rank_constrain = 0,
+  l_filter_reci_rank_constrain = 0, l_reci_rank_constrain = 0;
+  l3_filter_tot_constrain = 0, l3_tot_constrain = 0, r3_tot_constrain = 0,
+  r3_filter_tot_constrain = 0, l_filter_tot_constrain = 0,
+  r_filter_tot_constrain = 0, r_filter_rank_constrain = 0, r_rank_constrain = 0,
+  r_filter_reci_rank_constrain = 0, r_reci_rank_constrain = 0;
+}
+
 extern "C" void getHeadBatch(INT *ph, INT *pt, INT *pr) {
   for (INT i = 0; i < entityTotal; i++) {
     ph[i] = i;
@@ -111,10 +132,6 @@ extern "C" void testHead(REAL *con) {
   l_reci_rank_constrain += 1.0 / (l_s_constrain + 1);
 
   lastHead++;
-
-  printf("l_filter_s: %ld\n", l_filter_s);
-  printf("%f %f %f %f \n", l_tot / lastHead, l_filter_tot / lastHead,
-         l_rank / lastHead, l_filter_rank / lastHead);
 }
 
 extern "C" void testTail(REAL *con) {
@@ -185,9 +202,6 @@ extern "C" void testTail(REAL *con) {
   r_reci_rank_constrain += 1.0 / (1 + r_s_constrain);
 
   lastTail++;
-  printf("r_filter_s: %ld\n", r_filter_s);
-  printf("%f %f %f %f\n", r_tot / lastTail, r_filter_tot / lastTail,
-         r_rank / lastTail, r_filter_rank / lastTail);
 }
 
 extern "C" void test_link_prediction() {
@@ -307,14 +321,6 @@ extern "C" void getNegTest() {
     negTestList[i] = testList[i];
     negTestList[i].t = corrupt(testList[i].h, testList[i].r);
   }
-  FILE *fout = fopen((inPath + "test_neg.txt").c_str(), "w");
-  for (INT i = 0; i < testTotal; i++) {
-    fprintf(fout, "%ld\t%ld\t%ld\t%ld\n", testList[i].h, testList[i].t,
-            testList[i].r, INT(1));
-    fprintf(fout, "%ld\t%ld\t%ld\t%ld\n", negTestList[i].h, negTestList[i].t,
-            negTestList[i].r, INT(-1));
-  }
-  fclose(fout);
 }
 
 Triple *negValidList;
@@ -324,14 +330,6 @@ extern "C" void getNegValid() {
     negValidList[i] = validList[i];
     negValidList[i].t = corrupt(validList[i].h, validList[i].r);
   }
-  FILE *fout = fopen((inPath + "valid_neg.txt").c_str(), "w");
-  for (INT i = 0; i < validTotal; i++) {
-    fprintf(fout, "%ld\t%ld\t%ld\t%ld\n", validList[i].h, validList[i].t,
-            validList[i].r, INT(1));
-    fprintf(fout, "%ld\t%ld\t%ld\t%ld\n", negValidList[i].h, negValidList[i].t,
-            negValidList[i].r, INT(-1));
-  }
-  fclose(fout);
 }
 
 extern "C" void getTestBatch(INT *ph, INT *pt, INT *pr, INT *nh, INT *nt,
@@ -359,7 +357,7 @@ extern "C" void getValidBatch(INT *ph, INT *pt, INT *pr, INT *nh, INT *nt,
     nr[i] = negValidList[i].r;
   }
 }
-// REAL* relThresh;
+
 REAL threshEntire;
 extern "C" void getBestThreshold(REAL *relThresh, REAL *score_pos,
                                  REAL *score_neg) {

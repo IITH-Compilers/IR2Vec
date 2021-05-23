@@ -36,16 +36,19 @@ void IR2Vec_FA::getTransitiveUse(
 
   for (auto U : def->users()) {
     if (auto use = dyn_cast<Instruction>(U)) {
-      IR2VEC_DEBUG(outs() << "\nDef " << /* def << */ " ";
-                   def->print(outs(), true); outs() << "\n";);
-      IR2VEC_DEBUG(outs() << "Use " << /* use << */ " ";
-                   use->print(outs(), true); outs() << "\n";);
-      if (isMemOp(use->getOpcodeName(), operandNum, memWriteOps) &&
-          use->getOperand(operandNum) == def) {
-        writeDefsMap[root].push_back(use);
-      } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOps) &&
-                 use->getOperand(operandNum) == def) {
-        getTransitiveUse(root, use, visitedList, toAppend);
+      if (std::find(visitedList.begin(), visitedList.end(), use) ==
+          visitedList.end()) {
+        IR2VEC_DEBUG(outs() << "\nDef " << /* def << */ " ";
+                     def->print(outs(), true); outs() << "\n";);
+        IR2VEC_DEBUG(outs() << "Use " << /* use << */ " ";
+                     use->print(outs(), true); outs() << "\n";);
+        if (isMemOp(use->getOpcodeName(), operandNum, memWriteOps) &&
+            use->getOperand(operandNum) == def) {
+          writeDefsMap[root].push_back(use);
+        } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOps) &&
+                   use->getOperand(operandNum) == def) {
+          getTransitiveUse(root, use, visitedList, toAppend);
+        }
       }
     }
   }

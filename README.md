@@ -187,9 +187,5 @@ keywords = {heterogeneous systems, representation learning, compiler optimizatio
 ## Contributions
 Please feel free to raise issues to file a bug, to pose a question, or to initiate any related discussions. Pull requests are welcome :)
 
-##### Contributors
-1. [S. VenkataKeerthy](https://github.com/svkeerthy)
-2. [Rohit Aggarwal](https://github.com/rohitaggarwal007)
-
 ## License
 IR2Vec is released under a BSD 4-Clause License. See the LICENSE file for more details.
