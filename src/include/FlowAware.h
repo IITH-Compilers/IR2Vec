@@ -27,6 +27,7 @@ private:
   IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
+  const llvm::BasicBlock *toModify = nullptr;
 
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
   llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
@@ -49,8 +50,6 @@ private:
   llvm::SmallVector<llvm::SmallVector<const llvm::Instruction *, 10>, 10>
       allSCCs;
 
-
-
   void getAllSCC();
 
   IR2Vec::Vector getValue(std::string key);
@@ -70,8 +69,11 @@ private:
                 llvm::SmallVector<llvm::Function *, 15> &funcStack,
                 llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
                                      16> &instValMap);
+  llvm::SmallVector<llvm::Instruction *, 16>
+  findUses(llvm::Instruction *def, const llvm::Instruction *targetInst);
 
-  void traverseRD(const llvm::Instruction *inst,
+  void
+  traverseRD(const llvm::Instruction *inst,
              std::vector<std::pair<const llvm::Instruction *, bool>> &Visited,
              llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
 
@@ -80,8 +82,9 @@ private:
   IR2Vec::Vector func2Vec(llvm::Function &F,
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
   void transitiveKillAndUpdate(llvm::Instruction *I, IR2Vec::Vector val,
-                               bool avg = false);
-  void killAndUpdate(llvm::Instruction *I, IR2Vec::Vector val);
+                               bool kill = false, bool avg = false);
+  void killAndUpdate(llvm::Instruction *I, IR2Vec::Vector val,
+                     bool kill = false);
   bool isMemOp(llvm::StringRef opcode, unsigned &operand,
                llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
   std::string splitAndPipeFunctionName(std::string s);
