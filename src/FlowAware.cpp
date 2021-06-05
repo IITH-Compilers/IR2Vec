@@ -367,13 +367,16 @@ Vector IR2Vec_FA::func2Vec(Function &F,
         if (!uselist.empty()) {
           auto killdef = uselist.back();
           // outs() << *killdef << "\n";
-          auto It1 = instVecMap.find(killdef);
-          assert(It1 != instVecMap.end() &&
-                 "Instruction should be defined in map");
-          argToKill = dyn_cast<Instruction>(killdef->getOperand(1));
-          if (argToKill) {
-            prevVec = instVecMap[argToKill];
-            killAndUpdate(argToKill, It1->second, false);
+          if (std::find(component.begin(), component.end(), killdef) ==
+              component.end()) {
+            auto It1 = instVecMap.find(killdef);
+            assert(It1 != instVecMap.end() &&
+                   "Instruction should be defined in map");
+            argToKill = dyn_cast<Instruction>(killdef->getOperand(1));
+            if (argToKill) {
+              prevVec = instVecMap[argToKill];
+              killAndUpdate(argToKill, It1->second, false);
+            }
           }
         }
       }
