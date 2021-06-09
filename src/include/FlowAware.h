@@ -27,7 +27,7 @@ private:
   IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
-  const llvm::BasicBlock *toModify = nullptr;
+  //const llvm::BasicBlock *toModify = nullptr;
 
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
   llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
@@ -61,8 +61,14 @@ private:
   llvm::SmallVector<const llvm::Instruction *, 10>
   getReachingDefs(const llvm::Instruction *, unsigned i);
 
-  void inst2Vec(const llvm::Instruction &I,
+  void solveSingleComponent(const llvm::Instruction &I,
                 llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
+                                     16> &instValMap);
+  void getPartialVec(const llvm::Instruction &I,
+                llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
+                                     16> &instValMap);
+                                     
+  void solveInsts(llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
                                      16> &instValMap);
 
   void inst2Vec(const llvm::Instruction &I,
