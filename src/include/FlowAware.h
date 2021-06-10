@@ -27,7 +27,7 @@ private:
   IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
-  //const llvm::BasicBlock *toModify = nullptr;
+  // const llvm::BasicBlock *toModify = nullptr;
 
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
   llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
@@ -50,6 +50,10 @@ private:
   llvm::SmallVector<llvm::SmallVector<const llvm::Instruction *, 10>, 10>
       allSCCs;
 
+  llvm::SmallMapVector<const llvm::Instruction *,
+                       llvm::SmallVector<llvm::Instruction *, 16>, 16>
+      killMap;
+
   void getAllSCC();
 
   IR2Vec::Vector getValue(std::string key);
@@ -61,23 +65,21 @@ private:
   llvm::SmallVector<const llvm::Instruction *, 10>
   getReachingDefs(const llvm::Instruction *, unsigned i);
 
-  void solveSingleComponent(const llvm::Instruction &I,
-                llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
-                                     16> &instValMap);
+  void solveSingleComponent(
+      const llvm::Instruction &I,
+      llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 16>
+          &instValMap);
   void getPartialVec(const llvm::Instruction &I,
-                llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
-                                     16> &instValMap);
-                                     
-  void solveInsts(llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
-                                     16> &instValMap);
+                     llvm::SmallMapVector<const llvm::Instruction *,
+                                          IR2Vec::Vector, 16> &instValMap);
+
+  void solveInsts(llvm::SmallMapVector<const llvm::Instruction *,
+                                       IR2Vec::Vector, 16> &instValMap);
 
   void inst2Vec(const llvm::Instruction &I,
                 llvm::SmallVector<llvm::Function *, 15> &funcStack,
                 llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
                                      16> &instValMap);
-  llvm::SmallVector<llvm::Instruction *, 16>
-  findUses(llvm::Instruction *def, const llvm::Instruction *targetInst);
-
   void
   traverseRD(const llvm::Instruction *inst,
              std::vector<std::pair<const llvm::Instruction *, bool>> &Visited,
@@ -94,6 +96,11 @@ private:
   bool isMemOp(llvm::StringRef opcode, unsigned &operand,
                llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
   std::string splitAndPipeFunctionName(std::string s);
+
+  void TransitiveReads(llvm::SmallVector<llvm::Instruction *, 16> &Killlist,
+                       llvm::Instruction *Inst, llvm::BasicBlock *ParentBB);
+  llvm::SmallVector<llvm::Instruction *, 16>
+  createKilllist(llvm::Instruction *Arg, llvm::Instruction *writeInst);
 
   // For Debugging
   void print(IR2Vec::Vector t, unsigned pos) { llvm::outs() << t[pos]; }

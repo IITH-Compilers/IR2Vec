@@ -204,39 +204,49 @@ std::vector<int> topoOrder(std::map<int, std::vector<int>> adjList, int size) {
   return visitStack;
 }
 
-SmallVector<Instruction *, 16>
-findKillist(SmallVector<Instruction *, 16> uselist,
-            const Instruction *targetInst) {
-  SmallVector<Instruction *, 16> KillList;
+void IR2Vec_FA::TransitiveReads(SmallVector<Instruction *, 16> &Killlist,
+                                Instruction *Inst, BasicBlock *ParentBB) {
+  assert(Inst != nullptr);
+  unsigned operandNum;
+  bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOps);
 
-  for (auto I = uselist.rbegin(); I != uselist.rend(); I++) {
-    if (*I == targetInst)
-      break;
-    KillList.push_back(*I);
-  }
-  return KillList;
+  if (!isMemAccess)
+    return;
+  auto parentI = dyn_cast<Instruction>(Inst->getOperand(operandNum));
+  if (parentI == nullptr)
+    return;
+  if (ParentBB == parentI->getParent())
+    Killlist.push_back(parentI);
+  TransitiveReads(Killlist, parentI, ParentBB);
 }
 
 SmallVector<Instruction *, 16>
-IR2Vec_FA::findUses(Instruction *def, const Instruction *targetInst) {
-  SmallVector<Instruction *, 16> lists;
-  for (User *use : def->users()) {
-    if (Instruction *useInst = dyn_cast<Instruction>(use)) {
-      unsigned opnum;
-      if (isMemOp(useInst->getOpcodeName(), opnum, memWriteOps) &&
-          dyn_cast<Instruction>(useInst->getOperand(opnum)) == def) {
+IR2Vec_FA::createKilllist(Instruction *Arg, Instruction *writeInst) {
 
-        auto RD = instReachingDefsMap[targetInst];
-        if (std::find(RD.begin(), RD.end(), useInst) != RD.end())
-          lists.push_back(useInst);
-      } else if (useInst == targetInst) {
-        lists.push_back(useInst);
+  SmallVector<Instruction *, 16> KillList;
+  SmallVector<Instruction *, 16> tempList;
+  BasicBlock *ParentBB = writeInst->getParent();
+
+  unsigned opnum;
+
+  for (User *U : Arg->users()) {
+    if (Instruction *UseInst = dyn_cast<Instruction>(U)) {
+      if (isMemOp(UseInst->getOpcodeName(), opnum, memWriteOps)) {
+        Instruction *OpInst = dyn_cast<Instruction>(UseInst->getOperand(opnum));
+        if (OpInst && OpInst == Arg)
+          tempList.push_back(UseInst);
       }
     }
   }
-  auto killlist = findKillist(lists, targetInst);
 
-  return killlist;
+  for (auto I = tempList.rbegin(); I != tempList.rend(); I++) {
+    if (*I == writeInst)
+      break;
+    if (ParentBB == (*I)->getParent())
+      KillList.push_back(*I);
+  }
+
+  return KillList;
 }
 
 Vector IR2Vec_FA::func2Vec(Function &F,
@@ -254,10 +264,27 @@ Vector IR2Vec_FA::func2Vec(Function &F,
   Vector funcVector(DIM, 0);
   ReversePostOrderTraversal<Function *> RPOT(&F);
 
-  // if (F.getName() == "equal_data")
-  //   outs() << "Found!";
-
-  // outs() << F.getName() << "\n";
+  for (auto *b : RPOT) {
+    unsigned opnum;
+    SmallVector<Instruction *, 16> lists;
+    for (auto &I : *b) {
+      lists.clear();
+      if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
+          dyn_cast<Instruction>(I.getOperand(opnum))) {
+        Instruction *argI = cast<Instruction>(I.getOperand(opnum));
+        // outs() << "Uses of I:" << *parentI << " in: " << I << "\n";
+        // lists.push_back(parentI);
+        lists = createKilllist(argI, &I);
+        TransitiveReads(lists, argI, I.getParent());
+        if (argI->getParent() == I.getParent())
+          lists.push_back(argI);
+        // outs() << "For instruction:" << I << "\n";
+        // for (auto defs : lists)
+        //   outs() << *defs << "\n";
+        killMap[&I] = lists;
+      }
+    }
+  }
 
   for (auto *b : RPOT) {
     for (auto &I : *b) {
@@ -381,19 +408,19 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     IR2VEC_DEBUG(outs() << "-------------------------------------------\n");
     for (auto &I : *b) {
       auto It1 = livelinessMap.find(&I);
-      // if (It1->second == true) {
-      IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
-      // I.print(outs());
-      // outs() << " (" << &I << ") ";
-      // outs() << "\n";
-      auto vec = instVecMap.find(&I)->second;
-      IR2VEC_DEBUG(outs() << vec[0] << "\n\n");
-      // for (auto &vecs : vec)
-      //   outs() << vecs << " ";
-      // outs() << "\n";
-      std::transform(bbVector.begin(), bbVector.end(), vec.begin(),
-                     bbVector.begin(), std::plus<double>());
-      //}
+      if (It1->second == true) {
+        IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
+        // I.print(outs());
+        // outs() << " (" << &I << ") ";
+        // outs() << "\n";
+        auto vec = instVecMap.find(&I)->second;
+        IR2VEC_DEBUG(outs() << vec[0] << "\n\n");
+        // for (auto &vecs : vec)
+        //   outs() << vecs << " ";
+        // outs() << "\n";
+        std::transform(bbVector.begin(), bbVector.end(), vec.begin(),
+                       bbVector.begin(), std::plus<double>());
+      }
     }
 
     // outs() << "Basic Block:" << *b << "\n";
@@ -1057,6 +1084,24 @@ void IR2Vec_FA::solveInsts(
     instSolvedBySolver.push_back(xI[i]);
     bbInstMap[xI[i]->getParent()].push_back(xI[i]);
   }
+
+  for (auto BB : bbInstMap) {
+    unsigned opnum;
+    auto orderedInstVec = BB.second;
+    for (auto I : orderedInstVec) {
+      if (killMap.find(I) != killMap.end()) {
+        // outs() << "For Instruction:" << *I << "\n";
+        auto list = killMap[I];
+        for (auto defs : list) {
+          auto It2 = livelinessMap.find(defs);
+          if (It2 == livelinessMap.end())
+            livelinessMap.try_emplace(defs, false);
+          else
+            It2->second = false;
+        }
+      }
+    }
+  }
 }
 
 /*----------------------------------------------------------------------------------
@@ -1176,6 +1221,18 @@ void IR2Vec_FA::solveSingleComponent(
 
     instVecMap[&I] = instVector;
     livelinessMap.try_emplace(&I, true);
+
+    if (killMap.find(&I) != killMap.end()) {
+      // outs() << "For Instruction:" << I << "\n";
+      auto list = killMap[&I];
+      for (auto defs : list) {
+        auto It2 = livelinessMap.find(defs);
+        if (It2 == livelinessMap.end())
+          livelinessMap.try_emplace(defs, false);
+        else
+          It2->second = false;
+      }
+    }
   }
   assert(isCyclic == false && "A Single Component should not have a cycle!");
 }
@@ -1335,11 +1392,16 @@ void IR2Vec_FA::inst2Vec(
     instVecMap[&I] = instVector;
     livelinessMap.try_emplace(&I, true);
 
-    // kill and update
-    if (isMemWrite && dyn_cast<Instruction>(I.getOperand(operandNum))) {
-      IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
-      killAndUpdate(dyn_cast<Instruction>(I.getOperand(operandNum)),
-                    instVector);
+    if (killMap.find(&I) != killMap.end()) {
+      // outs() << "For Instruction:" << I << "\n";
+      auto list = killMap[&I];
+      for (auto defs : list) {
+        auto It2 = livelinessMap.find(defs);
+        if (It2 == livelinessMap.end())
+          livelinessMap.try_emplace(defs, false);
+        else
+          It2->second = false;
+      }
     }
   }
   assert(isCyclic == false && "All dependencies should have been solved!");
