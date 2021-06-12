@@ -36,6 +36,8 @@ private:
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
+  
+  llvm::SmallMapVector<const llvm::Function *, llvm::SmallVector<const llvm::Function *, 10>, 16> funcCallMap;
 
   llvm::SmallMapVector<const llvm::Instruction *,
                        llvm::SmallVector<const llvm::Instruction *, 10>, 16>
@@ -57,7 +59,7 @@ private:
   void getAllSCC();
 
   IR2Vec::Vector getValue(std::string key);
-  void collectWriteDefsMap(const llvm::Module &M);
+  void collectWriteDefsMap(llvm::Module &M);
   void getTransitiveUse(
       const llvm::Instruction *root, const llvm::Instruction *def,
       llvm::SmallVector<const llvm::Instruction *, 100> &visitedList,
@@ -89,10 +91,7 @@ private:
               llvm::SmallVector<llvm::Function *, 15> &funcStack);
   IR2Vec::Vector func2Vec(llvm::Function &F,
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
-  void transitiveKillAndUpdate(llvm::Instruction *I, IR2Vec::Vector val,
-                               bool kill = false, bool avg = false);
-  void killAndUpdate(llvm::Instruction *I, IR2Vec::Vector val,
-                     bool kill = false);
+  
   bool isMemOp(llvm::StringRef opcode, unsigned &operand,
                llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
   std::string splitAndPipeFunctionName(std::string s);
