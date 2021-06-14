@@ -292,6 +292,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
   if (It != funcVecMap.end()) {
     return It->second;
   }
+
   funcStack.push_back(&F);
 
   instReachingDefsMap.clear();
@@ -336,17 +337,18 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     }
   }
 
-  // for (auto &Inst : instReachingDefsMap) {
-  //   auto RD = Inst.second;
-  //   outs() << "(" << Inst.first << ")";
-  //   Inst.first->print(outs());
-  //   outs() << "\n RD : ";
-  //   for (auto defs : RD) {
-  //     defs->print(outs());
-  //     outs() << "(" << defs << ") ";
-  //   }
-  //   outs() << "\n";
-  // }
+  IR2VEC_DEBUG(for (auto &Inst
+                    : instReachingDefsMap) {
+    auto RD = Inst.second;
+    outs() << "(" << Inst.first << ")";
+    Inst.first->print(outs());
+    outs() << "\n RD : ";
+    for (auto defs : RD) {
+      defs->print(outs());
+      outs() << "(" << defs << ") ";
+    }
+    outs() << "\n";
+  });
 
   getAllSCC();
 
@@ -356,16 +358,16 @@ Vector IR2Vec_FA::func2Vec(Function &F,
               return a.size() < b.size();
             });
 
-  // int i = 0;
-  // for (auto &sets : allSCCs) {
-  //   outs() << "set: " << i << "\n";
-  //   for (auto insts : sets) {
-  //     insts->print(outs());
-  //     outs() << "  " << insts << " ";
-  //   }
-  //   outs() << "\n";
-  //   i++;
-  // }
+  IR2VEC_DEBUG(int i = 0; for (auto &sets
+                               : allSCCs) {
+    outs() << "set: " << i << "\n";
+    for (auto insts : sets) {
+      insts->print(outs());
+      outs() << "  " << insts << " ";
+    }
+    outs() << "\n";
+    i++;
+  });
 
   for (int i = 0; i < allSCCs.size(); i++) {
     auto set = allSCCs[i];
@@ -397,6 +399,17 @@ Vector IR2Vec_FA::func2Vec(Function &F,
   }
 
   auto stack = topoOrder(SCCAdjList, allSCCs.size());
+
+  for (int i = 0; i < allSCCs.size(); i++) {
+    if (std::find(stack.begin(), stack.end(), i) == stack.end()) {
+      stack.insert(stack.begin(), i);
+    }
+  }
+
+  IR2VEC_DEBUG(outs() << "New topo order: \n"; for (auto sets
+                                                    : stack) {
+    outs() << sets << " ";
+  } outs() << "\n";);
 
   SmallVector<double, DIM> prevVec;
   Instruction *argToKill = nullptr;
@@ -1087,8 +1100,15 @@ void IR2Vec_FA::solveSingleComponent(
     for (auto i : RDList) {
       // Check if value of RD is precomputed
       if (instVecMap.find(i) == instVecMap.end()) {
-        assert(instVecMap.find(i) != instVecMap.end() &&
-               "All RDs should have been solved by Topo Order!");
+
+        /*Some phi instructions reach themselves and hence may not be in the
+        instVecMap but should be in the partialInstValMap*/
+
+        if (partialInstValMap.find(i) == partialInstValMap.end()) {
+          assert(partialInstValMap.find(i) != partialInstValMap.end() &&
+                 "Should have been in instvecmap or partialmap");
+        }
+
       } else {
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
@@ -1345,9 +1365,7 @@ void IR2Vec_FA::getAllSCC() {
     }
   }
 
-  // for (auto &defs : timeStack) {
-  //   outs() << defs << "\n";
-  // }
+  IR2VEC_DEBUG(for (auto &defs : timeStack) { outs() << defs << "\n"; });
 
   // Reversing instReachingDefsMap
   llvm::SmallMapVector<const llvm::Instruction *,
