@@ -15,6 +15,7 @@
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
+#include <unordered_map>
 #include "llvm/Support/raw_ostream.h"
 
 #include <fstream>
@@ -84,7 +85,7 @@ private:
                                      16> &instValMap);
   void
   traverseRD(const llvm::Instruction *inst,
-             std::vector<std::pair<const llvm::Instruction *, bool>> &Visited,
+             std::unordered_map<const llvm::Instruction *, bool> &Visited,
              llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
 
   void bb2Vec(llvm::BasicBlock &B,

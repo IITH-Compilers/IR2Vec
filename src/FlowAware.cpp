@@ -6,6 +6,7 @@
 //
 #include "FlowAware.h"
 #include "VectorSolver.h"
+#include "profiler.h"
 
 #include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/ADT/MapVector.h"
@@ -213,7 +214,7 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                      std::to_string(cyclicCounter) + "\n");
 }
 
-void topoDFS(int vertex, std::map<int, std::vector<int>> adjList,
+void topoDFS(int vertex, std::map<int, std::vector<int>> &adjList,
              std::vector<bool> &Visited, std::vector<int> &visitStack) {
 
   Visited[vertex] = true;
@@ -228,7 +229,7 @@ void topoDFS(int vertex, std::map<int, std::vector<int>> adjList,
   visitStack.push_back(vertex);
 }
 
-std::vector<int> topoOrder(std::map<int, std::vector<int>> adjList, int size) {
+std::vector<int> topoOrder(std::map<int, std::vector<int>> &adjList, int size) {
   std::vector<bool> Visited(size, false);
   std::vector<int> visitStack;
 
@@ -350,7 +351,12 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     outs() << "\n";
   });
 
-  getAllSCC();
+  // Profile blocks
+  {
+    // Timer timer;
+    // outs() << "\nGetting SCCs for function:" << F.getName() << " \n";
+    getAllSCC();
+  }
 
   std::sort(allSCCs.begin(), allSCCs.end(),
             [](llvm::SmallVector<const llvm::Instruction *, 10> &a,
@@ -398,7 +404,23 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     }
   }
 
-  auto stack = topoOrder(SCCAdjList, allSCCs.size());
+  // outs() << "\nAdjList:\n";
+  // for (auto &nodes : SCCAdjList) {
+  //   outs() << "Adjlist for: " << nodes.first << "\n";
+  //   for (auto components : nodes.second) {
+  //     outs() << components << " ";
+  //   }
+  //   outs() << "\n";
+  // }
+
+  std::vector<int> stack;
+
+  // Profile blocks
+  {
+    // Timer timer;
+    // outs() << "\nGetting TopoOrder for function:" << F.getName() << " \n";
+    stack = topoOrder(SCCAdjList, allSCCs.size());
+  }
 
   for (int i = 0; i < allSCCs.size(); i++) {
     if (std::find(stack.begin(), stack.end(), i) == stack.end()) {
@@ -1307,20 +1329,21 @@ void IR2Vec_FA::inst2Vec(
 
 void IR2Vec_FA::traverseRD(
     const llvm::Instruction *inst,
-    std::vector<std::pair<const llvm::Instruction *, bool>> &Visited,
+    std::unordered_map<const llvm::Instruction *, bool> &Visited,
     llvm::SmallVector<const llvm::Instruction *, 10> &timeStack) {
 
   auto RDit = instReachingDefsMap.find(inst);
 
-  Visited.push_back(std::make_pair(inst, true));
+  Visited[inst] = true;
 
   if (RDit != instReachingDefsMap.end()) {
 
     auto RD = RDit->second;
 
     for (auto defs : RD) {
-      auto f = std::make_pair(defs, true);
-      if (std::find(Visited.begin(), Visited.end(), f) == Visited.end())
+      // auto f = std::make_pair(defs, true);
+      if (Visited.find(defs) == Visited.end())
+        // if (std::find(Visited.begin(), Visited.end(), f) == Visited.end())
         traverseRD(defs, Visited, timeStack);
     }
   }
@@ -1330,18 +1353,20 @@ void IR2Vec_FA::traverseRD(
 
 void DFSUtil(
     const llvm::Instruction *inst,
-    std::vector<std::pair<const llvm::Instruction *, bool>> &Visited,
+    std::unordered_map<const llvm::Instruction *, bool> &Visited,
     llvm::SmallMapVector<const llvm::Instruction *,
                          llvm::SmallVector<const llvm::Instruction *, 10>, 16>
-        reverseReachingDefsMap,
+        &reverseReachingDefsMap,
     llvm::SmallVector<const llvm::Instruction *, 10> &set) {
 
-  Visited.push_back(std::make_pair(inst, true));
+  // Visited.push_back(std::make_pair(inst, true));
+  Visited[inst] = true;
   auto RD = reverseReachingDefsMap[inst];
 
   for (auto defs : RD) {
-    auto f = std::make_pair(defs, true);
-    if (std::find(Visited.begin(), Visited.end(), f) == Visited.end()) {
+    // auto f = std::make_pair(defs, true);
+    // if (std::find(Visited.begin(), Visited.end(), f) == Visited.end()) {
+    if (Visited.find(defs) == Visited.end()) {
       set.push_back(defs);
       DFSUtil(defs, Visited, reverseReachingDefsMap, set);
     }
@@ -1354,14 +1379,21 @@ void DFSUtil(
 */
 
 void IR2Vec_FA::getAllSCC() {
-  std::vector<std::pair<const llvm::Instruction *, bool>> Visited(
-      instReachingDefsMap.size());
+  // std::vector<std::pair<const llvm::Instruction *, bool>> Visited(
+  // instReachingDefsMap.size());
+  std::unordered_map<const llvm::Instruction *, bool> Visited;
+
   llvm::SmallVector<const llvm::Instruction *, 10> timeStack;
 
-  for (auto &I : instReachingDefsMap) {
-    auto f = std::make_pair(I.first, true);
-    if (std::find(Visited.begin(), Visited.end(), f) == Visited.end()) {
-      traverseRD(I.first, Visited, timeStack);
+  // Profile blocks
+  {
+    // Timer timer;
+    // outs() << "\nTraversing RDs inside getAllSCC:\n";
+    for (auto &I : instReachingDefsMap) {
+      // auto f = std::make_pair(I.first, true);
+      if (Visited.find(I.first) == Visited.end()) {
+        traverseRD(I.first, Visited, timeStack);
+      }
     }
   }
 
@@ -1388,17 +1420,24 @@ void IR2Vec_FA::getAllSCC() {
   }
 
   Visited.clear();
-  // Second pass getting SCCs
-  while (timeStack.size() != 0) {
-    auto inst = timeStack.back();
-    timeStack.pop_back();
-    auto f = std::make_pair(inst, true);
-    if (std::find(Visited.begin(), Visited.end(), f) == Visited.end()) {
-      llvm::SmallVector<const llvm::Instruction *, 10> set;
-      set.push_back(inst);
-      DFSUtil(inst, Visited, reverseReachingDefsMap, set);
-      if (set.size() != 0)
-        allSCCs.push_back(set);
+
+  // Profile blocks
+  {
+    // Timer timer;
+    // outs() << "\n2nd pass inside getAllSCC:\n";
+    // Second pass getting SCCs
+    while (timeStack.size() != 0) {
+      auto inst = timeStack.back();
+      timeStack.pop_back();
+      // auto f = std::make_pair(inst, true);
+      if (Visited.find(inst) == Visited.end()) {
+        // if (std::find(Visited.begin(), Visited.end(), f) == Visited.end()) {
+        llvm::SmallVector<const llvm::Instruction *, 10> set;
+        set.push_back(inst);
+        DFSUtil(inst, Visited, reverseReachingDefsMap, set);
+        if (set.size() != 0)
+          allSCCs.push_back(set);
+      }
     }
   }
 }
