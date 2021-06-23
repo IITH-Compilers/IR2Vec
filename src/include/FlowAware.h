@@ -15,8 +15,8 @@
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
-#include <unordered_map>
 #include "llvm/Support/raw_ostream.h"
+#include <unordered_map>
 
 #include <fstream>
 
@@ -28,7 +28,6 @@ private:
   IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
-  
 
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
   llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
@@ -37,8 +36,10 @@ private:
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
-  
-  llvm::SmallMapVector<const llvm::Function *, llvm::SmallVector<const llvm::Function *, 10>, 16> funcCallMap;
+
+  llvm::SmallMapVector<const llvm::Function *,
+                       llvm::SmallVector<const llvm::Function *, 10>, 16>
+      funcCallMap;
 
   llvm::SmallMapVector<const llvm::Instruction *,
                        llvm::SmallVector<const llvm::Instruction *, 10>, 16>
@@ -48,6 +49,11 @@ private:
                        llvm::SmallVector<const llvm::Instruction *, 10>, 16>
       instReachingDefsMap;
 
+  // Reverse instReachingDefsMap
+  llvm::SmallMapVector<const llvm::Instruction *,
+                       llvm::SmallVector<const llvm::Instruction *, 10>, 16>
+      reverseReachingDefsMap;
+
   llvm::SmallVector<const llvm::Instruction *, 20> instSolvedBySolver;
 
   llvm::SmallVector<llvm::SmallVector<const llvm::Instruction *, 10>, 10>
@@ -56,6 +62,8 @@ private:
   llvm::SmallMapVector<const llvm::Instruction *,
                        llvm::SmallVector<llvm::Instruction *, 16>, 16>
       killMap;
+
+  std::map<int, std::vector<int>> SCCAdjList;
 
   void getAllSCC();
 
@@ -78,21 +86,28 @@ private:
 
   void solveInsts(llvm::SmallMapVector<const llvm::Instruction *,
                                        IR2Vec::Vector, 16> &instValMap);
+  std::vector<int> topoOrder(int size);
+
+  void topoDFS(int vertex, std::vector<bool> &Visited,
+               std::vector<int> &visitStack);
 
   void inst2Vec(const llvm::Instruction &I,
                 llvm::SmallVector<llvm::Function *, 15> &funcStack,
                 llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
                                      16> &instValMap);
-  void
-  traverseRD(const llvm::Instruction *inst,
-             std::unordered_map<const llvm::Instruction *, bool> &Visited,
-             llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
+  void traverseRD(const llvm::Instruction *inst,
+                  std::unordered_map<const llvm::Instruction *, bool> &Visited,
+                  llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
+
+  void DFSUtil(const llvm::Instruction *inst,
+               std::unordered_map<const llvm::Instruction *, bool> &Visited,
+               llvm::SmallVector<const llvm::Instruction *, 10> &set);
 
   void bb2Vec(llvm::BasicBlock &B,
               llvm::SmallVector<llvm::Function *, 15> &funcStack);
   IR2Vec::Vector func2Vec(llvm::Function &F,
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
-  
+
   bool isMemOp(llvm::StringRef opcode, unsigned &operand,
                llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
   std::string splitAndPipeFunctionName(std::string s);
