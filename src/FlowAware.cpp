@@ -454,7 +454,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
       solveSingleComponent(*defs, partialInstValMap);
       partialInstValMap.erase(defs);
     } else {
-      cyclicCounter++; //for components with length more than 1 will represent cycles
+      cyclicCounter++; // for components with length more than 1 will represent
+                       // cycles
       for (auto defs : component) {
         partialInstValMap[defs] = {};
         getPartialVec(*defs, partialInstValMap);
