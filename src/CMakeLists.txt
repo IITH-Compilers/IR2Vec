@@ -4,6 +4,7 @@ project(ir2vec VERSION 2.0.0)
 set(IR2VEC_LIB "IR2Vec")
 set(IR2VEC_LIB_STATIC "IR2Vec_Static")
 
+
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
 list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
@@ -35,7 +36,7 @@ set(binsrc CollectIR.cpp IR2Vec.cpp)
 file(GLOB RESOURCE_FILES ../vocabulary/**.txt)
 
 # llvm_map_components_to_libnames(llvm_libs all)
-llvm_map_components_to_libnames(llvm_libs support core irreader analysis)
+llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
 
 add_executable(${PROJECT_NAME} ${binsrc})
 target_link_libraries (${PROJECT_NAME} ${llvm_libs} objlib)

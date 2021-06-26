@@ -16,6 +16,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
+#include <unordered_map>
 
 #include <fstream>
 
@@ -36,14 +37,38 @@ private:
       instVecMap;
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
 
+  llvm::SmallMapVector<const llvm::Function *,
+                       llvm::SmallVector<const llvm::Function *, 10>, 16>
+      funcCallMap;
+
   llvm::SmallMapVector<const llvm::Instruction *,
                        llvm::SmallVector<const llvm::Instruction *, 10>, 16>
       writeDefsMap;
 
+  llvm::SmallMapVector<const llvm::Instruction *,
+                       llvm::SmallVector<const llvm::Instruction *, 10>, 16>
+      instReachingDefsMap;
+
+  // Reverse instReachingDefsMap
+  llvm::SmallMapVector<const llvm::Instruction *,
+                       llvm::SmallVector<const llvm::Instruction *, 10>, 16>
+      reverseReachingDefsMap;
+
   llvm::SmallVector<const llvm::Instruction *, 20> instSolvedBySolver;
 
+  llvm::SmallVector<llvm::SmallVector<const llvm::Instruction *, 10>, 10>
+      allSCCs;
+
+  llvm::SmallMapVector<const llvm::Instruction *,
+                       llvm::SmallVector<llvm::Instruction *, 16>, 16>
+      killMap;
+
+  std::map<int, std::vector<int>> SCCAdjList;
+
+  void getAllSCC();
+
   IR2Vec::Vector getValue(std::string key);
-  void collectWriteDefsMap(const llvm::Module &M);
+  void collectWriteDefsMap(llvm::Module &M);
   void getTransitiveUse(
       const llvm::Instruction *root, const llvm::Instruction *def,
       llvm::SmallVector<const llvm::Instruction *, 100> &visitedList,
@@ -51,21 +76,46 @@ private:
   llvm::SmallVector<const llvm::Instruction *, 10>
   getReachingDefs(const llvm::Instruction *, unsigned i);
 
+  void solveSingleComponent(
+      const llvm::Instruction &I,
+      llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 16>
+          &instValMap);
+  void getPartialVec(const llvm::Instruction &I,
+                     llvm::SmallMapVector<const llvm::Instruction *,
+                                          IR2Vec::Vector, 16> &instValMap);
+
+  void solveInsts(llvm::SmallMapVector<const llvm::Instruction *,
+                                       IR2Vec::Vector, 16> &instValMap);
+  std::vector<int> topoOrder(int size);
+
+  void topoDFS(int vertex, std::vector<bool> &Visited,
+               std::vector<int> &visitStack);
+
   void inst2Vec(const llvm::Instruction &I,
                 llvm::SmallVector<llvm::Function *, 15> &funcStack,
                 llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
                                      16> &instValMap);
+  void traverseRD(const llvm::Instruction *inst,
+                  std::unordered_map<const llvm::Instruction *, bool> &Visited,
+                  llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
+
+  void DFSUtil(const llvm::Instruction *inst,
+               std::unordered_map<const llvm::Instruction *, bool> &Visited,
+               llvm::SmallVector<const llvm::Instruction *, 10> &set);
 
   void bb2Vec(llvm::BasicBlock &B,
               llvm::SmallVector<llvm::Function *, 15> &funcStack);
   IR2Vec::Vector func2Vec(llvm::Function &F,
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
-  void transitiveKillAndUpdate(llvm::Instruction *I, IR2Vec::Vector val,
-                               bool avg = false);
-  void killAndUpdate(llvm::Instruction *I, IR2Vec::Vector val);
+
   bool isMemOp(llvm::StringRef opcode, unsigned &operand,
                llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
   std::string splitAndPipeFunctionName(std::string s);
+
+  void TransitiveReads(llvm::SmallVector<llvm::Instruction *, 16> &Killlist,
+                       llvm::Instruction *Inst, llvm::BasicBlock *ParentBB);
+  llvm::SmallVector<llvm::Instruction *, 16>
+  createKilllist(llvm::Instruction *Arg, llvm::Instruction *writeInst);
 
   // For Debugging
   void print(IR2Vec::Vector t, unsigned pos) { llvm::outs() << t[pos]; }

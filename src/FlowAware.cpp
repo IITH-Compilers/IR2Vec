@@ -12,11 +12,13 @@
 #include "llvm/ADT/PostOrderIterator.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Analysis/CFG.h"
+#include "llvm/Analysis/CallGraph.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/IR/Type.h"
 #include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Utils/BasicBlockUtils.h"
 
 #include <algorithm> // for transform
 #include <cxxabi.h>
@@ -55,10 +57,11 @@ void IR2Vec_FA::getTransitiveUse(
   return;
 }
 
-void IR2Vec_FA::collectWriteDefsMap(const Module &M) {
+void IR2Vec_FA::collectWriteDefsMap(Module &M) {
   SmallVector<const Instruction *, 100> visitedList;
   for (auto &F : M) {
     if (!F.isDeclaration()) {
+      EliminateUnreachableBlocks(F);
       for (auto &BB : F) {
         for (auto &I : BB) {
           unsigned operandNum = 0;
@@ -99,7 +102,24 @@ Vector IR2Vec_FA::getValue(std::string key) {
 void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *missCount,
                                            std::ostream *cyclicCount) {
+
   collectWriteDefsMap(M);
+
+  CallGraph cg = CallGraph(M);
+
+  for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
+    if (callItr->first && !callItr->first->isDeclaration()) {
+      auto ParentFunc = callItr->first;
+      CallGraphNode *cgn = callItr->second.get();
+      if (cgn) {
+        for (auto It = cgn->begin(); It != cgn->end(); It++) {
+          auto func = It->second->getFunction();
+          if (func && !func->isDeclaration())
+            funcCallMap[ParentFunc].push_back(func);
+        }
+      }
+    }
+  }
 
   int noOfFunc = 0;
 
@@ -111,11 +131,28 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
     }
   }
 
+  for (auto funcit : funcVecMap) {
+    if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
+      auto calleelist = funcCallMap[funcit.first];
+      Vector calleeVector(DIM, 0);
+      for (auto funcs : calleelist) {
+        auto tmp = funcVecMap[funcs];
+        std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
+                       calleeVector.begin(), std::plus<double>());
+      }
+      scaleVector(calleeVector, WA);
+      auto tmpParent = funcVecMap[funcit.first];
+      std::transform(calleeVector.begin(), calleeVector.end(),
+                     tmpParent.begin(), tmpParent.begin(), std::plus<double>());
+      funcVecMap[funcit.first] = tmpParent;
+    }
+  }
+
   for (auto &f : M) {
     if (!f.isDeclaration()) {
       Vector tmp;
       SmallVector<Function *, 15> funcStack;
-      tmp = func2Vec(f, funcStack);
+      tmp = funcVecMap[&f];
 
       if (level == 'f') {
         //  if(f.getName() == "main"){
@@ -176,16 +213,258 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                      std::to_string(cyclicCounter) + "\n");
 }
 
+void IR2Vec_FA::topoDFS(int vertex, std::vector<bool> &Visited,
+                        std::vector<int> &visitStack) {
+
+  Visited[vertex] = true;
+
+  auto list = SCCAdjList[vertex];
+
+  for (auto nodes : list) {
+    if (Visited[nodes] == false)
+      topoDFS(nodes, Visited, visitStack);
+  }
+
+  visitStack.push_back(vertex);
+}
+
+std::vector<int> IR2Vec_FA::topoOrder(int size) {
+  std::vector<bool> Visited(size, false);
+  std::vector<int> visitStack;
+
+  for (auto &nodes : SCCAdjList) {
+    if (Visited[nodes.first] == false) {
+      topoDFS(nodes.first, Visited, visitStack);
+    }
+  }
+
+  return visitStack;
+}
+
+void IR2Vec_FA::TransitiveReads(SmallVector<Instruction *, 16> &Killlist,
+                                Instruction *Inst, BasicBlock *ParentBB) {
+  assert(Inst != nullptr);
+  unsigned operandNum;
+  bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOps);
+
+  if (!isMemAccess)
+    return;
+  auto parentI = dyn_cast<Instruction>(Inst->getOperand(operandNum));
+  if (parentI == nullptr)
+    return;
+  if (ParentBB == parentI->getParent())
+    Killlist.push_back(parentI);
+  TransitiveReads(Killlist, parentI, ParentBB);
+}
+
+SmallVector<Instruction *, 16>
+IR2Vec_FA::createKilllist(Instruction *Arg, Instruction *writeInst) {
+
+  SmallVector<Instruction *, 16> KillList;
+  SmallVector<Instruction *, 16> tempList;
+  BasicBlock *ParentBB = writeInst->getParent();
+
+  unsigned opnum;
+
+  for (User *U : Arg->users()) {
+    if (Instruction *UseInst = dyn_cast<Instruction>(U)) {
+      if (isMemOp(UseInst->getOpcodeName(), opnum, memWriteOps)) {
+        Instruction *OpInst = dyn_cast<Instruction>(UseInst->getOperand(opnum));
+        if (OpInst && OpInst == Arg)
+          tempList.push_back(UseInst);
+      }
+    }
+  }
+
+  for (auto I = tempList.rbegin(); I != tempList.rend(); I++) {
+    if (*I == writeInst)
+      break;
+    if (ParentBB == (*I)->getParent())
+      KillList.push_back(*I);
+  }
+
+  return KillList;
+}
+
 Vector IR2Vec_FA::func2Vec(Function &F,
                            SmallVector<Function *, 15> &funcStack) {
   auto It = funcVecMap.find(&F);
   if (It != funcVecMap.end()) {
     return It->second;
   }
+
   funcStack.push_back(&F);
 
+  instReachingDefsMap.clear();
+  allSCCs.clear();
+  reverseReachingDefsMap.clear();
+  SCCAdjList.clear();
+
   Vector funcVector(DIM, 0);
+
   ReversePostOrderTraversal<Function *> RPOT(&F);
+
+  for (auto *b : RPOT) {
+    unsigned opnum;
+    SmallVector<Instruction *, 16> lists;
+    for (auto &I : *b) {
+      lists.clear();
+      if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
+          dyn_cast<Instruction>(I.getOperand(opnum))) {
+        Instruction *argI = cast<Instruction>(I.getOperand(opnum));
+        lists = createKilllist(argI, &I);
+        TransitiveReads(lists, argI, I.getParent());
+        if (argI->getParent() == I.getParent())
+          lists.push_back(argI);
+        killMap[&I] = lists;
+      }
+    }
+  }
+
+  for (auto *b : RPOT) {
+    for (auto &I : *b) {
+      for (int i = 0; i < I.getNumOperands(); i++) {
+        if (isa<Instruction>(I.getOperand(i))) {
+          auto RD = getReachingDefs(&I, i);
+          if (instReachingDefsMap.find(&I) == instReachingDefsMap.end()) {
+            instReachingDefsMap[&I] = RD;
+          } else {
+            auto RDList = instReachingDefsMap[&I];
+            RDList.insert(RDList.end(), RD.begin(), RD.end());
+            instReachingDefsMap[&I] = RDList;
+          }
+        }
+      }
+    }
+  }
+
+  IR2VEC_DEBUG(for (auto &Inst
+                    : instReachingDefsMap) {
+    auto RD = Inst.second;
+    outs() << "(" << Inst.first << ")";
+    Inst.first->print(outs());
+    outs() << "\n RD : ";
+    for (auto defs : RD) {
+      defs->print(outs());
+      outs() << "(" << defs << ") ";
+    }
+    outs() << "\n";
+  });
+
+  // one time Reversing instReachingDefsMap to be used to calculate SCCs
+  for (auto &I : instReachingDefsMap) {
+    auto RD = I.second;
+    for (auto defs : RD) {
+      if (reverseReachingDefsMap.find(defs) == reverseReachingDefsMap.end()) {
+        llvm::SmallVector<const llvm::Instruction *, 10> revDefs;
+        revDefs.push_back(I.first);
+        reverseReachingDefsMap[defs] = revDefs;
+      } else {
+        auto defVector = reverseReachingDefsMap[defs];
+        defVector.push_back(I.first);
+        reverseReachingDefsMap[defs] = defVector;
+      }
+    }
+  }
+
+  getAllSCC();
+
+  std::sort(allSCCs.begin(), allSCCs.end(),
+            [](llvm::SmallVector<const llvm::Instruction *, 10> &a,
+               llvm::SmallVector<const llvm::Instruction *, 10> &b) {
+              return a.size() < b.size();
+            });
+
+  IR2VEC_DEBUG(int i = 0; for (auto &sets
+                               : allSCCs) {
+    outs() << "set: " << i << "\n";
+    for (auto insts : sets) {
+      insts->print(outs());
+      outs() << "  " << insts << " ";
+    }
+    outs() << "\n";
+    i++;
+  });
+
+  for (int i = 0; i < allSCCs.size(); i++) {
+    auto set = allSCCs[i];
+    for (int j = 0; j < set.size(); j++) {
+      auto RD = instReachingDefsMap[set[j]];
+      if (!RD.empty()) {
+        for (auto defs : RD) {
+          for (int k = 0; k < allSCCs.size(); k++) {
+            if (k == i)
+              continue;
+            auto sccSet = allSCCs[k];
+            if (std::find(sccSet.begin(), sccSet.end(), defs) != sccSet.end()) {
+              // outs() << i << " depends on " << k << "\n";
+              if (SCCAdjList.find(k) == SCCAdjList.end()) {
+                std::vector<int> temp;
+                temp.push_back(i);
+                SCCAdjList[k] = temp;
+              } else {
+                auto temp = SCCAdjList[k];
+                if (std::find(temp.begin(), temp.end(), i) == temp.end())
+                  temp.push_back(i);
+                SCCAdjList[k] = temp;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  IR2VEC_DEBUG(outs() << "\nAdjList:\n"; for (auto &nodes
+                                              : SCCAdjList) {
+    outs() << "Adjlist for: " << nodes.first << "\n";
+    for (auto components : nodes.second) {
+      outs() << components << " ";
+    }
+    outs() << "\n";
+  });
+
+  std::vector<int> stack;
+
+  stack = topoOrder(allSCCs.size());
+
+  for (int i = 0; i < allSCCs.size(); i++) {
+    if (std::find(stack.begin(), stack.end(), i) == stack.end()) {
+      stack.insert(stack.begin(), i);
+    }
+  }
+
+  IR2VEC_DEBUG(outs() << "New topo order: \n"; for (auto sets
+                                                    : stack) {
+    outs() << sets << " ";
+  } outs() << "\n";);
+
+  SmallVector<double, DIM> prevVec;
+  Instruction *argToKill = nullptr;
+
+  while (stack.size() != 0) {
+    int idx = stack.back();
+    stack.pop_back();
+    auto component = allSCCs[idx];
+    SmallMapVector<const Instruction *, Vector, 16> partialInstValMap;
+    if (component.size() == 1) {
+      auto defs = component[0];
+      partialInstValMap[defs] = {};
+      getPartialVec(*defs, partialInstValMap);
+      solveSingleComponent(*defs, partialInstValMap);
+      partialInstValMap.erase(defs);
+    } else {
+      cyclicCounter++; // for components with length more than 1 will represent
+                       // cycles
+      for (auto defs : component) {
+        partialInstValMap[defs] = {};
+        getPartialVec(*defs, partialInstValMap);
+      }
+
+      if (!partialInstValMap.empty())
+        solveInsts(partialInstValMap);
+    }
+  }
 
   for (auto *b : RPOT) {
     bb2Vec(*b, funcStack);
@@ -257,8 +536,9 @@ bool isPotentiallyReachableFromMany(
 
   const Loop *StopLoop = LI ? getOutermostLoop(LI, StopBB) : nullptr;
 
-  // Limit the number of blocks we visit. The goal is to avoid run-away compile
-  // times on large CFGs without hampering sensible code. Arbitrarily chosen.
+  // Limit the number of blocks we visit. The goal is to avoid run-away
+  // compile times on large CFGs without hampering sensible code. Arbitrarily
+  // chosen.
   unsigned Limit = 32;
 
   SmallPtrSet<const BasicBlock *, 32> Visited;
@@ -324,8 +604,9 @@ bool isPotentiallyReachable(
     // blocks.
     BasicBlock *BB = const_cast<BasicBlock *>(A->getParent());
 
-    // If the block is in a loop then we can reach any instruction in the block
-    // from any other instruction in the block by going around a backedge.
+    // If the block is in a loop then we can reach any instruction in the
+    // block from any other instruction in the block by going around a
+    // backedge.
     if (LI && LI->getLoopFor(BB) != nullptr)
       return true;
 
@@ -415,9 +696,9 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
       outs() << "+++++++++++++++++++++++++\n";
     });
 
-    // If there is a reachable write within I's basic block only that defn would
-    // reach always If there are more than one defn, take the immediate defn
-    // before I
+    // If there is a reachable write within I's basic block only that defn
+    // would reach always If there are more than one defn, take the immediate
+    // defn before I
     if (!bbInstMap[I->getParent()].empty()) {
       IR2VEC_DEBUG(outs() << "--------Within BB--------\n");
       IR2VEC_DEBUG(I->print(outs()); outs() << "\n");
@@ -503,67 +784,6 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
   return {};
 }
 
-void IR2Vec_FA::killAndUpdate(Instruction *I, Vector val) {
-  IR2VEC_DEBUG(outs() << "kill and update: \n");
-  IR2VEC_DEBUG(I->print(outs()); outs() << "\n");
-  if (I == nullptr)
-    return;
-  auto It1 = instVecMap.find(I);
-  assert(It1 != instVecMap.end() && "Instruction should be defined in map");
-  It1->second = val;
-
-  auto It2 = livelinessMap.find(I);
-  assert(It2 != livelinessMap.end() &&
-         "Instruction should be in livelinessMap");
-  It2->second = false;
-
-  transitiveKillAndUpdate(I, val);
-}
-
-void IR2Vec_FA::transitiveKillAndUpdate(Instruction *I, Vector val, bool avg) {
-  assert(I != nullptr);
-  IR2VEC_DEBUG(outs() << "I: ");
-  IR2VEC_DEBUG(I->print(outs()); outs() << "\n");
-  unsigned operandNum;
-  bool isMemAccess = isMemOp(I->getOpcodeName(), operandNum, memAccessOps);
-  if (!isMemAccess)
-    return;
-
-  auto parentI = dyn_cast<Instruction>(I->getOperand(operandNum));
-  if (parentI == nullptr)
-    return;
-  IR2VEC_DEBUG(outs() << "\n parentI: ");
-  IR2VEC_DEBUG(parentI->print(outs()); outs() << "\n");
-
-  if (strcmp(parentI->getOpcodeName(), "getelementptr") == 0)
-    avg = true;
-
-  IR2VEC_DEBUG(outs() << "\nVal : "; for (auto i
-                                          : val) { outs() << i << " "; });
-  auto It1 = instVecMap.find(parentI);
-  assert(It1 != instVecMap.end() && "Instruction should be defined in map");
-
-  IR2VEC_DEBUG(outs() << "\nIt.second =  : ";
-               for (auto i
-                    : It1->second) { outs() << i << " "; });
-
-  if (avg) {
-    std::transform(It1->second.begin(), It1->second.end(), val.begin(),
-                   It1->second.begin(), std::plus<double>());
-    scaleVector(It1->second, WT);
-  } else {
-    It1->second = val;
-  }
-  IR2VEC_DEBUG(outs() << "\nafter transforming : ";
-               for (auto i
-                    : It1->second) { outs() << i << " "; });
-  auto It2 = livelinessMap.find(parentI);
-  assert(It2 != livelinessMap.end() &&
-         "Instruction should be in livelinessMap");
-  It2->second = false;
-
-  transitiveKillAndUpdate(parentI, val, avg);
-}
 bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand,
                         SmallDenseMap<StringRef, unsigned> map) {
   bool isMemOperand = false;
@@ -574,6 +794,385 @@ bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand,
   }
   return isMemOperand;
 }
+
+/*----------------------------------------------------------------------------------
+  Function to get Partial Vector of an instruction
+  ----------------------------------------------------------------------------------
+*/
+void IR2Vec_FA::getPartialVec(
+    const Instruction &I,
+    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
+
+  if (instVecMap.find(&I) != instVecMap.end()) {
+    IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
+    return;
+  }
+
+  Vector instVector(DIM, 0);
+  StringRef opcodeName = I.getOpcodeName();
+  auto vec = getValue(opcodeName.str());
+  IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
+  std::transform(instVector.begin(), instVector.end(), vec.begin(),
+                 instVector.begin(), std::plus<double>());
+  partialInstValMap[&I] = instVector;
+
+  IR2VEC_DEBUG(outs() << "contents of partialInstValMap:\n";
+               for (auto i
+                    : partialInstValMap) {
+                 i.first->print(outs());
+                 outs() << "\n";
+               });
+  auto type = I.getType();
+
+  if (type->isVoidTy()) {
+    vec = getValue("voidTy");
+  } else if (type->isFloatingPointTy()) {
+    vec = getValue("floatTy");
+  } else if (type->isIntegerTy()) {
+    vec = getValue("integerTy");
+  } else if (type->isFunctionTy()) {
+    vec = getValue("functionTy");
+  } else if (type->isStructTy()) {
+    vec = getValue("structTy");
+  } else if (type->isArrayTy()) {
+    vec = getValue("arrayTy");
+  } else if (type->isPointerTy()) {
+    vec = getValue("pointerTy");
+  } else if (type->isVectorTy()) {
+    vec = getValue("vectorTy");
+  } else if (type->isEmptyTy()) {
+    vec = getValue("emptyTy");
+  } else if (type->isLabelTy()) {
+    vec = getValue("labelTy");
+  } else if (type->isTokenTy()) {
+    vec = getValue("tokenTy");
+  } else if (type->isMetadataTy()) {
+    vec = getValue("metadataTy");
+  } else {
+    vec = getValue("unknownTy");
+  }
+
+  scaleVector(vec, WT);
+  std::transform(instVector.begin(), instVector.end(), vec.begin(),
+                 instVector.begin(), std::plus<double>());
+
+  partialInstValMap[&I] = instVector;
+}
+/*----------------------------------------------------------------------------------
+  Function to solve circular dependencies in Instructions
+  ----------------------------------------------------------------------------------
+*/
+void IR2Vec_FA::solveInsts(
+    llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 16>
+        &partialInstValMap) {
+  std::map<unsigned, const Instruction *> xI;
+  std::map<const Instruction *, unsigned> Ix;
+  std::vector<std::vector<double>> A, B;
+  SmallMapVector<const Instruction *,
+                 SmallMapVector<const Instruction *, double, 16>, 16>
+      RDValMap;
+  unsigned pos = 0;
+  for (auto It : partialInstValMap) {
+    auto inst = It.first;
+    if (instVecMap.find(inst) == instVecMap.end()) {
+      Ix[inst] = pos;
+      xI[pos++] = inst;
+      std::vector<double> tmp;
+      for (auto i : It.second) {
+        tmp.push_back((int)(i * 10) / 10.0);
+      }
+      B.push_back(tmp);
+      for (unsigned i = 0; i < inst->getNumOperands(); i++) {
+        if (isa<Function>(inst->getOperand(i))) {
+          auto f = getValue("function");
+          if (isa<CallInst>(inst)) {
+            auto ci = dyn_cast<CallInst>(inst);
+            Function *func = ci->getCalledFunction();
+            if (func) {
+              if (!func->isDeclaration()) {
+                // Will be dealt with later
+                Vector tempCall(DIM, 0);
+                f = tempCall;
+              }
+            }
+          }
+          auto svtmp = f;
+          scaleVector(svtmp, WA);
+          std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+          std::vector<double> vec = B.back();
+          IR2VEC_DEBUG(outs() << vec.back() << "\n");
+          IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+          B.pop_back();
+          std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                         std::plus<double>());
+          IR2VEC_DEBUG(outs() << vec.back() << "\n");
+          B.push_back(vec);
+        } else if (isa<Constant>(inst->getOperand(i)) &&
+                   !isa<PointerType>(inst->getOperand(i)->getType())) {
+          auto c = getValue("constant");
+          auto svtmp = c;
+          scaleVector(svtmp, WA);
+          std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+          std::vector<double> vec = B.back();
+          IR2VEC_DEBUG(outs() << vec.back() << "\n");
+          IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+          B.pop_back();
+          std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                         std::plus<double>());
+          IR2VEC_DEBUG(outs() << vec.back() << "\n");
+          B.push_back(vec);
+        } else if (isa<BasicBlock>(inst->getOperand(i))) {
+          auto l = getValue("label");
+          auto svtmp = l;
+          scaleVector(svtmp, WA);
+          std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+          std::vector<double> vec = B.back();
+          IR2VEC_DEBUG(outs() << vec.back() << "\n");
+          IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+          B.pop_back();
+          std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                         std::plus<double>());
+          IR2VEC_DEBUG(outs() << vec.back() << "\n");
+          B.push_back(vec);
+        } else {
+          if (isa<Instruction>(inst->getOperand(i))) {
+            auto RD = getReachingDefs(inst, i);
+            for (auto i : RD) {
+              // Check if value of RD is precomputed
+              if (instVecMap.find(i) == instVecMap.end()) {
+                if (partialInstValMap.find(i) == partialInstValMap.end()) {
+                  assert(partialInstValMap.find(i) != partialInstValMap.end() &&
+                         "Should not reach");
+                }
+                if (RDValMap.find(inst) == RDValMap.end()) {
+                  SmallMapVector<const Instruction *, double, 16> tmp;
+                  tmp[i] = WA;
+                  RDValMap[inst] = tmp;
+                } else {
+                  RDValMap[inst][i] = WA;
+                }
+              } else {
+                auto svtmp = instVecMap[i];
+                scaleVector(svtmp, WA);
+                std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+                std::vector<double> vec = B.back();
+                IR2VEC_DEBUG(outs() << vec.back() << "\n");
+                IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+                B.pop_back();
+                std::transform(vtmp.begin(), vtmp.end(), vec.begin(),
+                               vec.begin(), std::plus<double>());
+                IR2VEC_DEBUG(outs() << vec.back() << "\n");
+                B.push_back(vec);
+              }
+            }
+          } else if (isa<PointerType>(inst->getOperand(i)->getType())) {
+            auto l = getValue("pointer");
+            auto svtmp = l;
+            scaleVector(svtmp, WA);
+            std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+            std::vector<double> vec = B.back();
+            IR2VEC_DEBUG(outs() << vec.back() << "\n");
+            IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+            B.pop_back();
+            std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                           std::plus<double>());
+            IR2VEC_DEBUG(outs() << vec.back() << "\n");
+            B.push_back(vec);
+          } else {
+            auto l = getValue("variable");
+            auto svtmp = l;
+            scaleVector(svtmp, WA);
+            std::vector<double> vtmp(svtmp.begin(), svtmp.end());
+            std::vector<double> vec = B.back();
+            IR2VEC_DEBUG(outs() << vec.back() << "\n");
+            IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
+            B.pop_back();
+            std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
+                           std::plus<double>());
+            IR2VEC_DEBUG(outs() << vec.back() << "\n");
+            B.push_back(vec);
+          }
+        }
+      }
+    }
+  }
+
+  for (unsigned i = 0; i < xI.size(); i++) {
+    std::vector<double> tmp(xI.size(), 0);
+    A.push_back(tmp);
+  }
+
+  for (unsigned i = 0; i < xI.size(); i++) {
+    A[i][i] = 1;
+    auto tmp = A[i];
+    auto instRDVal = RDValMap[xI[i]];
+    for (auto j : instRDVal) {
+      A[i][Ix[j.first]] = (int)((A[i][Ix[j.first]] - j.second) * 10) / 10.0;
+    }
+  }
+
+  for (unsigned i = 0; i < B.size(); i++) {
+    auto Bvec = B[i];
+    for (unsigned j = 0; j < B[i].size(); j++) {
+      B[i][j] = (int)(B[i][j] * 10) / 10.0;
+    }
+  }
+
+  auto C = solve(A, B);
+  SmallMapVector<const BasicBlock *, SmallVector<const Instruction *, 10>, 16>
+      bbInstMap;
+
+  for (unsigned i = 0; i < C.size(); i++) {
+    Vector tmp(C[i].begin(), C[i].end());
+    IR2VEC_DEBUG(outs() << "inst:"
+                        << "\t";
+                 xI[i]->print(outs()); outs() << "\nVAL: " << tmp[0] << "\n");
+
+    instVecMap[xI[i]] = tmp;
+    livelinessMap.try_emplace(xI[i], true);
+
+    instSolvedBySolver.push_back(xI[i]);
+    bbInstMap[xI[i]->getParent()].push_back(xI[i]);
+  }
+
+  for (auto BB : bbInstMap) {
+    unsigned opnum;
+    auto orderedInstVec = BB.second;
+    for (auto I : orderedInstVec) {
+      if (killMap.find(I) != killMap.end()) {
+        auto list = killMap[I];
+        for (auto defs : list) {
+          auto It2 = livelinessMap.find(defs);
+          if (It2 == livelinessMap.end())
+            livelinessMap.try_emplace(defs, false);
+          else
+            It2->second = false;
+        }
+      }
+    }
+  }
+}
+
+/*----------------------------------------------------------------------------------
+  Function to solve a single instruction usually forming a SCC
+  ----------------------------------------------------------------------------------
+*/
+
+void IR2Vec_FA::solveSingleComponent(
+    const Instruction &I,
+    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
+
+  if (instVecMap.find(&I) != instVecMap.end()) {
+    IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
+    return;
+  }
+
+  Vector instVector(DIM, 0);
+  StringRef opcodeName = I.getOpcodeName();
+
+  instVector = partialInstValMap[&I];
+
+  unsigned operandNum;
+  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOps);
+  bool isCyclic = false;
+  Vector VecArgs(DIM, 0);
+
+  SmallVector<const Instruction *, 10> RDList;
+  RDList.clear();
+
+  for (unsigned i = 0; i < I.getNumOperands() /*&& !isCyclic*/; i++) {
+    Vector vecOp(DIM, 0);
+    if (isa<Function>(I.getOperand(i))) {
+      vecOp = getValue("function");
+      if (isa<CallInst>(I)) {
+        auto ci = dyn_cast<CallInst>(&I);
+        Function *func = ci->getCalledFunction();
+        if (func) {
+          if (!func->isDeclaration()) {
+            // Will be dealt with later
+            Vector tempCall(DIM, 0);
+            vecOp = tempCall;
+          }
+        }
+      }
+    }
+    // Checking that the argument is not of pointer type because some
+    // non-numeric/alphabetic constants are also caught as pointer types
+    else if (isa<Constant>(I.getOperand(i)) &&
+             !isa<PointerType>(I.getOperand(i)->getType())) {
+      vecOp = getValue("constant");
+    } else if (isa<BasicBlock>(I.getOperand(i))) {
+      vecOp = getValue("label");
+    } else {
+      if (isa<Instruction>(I.getOperand(i))) {
+        auto RD = getReachingDefs(&I, i);
+        RDList.insert(RDList.end(), RD.begin(), RD.end());
+      } else if (isa<PointerType>(I.getOperand(i)->getType())) {
+        vecOp = getValue("pointer");
+      } else
+        vecOp = getValue("variable");
+    }
+
+    std::transform(VecArgs.begin(), VecArgs.end(), vecOp.begin(),
+                   VecArgs.begin(), std::plus<double>());
+  }
+
+  Vector vecInst = Vector(DIM, 0);
+
+  if (!RDList.empty()) {
+    for (auto i : RDList) {
+      // Check if value of RD is precomputed
+      if (instVecMap.find(i) == instVecMap.end()) {
+
+        /*Some phi instructions reach themselves and hence may not be in the
+        instVecMap but should be in the partialInstValMap*/
+
+        if (partialInstValMap.find(i) == partialInstValMap.end()) {
+          assert(partialInstValMap.find(i) != partialInstValMap.end() &&
+                 "Should have been in instvecmap or partialmap");
+        }
+
+      } else {
+        std::transform(instVecMap[i].begin(), instVecMap[i].end(),
+                       vecInst.begin(), vecInst.begin(), std::plus<double>());
+      }
+    }
+  }
+
+  if (!isCyclic) {
+    std::transform(VecArgs.begin(), VecArgs.end(), vecInst.begin(),
+                   VecArgs.begin(), std::plus<double>());
+
+    IR2VEC_DEBUG(outs() << VecArgs[0]);
+
+    scaleVector(VecArgs, WA);
+    IR2VEC_DEBUG(outs() << VecArgs.front());
+    std::transform(instVector.begin(), instVector.end(), VecArgs.begin(),
+                   instVector.begin(), std::plus<double>());
+    IR2VEC_DEBUG(outs() << instVector.front());
+
+    instVecMap[&I] = instVector;
+    livelinessMap.try_emplace(&I, true);
+
+    if (killMap.find(&I) != killMap.end()) {
+      auto list = killMap[&I];
+      for (auto defs : list) {
+        auto It2 = livelinessMap.find(defs);
+        if (It2 == livelinessMap.end())
+          livelinessMap.try_emplace(defs, false);
+        else
+          It2->second = false;
+      }
+    }
+  }
+  assert(isCyclic == false && "A Single Component should not have a cycle!");
+}
+
+/*----------------------------------------------------------------------------------
+  Function to solve left over instructions after all dependencies are solved
+  ----------------------------------------------------------------------------------
+*/
+
 void IR2Vec_FA::inst2Vec(
     const Instruction &I, SmallVector<Function *, 15> &funcStack,
     SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
@@ -587,7 +1186,6 @@ void IR2Vec_FA::inst2Vec(
   StringRef opcodeName = I.getOpcodeName();
   auto vec = getValue(opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
-
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
   partialInstValMap[&I] = instVector;
@@ -598,85 +1196,39 @@ void IR2Vec_FA::inst2Vec(
                  i.first->print(outs());
                  outs() << "\n";
                });
-   auto type = I.getType();
-    
-    if(type->isVoidTy()){
-    vec = getValue("voidTy");
-    }
-    else if( type->isFloatingPointTy()){
-    vec = getValue("floatTy");
-    }
-    else if (type->isIntegerTy()){
-	vec= getValue("integerTy");
-    }
-    else if(type->isFunctionTy()){
-    vec= getValue("functionTy");
-    }
-    else if (type->isStructTy()){
-    vec = getValue("structTy");
-    }
-    else if (type->isArrayTy()){
-   vec = getValue("arrayTy");
-    }
-    else if (type->isPointerTy()){
-     vec = getValue("pointerTy");
-    }
-    else if(type->isVectorTy()){
-    vec =getValue("vectorTy");
-    }
-    else if(type->isEmptyTy()){
-    vec =getValue("emptyTy");
-    }
-    else if (type->isLabelTy()){
-    vec = getValue("labelTy");
-    }
-    else if(type->isTokenTy()){
-    vec = getValue("tokenTy");
-    }
-    else if(type->isMetadataTy()){
-    vec = getValue("metadataTy");
-    }
-    else{
-    vec = getValue("unknownTy");
-    }
 
-/*  switch (I.getType()->getTypeID()) {
-  case 0:
+  auto type = I.getType();
+
+  if (type->isVoidTy()) {
     vec = getValue("voidTy");
-    break;
-  case 1:
-  case 2:
-  case 3:
-  case 4:
-  case 5:
-  case 6:
+  } else if (type->isFloatingPointTy()) {
     vec = getValue("floatTy");
-    break;
-  case 11:
+  } else if (type->isIntegerTy()) {
     vec = getValue("integerTy");
-    break;
-  case 12:
+  } else if (type->isFunctionTy()) {
     vec = getValue("functionTy");
-    break;
-  case 13:
+  } else if (type->isStructTy()) {
     vec = getValue("structTy");
-    break;
-  case 14:
+  } else if (type->isArrayTy()) {
     vec = getValue("arrayTy");
-    break;
-  case 15:
+  } else if (type->isPointerTy()) {
     vec = getValue("pointerTy");
-    break;
-  case 16:
+  } else if (type->isVectorTy()) {
     vec = getValue("vectorTy");
-    break;
-  default:
+  } else if (type->isEmptyTy()) {
+    vec = getValue("emptyTy");
+  } else if (type->isLabelTy()) {
+    vec = getValue("labelTy");
+  } else if (type->isTokenTy()) {
+    vec = getValue("tokenTy");
+  } else if (type->isMetadataTy()) {
+    vec = getValue("metadataTy");
+  } else {
     vec = getValue("unknownTy");
-  }*/
+  }
   scaleVector(vec, WT);
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
-
   partialInstValMap[&I] = instVector;
 
   unsigned operandNum;
@@ -695,10 +1247,10 @@ void IR2Vec_FA::inst2Vec(
         auto ci = dyn_cast<CallInst>(&I);
         Function *func = ci->getCalledFunction();
         if (func) {
-          if (!func->isDeclaration() &&
-              std::find(funcStack.begin(), funcStack.end(), func) ==
-                  funcStack.end()) {
-            vec = func2Vec(*func, funcStack);
+          if (!func->isDeclaration()) {
+            // Will be dealt with later
+            Vector tempCall(DIM, 0);
+            vecOp = tempCall;
           }
         }
       }
@@ -730,22 +1282,8 @@ void IR2Vec_FA::inst2Vec(
     for (auto i : RDList) {
       // Check if value of RD is precomputed
       if (instVecMap.find(i) == instVecMap.end()) {
-        if (partialInstValMap.find(i) == partialInstValMap.end()) {
-          partialInstValMap[i] = {};
-          inst2Vec(*i, funcStack, partialInstValMap);
-          partialInstValMap.erase(i);
-
-          if (std::find(instSolvedBySolver.begin(), instSolvedBySolver.end(),
-                        &I) != instSolvedBySolver.end())
-            return;
-
-          std::transform(instVecMap[i].begin(), instVecMap[i].end(),
-                         vecInst.begin(), vecInst.begin(), std::plus<double>());
-
-        } else {
-          isCyclic = true;
-          break;
-        }
+        assert(instVecMap.find(i) != instVecMap.end() &&
+               "All RDs should have been solved by Topo Order!");
       } else {
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
@@ -764,244 +1302,106 @@ void IR2Vec_FA::inst2Vec(
     std::transform(instVector.begin(), instVector.end(), VecArgs.begin(),
                    instVector.begin(), std::plus<double>());
     IR2VEC_DEBUG(outs() << instVector.front());
-  }
-
-  if (isCyclic) {
-    IR2VEC_DEBUG(outs() << "XX------------Cyclic dependncy in the "
-                           "IRs---------------------XX \n");
-    cyclicCounter++;
-    // There is a chance that all operands of an instruction has not been
-    // processed. In such a case for a cyclic dependencies, process all unseen
-    // operands now.
-    const auto tmp = partialInstValMap;
-    for (auto It : tmp) {
-      auto inst = It.first;
-      for (unsigned i = 0; i < inst->getNumOperands(); i++) {
-        if (isa<Constant>(inst->getOperand(i)) ||
-            isa<BasicBlock>(inst->getOperand(i)) ||
-            isa<Function>(inst->getOperand(i)))
-          continue;
-        else {
-          auto RD = getReachingDefs(inst, i);
-          for (auto i : RD) {
-            // Check if value of RD is precomputed
-            if (instVecMap.find(i) == instVecMap.end()) {
-              if (partialInstValMap.find(i) == partialInstValMap.end()) {
-                partialInstValMap[i] = {};
-                inst2Vec(*i, funcStack, partialInstValMap);
-                partialInstValMap.erase(i);
-                if (std::find(instSolvedBySolver.begin(),
-                              instSolvedBySolver.end(),
-                              &I) != instSolvedBySolver.end())
-                  return;
-              }
-            }
-          }
-        }
-      }
-    }
-    std::map<unsigned, const Instruction *> xI;
-    std::map<const Instruction *, unsigned> Ix;
-    std::vector<std::vector<double>> A, B;
-    SmallMapVector<const Instruction *,
-                   SmallMapVector<const Instruction *, double, 16>, 16>
-        RDValMap;
-    unsigned pos = 0;
-    for (auto It : partialInstValMap) {
-      auto inst = It.first;
-      if (instVecMap.find(inst) == instVecMap.end()) {
-        Ix[inst] = pos;
-        xI[pos++] = inst;
-        std::vector<double> tmp;
-        for (auto i : It.second) {
-          tmp.push_back((int)(i * 10) / 10.0);
-        }
-        B.push_back(tmp);
-        for (unsigned i = 0; i < inst->getNumOperands(); i++) {
-          if (isa<Function>(inst->getOperand(i))) {
-            auto f = getValue("function");
-            if (isa<CallInst>(inst)) {
-              auto ci = dyn_cast<CallInst>(inst);
-              Function *func = ci->getCalledFunction();
-              if (func) {
-                if (!func->isDeclaration() &&
-                    std::find(funcStack.begin(), funcStack.end(), func) ==
-                        funcStack.end()) {
-                  f = func2Vec(*func, funcStack);
-                }
-              }
-            }
-            auto svtmp = f;
-            scaleVector(svtmp, WA);
-            std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-            std::vector<double> vec = B.back();
-            IR2VEC_DEBUG(outs() << vec.back() << "\n");
-            IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-            B.pop_back();
-            std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                           std::plus<double>());
-            IR2VEC_DEBUG(outs() << vec.back() << "\n");
-            B.push_back(vec);
-          } else if (isa<Constant>(inst->getOperand(i)) &&
-                     !isa<PointerType>(inst->getOperand(i)->getType())) {
-            auto c = getValue("constant");
-            auto svtmp = c;
-            scaleVector(svtmp, WA);
-            std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-            std::vector<double> vec = B.back();
-            IR2VEC_DEBUG(outs() << vec.back() << "\n");
-            IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-            B.pop_back();
-            std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                           std::plus<double>());
-            IR2VEC_DEBUG(outs() << vec.back() << "\n");
-            B.push_back(vec);
-          } else if (isa<BasicBlock>(inst->getOperand(i))) {
-            auto l = getValue("label");
-            auto svtmp = l;
-            scaleVector(svtmp, WA);
-            std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-            std::vector<double> vec = B.back();
-            IR2VEC_DEBUG(outs() << vec.back() << "\n");
-            IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-            B.pop_back();
-            std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                           std::plus<double>());
-            IR2VEC_DEBUG(outs() << vec.back() << "\n");
-            B.push_back(vec);
-          } else {
-            if (isa<Instruction>(inst->getOperand(i))) {
-              auto RD = getReachingDefs(inst, i);
-              for (auto i : RD) {
-                // Check if value of RD is precomputed
-                if (instVecMap.find(i) == instVecMap.end()) {
-                  if (partialInstValMap.find(i) == partialInstValMap.end()) {
-                    llvm_unreachable("Should not reach");
-                  }
-                  if (RDValMap.find(inst) == RDValMap.end()) {
-                    // SmallDenseMap<const Instruction *, double> tmp;
-                    SmallMapVector<const Instruction *, double, 16> tmp;
-                    tmp[i] = WA;
-                    RDValMap[inst] = tmp;
-                  } else {
-                    RDValMap[inst][i] = WA;
-                  }
-                } else {
-                  auto svtmp = instVecMap[i];
-                  scaleVector(svtmp, WA);
-                  std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-                  std::vector<double> vec = B.back();
-                  IR2VEC_DEBUG(outs() << vec.back() << "\n");
-                  IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-                  B.pop_back();
-                  std::transform(vtmp.begin(), vtmp.end(), vec.begin(),
-                                 vec.begin(), std::plus<double>());
-                  IR2VEC_DEBUG(outs() << vec.back() << "\n");
-                  B.push_back(vec);
-                }
-              }
-            } else if (isa<PointerType>(inst->getOperand(i)->getType())) {
-              auto svtmp = getValue("pointer");
-              scaleVector(svtmp, WA);
-              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-              std::vector<double> vec = B.back();
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-              B.pop_back();
-              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                             std::plus<double>());
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              B.push_back(vec);
-            } else {
-              auto svtmp = getValue("variable");
-              scaleVector(svtmp, WA);
-              std::vector<double> vtmp(svtmp.begin(), svtmp.end());
-              std::vector<double> vec = B.back();
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              IR2VEC_DEBUG(outs() << vtmp.back() << "\n");
-              B.pop_back();
-              std::transform(vtmp.begin(), vtmp.end(), vec.begin(), vec.begin(),
-                             std::plus<double>());
-              IR2VEC_DEBUG(outs() << vec.back() << "\n");
-              B.push_back(vec);
-            }
-          }
-        }
-      }
-    }
-
-    for (unsigned i = 0; i < xI.size(); i++) {
-      std::vector<double> tmp(xI.size(), 0);
-      A.push_back(tmp);
-    }
-
-    for (unsigned i = 0; i < xI.size(); i++) {
-      A[i][i] = 1;
-      auto tmp = A[i];
-      auto instRDVal = RDValMap[xI[i]];
-      for (auto j : instRDVal) {
-        A[i][Ix[j.first]] = (int)((A[i][Ix[j.first]] - j.second) * 10) / 10.0;
-      }
-    }
-
-    for (unsigned i = 0; i < B.size(); i++) {
-      auto Bvec = B[i];
-      for (unsigned j = 0; j < B[i].size(); j++) {
-        B[i][j] = (int)(B[i][j] * 10) / 10.0;
-      }
-    }
-
-    auto C = solve(A, B);
-    SmallMapVector<const BasicBlock *, SmallVector<const Instruction *, 10>, 16>
-        bbInstMap;
-
-    for (unsigned i = 0; i < C.size(); i++) {
-      Vector tmp(C[i].begin(), C[i].end());
-      IR2VEC_DEBUG(outs() << "inst:"
-                          << "\t";
-                   xI[i]->print(outs()); outs() << "\nVAL: " << tmp[0] << "\n");
-
-      instVecMap[xI[i]] = tmp;
-      livelinessMap.try_emplace(xI[i], true);
-
-      instSolvedBySolver.push_back(xI[i]);
-      bbInstMap[xI[i]->getParent()].push_back(xI[i]);
-    }
-
-    for (auto BB : bbInstMap) {
-      unsigned opnum;
-      auto orderedInstVec = BB.second;
-      for (auto I : orderedInstVec) {
-        if (isMemOp(I->getOpcodeName(), opnum, memWriteOps) &&
-            dyn_cast<Instruction>(I->getOperand(opnum))) {
-          IR2VEC_DEBUG(outs()
-                       << I->getParent()->getParent()->getName() << "\n");
-          IR2VEC_DEBUG(I->print(outs()); outs() << "\n");
-          killAndUpdate(dyn_cast<Instruction>(I->getOperand(opnum)),
-                        instVecMap[I]);
-        }
-      }
-    }
-    IR2VEC_DEBUG(outs() << "\nYY------------Cyclic dependncy in the "
-                           "IRs---------------------YY\n");
-  }
-
-  else {
     instVecMap[&I] = instVector;
     livelinessMap.try_emplace(&I, true);
 
-    // kill and update
-    if (isMemWrite && dyn_cast<Instruction>(I.getOperand(operandNum))) {
-      IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
-      killAndUpdate(dyn_cast<Instruction>(I.getOperand(operandNum)),
-                    instVector);
+    if (killMap.find(&I) != killMap.end()) {
+      auto list = killMap[&I];
+      for (auto defs : list) {
+        auto It2 = livelinessMap.find(defs);
+        if (It2 == livelinessMap.end())
+          livelinessMap.try_emplace(defs, false);
+        else
+          It2->second = false;
+      }
+    }
+  }
+  assert(isCyclic == false && "All dependencies should have been solved!");
+}
+
+/*----------------------------------------------------------------------------------
+  Utility function : Traverses Reaching definitions
+  ----------------------------------------------------------------------------------
+*/
+
+void IR2Vec_FA::traverseRD(
+    const llvm::Instruction *inst,
+    std::unordered_map<const llvm::Instruction *, bool> &Visited,
+    llvm::SmallVector<const llvm::Instruction *, 10> &timeStack) {
+
+  auto RDit = instReachingDefsMap.find(inst);
+
+  Visited[inst] = true;
+
+  if (RDit != instReachingDefsMap.end()) {
+
+    auto RD = RDit->second;
+
+    for (auto defs : RD) {
+      if (Visited.find(defs) == Visited.end())
+        traverseRD(defs, Visited, timeStack);
+    }
+  }
+  // All the children (RDs) of current node is done push to timeStack
+  timeStack.push_back(inst);
+}
+
+void IR2Vec_FA::DFSUtil(
+    const llvm::Instruction *inst,
+    std::unordered_map<const llvm::Instruction *, bool> &Visited,
+    llvm::SmallVector<const llvm::Instruction *, 10> &set) {
+
+  Visited[inst] = true;
+  auto RD = reverseReachingDefsMap[inst];
+
+  for (auto defs : RD) {
+    if (Visited.find(defs) == Visited.end()) {
+      set.push_back(defs);
+      DFSUtil(defs, Visited, set);
+    }
+  }
+}
+
+/*----------------------------------------------------------------------------------
+  Utility function : Creates and returns all SCCs
+  ----------------------------------------------------------------------------------
+*/
+
+void IR2Vec_FA::getAllSCC() {
+
+  std::unordered_map<const llvm::Instruction *, bool> Visited;
+
+  llvm::SmallVector<const llvm::Instruction *, 10> timeStack;
+
+  for (auto &I : instReachingDefsMap) {
+    if (Visited.find(I.first) == Visited.end()) {
+      traverseRD(I.first, Visited, timeStack);
+    }
+  }
+
+  IR2VEC_DEBUG(for (auto &defs : timeStack) { outs() << defs << "\n"; });
+
+  Visited.clear();
+
+  // Second pass getting SCCs
+  while (timeStack.size() != 0) {
+    auto inst = timeStack.back();
+    timeStack.pop_back();
+    if (Visited.find(inst) == Visited.end()) {
+      llvm::SmallVector<const llvm::Instruction *, 10> set;
+      set.push_back(inst);
+      DFSUtil(inst, Visited, set);
+      if (set.size() != 0)
+        allSCCs.push_back(set);
     }
   }
 }
 
 void IR2Vec_FA::bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack) {
   SmallMapVector<const Instruction *, Vector, 16> partialInstValMap;
+
   for (auto &I : B) {
+
     partialInstValMap[&I] = {};
     IR2VEC_DEBUG(outs() << "XX------------ Call from bb2vec function "
                            "Started---------------------XX\n");
