@@ -6,6 +6,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
+![LLVM](https://img.shields.io/badge/LLVM-v10.0.1-blue)
 ![Tests](https://github.com/svkeerthy/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/svkeerthy/IR2Vec/workflows/Publish/badge.svg)
 ![pre-commit checks](https://github.com/svkeerthy/IR2Vec/workflows/pre-commit%20checks/badge.svg)
