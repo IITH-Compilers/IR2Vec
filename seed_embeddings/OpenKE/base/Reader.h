@@ -21,6 +21,7 @@ INT *testLef, *testRig;
 INT *validLef, *validRig;
 
 extern "C" void importTrainFiles() {
+
   printf("The toolkit is importing datasets.\n");
   FILE *fin;
   int tmp;

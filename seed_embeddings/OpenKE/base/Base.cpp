@@ -3,6 +3,7 @@
 #include "Reader.h"
 #include "Setting.h"
 #include "Test.h"
+#include "Valid.h"
 #include <cstdlib>
 #include <pthread.h>
 
@@ -13,6 +14,10 @@ extern "C" void setOutPath(char *path);
 extern "C" void setWorkThreads(INT threads);
 
 extern "C" void setBern(INT con);
+
+extern "C" void setHeadTailCrossSampling(INT con);
+
+extern "C" bool judgeHeadBatch();
 
 extern "C" INT getWorkThreads();
 
@@ -41,6 +46,7 @@ struct Parameter {
   INT batchSize;
   INT negRate;
   INT negRelRate;
+  INT headBatchFlag;
 };
 
 void *getBatch(void *con) {
@@ -53,6 +59,7 @@ void *getBatch(void *con) {
   INT batchSize = para->batchSize;
   INT negRate = para->negRate;
   INT negRelRate = para->negRelRate;
+  INT headBatchFlag = para->headBatchFlag;
   INT lef, rig;
   if (batchSize % workThreads == 0) {
     lef = id * (batchSize / workThreads);
@@ -72,23 +79,39 @@ void *getBatch(void *con) {
     batch_y[batch] = 1;
     INT last = batchSize;
     for (INT times = 0; times < negRate; times++) {
-      if (bernFlag)
-        prob = 1000 * right_mean[trainList[i].r] /
-               (right_mean[trainList[i].r] + left_mean[trainList[i].r]);
-      if (randd(id) % 1000 < prob) {
-        batch_h[batch + last] = trainList[i].h;
-        batch_t[batch + last] =
-            corrupt_head(id, trainList[i].h, trainList[i].r);
-        batch_r[batch + last] = trainList[i].r;
+      if (!crossSamplingFlag) {
+        if (bernFlag)
+          prob = 1000 * right_mean[trainList[i].r] /
+                 (right_mean[trainList[i].r] + left_mean[trainList[i].r]);
+        if (randd(id) % 1000 < prob) {
+          batch_h[batch + last] = trainList[i].h;
+          batch_t[batch + last] =
+              corrupt_head(id, trainList[i].h, trainList[i].r);
+          batch_r[batch + last] = trainList[i].r;
+        } else {
+          batch_h[batch + last] =
+              corrupt_tail(id, trainList[i].t, trainList[i].r);
+          ;
+          batch_t[batch + last] = trainList[i].t;
+          batch_r[batch + last] = trainList[i].r;
+        }
+        batch_y[batch + last] = -1;
+        last += batchSize;
       } else {
-        batch_h[batch + last] =
-            corrupt_tail(id, trainList[i].t, trainList[i].r);
-        ;
-        batch_t[batch + last] = trainList[i].t;
-        batch_r[batch + last] = trainList[i].r;
+        if (headBatchFlag) {
+          batch_h[batch + last] =
+              corrupt_tail(id, trainList[i].t, trainList[i].r);
+          batch_t[batch + last] = trainList[i].t;
+          batch_r[batch + last] = trainList[i].r;
+        } else {
+          batch_h[batch + last] = trainList[i].h;
+          batch_t[batch + last] =
+              corrupt_head(id, trainList[i].h, trainList[i].r);
+          batch_r[batch + last] = trainList[i].r;
+        }
+        batch_y[batch + last] = -1;
+        last += batchSize;
       }
-      batch_y[batch + last] = -1;
-      last += batchSize;
     }
     for (INT times = 0; times < negRelRate; times++) {
       batch_h[batch + last] = trainList[i].h;
@@ -103,7 +126,7 @@ void *getBatch(void *con) {
 
 extern "C" void sampling(INT *batch_h, INT *batch_t, INT *batch_r,
                          REAL *batch_y, INT batchSize, INT negRate = 1,
-                         INT negRelRate = 0) {
+                         INT negRelRate = 0, INT headBatchFlag = 0) {
   pthread_t *pt = (pthread_t *)malloc(workThreads * sizeof(pthread_t));
   Parameter *para = (Parameter *)malloc(workThreads * sizeof(Parameter));
   for (INT threads = 0; threads < workThreads; threads++) {
@@ -115,6 +138,7 @@ extern "C" void sampling(INT *batch_h, INT *batch_t, INT *batch_r,
     para[threads].batchSize = batchSize;
     para[threads].negRate = negRate;
     para[threads].negRelRate = negRelRate;
+    para[threads].headBatchFlag = headBatchFlag;
     pthread_create(&pt[threads], NULL, getBatch, (void *)(para + threads));
   }
   for (INT threads = 0; threads < workThreads; threads++)
