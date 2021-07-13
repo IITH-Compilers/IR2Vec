@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ir2vec VERSION 1.1.0)
+project(ir2vec VERSION 2.0.0)
 
 set(IR2VEC_LIB "IR2Vec")
 set(IR2VEC_LIB_STATIC "IR2Vec_Static")
@@ -10,8 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
 list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
-
-find_package(LLVM 10.0.1 REQUIRED CONFIG)
+find_package(LLVM 12.0.0 REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
@@ -69,7 +68,7 @@ install(TARGETS ${IR2VEC_LIB} ${IR2VEC_LIB_STATIC}
 add_subdirectory(test-suite)
 
 add_custom_target(verify-symbolic
- COMMAND bash ./sanity_check.sh SYM llvm10
+ COMMAND bash ./sanity_check.sh SYM llvm12
  COMMENT "Generating Symbolic IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
  DEPENDS ${PROJECT_NAME}
@@ -77,7 +76,7 @@ add_custom_target(verify-symbolic
  )
 
 add_custom_target(verify-flowaware
- COMMAND bash sanity_check.sh FA llvm10
+ COMMAND bash sanity_check.sh FA llvm12
  COMMENT "Generating Flow-Aware IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
  DEPENDS ${PROJECT_NAME}

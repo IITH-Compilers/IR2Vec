@@ -810,7 +810,7 @@ void IR2Vec_FA::getPartialVec(
 
   Vector instVector(DIM, 0);
   StringRef opcodeName = I.getOpcodeName();
-  auto vec = getValue(opcodeName);
+  auto vec = getValue(opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
@@ -822,40 +822,36 @@ void IR2Vec_FA::getPartialVec(
                  i.first->print(outs());
                  outs() << "\n";
                });
+  auto type = I.getType();
 
-  switch (I.getType()->getTypeID()) {
-  case 0:
+  if (type->isVoidTy()) {
     vec = getValue("voidTy");
-    break;
-  case 1:
-  case 2:
-  case 3:
-  case 4:
-  case 5:
-  case 6:
+  } else if (type->isFloatingPointTy()) {
     vec = getValue("floatTy");
-    break;
-  case 11:
+  } else if (type->isIntegerTy()) {
     vec = getValue("integerTy");
-    break;
-  case 12:
+  } else if (type->isFunctionTy()) {
     vec = getValue("functionTy");
-    break;
-  case 13:
+  } else if (type->isStructTy()) {
     vec = getValue("structTy");
-    break;
-  case 14:
+  } else if (type->isArrayTy()) {
     vec = getValue("arrayTy");
-    break;
-  case 15:
+  } else if (type->isPointerTy()) {
     vec = getValue("pointerTy");
-    break;
-  case 16:
+  } else if (type->isVectorTy()) {
     vec = getValue("vectorTy");
-    break;
-  default:
+  } else if (type->isEmptyTy()) {
+    vec = getValue("emptyTy");
+  } else if (type->isLabelTy()) {
+    vec = getValue("labelTy");
+  } else if (type->isTokenTy()) {
+    vec = getValue("tokenTy");
+  } else if (type->isMetadataTy()) {
+    vec = getValue("metadataTy");
+  } else {
     vec = getValue("unknownTy");
   }
+
   scaleVector(vec, WT);
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
@@ -1188,7 +1184,7 @@ void IR2Vec_FA::inst2Vec(
 
   Vector instVector(DIM, 0);
   StringRef opcodeName = I.getOpcodeName();
-  auto vec = getValue(opcodeName);
+  auto vec = getValue(opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
@@ -1201,37 +1197,33 @@ void IR2Vec_FA::inst2Vec(
                  outs() << "\n";
                });
 
-  switch (I.getType()->getTypeID()) {
-  case 0:
+  auto type = I.getType();
+
+  if (type->isVoidTy()) {
     vec = getValue("voidTy");
-    break;
-  case 1:
-  case 2:
-  case 3:
-  case 4:
-  case 5:
-  case 6:
+  } else if (type->isFloatingPointTy()) {
     vec = getValue("floatTy");
-    break;
-  case 11:
+  } else if (type->isIntegerTy()) {
     vec = getValue("integerTy");
-    break;
-  case 12:
+  } else if (type->isFunctionTy()) {
     vec = getValue("functionTy");
-    break;
-  case 13:
+  } else if (type->isStructTy()) {
     vec = getValue("structTy");
-    break;
-  case 14:
+  } else if (type->isArrayTy()) {
     vec = getValue("arrayTy");
-    break;
-  case 15:
+  } else if (type->isPointerTy()) {
     vec = getValue("pointerTy");
-    break;
-  case 16:
+  } else if (type->isVectorTy()) {
     vec = getValue("vectorTy");
-    break;
-  default:
+  } else if (type->isEmptyTy()) {
+    vec = getValue("emptyTy");
+  } else if (type->isLabelTy()) {
+    vec = getValue("labelTy");
+  } else if (type->isTokenTy()) {
+    vec = getValue("tokenTy");
+  } else if (type->isMetadataTy()) {
+    vec = getValue("metadataTy");
+  } else {
     vec = getValue("unknownTy");
   }
   scaleVector(vec, WT);

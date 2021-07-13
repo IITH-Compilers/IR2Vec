@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install LLVM-10.0.1
+    - name: Install LLVM-12.0.0
       run: |
-          wget https://apt.llvm.org/llvm.sh
-          sudo bash llvm.sh 10
+        wget https://apt.llvm.org/llvm.sh
+        sudo bash llvm.sh 12
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |

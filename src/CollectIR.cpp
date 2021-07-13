@@ -9,6 +9,7 @@
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
 #include "llvm/Pass.h"
 #include "llvm/Transforms/Scalar.h"
 #include <fstream>
@@ -25,39 +26,55 @@ void CollectIR::generateTriplets(std::ostream &out) {
 void CollectIR::traverseBasicBlock(BasicBlock &B) {
   for (Instruction &I : B) {
     res += "\n" + std::string(I.getOpcodeName()) + " ";
-    switch (I.getType()->getTypeID()) {
-    case 0:
-      res += " voidTy ";
-      break;
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-      res += " floatTy ";
-      break;
-    case 11:
-      res += " integerTy ";
-      break;
-    case 12:
-      res += " functionTy ";
-      break;
-    case 13:
-      res += " structTy ";
-      break;
-    case 14:
-      res += " arrayTy ";
-      break;
-    case 15:
-      res += " pointerTy ";
-      break;
-    case 16:
-      res += " vectorTy ";
-      break;
-    default:
-      res += "unknownTy";
+    auto type = I.getType();
+    IR2VEC_DEBUG(I.print(outs()); outs() << "\n";);
+    IR2VEC_DEBUG(I.getType()->print(outs()); outs() << " Type\n";);
+
+    std::string stype;
+
+    if (type->isVoidTy()) {
+      stype = " voidTy ";
+      res += stype;
+    } else if (type->isFloatingPointTy()) {
+      stype = " floatTy ";
+      res += stype;
+    } else if (type->isIntegerTy()) {
+      stype = " integerTy ";
+      res += stype;
+    } else if (type->isFunctionTy()) {
+      stype = " functionTy ";
+      res += stype;
+    } else if (type->isStructTy()) {
+      stype = " structTy ";
+      res += stype;
+    } else if (type->isArrayTy()) {
+      stype = " arrayTy ";
+      res += stype;
+    } else if (type->isPointerTy()) {
+      stype = " pointerTy ";
+      res += stype;
+    } else if (type->isVectorTy()) {
+      stype = " vectorTy ";
+      res += stype;
+    } else if (type->isEmptyTy()) {
+      stype = " emptyTy ";
+      res += stype;
+    } else if (type->isLabelTy()) {
+      stype = " labelTy ";
+      res += stype;
+    } else if (type->isTokenTy()) {
+      stype = " tokenTy ";
+      res += stype;
+    } else if (type->isMetadataTy()) {
+      stype = " metadataTy ";
+      res += stype;
+    } else {
+      stype = " unknownTy ";
+      res += stype;
     }
+
+    IR2VEC_DEBUG(errs() << "Type taken : " << stype << "\n";);
+
     for (unsigned i = 0; i < I.getNumOperands(); i++) {
       IR2VEC_DEBUG(I.print(outs()); outs() << "\n";);
       IR2VEC_DEBUG(outs() << i << "\n");
