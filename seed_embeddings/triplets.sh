@@ -7,9 +7,8 @@
 #Usage: bash triplets.sh <build dir> <No of opt> <llFile list> <output FileName>
 
 _DEBUG="off"
-function DEBUG()
-{
- [ "$_DEBUG" == "on" ] &&  $@
+function DEBUG() {
+	[ "$_DEBUG" == "on" ] && $@
 }
 
 COLLECT_BUILD=$1
@@ -53,7 +52,7 @@ while read p; do
 	a=0
 	USED_OPT=()
 	while [ "$a" -lt "$NO_OF_OPT_FILES" ]; do # this is loop1
-	    tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXXXXXX)
+		tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXXXXXX)
 		opt_index=$((RANDOM % 6))
 		DEBUG echo "opt_index from $opt_index"
 		opt=${OPT_LEVELS[$opt_index]}
@@ -73,12 +72,11 @@ while read p; do
 		${LLVM_BUILD}/bin/opt-12 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
-	    rm "$tmpfile"
+		rm "$tmpfile"
 	done &
-	if [ $counter == 100 ];
-	then
-	 sleep 20
-	 counter=0
+	if [ $counter == 100 ]; then
+		sleep 20
+		counter=0
 	fi
 
 done <$3

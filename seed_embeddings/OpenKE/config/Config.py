@@ -10,8 +10,8 @@ import json
 
 class Config(object):
     """
-	use ctypes to call C functions from python and set essential parameters.
-	"""
+    use ctypes to call C functions from python and set essential parameters.
+    """
 
     def __init__(self):
         base_file = os.path.abspath(
@@ -89,13 +89,13 @@ class Config(object):
         self.test_link_prediction = False
         self.test_triple_classification = False
         self.early_stopping = (
-            None
-        )  # It expects a tuple of the following: (patience, min_delta)
+            None  # It expects a tuple of the following: (patience, min_delta)
+        )
 
     def init_link_prediction(self):
         r"""
-		import essential files and set essential interfaces for link prediction
-		"""
+        import essential files and set essential interfaces for link prediction
+        """
         self.lib.importTestFiles()
         self.lib.importTypeFiles()
         self.test_h = np.zeros(self.lib.getEntityTotal(), dtype=np.int64)
@@ -107,8 +107,8 @@ class Config(object):
 
     def init_triple_classification(self):
         r"""
-		import essential files and set essential interfaces for triple classification
-		"""
+        import essential files and set essential interfaces for triple classification
+        """
         self.lib.importTestFiles()
         self.lib.importTypeFiles()
 
@@ -518,14 +518,14 @@ class Config(object):
     def predict_head_entity(self, t, r, k):
         r"""This mothod predicts the top k head entities given tail entity and relation.
 
-		Args:
-			t (int): tail entity id
-			r (int): relation id
-			k (int): top k head entities
+        Args:
+                t (int): tail entity id
+                r (int): relation id
+                k (int): top k head entities
 
-		Returns:
-			list: k possible head entity ids
-		"""
+        Returns:
+                list: k possible head entity ids
+        """
         self.init_link_prediction()
         if self.importName != None:
             self.restore_tensorflow()
@@ -539,14 +539,14 @@ class Config(object):
     def predict_tail_entity(self, h, r, k):
         r"""This mothod predicts the top k tail entities given head entity and relation.
 
-		Args:
-			h (int): head entity id
-			r (int): relation id
-			k (int): top k tail entities
+        Args:
+                h (int): head entity id
+                r (int): relation id
+                k (int): top k tail entities
 
-		Returns:
-			list: k possible tail entity ids
-		"""
+        Returns:
+                list: k possible tail entity ids
+        """
         self.init_link_prediction()
         if self.importName != None:
             self.restore_tensorflow()
@@ -560,14 +560,14 @@ class Config(object):
     def predict_relation(self, h, t, k):
         r"""This methods predict the relation id given head entity and tail entity.
 
-		Args:
-			h (int): head entity id
-			t (int): tail entity id
-			k (int): top k relations
+        Args:
+                h (int): head entity id
+                t (int): tail entity id
+                k (int): top k relations
 
-		Returns:
-			list: k possible relation ids
-		"""
+        Returns:
+                list: k possible relation ids
+        """
         self.init_link_prediction()
         if self.importName != None:
             self.restore_tensorflow()
@@ -581,12 +581,12 @@ class Config(object):
     def predict_triple(self, h, t, r, thresh=None):
         r"""This method tells you whether the given triple (h, t, r) is correct of wrong
 
-		Args:
-			h (int): head entity id
-			t (int): tail entity id
-			r (int): relation id
-			thresh (fload): threshold for the triple
-		"""
+        Args:
+                h (int): head entity id
+                t (int): tail entity id
+                r (int): relation id
+                thresh (fload): threshold for the triple
+        """
         self.init_triple_classification()
         if self.importName != None:
             self.restore_tensorflow()

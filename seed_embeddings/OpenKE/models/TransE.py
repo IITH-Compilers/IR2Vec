@@ -6,9 +6,9 @@ from .Model import model
 
 class TransE(model):
     r"""
-	TransE is the first model to introduce translation-based embedding,
-	which interprets relations as the translations operating on entities.
-	"""
+    TransE is the first model to introduce translation-based embedding,
+    which interprets relations as the translations operating on entities.
+    """
 
     def _calc(self, h, t, r):
         h = tf.nn.l2_normalize(h, -1)

@@ -11,9 +11,9 @@ else:
 
 class TransR(model):
     r"""
-	TransR first projects entities from entity space to corresponding relation space
-	and then builds translations between projected entities.
-	"""
+    TransR first projects entities from entity space to corresponding relation space
+    and then builds translations between projected entities.
+    """
 
     def _transfer(self, transfer_matrix, embeddings):
         return matmul_func(embeddings, transfer_matrix)

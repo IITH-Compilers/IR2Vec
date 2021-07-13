@@ -165,45 +165,33 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     std::transform(instVector.begin(), instVector.end(), vec.begin(),
                    instVector.begin(), std::plus<double>());
     auto type = I.getType();
-    
-    if(type->isVoidTy()){
-    vec = getValue("voidTy");
-    }
-    else if( type->isFloatingPointTy()){
-    vec = getValue("floatTy");
-    }
-    else if (type->isIntegerTy()){
-	vec= getValue("integerTy");
-    }
-    else if(type->isFunctionTy()){
-    vec= getValue("functionTy");
-    }
-    else if (type->isStructTy()){
-    vec = getValue("structTy");
-    }
-    else if (type->isArrayTy()){
-   vec = getValue("arrayTy");
-    }
-    else if (type->isPointerTy()){
-     vec = getValue("pointerTy");
-    }
-    else if(type->isVectorTy()){
-    vec =getValue("vectorTy");
-    }
-    else if(type->isEmptyTy()){
-    vec =getValue("emptyTy");
-    }
-    else if (type->isLabelTy()){
-    vec = getValue("labelTy");
-    }
-    else if(type->isTokenTy()){
-    vec = getValue("tokenTy");
-    }
-    else if(type->isMetadataTy()){
-    vec = getValue("metadataTy");
-    }
-    else{
-    vec = getValue("unknownTy");
+
+    if (type->isVoidTy()) {
+      vec = getValue("voidTy");
+    } else if (type->isFloatingPointTy()) {
+      vec = getValue("floatTy");
+    } else if (type->isIntegerTy()) {
+      vec = getValue("integerTy");
+    } else if (type->isFunctionTy()) {
+      vec = getValue("functionTy");
+    } else if (type->isStructTy()) {
+      vec = getValue("structTy");
+    } else if (type->isArrayTy()) {
+      vec = getValue("arrayTy");
+    } else if (type->isPointerTy()) {
+      vec = getValue("pointerTy");
+    } else if (type->isVectorTy()) {
+      vec = getValue("vectorTy");
+    } else if (type->isEmptyTy()) {
+      vec = getValue("emptyTy");
+    } else if (type->isLabelTy()) {
+      vec = getValue("labelTy");
+    } else if (type->isTokenTy()) {
+      vec = getValue("tokenTy");
+    } else if (type->isMetadataTy()) {
+      vec = getValue("metadataTy");
+    } else {
+      vec = getValue("unknownTy");
     }
 
     /*switch (I.getType()->getTypeID()) {
