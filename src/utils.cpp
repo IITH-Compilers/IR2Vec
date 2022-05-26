@@ -37,7 +37,7 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
 }
 
 void IR2Vec::collectDataFromVocab(std::map<std::string, Vector> &opcMap) {
-  errs() << "Reading from " + vocab + "\n";
+  IR2VEC_DEBUG(errs() << "Reading from " + vocab + "\n");
   std::ifstream i(vocab);
   std::string delimiter = ":";
   for (std::string line; getline(i, line);) {

@@ -26,7 +26,7 @@ using abi::__cxa_demangle;
 Vector IR2Vec_Symbolic::getValue(std::string key) {
   Vector vec;
   if (opcMap.find(key) == opcMap.end())
-    errs() << "cannot find key in map : " << key << "\n";
+    IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
   else
     vec = opcMap[key];
   return vec;
