@@ -3,7 +3,7 @@
 //
 // This software is available under the BSD 4-Clause License. Please see LICENSE
 // file in the top-level directory for more details.
-//
+// 
 #include "FlowAware.h"
 #include "VectorSolver.h"
 
