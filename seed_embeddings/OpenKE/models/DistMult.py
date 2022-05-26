@@ -59,7 +59,7 @@ class DistMult(model):
             + tf.nn.softplus(-neg_y * _n_score)
         )
         regul_func = tf.reduce_mean(
-            input_tensor=p_h ** 2 + p_t ** 2 + p_r ** 2 + n_h ** 2 + n_t ** 2 + n_r ** 2
+            input_tensor=p_h**2 + p_t**2 + p_r**2 + n_h**2 + n_t**2 + n_r**2
         )
         self.loss = loss_func + config.lmbda * regul_func
 
