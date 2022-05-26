@@ -98,18 +98,18 @@ class ComplEx(model):
             + tf.nn.softplus(-neg_y * _n_score)
         )
         regul_func = tf.reduce_mean(
-            input_tensor=p1_h ** 2
-            + p1_t ** 2
-            + p1_r ** 2
-            + n1_h ** 2
-            + n1_t ** 2
-            + n1_r ** 2
-            + p2_h ** 2
-            + p2_t ** 2
-            + p2_r ** 2
-            + n2_h ** 2
-            + n2_t ** 2
-            + n2_r ** 2
+            input_tensor=p1_h**2
+            + p1_t**2
+            + p1_r**2
+            + n1_h**2
+            + n1_t**2
+            + n1_r**2
+            + p2_h**2
+            + p2_t**2
+            + p2_r**2
+            + n2_h**2
+            + n2_t**2
+            + n2_r**2
         )
         self.loss = loss_func + config.lmbda * regul_func
 
