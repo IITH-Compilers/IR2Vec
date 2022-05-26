@@ -7,7 +7,7 @@ repos:
     -   id: trailing-whitespace
         exclude: test-suite/oracle
 -   repo: https://github.com/psf/black
-    rev: 21.6b0
+    rev: 22.3.0
     hooks:
     -   id: black
 -   repo: https://github.com/pocc/pre-commit-hooks
