@@ -110,15 +110,15 @@ class Analogy(model):
             input_tensor=tf.nn.softplus(-y * res), axis=0, keepdims=False
         )
         regul_func = (
-            tf.reduce_mean(input_tensor=e1_h ** 2)
-            + tf.reduce_mean(input_tensor=e1_t ** 2)
-            + tf.reduce_mean(input_tensor=e2_h ** 2)
-            + tf.reduce_mean(input_tensor=e2_t ** 2)
-            + tf.reduce_mean(input_tensor=r1 ** 2)
-            + tf.reduce_mean(input_tensor=r2 ** 2)
-            + tf.reduce_mean(input_tensor=e_h ** 2)
-            + tf.reduce_mean(input_tensor=e_t ** 2)
-            + tf.reduce_mean(input_tensor=rel ** 2)
+            tf.reduce_mean(input_tensor=e1_h**2)
+            + tf.reduce_mean(input_tensor=e1_t**2)
+            + tf.reduce_mean(input_tensor=e2_h**2)
+            + tf.reduce_mean(input_tensor=e2_t**2)
+            + tf.reduce_mean(input_tensor=r1**2)
+            + tf.reduce_mean(input_tensor=r2**2)
+            + tf.reduce_mean(input_tensor=e_h**2)
+            + tf.reduce_mean(input_tensor=e_t**2)
+            + tf.reduce_mean(input_tensor=rel**2)
         )
         # Calculating loss to get what the framework will optimize
         self.loss = loss_func + config.lmbda * regul_func
