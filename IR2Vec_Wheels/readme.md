@@ -1,0 +1,17 @@
+    ------------------------ AUTHOR : SHIKHAR JAIN (IITH COMPILERS) & ANILAVA KUNDU (IITH COMPILERS) ----------------------------------
+- Each manylinux wheel is specific to Python ABI version , hence install them accodingly
+- Dependecies
+  - patchelf(sudo apt / as python package)
+- Input:
+  - .ll/.bc file for which embeddings are needed
+  - "fa" -> Flow-Aware Encoddings ; "sym" -> Symbolic Encoddings
+  - "p" -> program level ; "f" -> function level 
+- Output:
+  -A dictionary containing:
+    -Instruction_Dict : Key: Instruction[ String Representation ] ; Value : Embedding Vector ,Dim=<1*300>
+    -Function_Dict: Key: Function name[ String ] ; Value : Embedding Vector ,Dim=<1*300>
+    -Program_List: Key: Program/Module Name[ String ]  ; Value : Embedding Vector ,Dim=<1*300>
+    -Message: [ String ] Appropriate debugg message .
+    -Status: [ Bool ] True if everrything went fine else False
+- test1.py:
+  An example file to understand the functioning.
