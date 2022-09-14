@@ -3,3 +3,5 @@ build/
 __pycache__/
 .vscode
 experiments/*/output
+/home/shikhar_jain/Github/IR2Vec_Fork/IR2Vec/Manylinux2014_Compliant_Source/pkg/test1.sh
+/home/shikhar_jain/Github/IR2Vec_Fork/IR2Vec/Manylinux2014_Compliant_Source/pkg/test2.sh
