@@ -5,7 +5,7 @@
 - Input:
   - .ll/.bc file for which embeddings are needed
   - "fa" -> Flow-Aware Encoddings ; "sym" -> Symbolic Encoddings
-  - "p" -> program level ; "f" -> function level 
+  - "p" -> program level ; "f" -> function level
 - Output:
   -A dictionary containing:
     -Instruction_Dict : Key: Instruction[ String Representation ] ; Value : Embedding Vector ,Dim=<1*300>
