@@ -1,13 +1,4 @@
-# import subprocess as sp
-# import re
-# import pathlib
-# import os
-# from dbm.ndbm import library
 from setuptools import setup, Extension
-
-# from pathlib import Path
-
-# print('$ORIGIN')
 
 IR2Vec_core = Extension(
     "IR2Vec_pkg.core",
@@ -18,11 +9,7 @@ IR2Vec_core = Extension(
     ],  # list of directories to search for C/C++ header files (in Unix form for portability)
     libraries=["z"],
     extra_objects=["./libIR2Vec.a", "./libLLVMMother.a"],
-    # library_dirs=['./'],
-    extra_compile_args=["-v"],
-    # extra_link_args=["-lz"]
-    # library_dirs=['./IR2Vec_pkg'],
-    # runtime_library_dirs=['./IR2Vec_pkg']
+    extra_compile_args=["-v"]
 )
 
 setup(
