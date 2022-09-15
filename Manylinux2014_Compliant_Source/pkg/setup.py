@@ -9,7 +9,7 @@ IR2Vec_core = Extension(
     ],  # list of directories to search for C/C++ header files (in Unix form for portability)
     libraries=["z"],
     extra_objects=["./libIR2Vec.a", "./libLLVMMother.a"],
-    extra_compile_args=["-v"]
+    extra_compile_args=["-v"],
 )
 
 setup(
