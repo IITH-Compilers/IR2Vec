@@ -20,6 +20,21 @@ typedef std::vector<std::vector<double>> matrix;
 
 MatrixXd calculate(MatrixXd A, MatrixXd B) {
   if (A.determinant() != 0) {
+    //int c=A.cols();
+    //int r=A.rows();
+    //MatrixXd invA(r,c);
+    //invA=A.inverse();
+
+    //outs()<<"Inverse:\n";    
+
+    //for(int i=0;i<r;i++){
+    //	for(int j=0;j<c;j++){
+    //	   outs()<<invA(i,j)<<" ";	
+    //	}
+    //	outs()<<"\n";
+    //}
+    //outs()<<"====\n";    
+    
     return A.fullPivHouseholderQr().solve(B);
   } else {
     // To-Do: perturb probabilities

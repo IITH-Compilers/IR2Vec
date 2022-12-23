@@ -293,6 +293,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     return It->second;
   }
 
+  outs()<<"For function: "<<F.getName()<<"\n";  
+
   funcStack.push_back(&F);
 
   instReachingDefsMap.clear();
@@ -439,6 +441,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     outs() << sets << " ";
   } outs() << "\n";);
 
+
+
   SmallVector<double, DIM> prevVec;
   Instruction *argToKill = nullptr;
 
@@ -446,6 +450,15 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     int idx = stack.back();
     stack.pop_back();
     auto component = allSCCs[idx];
+    
+    outs() << "set: " << idx << "\n"; 
+
+    for (auto insts : component) {
+      insts->print(outs());
+      outs() << "  " << insts << " ";
+    }
+    outs() << "========\n";
+
     SmallMapVector<const Instruction *, Vector, 16> partialInstValMap;
     if (component.size() == 1) {
       auto defs = component[0];
@@ -462,8 +475,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
       }
 
       if (!partialInstValMap.empty())
-        solveInstsIteratively(partialInstValMap);
-	//solveInsts(partialInstValMap);
+        //solveInstsIteratively(partialInstValMap);
+	solveInsts(partialInstValMap);
     }
   }
 
@@ -1214,12 +1227,25 @@ void IR2Vec_FA::solveInsts(
     }
   }
 
+  //for(int i=0;i<xI.size();i++){
+  //    for(int j=0;j<xI.size();j++){
+  // 	outs()<<A[i][j]<<" ";
+  //   }
+  //    outs()<<"\n";
+  //   }
+
+   //outs()<<"=====\n";
+
+
+
   for (unsigned i = 0; i < B.size(); i++) {
     auto Bvec = B[i];
     for (unsigned j = 0; j < B[i].size(); j++) {
       B[i][j] = (int)(B[i][j] * 10) / 10.0;
     }
   }
+
+  
 
   auto C = solve(A, B);
   SmallMapVector<const BasicBlock *, SmallVector<const Instruction *, 10>, 16>
