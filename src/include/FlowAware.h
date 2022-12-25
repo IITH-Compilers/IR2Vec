@@ -35,6 +35,15 @@ private:
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
+
+  llvm::SmallMapVector<const llvm::Instruction *, 
+                       std::vector<float>, 128>
+      instCoeffMap;
+  
+  llvm::SmallMapVector<const llvm::Function *, 
+                       std::vector<float>, 128>
+      funcCoeffMap;
+
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
 
   llvm::SmallMapVector<const llvm::Function *,
@@ -79,7 +88,8 @@ private:
   void solveSingleComponent(
       const llvm::Instruction &I,
       llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 16>
-          &instValMap);
+          &instValMap,unsigned numArgs);
+
   void getPartialVec(const llvm::Instruction &I,
                      llvm::SmallMapVector<const llvm::Instruction *,
                                           IR2Vec::Vector, 16> &instValMap);
@@ -98,7 +108,7 @@ private:
   void inst2Vec(const llvm::Instruction &I,
                 llvm::SmallVector<llvm::Function *, 15> &funcStack,
                 llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
-                                     16> &instValMap);
+                                     16> &instValMap,unsigned numArgs);
   void traverseRD(const llvm::Instruction *inst,
                   std::unordered_map<const llvm::Instruction *, bool> &Visited,
                   llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
@@ -108,13 +118,17 @@ private:
                llvm::SmallVector<const llvm::Instruction *, 10> &set);
 
   void bb2Vec(llvm::BasicBlock &B,
-              llvm::SmallVector<llvm::Function *, 15> &funcStack);
+              llvm::SmallVector<llvm::Function *, 15> &funcStack,unsigned numArgs);
   IR2Vec::Vector func2Vec(llvm::Function &F,
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
 
   bool isMemOp(llvm::StringRef opcode, unsigned &operand,
                llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
   std::string splitAndPipeFunctionName(std::string s);
+
+  void isArgumentsReachable(llvm::Function &F,
+                            const llvm::Instruction* I,
+                            std::vector<float> &coeffVector);
 
   void TransitiveReads(llvm::SmallVector<llvm::Instruction *, 16> &Killlist,
                        llvm::Instruction *Inst, llvm::BasicBlock *ParentBB);

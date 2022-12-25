@@ -9,6 +9,7 @@
 #define EIGEN_MPL2_ONLY
 
 #include "Eigen/LU"
+#include <iostream>
 #include "Eigen/QR"
 #include "llvm/ADT/SmallVector.h"
 #include <vector>
@@ -74,5 +75,35 @@ matrix solve(matrix A, matrix B) {
   }
   return raw_data;
 }
+
+matrix solveCoefficients(matrix A, matrix Coeff){
+  int r = A.size();
+  int c = A[0].size();
+  MatrixXd mA(r, c);
+  mA = formMatrix(A, r, c);
+  MatrixXd invA(r,c);
+  invA=mA.inverse();
+
+  r = Coeff.size();
+  c = Coeff[0].size();
+  MatrixXd mCoeff(r, c);
+  mCoeff = formMatrix(Coeff, r, c);
+   
+  
+  MatrixXd result=invA*mCoeff;
+  
+  std::vector<std::vector<double>> raw_data;
+  // raw_data.resize(x.rows());
+  for (unsigned i = 0; i < result.rows(); i++) {
+    std::vector<double> tmp;
+    tmp.resize(result.cols());
+    VectorXd::Map(&tmp[0], result.cols()) = result.row(i);
+    raw_data.push_back(tmp);
+  }
+
+  return raw_data;
+
+}
+
 
 #endif

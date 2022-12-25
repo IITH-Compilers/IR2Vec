@@ -26,7 +26,6 @@ namespace IR2Vec {
 
 #define DIM 300
 using Vector = llvm::SmallVector<double, DIM>;
-
 extern bool fa;
 extern bool sym;
 extern bool collectIR;
@@ -43,6 +42,7 @@ extern bool debug;
 std::unique_ptr<llvm::Module> getLLVMIR();
 void collectDataFromVocab(std::map<std::string, Vector> &opcMap);
 void scaleVector(Vector &vec, float factor);
+void scaleCoefficients(std::vector<float> &vec, float factor);
 } // namespace IR2Vec
 
 #endif

@@ -135,11 +135,26 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
     if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
       auto calleelist = funcCallMap[funcit.first];
       Vector calleeVector(DIM, 0);
+      Vector coeffVector(DIM,0);
+
       for (auto funcs : calleelist) {
         auto tmp = funcVecMap[funcs];
         std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
                        calleeVector.begin(), std::plus<double>());
+        
+        
+        for(auto coeff:funcCoeffMap[funcs]){
+          auto temp=getValue("variable");
+          scaleVector(temp,coeff);
+          std::transform(temp.begin(), temp.end(), coeffVector.begin(),
+                       coeffVector.begin(), std::plus<double>());
+        }
+
       }
+
+      std::transform(coeffVector.begin(), coeffVector.end(), calleeVector.begin(),
+                       calleeVector.begin(), std::plus<double>());
+
       scaleVector(calleeVector, WA);
       auto tmpParent = funcVecMap[funcit.first];
       std::transform(calleeVector.begin(), calleeVector.end(),
@@ -286,14 +301,38 @@ IR2Vec_FA::createKilllist(Instruction *Arg, Instruction *writeInst) {
   return KillList;
 }
 
+void IR2Vec_FA::isArgumentsReachable(Function &F,const Instruction* I,
+                                     std::vector<float> &coeffVector){    
+    for(auto &args:F.args()){
+      bool Found=false;
+      for(auto Users:args.users()){
+        if(Users==I){
+          coeffVector.push_back(WA);
+          Found=true;
+          break;
+        }
+      }
+      if(!Found)
+        coeffVector.push_back(0);
+    }
+}
+
 Vector IR2Vec_FA::func2Vec(Function &F,
                            SmallVector<Function *, 15> &funcStack) {
+  
   auto It = funcVecMap.find(&F);
   if (It != funcVecMap.end()) {
     return It->second;
   }
 
-  outs()<<"For function: "<<F.getName()<<"\n";  
+  //Get number of arguments for current processing function
+  unsigned numArgs=0;
+
+  for(auto &args:F.args()){
+    numArgs++;
+  }
+
+  //outs()<<"For function: "<<F.getName()<<"\n";  
 
   funcStack.push_back(&F);
 
@@ -303,6 +342,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
   SCCAdjList.clear();
 
   Vector funcVector(DIM, 0);
+
+  std::vector<float> FuncCoeff(numArgs,0);
 
   ReversePostOrderTraversal<Function *> RPOT(&F);
 
@@ -450,45 +491,83 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     int idx = stack.back();
     stack.pop_back();
     auto component = allSCCs[idx];
-    
-    outs() << "set: " << idx << "\n"; 
-
-    for (auto insts : component) {
-      insts->print(outs());
-      outs() << "  " << insts << " ";
-    }
-    outs() << "========\n";
 
     SmallMapVector<const Instruction *, Vector, 16> partialInstValMap;
     if (component.size() == 1) {
       auto defs = component[0];
+
+      //temp vector to store coefficients if any
+      std::vector<float> coeffVector;
+
+
+      //defs->dump();
+
+      //Checking if any argument is reaching directly to this instruction
+      isArgumentsReachable(F,defs,coeffVector);
+
+      // outs()<<coeffVector.size();
+
+      instCoeffMap[defs]=coeffVector;  
+
+      // for(auto coeff:coeffVector){
+      //   outs()<<"Coefficients: "<<coeff<<" ";
+      // }
+
+      // outs()<<"\n====\n";
+
       partialInstValMap[defs] = {};
       getPartialVec(*defs, partialInstValMap);
-      solveSingleComponent(*defs, partialInstValMap);
+      solveSingleComponent(*defs, partialInstValMap,numArgs);
       partialInstValMap.erase(defs);
+
+      // outs()<<coeffVector.size();
+
+      // outs()<<"\n Coefficients: "<<"\n"; 
+
+      // for(auto coeff:instCoeffMap[defs]){
+      //   outs()<<coeff<<" ";
+      // }
+
+      // outs()<<"\n====\n";
+
+
     } else {
       cyclicCounter++; // for components with length more than 1 will represent
                        // cycles
       for (auto defs : component) {
+        
+        std::vector<float> coeffVector;
+        isArgumentsReachable(F,defs,coeffVector);
+        instCoeffMap[defs]=coeffVector;
+
         partialInstValMap[defs] = {};
         getPartialVec(*defs, partialInstValMap);
       }
 
       if (!partialInstValMap.empty())
         //solveInstsIteratively(partialInstValMap);
-	solveInsts(partialInstValMap);
+	      solveInsts(partialInstValMap);
     }
   }
 
   for (auto *b : RPOT) {
-    bb2Vec(*b, funcStack);
+    bb2Vec(*b, funcStack,numArgs);
     Vector bbVector(DIM, 0);
+
+    std::vector<float> BBCoeff(numArgs,0);
+
     IR2VEC_DEBUG(outs() << "-------------------------------------------\n");
     for (auto &I : *b) {
       auto It1 = livelinessMap.find(&I);
       if (It1->second == true) {
         IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
         auto vec = instVecMap.find(&I)->second;
+
+        auto Coefftmp=instCoeffMap.find(&I)->second;
+
+        std::transform(BBCoeff.begin(),BBCoeff.end(),Coefftmp.begin(),
+                       BBCoeff.begin(),std::plus<double>());
+
         IR2VEC_DEBUG(outs() << vec[0] << "\n\n");
         std::transform(bbVector.begin(), bbVector.end(), vec.begin(),
                        bbVector.begin(), std::plus<double>());
@@ -502,12 +581,16 @@ Vector IR2Vec_FA::func2Vec(Function &F,
       }
     }
 
+    std::transform(FuncCoeff.begin(), FuncCoeff.end(), BBCoeff.begin(),
+                   FuncCoeff.begin(), std::plus<double>());
+
     std::transform(funcVector.begin(), funcVector.end(), bbVector.begin(),
                    funcVector.begin(), std::plus<double>());
   }
 
   funcStack.pop_back();
   funcVecMap[&F] = funcVector;
+  funcCoeffMap[&F]=FuncCoeff;
   return funcVector;
 }
 
@@ -1084,6 +1167,7 @@ void IR2Vec_FA::solveInsts(
   std::map<unsigned, const Instruction *> xI;
   std::map<const Instruction *, unsigned> Ix;
   std::vector<std::vector<double>> A, B;
+  std::vector<std::vector<double>> CoeffMatrix;
   SmallMapVector<const Instruction *,
                  SmallMapVector<const Instruction *, double, 16>, 16>
       RDValMap;
@@ -1098,6 +1182,8 @@ void IR2Vec_FA::solveInsts(
         tmp.push_back((int)(i * 10) / 10.0);
       }
       B.push_back(tmp);
+      std::vector<double> tmpCoeff(instCoeffMap[inst].begin(),instCoeffMap[inst].end());
+      CoeffMatrix.push_back(tmpCoeff);
       for (unsigned i = 0; i < inst->getNumOperands(); i++) {
         if (isa<Function>(inst->getOperand(i))) {
           auto f = getValue("function");
@@ -1180,6 +1266,21 @@ void IR2Vec_FA::solveInsts(
                 IR2VEC_DEBUG(outs() << vec.back() << "\n");
                 B.push_back(vec);
               }
+              //checking for coefficients
+              if(instCoeffMap.find(i)==instCoeffMap.end()){
+                 assert(instCoeffMap.find(i) != instCoeffMap.end() &&
+                         "Should not reach"); 
+              }
+              else{
+                auto coefftmp=instCoeffMap[i];
+                scaleCoefficients(coefftmp,WA);
+                std::vector<double> vec= CoeffMatrix.back();
+                CoeffMatrix.pop_back();
+                std::transform(coefftmp.begin(), coefftmp.end(), vec.begin(),
+                               vec.begin(), std::plus<double>());
+                //outs()<<vec.size()<<"\n";
+                CoeffMatrix.push_back(vec);
+              }
             }
           } else if (isa<PointerType>(inst->getOperand(i)->getType())) {
             auto l = getValue("pointer");
@@ -1227,14 +1328,14 @@ void IR2Vec_FA::solveInsts(
     }
   }
 
-  //for(int i=0;i<xI.size();i++){
-  //    for(int j=0;j<xI.size();j++){
-  // 	outs()<<A[i][j]<<" ";
+  // for(int i=0;i<xI.size();i++){
+  //    for(int j=0;j<3;j++){
+  // 	outs()<<CoeffMatrix[i][j]<<" ";
   //   }
   //    outs()<<"\n";
   //   }
 
-   //outs()<<"=====\n";
+  //  outs()<<"=====\n";
 
 
 
@@ -1248,6 +1349,24 @@ void IR2Vec_FA::solveInsts(
   
 
   auto C = solve(A, B);
+   
+  auto resultCoeff = solveCoefficients(A,CoeffMatrix);
+
+  // for(int i=0;i<xI.size();i++){
+  //   for(int j=0;j<resultCoeff[0].size();j++){
+  // 	  outs()<<resultCoeff[i][j]<<" ";
+  //   }
+  //   outs()<<"\n";
+  // }
+
+  // outs()<<"=====\n";
+  
+  for (unsigned i = 0; i < resultCoeff.size(); i++) {
+    std::vector<float> tmp(resultCoeff[i].begin(),resultCoeff[i].end());
+    instCoeffMap[xI[i]]=tmp;
+  }
+
+
   SmallMapVector<const BasicBlock *, SmallVector<const Instruction *, 10>, 16>
       bbInstMap;
 
@@ -1289,7 +1408,8 @@ void IR2Vec_FA::solveInsts(
 
 void IR2Vec_FA::solveSingleComponent(
     const Instruction &I,
-    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
+    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap,
+    unsigned numArgs) {
 
   if (instVecMap.find(&I) != instVecMap.end()) {
     IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
@@ -1348,6 +1468,8 @@ void IR2Vec_FA::solveSingleComponent(
 
   Vector vecInst = Vector(DIM, 0);
 
+  std::vector<float> tmpCoeff(numArgs,0);
+
   if (!RDList.empty()) {
     for (auto i : RDList) {
       // Check if value of RD is precomputed
@@ -1365,6 +1487,14 @@ void IR2Vec_FA::solveSingleComponent(
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
       }
+      if(instCoeffMap.find(i) == instCoeffMap.end()){
+          (instCoeffMap.find(i) != instCoeffMap.end() &&
+                 "Should have been solved");
+      }
+      else {
+         std::transform(instCoeffMap[i].begin(),instCoeffMap[i].end(),
+                       tmpCoeff.begin(),tmpCoeff.begin(),std::plus<double>()); 
+      }
     }
   }
 
@@ -1375,11 +1505,24 @@ void IR2Vec_FA::solveSingleComponent(
     IR2VEC_DEBUG(outs() << VecArgs[0]);
 
     scaleVector(VecArgs, WA);
+    scaleCoefficients(tmpCoeff, WA);
+
+
     IR2VEC_DEBUG(outs() << VecArgs.front());
+
+    auto CoeffInst=instCoeffMap[&I];
+
+    // outs()<<"Size: "<<CoeffInst.size()<<"\n";
+
+    std::transform(CoeffInst.begin(), CoeffInst.end(), tmpCoeff.begin(),
+                   CoeffInst.begin(), std::plus<double>());
+
     std::transform(instVector.begin(), instVector.end(), VecArgs.begin(),
                    instVector.begin(), std::plus<double>());
+
     IR2VEC_DEBUG(outs() << instVector.front());
 
+    instCoeffMap[&I] = CoeffInst;
     instVecMap[&I] = instVector;
     livelinessMap.try_emplace(&I, true);
 
@@ -1404,7 +1547,7 @@ void IR2Vec_FA::solveSingleComponent(
 
 void IR2Vec_FA::inst2Vec(
     const Instruction &I, SmallVector<Function *, 15> &funcStack,
-    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
+    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap,unsigned numArgs) {
 
   if (instVecMap.find(&I) != instVecMap.end()) {
     IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
@@ -1507,6 +1650,8 @@ void IR2Vec_FA::inst2Vec(
 
   Vector vecInst = Vector(DIM, 0);
 
+  std::vector<float> tmpCoeff(numArgs,0);
+
   if (!RDList.empty()) {
     for (auto i : RDList) {
       // Check if value of RD is precomputed
@@ -1516,6 +1661,14 @@ void IR2Vec_FA::inst2Vec(
       } else {
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
+      }
+      if(instCoeffMap.find(i) == instCoeffMap.end()){
+          (instCoeffMap.find(i) != instCoeffMap.end() &&
+                 "Should have been solved");
+      }
+      else {
+         std::transform(instCoeffMap[i].begin(),instCoeffMap[i].end(),
+                       tmpCoeff.begin(),tmpCoeff.begin(),std::plus<double>()); 
       }
     }
   }
@@ -1527,11 +1680,22 @@ void IR2Vec_FA::inst2Vec(
     IR2VEC_DEBUG(outs() << VecArgs[0]);
 
     scaleVector(VecArgs, WA);
+    scaleCoefficients(tmpCoeff, WA);
+
+    auto CoeffInst=instCoeffMap[&I];
+
+
+    std::transform(CoeffInst.begin(), CoeffInst.end(), tmpCoeff.begin(),
+                   CoeffInst.begin(), std::plus<double>());
+
+
     IR2VEC_DEBUG(outs() << VecArgs.front());
     std::transform(instVector.begin(), instVector.end(), VecArgs.begin(),
                    instVector.begin(), std::plus<double>());
     IR2VEC_DEBUG(outs() << instVector.front());
+
     instVecMap[&I] = instVector;
+    instCoeffMap[&I]= CoeffInst;
     livelinessMap.try_emplace(&I, true);
 
     if (killMap.find(&I) != killMap.end()) {
@@ -1626,7 +1790,8 @@ void IR2Vec_FA::getAllSCC() {
   }
 }
 
-void IR2Vec_FA::bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack) {
+void IR2Vec_FA::bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack,
+                       unsigned numArgs) {
   SmallMapVector<const Instruction *, Vector, 16> partialInstValMap;
 
   for (auto &I : B) {
@@ -1634,7 +1799,15 @@ void IR2Vec_FA::bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack) {
     partialInstValMap[&I] = {};
     IR2VEC_DEBUG(outs() << "XX------------ Call from bb2vec function "
                            "Started---------------------XX\n");
-    inst2Vec(I, funcStack, partialInstValMap);
+    if(instCoeffMap.find(&I)==instCoeffMap.end()){
+       std::vector<float> coeffVector;
+
+      //Checking if any argument is reaching directly to this instruction
+      isArgumentsReachable(*B.getParent(),&I,coeffVector);
+      instCoeffMap[&I]=coeffVector;
+    }
+
+    inst2Vec(I, funcStack, partialInstValMap,numArgs);
     IR2VEC_DEBUG(outs() << "YY------------Call from bb2vec function "
                            "Ended---------------------YY\n");
     partialInstValMap.erase(&I);

@@ -65,3 +65,9 @@ void IR2Vec::scaleVector(Vector &vec, float factor) {
     vec[i] = vec[i] * factor;
   }
 }
+
+void IR2Vec::scaleCoefficients(std::vector<float> &vec, float factor) {
+  for (unsigned i = 0; i < vec.size(); i++) {
+    vec[i] = vec[i] * factor;
+  }
+}
