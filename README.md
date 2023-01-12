@@ -67,9 +67,10 @@ instructions.
 
 #### Command-Line options
 
-- `mode` - can be one of `sym`/`fa`
+- `mode` - can be one of `sym`/`fa`/`ifa`
     - `sym` denotes Symbolic representation
     - `fa` denotes Flow-Aware representation
+    - `ifa` denotes Interprocedural Flow-Aware representation
 - `vocab`  - the path to the seed embeddings file
 -  `o` - file in which the embeddings are to be appended;     (Note : If  file doesn’t exist, new file would be created, else embeddings would be appended)
 - `level` - can be one of chars `p`/`f`.
