@@ -20,6 +20,9 @@
 
 #include <fstream>
 
+
+static bool ifa=false; 
+
 class IR2Vec_FA {
 
 private:

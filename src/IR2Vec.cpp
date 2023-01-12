@@ -25,6 +25,11 @@ cl::opt<bool> cl_fa("fa", cl::Optional,
                     cl::desc("Generate Flow-Aware Encodings"), cl::init(false),
                     cl::cat(category));
 
+cl::opt<bool>cl_ifa("ifa", cl::Optional,
+                    cl::desc("Generate interprocedural Flow-Aware Encodings"), cl::init(false),
+                    cl::cat(category));
+
+
 cl::opt<bool> cl_collectIR(
     "collectIR", cl::Optional,
     cl::desc("Generate triplets for training seed embedding vocabulary"),
@@ -84,14 +89,16 @@ int main(int argc, char **argv) {
   WA = cl_WA;
   WT = cl_WT;
   debug = cl_debug;
+  ifa=cl_ifa;
+
 
   bool failed = false;
-  if (!((sym ^ fa) ^ collectIR)) {
-    errs() << "Either of sym, fa or collectIR should be specified\n";
+  if (!((sym ^ fa ^ ifa) ^ collectIR)) {
+    errs() << "Either of sym, fa, ifa or collectIR should be specified\n";
     failed = true;
   }
 
-  if (sym || fa) {
+  if (sym || fa || ifa ) {
     if (level != 'p' && level != 'f') {
       errs() << "Invalid level specified: Use either p or f\n";
       failed = true;
@@ -114,7 +121,7 @@ int main(int argc, char **argv) {
 
   auto M = getLLVMIR();
 
-  if (fa) {
+  if (fa || ifa ) {
     IR2Vec_FA FA(*M);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);
