@@ -94,10 +94,7 @@ private:
                      llvm::SmallMapVector<const llvm::Instruction *,
                                           IR2Vec::Vector, 16> &instValMap);
 
-  
-  void solveInstsIteratively(llvm::SmallMapVector<const llvm::Instruction *,
-                                       IR2Vec::Vector, 16> &instValMap);
-  
+    
   void solveInsts(llvm::SmallMapVector<const llvm::Instruction *,
                                        IR2Vec::Vector, 16> &instValMap);
   std::vector<int> topoOrder(int size);
