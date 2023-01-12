@@ -106,7 +106,7 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   collectWriteDefsMap(M);
 
   CallGraph cg = CallGraph(M);
-
+  
   for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
     if (callItr->first && !callItr->first->isDeclaration()) {
       auto ParentFunc = callItr->first;

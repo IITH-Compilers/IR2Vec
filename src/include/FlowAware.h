@@ -21,13 +21,12 @@
 #include <fstream>
 
 
-static bool ifa=false; 
-
 class IR2Vec_FA {
 
 private:
   llvm::Module &M;
   std::string res;
+  bool ifa;
   IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
@@ -79,6 +78,7 @@ private:
 
   void getAllSCC();
 
+  
   IR2Vec::Vector getValue(std::string key);
   void collectWriteDefsMap(llvm::Module &M);
   void getTransitiveUse(
@@ -154,6 +154,11 @@ public:
     dataMissCounter = 0;
     cyclicCounter = 0;
   }
+
+  void setIFA(bool cl_ifa){
+	ifa=cl_ifa;
+  }
+
 
   void generateFlowAwareEncodings(std::ostream *o = nullptr,
                                   std::ostream *missCount = nullptr,

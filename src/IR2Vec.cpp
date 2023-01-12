@@ -89,16 +89,14 @@ int main(int argc, char **argv) {
   WA = cl_WA;
   WT = cl_WT;
   debug = cl_debug;
-  ifa=cl_ifa;
-
 
   bool failed = false;
-  if (!((sym ^ fa ^ ifa) ^ collectIR)) {
+  if (!((sym ^ fa ^ cl_ifa) ^ collectIR)) {
     errs() << "Either of sym, fa, ifa or collectIR should be specified\n";
     failed = true;
   }
 
-  if (sym || fa || ifa ) {
+  if (sym || fa || cl_ifa ) {
     if (level != 'p' && level != 'f') {
       errs() << "Invalid level specified: Use either p or f\n";
       failed = true;
@@ -121,8 +119,9 @@ int main(int argc, char **argv) {
 
   auto M = getLLVMIR();
 
-  if (fa || ifa ) {
+  if (fa || cl_ifa ) {
     IR2Vec_FA FA(*M);
+    FA.setIFA(cl_ifa);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);
     missCount.open("missCount_" + oname, std::ios_base::app);
