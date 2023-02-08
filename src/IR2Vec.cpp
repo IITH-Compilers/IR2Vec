@@ -39,6 +39,9 @@ cl::opt<std::string> cl_iname(cl::Positional, cl::desc("Input file path"),
 
 cl::opt<std::string> cl_oname("o", cl::Required, cl::desc("Output file path"),
                               cl::cat(category));
+// for on demand generation of embeddings taking function name
+cl::opt<std::string> cl_fname("fname", cl::Optional, cl::init(""), cl::desc("Function name"),
+                              cl::cat(category));
 
 cl::opt<char>
     cl_level("level", cl::Optional, cl::init(0),
@@ -61,13 +64,15 @@ cl::opt<bool> cl_debug("debug-ir2vec", cl::Optional,
                        cl::desc("Diagnostics for debugging"), cl::init(false),
                        cl::cat(category));
 
-void printVersion(raw_ostream &ostream) {
+void printVersion(raw_ostream &ostream)
+{
   ostream << "\033[1;35m"
           << "IR2Vec Version : " << IR2VEC_VERSION << "\033[0m\n";
   cl::PrintVersionMessage();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   cl::SetVersionPrinter(printVersion);
   cl::HideUnrelatedOptions(category);
   cl::ParseCommandLineOptions(argc, argv);
@@ -78,6 +83,8 @@ int main(int argc, char **argv) {
   vocab = cl_vocab;
   iname = cl_iname;
   oname = cl_oname;
+  // newly added
+  fname = cl_fname;
   level = cl_level;
   cls = cl_cls;
   WO = cl_WO;
@@ -86,23 +93,29 @@ int main(int argc, char **argv) {
   debug = cl_debug;
 
   bool failed = false;
-  if (!((sym ^ fa) ^ collectIR)) {
+  if (!((sym ^ fa) ^ collectIR))
+  {
     errs() << "Either of sym, fa or collectIR should be specified\n";
     failed = true;
   }
 
-  if (sym || fa) {
-    if (level != 'p' && level != 'f') {
+  if (sym || fa)
+  {
+
+    if (level != 'p' && level != 'f')
+    {
       errs() << "Invalid level specified: Use either p or f\n";
       failed = true;
     }
-    if (vocab.empty()) {
+    if (vocab.empty())
+    {
       errs() << "Should specify vocab pointing to the path of vocabulary\n";
       failed = true;
     }
   }
 
-  else {
+  else
+  {
     if (level)
       errs() << "[WARNING] level would not be used in collectIR mode\n";
     if (!vocab.empty())
@@ -113,8 +126,18 @@ int main(int argc, char **argv) {
     exit(1);
 
   auto M = getLLVMIR();
-
-  if (fa) {
+  // newly added
+  
+  if (sym && !(fname.empty()))
+  {
+    IR2Vec_Symbolic SYM(*M);
+    
+    std::ofstream o;
+    o.open(oname, std::ios_base::app);
+    SYM.generateSymbolicEncodingsForFunction(&o, fname);
+  }
+  else if (fa)
+  {
     IR2Vec_FA FA(*M);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);
@@ -123,14 +146,16 @@ int main(int argc, char **argv) {
     FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
   }
 
-  else if (sym) {
+  else if (sym)
+  {
     IR2Vec_Symbolic SYM(*M);
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     SYM.generateSymbolicEncodings(&o);
   }
 
-  else if (collectIR) {
+  else if (collectIR)
+  {
     CollectIR cir(M);
     std::ofstream o;
     o.open(oname, std::ios_base::app);

@@ -18,7 +18,8 @@
 #include <fstream>
 #include <map>
 
-class IR2Vec_Symbolic {
+class IR2Vec_Symbolic
+{
 
 private:
   llvm::Module &M;
@@ -36,21 +37,24 @@ private:
   std::map<std::string, IR2Vec::Vector> opcMap;
 
 public:
-  IR2Vec_Symbolic(llvm::Module &M) : M{M} {
+  IR2Vec_Symbolic(llvm::Module &M) : M{M}
+  {
     pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
     IR2Vec::collectDataFromVocab(opcMap);
   }
 
   void generateSymbolicEncodings(std::ostream *o = nullptr);
-
+  void generateSymbolicEncodingsForFunction(std::ostream *o = nullptr, std::string name = "");
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
-  getInstVecMap() {
+  getInstVecMap()
+  {
     return instVecMap;
   }
 
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
-  getFuncVecMap() {
+  getFuncVecMap()
+  {
     return funcVecMap;
   }
 
