@@ -123,11 +123,12 @@ int main(int argc, char **argv) {
 
   if (sym && !(fname.empty())) {
     IR2Vec_Symbolic SYM(*M);
-
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     SYM.generateSymbolicEncodingsForFunction(&o, fname);
-  } else if (fa) {
+  }
+
+  else if (fa) {
     IR2Vec_FA FA(*M);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);

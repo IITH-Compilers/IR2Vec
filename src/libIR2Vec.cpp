@@ -9,6 +9,7 @@
 #include "IR2Vec.h"
 #include "Symbolic.h"
 #include "utils.h"
+
 #include "llvm/IR/Module.h"
 #include "llvm/Support/CommandLine.h"
 
@@ -22,18 +23,23 @@ int IR2Vec::Embeddings::generateEncodings(
   IR2Vec::WA = WA;
   IR2Vec::WT = WT;
   IR2Vec::fname = fname;
+
   if (mode == IR2Vec::IR2VecMode::FlowAware) {
     IR2Vec_FA FA(M);
     FA.generateFlowAwareEncodings(o);
     instVecMap = FA.getInstVecMap();
     funcVecMap = FA.getFuncVecMap();
     pgmVector = FA.getProgramVector();
-  } else if (mode == IR2Vec::IR2VecMode::Symbolic && !fname.empty()) {
+  }
+
+  else if (mode == IR2Vec::IR2VecMode::Symbolic && !fname.empty()) {
     IR2Vec_Symbolic SYM(M);
     SYM.generateSymbolicEncodingsForFunction(0, fname);
     instVecMap = SYM.getInstVecMap();
     funcVecMap = SYM.getFuncVecMap();
-  } else if (mode == IR2Vec::IR2VecMode::Symbolic) {
+  }
+
+  else if (mode == IR2Vec::IR2VecMode::Symbolic) {
     IR2Vec_Symbolic SYM(M);
     SYM.generateSymbolicEncodings(o);
     instVecMap = SYM.getInstVecMap();

@@ -5,6 +5,7 @@
 // file in the top-level directory for more details.
 //
 #include "Symbolic.h"
+
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PostOrderIterator.h"
 #include "llvm/Analysis/LoopInfo.h"
@@ -12,12 +13,14 @@
 #include "llvm/IR/Type.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Transforms/Scalar.h"
+
 #include <algorithm> // for transform
 #include <ctype.h>
 #include <cxxabi.h>
 #include <functional> // for plus
 #include <iomanip>
 #include <queue>
+
 using namespace llvm;
 using namespace IR2Vec;
 using abi::__cxa_demangle;
