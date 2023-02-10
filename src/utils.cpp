@@ -17,6 +17,7 @@ bool IR2Vec::collectIR;
 std::string IR2Vec::vocab;
 std::string IR2Vec::iname;
 std::string IR2Vec::oname;
+std::string IR2Vec::fname;
 char IR2Vec::level;
 int IR2Vec::cls;
 float IR2Vec::WO;

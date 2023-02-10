@@ -20,25 +20,27 @@ enum IR2VecMode { FlowAware, Symbolic };
 
 class Embeddings {
   int generateEncodings(llvm::Module &M, IR2VecMode mode, std::string vocab,
-                        char level = '\0', std::ostream *o = nullptr,
-                        int cls = -1, float WO = 1, float WA = 0.2,
-                        float WT = 0.5);
+                        char level = '\0', std::string fname = "",
+                        std::ostream *o = nullptr, int cls = -1, float WO = 1,
+                        float WA = 0.2, float WT = 0.5);
 
   llvm::SmallMapVector<const llvm::Instruction *, Vector, 128> instVecMap;
   llvm::SmallMapVector<const llvm::Function *, Vector, 16> funcVecMap;
   Vector pgmVector;
 
 public:
-  Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab, float WO = 1,
-             float WA = 0.2, float WT = 0.5) {
-    generateEncodings(M, mode, vocab, '\0', nullptr, -1, WO, WA, WT);
+  Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab,
+             std::string fname = "", float WO = 1, float WA = 0.2,
+             float WT = 0.5) {
+    generateEncodings(M, mode, vocab, '\0', fname, nullptr, -1, WO, WA, WT);
   }
 
   // Use this constructor if the representations ought to be written to a file.
   // Analogous to the command line options that are being used in IR2Vec binary.
   Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab, char level,
-             std::ostream *o, float WO = 1, float WA = 0.2, float WT = 0.5) {
-    generateEncodings(M, mode, vocab, level, o, -1, WO, WA, WT);
+             std::ostream *o, float WO = 1, float WA = 0.2, float WT = 0.5,
+             std::string fname = "") {
+    generateEncodings(M, mode, vocab, level, fname, o, -1, WO, WA, WT);
   }
 
   // Returns a map containing instructions and the corresponding vector
