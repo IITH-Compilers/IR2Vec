@@ -140,6 +140,12 @@ public:
   void generateFlowAwareEncodings(std::ostream *o = nullptr,
                                   std::ostream *missCount = nullptr,
                                   std::ostream *cyclicCount = nullptr);
+
+  // newly added
+  void generateFlowAwareEncodingsForFunction(
+      std::ostream *o = nullptr, std::string name = "",
+      std::ostream *missCount = nullptr, std::ostream *cyclicCount = nullptr);
+
   std::map<std::string, IR2Vec::Vector> opcMap;
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>

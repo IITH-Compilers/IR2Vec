@@ -13,6 +13,7 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Analysis/CFG.h"
 #include "llvm/Analysis/CallGraph.h"
+#include "llvm/Demangle/Demangle.h" //for getting function base name
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/DebugInfoMetadata.h"
@@ -197,6 +198,111 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
       res += std::to_string(i) + "\t";
     }
     res += "\n";
+  }
+
+  if (o)
+    *o << res;
+
+  if (missCount) {
+    std::string missEntry =
+        (M.getSourceFileName() + "\t" + std::to_string(dataMissCounter) + "\n");
+    *missCount << missEntry;
+  }
+
+  if (cyclicCount)
+    *cyclicCount << (M.getSourceFileName() + "\t" +
+                     std::to_string(cyclicCounter) + "\n");
+}
+
+// newly added
+void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
+    std::ostream *o, std::string name, std::ostream *missCount,
+    std::ostream *cyclicCount) {
+
+  collectWriteDefsMap(M);
+
+  CallGraph cg = CallGraph(M);
+
+  for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
+    if (callItr->first && !callItr->first->isDeclaration()) {
+      auto ParentFunc = callItr->first;
+      CallGraphNode *cgn = callItr->second.get();
+      if (cgn) {
+        for (auto It = cgn->begin(); It != cgn->end(); It++) {
+          auto func = It->second->getFunction();
+          if (func && !func->isDeclaration())
+            funcCallMap[ParentFunc].push_back(func);
+        }
+      }
+    }
+  }
+
+  int noOfFunc = 0;
+
+  for (auto &f : M) {
+
+    if (!f.isDeclaration()) {
+      SmallVector<Function *, 15> funcStack;
+      auto tmp = func2Vec(f, funcStack);
+      funcVecMap[&f] = tmp;
+    }
+  }
+
+  for (auto funcit : funcVecMap) {
+    if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
+      auto calleelist = funcCallMap[funcit.first];
+      Vector calleeVector(DIM, 0);
+      for (auto funcs : calleelist) {
+        auto tmp = funcVecMap[funcs];
+        std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
+                       calleeVector.begin(), std::plus<double>());
+      }
+      scaleVector(calleeVector, WA);
+      auto tmpParent = funcVecMap[funcit.first];
+      std::transform(calleeVector.begin(), calleeVector.end(),
+                     tmpParent.begin(), tmpParent.begin(), std::plus<double>());
+      funcVecMap[funcit.first] = tmpParent;
+    }
+  }
+
+  for (auto &f : M) {
+    auto funcName = f.getName().str();
+    // getting demangled function name
+    std::size_t sz = 17;
+    int status;
+    char *const readable_name =
+        __cxa_demangle(funcName.c_str(), 0, &sz, &status);
+
+    auto demangledName = status == 0 ? std::string(readable_name) : funcName;
+    // getting actual function name
+    size_t Size = 1;
+    char *Buf = static_cast<char *>(std::malloc(Size));
+    const char *mangled = funcName.c_str();
+    char *Result;
+    llvm::ItaniumPartialDemangler Mangler;
+    if (Mangler.partialDemangle(mangled)) {
+      Result = &demangledName[0];
+    } else {
+      Result = Mangler.getFunctionBaseName(Buf, &Size);
+    }
+    if (!f.isDeclaration() && Result == name) {
+      Vector tmp;
+      SmallVector<Function *, 15> funcStack;
+      tmp = funcVecMap[&f];
+
+      res += M.getSourceFileName() + "__" + demangledName + "\t";
+
+      res += "=\t";
+      for (auto i : tmp) {
+        if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+          i = 0;
+        }
+        res += std::to_string(i) + "\t";
+      }
+      res += "\n";
+
+      noOfFunc++;
+    }
   }
 
   if (o)

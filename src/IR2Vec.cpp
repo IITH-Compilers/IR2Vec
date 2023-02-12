@@ -120,12 +120,21 @@ int main(int argc, char **argv) {
 
   auto M = getLLVMIR();
   // newly added
-
   if (sym && !(fname.empty())) {
     IR2Vec_Symbolic SYM(*M);
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     SYM.generateSymbolicEncodingsForFunction(&o, fname);
+  }
+
+  else if (fa && !(fname.empty())) {
+    IR2Vec_FA FA(*M);
+    std::ofstream o, missCount, cyclicCount;
+    o.open(oname, std::ios_base::app);
+    missCount.open("missCount_" + oname, std::ios_base::app);
+    cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
+    FA.generateFlowAwareEncodingsForFunction(&o, fname, &missCount,
+                                             &cyclicCount);
   }
 
   else if (fa) {
