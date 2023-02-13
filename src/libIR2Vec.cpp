@@ -24,7 +24,13 @@ int IR2Vec::Embeddings::generateEncodings(
   IR2Vec::WT = WT;
   IR2Vec::fname = fname;
 
-  if (mode == IR2Vec::IR2VecMode::FlowAware) {
+  if (mode == IR2Vec::IR2VecMode::FlowAware && !fname.empty()) {
+    IR2Vec_FA FA(M);
+    FA.generateFlowAwareEncodingsForFunction(o, fname);
+    instVecMap = FA.getInstVecMap();
+    funcVecMap = FA.getFuncVecMap();
+
+  } else if (mode == IR2Vec::IR2VecMode::FlowAware) {
     IR2Vec_FA FA(M);
     FA.generateFlowAwareEncodings(o);
     instVecMap = FA.getInstVecMap();
