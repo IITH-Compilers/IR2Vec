@@ -240,8 +240,26 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
   int noOfFunc = 0;
 
   for (auto &f : M) {
+    auto funcName = f.getName().str();
+    // getting demangled function name
+    std::size_t sz = 17;
+    int status;
+    char *const readable_name =
+        __cxa_demangle(funcName.c_str(), 0, &sz, &status);
 
-    if (!f.isDeclaration()) {
+    auto demangledName = status == 0 ? std::string(readable_name) : funcName;
+    // getting actual function name
+    size_t Size = 1;
+    char *Buf = static_cast<char *>(std::malloc(Size));
+    const char *mangled = funcName.c_str();
+    char *Result;
+    llvm::ItaniumPartialDemangler Mangler;
+    if (Mangler.partialDemangle(mangled)) {
+      Result = &demangledName[0];
+    } else {
+      Result = Mangler.getFunctionBaseName(Buf, &Size);
+    }
+    if (!f.isDeclaration() && Result == name) {
       SmallVector<Function *, 15> funcStack;
       auto tmp = func2Vec(f, funcStack);
       funcVecMap[&f] = tmp;
