@@ -25,7 +25,8 @@
 #include <cxxabi.h>
 #include <functional>
 #include <regex>
-
+// #include <stdio.h>
+// #include <time.h> // for calculating time taken
 using namespace llvm;
 using namespace IR2Vec;
 using abi::__cxa_demangle;
@@ -104,23 +105,8 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *missCount,
                                            std::ostream *cyclicCount) {
 
+  // clock_t start = clock();
   collectWriteDefsMap(M);
-
-  CallGraph cg = CallGraph(M);
-
-  for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
-    if (callItr->first && !callItr->first->isDeclaration()) {
-      auto ParentFunc = callItr->first;
-      CallGraphNode *cgn = callItr->second.get();
-      if (cgn) {
-        for (auto It = cgn->begin(); It != cgn->end(); It++) {
-          auto func = It->second->getFunction();
-          if (func && !func->isDeclaration())
-            funcCallMap[ParentFunc].push_back(func);
-        }
-      }
-    }
-  }
 
   int noOfFunc = 0;
 
@@ -134,13 +120,16 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
 
   for (auto funcit : funcVecMap) {
     if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
+      // errs() << funcit.first->getName().str() << " in map\n";
       auto calleelist = funcCallMap[funcit.first];
       Vector calleeVector(DIM, 0);
       for (auto funcs : calleelist) {
+        // errs() << funcs->getName().str() << " ";
         auto tmp = funcVecMap[funcs];
         std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
                        calleeVector.begin(), std::plus<double>());
       }
+      // errs() << "\n";
       scaleVector(calleeVector, WA);
       auto tmpParent = funcVecMap[funcit.first];
       std::transform(calleeVector.begin(), calleeVector.end(),
@@ -212,33 +201,46 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   if (cyclicCount)
     *cyclicCount << (M.getSourceFileName() + "\t" +
                      std::to_string(cyclicCounter) + "\n");
+  // clock_t end = clock();
+  // double elapsed = double(end - start) / CLOCKS_PER_SEC;
+  // printf("Time measured: %.6f seconds.\n", elapsed);
 }
 
 // newly added
+// This function will update funcVecMap by doing DFS starting from parent
+// function
+void IR2Vec_FA::updateFuncVecMap(
+    llvm::Function *function,
+    llvm::SmallMapVector<const llvm::Function *,
+                         llvm::SmallVector<const llvm::Function *, 10>, 16>
+        &funcCallMap,
+    std::unordered_set<const llvm::Function *> &visitedFunctions) {
+  visitedFunctions.insert(function);
+  SmallVector<Function *, 15> funcStack;
+  funcStack.clear();
+  auto tmpParent = func2Vec(*function, funcStack);
+  // funcVecMap is updated with vectors returned by func2Vec
+  funcVecMap[function] = tmpParent;
+  auto calledFunctions = funcCallMap[function];
+  for (auto &calledFunction : calledFunctions) {
+    if (!calledFunction->isDeclaration() &&
+        visitedFunctions.count(calledFunction) == 0) {
+      // doing casting since calledFunctionsis of type of const llvm::Function*
+      // and we need llvm::Function* as argument
+      Function *foo = const_cast<Function *>(calledFunction);
+      // errs() << foo->getName().str() << "\n";
+      // This function is called recursively to update funcVecMap
+      updateFuncVecMap(foo, funcCallMap, visitedFunctions);
+    }
+  }
+}
+
 void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
     std::ostream *o, std::string name, std::ostream *missCount,
     std::ostream *cyclicCount) {
-
+  // clock_t start = clock();
   collectWriteDefsMap(M);
-
-  CallGraph cg = CallGraph(M);
-
-  for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
-    if (callItr->first && !callItr->first->isDeclaration()) {
-      auto ParentFunc = callItr->first;
-      CallGraphNode *cgn = callItr->second.get();
-      if (cgn) {
-        for (auto It = cgn->begin(); It != cgn->end(); It++) {
-          auto func = It->second->getFunction();
-          if (func && !func->isDeclaration())
-            funcCallMap[ParentFunc].push_back(func);
-        }
-      }
-    }
-  }
-
   int noOfFunc = 0;
-
   for (auto &f : M) {
     auto funcName = f.getName().str();
     // getting demangled function name
@@ -260,26 +262,30 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
       Result = Mangler.getFunctionBaseName(Buf, &Size);
     }
     if (!f.isDeclaration() && Result == name) {
-      SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
-      funcVecMap[&f] = tmp;
+      // If fname is matched with one of the functions in module, we will update
+      // funcVecMap of it and it's child functions recursively
+      std::unordered_set<const Function *> visitedFunctions;
+      updateFuncVecMap(&f, funcCallMap, visitedFunctions);
     }
   }
-
-  for (auto funcit : funcVecMap) {
-    if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
-      auto calleelist = funcCallMap[funcit.first];
+  // iterating over all functions in module instead of funcVecMap to preserve
+  // order
+  for (auto &f : M) {
+    if (funcVecMap.find(&f) != funcVecMap.end()) {
+      auto calleelist = funcCallMap[&f];
       Vector calleeVector(DIM, 0);
       for (auto funcs : calleelist) {
+        // errs() << funcs->getName().str() << " ";
         auto tmp = funcVecMap[funcs];
         std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
                        calleeVector.begin(), std::plus<double>());
       }
+      // errs() << "\n";
       scaleVector(calleeVector, WA);
-      auto tmpParent = funcVecMap[funcit.first];
+      auto tmpParent = funcVecMap[&f];
       std::transform(calleeVector.begin(), calleeVector.end(),
                      tmpParent.begin(), tmpParent.begin(), std::plus<double>());
-      funcVecMap[funcit.first] = tmpParent;
+      funcVecMap[&f] = tmpParent;
     }
   }
 
@@ -335,6 +341,9 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
   if (cyclicCount)
     *cyclicCount << (M.getSourceFileName() + "\t" +
                      std::to_string(cyclicCounter) + "\n");
+  // clock_t end = clock();
+  // double elapsed = double(end - start) / CLOCKS_PER_SEC;
+  // printf("Time measured: %.6f seconds.\n", elapsed);
 }
 
 void IR2Vec_FA::topoDFS(int vertex, std::vector<bool> &Visited,
@@ -1255,7 +1264,6 @@ void IR2Vec_FA::solveSingleComponent(
           assert(partialInstValMap.find(i) != partialInstValMap.end() &&
                  "Should have been in instvecmap or partialmap");
         }
-
       } else {
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());

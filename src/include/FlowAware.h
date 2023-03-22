@@ -10,6 +10,7 @@
 #include "utils.h"
 
 #include "llvm/ADT/MapVector.h"
+#include "llvm/Analysis/CallGraph.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Dominators.h"
@@ -17,6 +18,7 @@
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
 #include <unordered_map>
+#include <unordered_set>
 
 #include <fstream>
 
@@ -122,6 +124,7 @@ private:
 
 public:
   IR2Vec_FA(llvm::Module &M) : M{M} {
+
     pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
     IR2Vec::collectDataFromVocab(opcMap);
@@ -135,6 +138,25 @@ public:
 
     dataMissCounter = 0;
     cyclicCounter = 0;
+
+    llvm::CallGraph cg = llvm::CallGraph(M);
+
+    for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
+      if (callItr->first && !callItr->first->isDeclaration()) {
+        auto ParentFunc = callItr->first;
+        llvm::CallGraphNode *cgn = callItr->second.get();
+        if (cgn) {
+
+          for (auto It = cgn->begin(); It != cgn->end(); It++) {
+
+            auto func = It->second->getFunction();
+            if (func && !func->isDeclaration()) {
+              funcCallMap[ParentFunc].push_back(func);
+            }
+          }
+        }
+      }
+    }
   }
 
   void generateFlowAwareEncodings(std::ostream *o = nullptr,
@@ -142,6 +164,12 @@ public:
                                   std::ostream *cyclicCount = nullptr);
 
   // newly added
+  void updateFuncVecMap(
+      llvm::Function *function,
+      llvm::SmallMapVector<const llvm::Function *,
+                           llvm::SmallVector<const llvm::Function *, 10>, 16>
+          &funcCallMap,
+      std::unordered_set<const llvm::Function *> &visitedFunctions);
   void generateFlowAwareEncodingsForFunction(
       std::ostream *o = nullptr, std::string name = "",
       std::ostream *missCount = nullptr, std::ostream *cyclicCount = nullptr);
