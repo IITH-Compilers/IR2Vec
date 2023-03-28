@@ -40,8 +40,8 @@ cl::opt<std::string> cl_iname(cl::Positional, cl::desc("Input file path"),
 cl::opt<std::string> cl_oname("o", cl::Required, cl::desc("Output file path"),
                               cl::cat(category));
 // for on demand generation of embeddings taking function name
-cl::opt<std::string> cl_fname("fname", cl::Optional, cl::init(""),
-                              cl::desc("Function name"), cl::cat(category));
+cl::opt<std::string> cl_funcName("funcName", cl::Optional, cl::init(""),
+                                 cl::desc("Function name"), cl::cat(category));
 
 cl::opt<char>
     cl_level("level", cl::Optional, cl::init(0),
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
   iname = cl_iname;
   oname = cl_oname;
   // newly added
-  fname = cl_fname;
+  funcName = cl_funcName;
   level = cl_level;
   cls = cl_cls;
   WO = cl_WO;
@@ -120,21 +120,23 @@ int main(int argc, char **argv) {
 
   auto M = getLLVMIR();
   // newly added
-  if (sym && !(fname.empty())) {
+  if (sym && !(funcName.empty())) {
     IR2Vec_Symbolic SYM(*M);
     std::ofstream o;
     o.open(oname, std::ios_base::app);
-    SYM.generateSymbolicEncodingsForFunction(&o, fname);
+    SYM.generateSymbolicEncodingsForFunction(&o, funcName);
+    o.close();
   }
 
-  else if (fa && !(fname.empty())) {
+  else if (fa && !(funcName.empty())) {
     IR2Vec_FA FA(*M);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);
     missCount.open("missCount_" + oname, std::ios_base::app);
     cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
-    FA.generateFlowAwareEncodingsForFunction(&o, fname, &missCount,
+    FA.generateFlowAwareEncodingsForFunction(&o, funcName, &missCount,
                                              &cyclicCount);
+    o.close();
   }
 
   else if (fa) {
@@ -144,6 +146,7 @@ int main(int argc, char **argv) {
     missCount.open("missCount_" + oname, std::ios_base::app);
     cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
     FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
+    o.close();
   }
 
   else if (sym) {
@@ -151,6 +154,7 @@ int main(int argc, char **argv) {
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     SYM.generateSymbolicEncodings(&o);
+    o.close();
   }
 
   else if (collectIR) {
@@ -158,6 +162,8 @@ int main(int argc, char **argv) {
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     cir.generateTriplets(o);
+    o.close();
   }
+
   return 0;
 }

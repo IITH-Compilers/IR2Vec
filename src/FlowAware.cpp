@@ -13,7 +13,7 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Analysis/CFG.h"
 #include "llvm/Analysis/CallGraph.h"
-#include "llvm/Demangle/Demangle.h" //for getting function base name
+
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/DebugInfoMetadata.h"
@@ -25,8 +25,7 @@
 #include <cxxabi.h>
 #include <functional>
 #include <regex>
-// #include <stdio.h>
-// #include <time.h> // for calculating time taken
+
 using namespace llvm;
 using namespace IR2Vec;
 using abi::__cxa_demangle;
@@ -101,12 +100,58 @@ Vector IR2Vec_FA::getValue(std::string key) {
   return vec;
 }
 
+// Function to get demangled function name
+auto IR2Vec_FA::getDemagledName(llvm::Function *function) {
+  auto functionName = function->getName().str();
+  std::size_t sz = 17;
+  int status;
+  char *const readable_name =
+      __cxa_demangle(functionName.c_str(), 0, &sz, &status);
+  auto demangledName = status == 0 ? std::string(readable_name) : functionName;
+  return demangledName;
+}
+
+// Function to get actual function name
+auto IR2Vec_FA::getActualName(llvm::Function *function) {
+  auto functionName = function->getName().str();
+  auto demangledName = getDemagledName(function);
+  size_t Size = 1;
+  char *Buf = static_cast<char *>(std::malloc(Size));
+  const char *mangled = functionName.c_str();
+  char *baseName;
+  llvm::ItaniumPartialDemangler Mangler;
+  if (Mangler.partialDemangle(mangled)) {
+    baseName = &demangledName[0];
+  } else {
+    baseName = Mangler.getFunctionBaseName(Buf, &Size);
+  }
+  return baseName;
+}
+
+// Function to update funcVecMap of function with vectors of it's callee list
+void IR2Vec_FA::secondUpdateFuncVecMap(const llvm::Function *function) {
+  if (funcCallMap.find(function) != funcCallMap.end()) {
+
+    auto calleelist = funcCallMap[function];
+    Vector calleeVector(DIM, 0);
+    for (auto funcs : calleelist) {
+
+      auto tmp = funcVecMap[funcs];
+      std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
+                     calleeVector.begin(), std::plus<double>());
+    }
+
+    scaleVector(calleeVector, WA);
+    auto tmpParent = funcVecMap[function];
+    std::transform(calleeVector.begin(), calleeVector.end(), tmpParent.begin(),
+                   tmpParent.begin(), std::plus<double>());
+    funcVecMap[function] = tmpParent;
+  }
+}
+
 void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *missCount,
                                            std::ostream *cyclicCount) {
-
-  // clock_t start = clock();
-  collectWriteDefsMap(M);
 
   int noOfFunc = 0;
 
@@ -119,23 +164,7 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   }
 
   for (auto funcit : funcVecMap) {
-    if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
-      // errs() << funcit.first->getName().str() << " in map\n";
-      auto calleelist = funcCallMap[funcit.first];
-      Vector calleeVector(DIM, 0);
-      for (auto funcs : calleelist) {
-        // errs() << funcs->getName().str() << " ";
-        auto tmp = funcVecMap[funcs];
-        std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
-                       calleeVector.begin(), std::plus<double>());
-      }
-      // errs() << "\n";
-      scaleVector(calleeVector, WA);
-      auto tmpParent = funcVecMap[funcit.first];
-      std::transform(calleeVector.begin(), calleeVector.end(),
-                     tmpParent.begin(), tmpParent.begin(), std::plus<double>());
-      funcVecMap[funcit.first] = tmpParent;
-    }
+    secondUpdateFuncVecMap(funcit.first);
   }
 
   for (auto &f : M) {
@@ -145,14 +174,9 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
       tmp = funcVecMap[&f];
 
       if (level == 'f') {
-        //  if(f.getName() == "main"){
-        auto funcName = f.getName().str();
-        std::size_t sz = 17;
-        int status;
-        char *const readable_name =
-            __cxa_demangle(funcName.c_str(), 0, &sz, &status);
-        auto demangledName =
-            status == 0 ? std::string(readable_name) : funcName;
+
+        auto demangledName = getDemagledName(&f);
+
         res += M.getSourceFileName() + "__" + demangledName + "\t";
 
         res += "=\t";
@@ -163,8 +187,6 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
           res += std::to_string(i) + "\t";
         }
         res += "\n";
-
-        // }
 
         noOfFunc++;
       }
@@ -201,20 +223,13 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   if (cyclicCount)
     *cyclicCount << (M.getSourceFileName() + "\t" +
                      std::to_string(cyclicCounter) + "\n");
-  // clock_t end = clock();
-  // double elapsed = double(end - start) / CLOCKS_PER_SEC;
-  // printf("Time measured: %.6f seconds.\n", elapsed);
 }
 
-// newly added
 // This function will update funcVecMap by doing DFS starting from parent
 // function
 void IR2Vec_FA::updateFuncVecMap(
     llvm::Function *function,
-    llvm::SmallMapVector<const llvm::Function *,
-                         llvm::SmallVector<const llvm::Function *, 10>, 16>
-        &funcCallMap,
-    std::unordered_set<const llvm::Function *> &visitedFunctions) {
+    llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
   visitedFunctions.insert(function);
   SmallVector<Function *, 15> funcStack;
   funcStack.clear();
@@ -223,14 +238,13 @@ void IR2Vec_FA::updateFuncVecMap(
   funcVecMap[function] = tmpParent;
   auto calledFunctions = funcCallMap[function];
   for (auto &calledFunction : calledFunctions) {
-    if (!calledFunction->isDeclaration() &&
+    if (calledFunction != nullptr && !calledFunction->isDeclaration() &&
         visitedFunctions.count(calledFunction) == 0) {
-      // doing casting since calledFunctionsis of type of const llvm::Function*
+      // doing casting since calledFunctions is of type of const llvm::Function*
       // and we need llvm::Function* as argument
-      Function *foo = const_cast<Function *>(calledFunction);
-      // errs() << foo->getName().str() << "\n";
+      auto *callee = const_cast<Function *>(calledFunction);
       // This function is called recursively to update funcVecMap
-      updateFuncVecMap(foo, funcCallMap, visitedFunctions);
+      updateFuncVecMap(callee, visitedFunctions);
     }
   }
 }
@@ -238,94 +252,52 @@ void IR2Vec_FA::updateFuncVecMap(
 void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
     std::ostream *o, std::string name, std::ostream *missCount,
     std::ostream *cyclicCount) {
-  // clock_t start = clock();
-  collectWriteDefsMap(M);
+
   int noOfFunc = 0;
   for (auto &f : M) {
-    auto funcName = f.getName().str();
-    // getting demangled function name
-    std::size_t sz = 17;
-    int status;
-    char *const readable_name =
-        __cxa_demangle(funcName.c_str(), 0, &sz, &status);
 
-    auto demangledName = status == 0 ? std::string(readable_name) : funcName;
-    // getting actual function name
-    size_t Size = 1;
-    char *Buf = static_cast<char *>(std::malloc(Size));
-    const char *mangled = funcName.c_str();
-    char *Result;
-    llvm::ItaniumPartialDemangler Mangler;
-    if (Mangler.partialDemangle(mangled)) {
-      Result = &demangledName[0];
-    } else {
-      Result = Mangler.getFunctionBaseName(Buf, &Size);
-    }
+    auto Result = getActualName(&f);
     if (!f.isDeclaration() && Result == name) {
-      // If fname is matched with one of the functions in module, we will update
-      // funcVecMap of it and it's child functions recursively
-      std::unordered_set<const Function *> visitedFunctions;
-      updateFuncVecMap(&f, funcCallMap, visitedFunctions);
+      // If funcName is matched with one of the functions in module, we will
+      // update funcVecMap of it and it's child functions recursively
+      llvm::SmallSet<const Function *, 16> visitedFunctions;
+      updateFuncVecMap(&f, visitedFunctions);
     }
   }
   // iterating over all functions in module instead of funcVecMap to preserve
   // order
   for (auto &f : M) {
     if (funcVecMap.find(&f) != funcVecMap.end()) {
-      auto calleelist = funcCallMap[&f];
-      Vector calleeVector(DIM, 0);
-      for (auto funcs : calleelist) {
-        // errs() << funcs->getName().str() << " ";
-        auto tmp = funcVecMap[funcs];
-        std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
-                       calleeVector.begin(), std::plus<double>());
-      }
-      // errs() << "\n";
-      scaleVector(calleeVector, WA);
-      auto tmpParent = funcVecMap[&f];
-      std::transform(calleeVector.begin(), calleeVector.end(),
-                     tmpParent.begin(), tmpParent.begin(), std::plus<double>());
-      funcVecMap[&f] = tmpParent;
+      auto *function = const_cast<const Function *>(&f);
+      secondUpdateFuncVecMap(function);
     }
   }
 
   for (auto &f : M) {
-    auto funcName = f.getName().str();
-    // getting demangled function name
-    std::size_t sz = 17;
-    int status;
-    char *const readable_name =
-        __cxa_demangle(funcName.c_str(), 0, &sz, &status);
 
-    auto demangledName = status == 0 ? std::string(readable_name) : funcName;
+    // getting demangled function name
+    auto demangledName = getDemagledName(&f);
     // getting actual function name
-    size_t Size = 1;
-    char *Buf = static_cast<char *>(std::malloc(Size));
-    const char *mangled = funcName.c_str();
-    char *Result;
-    llvm::ItaniumPartialDemangler Mangler;
-    if (Mangler.partialDemangle(mangled)) {
-      Result = &demangledName[0];
-    } else {
-      Result = Mangler.getFunctionBaseName(Buf, &Size);
-    }
+    auto Result = getActualName(&f);
     if (!f.isDeclaration() && Result == name) {
       Vector tmp;
       SmallVector<Function *, 15> funcStack;
       tmp = funcVecMap[&f];
+      if (level == 'f') {
 
-      res += M.getSourceFileName() + "__" + demangledName + "\t";
+        res += M.getSourceFileName() + "__" + demangledName + "\t";
 
-      res += "=\t";
-      for (auto i : tmp) {
-        if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-          i = 0;
+        res += "=\t";
+        for (auto i : tmp) {
+          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+            i = 0;
+          }
+          res += std::to_string(i) + "\t";
         }
-        res += std::to_string(i) + "\t";
-      }
-      res += "\n";
+        res += "\n";
 
-      noOfFunc++;
+        noOfFunc++;
+      }
     }
   }
 
@@ -341,9 +313,6 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
   if (cyclicCount)
     *cyclicCount << (M.getSourceFileName() + "\t" +
                      std::to_string(cyclicCounter) + "\n");
-  // clock_t end = clock();
-  // double elapsed = double(end - start) / CLOCKS_PER_SEC;
-  // printf("Time measured: %.6f seconds.\n", elapsed);
 }
 
 void IR2Vec_FA::topoDFS(int vertex, std::vector<bool> &Visited,

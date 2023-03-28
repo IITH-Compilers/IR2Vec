@@ -10,17 +10,17 @@
 #include "utils.h"
 
 #include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallSet.h"
 #include "llvm/Analysis/CallGraph.h"
 #include "llvm/Analysis/LoopInfo.h"
+#include "llvm/Demangle/Demangle.h" //for getting function base name
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
-#include <unordered_map>
-#include <unordered_set>
-
 #include <fstream>
+#include <unordered_map>
 
 class IR2Vec_FA {
 
@@ -122,6 +122,14 @@ private:
   // For Debugging
   void print(IR2Vec::Vector t, unsigned pos) { llvm::outs() << t[pos]; }
 
+  void updateFuncVecMap(
+      llvm::Function *function,
+      llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions);
+  auto getDemagledName(llvm::Function *function);
+  auto getActualName(llvm::Function *function);
+  void secondUpdateFuncVecMap(const llvm::Function *function);
+  void updateRes(IR2Vec::Vector tmp);
+
 public:
   IR2Vec_FA(llvm::Module &M) : M{M} {
 
@@ -138,6 +146,8 @@ public:
 
     dataMissCounter = 0;
     cyclicCounter = 0;
+
+    collectWriteDefsMap(M);
 
     llvm::CallGraph cg = llvm::CallGraph(M);
 
@@ -164,12 +174,7 @@ public:
                                   std::ostream *cyclicCount = nullptr);
 
   // newly added
-  void updateFuncVecMap(
-      llvm::Function *function,
-      llvm::SmallMapVector<const llvm::Function *,
-                           llvm::SmallVector<const llvm::Function *, 10>, 16>
-          &funcCallMap,
-      std::unordered_set<const llvm::Function *> &visitedFunctions);
+
   void generateFlowAwareEncodingsForFunction(
       std::ostream *o = nullptr, std::string name = "",
       std::ostream *missCount = nullptr, std::ostream *cyclicCount = nullptr);

@@ -33,7 +33,7 @@ extern bool collectIR;
 extern std::string vocab;
 extern std::string iname;
 extern std::string oname;
-extern std::string fname;
+extern std::string funcName;
 extern char level;
 extern int cls;
 extern float WO;
