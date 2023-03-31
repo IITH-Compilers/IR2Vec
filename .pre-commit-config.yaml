@@ -19,7 +19,7 @@ repos:
 #     rev: v0.4.0
 #     hooks:
 #         - id: black_nbconvert
-- repo: https://github.com/psf/black
+-   repo: https://github.com/psf/black
     rev: "22.1.0"
     hooks:
       - id: black-jupyter
