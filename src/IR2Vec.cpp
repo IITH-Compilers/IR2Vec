@@ -9,8 +9,9 @@
 #include "FlowAware.h"
 #include "Symbolic.h"
 #include "version.h"
-
 #include "llvm/Support/CommandLine.h"
+#include <stdio.h>
+#include <time.h>
 
 using namespace llvm;
 using namespace IR2Vec;
@@ -24,7 +25,9 @@ cl::opt<bool> cl_sym("sym", cl::Optional,
 cl::opt<bool> cl_fa("fa", cl::Optional,
                     cl::desc("Generate Flow-Aware Encodings"), cl::init(false),
                     cl::cat(category));
-
+cl::opt<bool> cl_printTime("printTime", cl::Optional,
+                           cl::desc("Prints time taken to generate Encodings"),
+                           cl::init(false), cl::cat(category));
 cl::opt<bool> cl_collectIR(
     "collectIR", cl::Optional,
     cl::desc("Generate triplets for training seed embedding vocabulary"),
@@ -39,6 +42,9 @@ cl::opt<std::string> cl_iname(cl::Positional, cl::desc("Input file path"),
 
 cl::opt<std::string> cl_oname("o", cl::Required, cl::desc("Output file path"),
                               cl::cat(category));
+// for on demand generation of embeddings taking function name
+cl::opt<std::string> cl_funcName("funcName", cl::Optional, cl::init(""),
+                                 cl::desc("Function name"), cl::cat(category));
 
 cl::opt<char>
     cl_level("level", cl::Optional, cl::init(0),
@@ -78,12 +84,15 @@ int main(int argc, char **argv) {
   vocab = cl_vocab;
   iname = cl_iname;
   oname = cl_oname;
+  // newly added
+  funcName = cl_funcName;
   level = cl_level;
   cls = cl_cls;
   WO = cl_WO;
   WA = cl_WA;
   WT = cl_WT;
   debug = cl_debug;
+  printTime = cl_printTime;
 
   bool failed = false;
   if (!((sym ^ fa) ^ collectIR)) {
@@ -92,6 +101,7 @@ int main(int argc, char **argv) {
   }
 
   if (sym || fa) {
+
     if (level != 'p' && level != 'f') {
       errs() << "Invalid level specified: Use either p or f\n";
       failed = true;
@@ -113,21 +123,87 @@ int main(int argc, char **argv) {
     exit(1);
 
   auto M = getLLVMIR();
+  // newly added
+  if (sym && !(funcName.empty())) {
+    IR2Vec_Symbolic SYM(*M);
+    std::ofstream o;
+    o.open(oname, std::ios_base::app);
+    if (printTime) {
+      clock_t start = clock();
+      SYM.generateSymbolicEncodingsForFunction(&o, funcName);
+      clock_t end = clock();
+      double elapsed = double(end - start) / CLOCKS_PER_SEC;
+      printf(
+          "Time taken by on-demand generation of symbolic encodings is: %.6f "
+          "seconds.\n",
+          elapsed);
+    } else {
+      SYM.generateSymbolicEncodingsForFunction(&o, funcName);
+    }
 
-  if (fa) {
+    o.close();
+  }
+
+  else if (fa && !(funcName.empty())) {
     IR2Vec_FA FA(*M);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);
     missCount.open("missCount_" + oname, std::ios_base::app);
     cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
-    FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
+    if (printTime) {
+      clock_t start = clock();
+      FA.generateFlowAwareEncodingsForFunction(&o, funcName, &missCount,
+                                               &cyclicCount);
+      clock_t end = clock();
+      double elapsed = double(end - start) / CLOCKS_PER_SEC;
+      printf(
+          "Time taken by on-demand generation of flow-aware encodings is: %.6f "
+          "seconds.\n",
+          elapsed);
+    } else {
+      FA.generateFlowAwareEncodingsForFunction(&o, funcName, &missCount,
+                                               &cyclicCount);
+    }
+
+    o.close();
+  }
+
+  else if (fa) {
+    IR2Vec_FA FA(*M);
+    std::ofstream o, missCount, cyclicCount;
+    o.open(oname, std::ios_base::app);
+    missCount.open("missCount_" + oname, std::ios_base::app);
+    cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
+    if (printTime) {
+      clock_t start = clock();
+      FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
+      clock_t end = clock();
+      double elapsed = double(end - start) / CLOCKS_PER_SEC;
+      printf("Time taken by normal generation of flow-aware encodings is: %.6f "
+             "seconds.\n",
+             elapsed);
+    } else {
+      FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
+    }
+    o.close();
   }
 
   else if (sym) {
     IR2Vec_Symbolic SYM(*M);
     std::ofstream o;
     o.open(oname, std::ios_base::app);
-    SYM.generateSymbolicEncodings(&o);
+    if (printTime) {
+      clock_t start = clock();
+      SYM.generateSymbolicEncodings(&o);
+      clock_t end = clock();
+      double elapsed = double(end - start) / CLOCKS_PER_SEC;
+      printf("Time taken by normal generation of symbolic encodings is: %.6f "
+             "seconds.\n",
+             elapsed);
+    } else {
+      SYM.generateSymbolicEncodings(&o);
+    }
+    o.close();
   }
 
   else if (collectIR) {
@@ -135,6 +211,8 @@ int main(int argc, char **argv) {
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     cir.generateTriplets(o);
+    o.close();
   }
+
   return 0;
 }

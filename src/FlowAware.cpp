@@ -13,6 +13,7 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Analysis/CFG.h"
 #include "llvm/Analysis/CallGraph.h"
+
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/DebugInfoMetadata.h"
@@ -21,13 +22,12 @@
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 
 #include <algorithm> // for transform
-#include <cxxabi.h>
+
 #include <functional>
 #include <regex>
 
 using namespace llvm;
 using namespace IR2Vec;
-using abi::__cxa_demangle;
 
 void IR2Vec_FA::getTransitiveUse(
     const Instruction *root, const Instruction *def,
@@ -99,27 +99,30 @@ Vector IR2Vec_FA::getValue(std::string key) {
   return vec;
 }
 
+// Function to update funcVecMap of function with vectors of it's callee list
+void IR2Vec_FA::updateFuncVecMapWithCallee(const llvm::Function *function) {
+  if (funcCallMap.find(function) != funcCallMap.end()) {
+
+    auto calleelist = funcCallMap[function];
+    Vector calleeVector(DIM, 0);
+    for (auto funcs : calleelist) {
+
+      auto tmp = funcVecMap[funcs];
+      std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
+                     calleeVector.begin(), std::plus<double>());
+    }
+
+    scaleVector(calleeVector, WA);
+    auto tmpParent = funcVecMap[function];
+    std::transform(calleeVector.begin(), calleeVector.end(), tmpParent.begin(),
+                   tmpParent.begin(), std::plus<double>());
+    funcVecMap[function] = tmpParent;
+  }
+}
+
 void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *missCount,
                                            std::ostream *cyclicCount) {
-
-  collectWriteDefsMap(M);
-
-  CallGraph cg = CallGraph(M);
-
-  for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
-    if (callItr->first && !callItr->first->isDeclaration()) {
-      auto ParentFunc = callItr->first;
-      CallGraphNode *cgn = callItr->second.get();
-      if (cgn) {
-        for (auto It = cgn->begin(); It != cgn->end(); It++) {
-          auto func = It->second->getFunction();
-          if (func && !func->isDeclaration())
-            funcCallMap[ParentFunc].push_back(func);
-        }
-      }
-    }
-  }
 
   int noOfFunc = 0;
 
@@ -132,20 +135,7 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   }
 
   for (auto funcit : funcVecMap) {
-    if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
-      auto calleelist = funcCallMap[funcit.first];
-      Vector calleeVector(DIM, 0);
-      for (auto funcs : calleelist) {
-        auto tmp = funcVecMap[funcs];
-        std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
-                       calleeVector.begin(), std::plus<double>());
-      }
-      scaleVector(calleeVector, WA);
-      auto tmpParent = funcVecMap[funcit.first];
-      std::transform(calleeVector.begin(), calleeVector.end(),
-                     tmpParent.begin(), tmpParent.begin(), std::plus<double>());
-      funcVecMap[funcit.first] = tmpParent;
-    }
+    updateFuncVecMapWithCallee(funcit.first);
   }
 
   for (auto &f : M) {
@@ -155,27 +145,8 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
       tmp = funcVecMap[&f];
 
       if (level == 'f') {
-        //  if(f.getName() == "main"){
-        auto funcName = f.getName().str();
-        std::size_t sz = 17;
-        int status;
-        char *const readable_name =
-            __cxa_demangle(funcName.c_str(), 0, &sz, &status);
-        auto demangledName =
-            status == 0 ? std::string(readable_name) : funcName;
-        res += M.getSourceFileName() + "__" + demangledName + "\t";
-
-        res += "=\t";
-        for (auto i : tmp) {
-          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-            i = 0;
-          }
-          res += std::to_string(i) + "\t";
-        }
+        res += updatedRes(tmp, &f, &M);
         res += "\n";
-
-        // }
-
         noOfFunc++;
       }
 
@@ -197,6 +168,83 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
       res += std::to_string(i) + "\t";
     }
     res += "\n";
+  }
+
+  if (o)
+    *o << res;
+
+  if (missCount) {
+    std::string missEntry =
+        (M.getSourceFileName() + "\t" + std::to_string(dataMissCounter) + "\n");
+    *missCount << missEntry;
+  }
+
+  if (cyclicCount)
+    *cyclicCount << (M.getSourceFileName() + "\t" +
+                     std::to_string(cyclicCounter) + "\n");
+}
+
+// This function will update funcVecMap by doing DFS starting from parent
+// function
+void IR2Vec_FA::updateFuncVecMap(
+    llvm::Function *function,
+    llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
+  visitedFunctions.insert(function);
+  SmallVector<Function *, 15> funcStack;
+  funcStack.clear();
+  auto tmpParent = func2Vec(*function, funcStack);
+  // funcVecMap is updated with vectors returned by func2Vec
+  funcVecMap[function] = tmpParent;
+  auto calledFunctions = funcCallMap[function];
+  for (auto &calledFunction : calledFunctions) {
+    if (calledFunction && !calledFunction->isDeclaration() &&
+        visitedFunctions.count(calledFunction) == 0) {
+      // doing casting since calledFunctions is of type of const llvm::Function*
+      // and we need llvm::Function* as argument
+      auto *callee = const_cast<Function *>(calledFunction);
+      // This function is called recursively to update funcVecMap
+      updateFuncVecMap(callee, visitedFunctions);
+    }
+  }
+}
+
+void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
+    std::ostream *o, std::string name, std::ostream *missCount,
+    std::ostream *cyclicCount) {
+
+  int noOfFunc = 0;
+  for (auto &f : M) {
+
+    auto Result = getActualName(&f);
+    if (!f.isDeclaration() && Result == name) {
+      // If funcName is matched with one of the functions in module, we will
+      // update funcVecMap of it and it's child functions recursively
+      llvm::SmallSet<const Function *, 16> visitedFunctions;
+      updateFuncVecMap(&f, visitedFunctions);
+    }
+  }
+  // iterating over all functions in module instead of funcVecMap to preserve
+  // order
+  for (auto &f : M) {
+    if (funcVecMap.find(&f) != funcVecMap.end()) {
+      auto *function = const_cast<const Function *>(&f);
+      updateFuncVecMapWithCallee(function);
+    }
+  }
+
+  for (auto &f : M) {
+    auto Result = getActualName(&f);
+    if (!f.isDeclaration() && Result == name) {
+      Vector tmp;
+      SmallVector<Function *, 15> funcStack;
+      tmp = funcVecMap[&f];
+
+      if (level == 'f') {
+        res += updatedRes(tmp, &f, &M);
+        res += "\n";
+        noOfFunc++;
+      }
+    }
   }
 
   if (o)
@@ -1131,7 +1179,6 @@ void IR2Vec_FA::solveSingleComponent(
           assert(partialInstValMap.find(i) != partialInstValMap.end() &&
                  "Should have been in instvecmap or partialmap");
         }
-
       } else {
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
