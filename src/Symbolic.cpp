@@ -36,42 +36,14 @@ Vector IR2Vec_Symbolic::getValue(std::string key) {
 
 void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
   int noOfFunc = 0;
-
   for (auto &f : M) {
     if (!f.isDeclaration()) {
       SmallVector<Function *, 15> funcStack;
       auto tmp = func2Vec(f, funcStack);
       funcVecMap[&f] = tmp;
-    }
-  }
-
-  for (auto &f : M) {
-    if (!f.isDeclaration()) {
-      SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
       if (level == 'f') {
-        //  if(f.getName() == "main"){
-        auto funcName = f.getName().str();
-        std::size_t sz = 17;
-        int status;
-        char *const readable_name =
-            __cxa_demangle(funcName.c_str(), 0, &sz, &status);
-        auto demangledName =
-            status == 0 ? std::string(readable_name) : funcName;
-
-        res += M.getSourceFileName() + "__" + demangledName + "\t";
-
-        res += "=\t";
-        for (auto i : tmp) {
-          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-            i = 0;
-          }
-          res += std::to_string(i) + "\t";
-        }
+        res += updatedRes(tmp, &f, &M);
         res += "\n";
-
-        // }
-
         noOfFunc++;
       }
 
@@ -108,41 +80,18 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
 // for generating symbolic encodings for specific function
 void IR2Vec_Symbolic::generateSymbolicEncodingsForFunction(std::ostream *o,
                                                            std::string name) {
+  int noOfFunc = 0;
   for (auto &f : M) {
-    auto funcName = f.getName().str();
-    // getting demangled function name
-    std::size_t sz = 17;
-    int status;
-    char *const readable_name =
-        __cxa_demangle(funcName.c_str(), 0, &sz, &status);
-
-    auto demangledName = status == 0 ? std::string(readable_name) : funcName;
-    // getting actual function name
-    size_t Size = 1;
-    char *Buf = static_cast<char *>(std::malloc(Size));
-    const char *mangled = funcName.c_str();
-    char *Result;
-    llvm::ItaniumPartialDemangler Mangler;
-    if (Mangler.partialDemangle(mangled)) {
-      Result = &demangledName[0];
-    } else {
-      Result = Mangler.getFunctionBaseName(Buf, &Size);
-    }
+    auto Result = getActualName(&f);
     if (!f.isDeclaration() && Result == name) {
+      Vector tmp;
       SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
+      tmp = func2Vec(f, funcStack);
+      funcVecMap[&f] = tmp;
       if (level == 'f') {
-
-        res += M.getSourceFileName() + "__" + demangledName + "\t";
-
-        res += "=\t";
-        for (auto i : tmp) {
-          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-            i = 0;
-          }
-          res += std::to_string(i) + "\t";
-        }
+        res += updatedRes(tmp, &f, &M);
         res += "\n";
+        noOfFunc++;
       }
     }
   }

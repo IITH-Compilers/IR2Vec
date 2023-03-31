@@ -13,7 +13,6 @@
 #include "llvm/ADT/SmallSet.h"
 #include "llvm/Analysis/CallGraph.h"
 #include "llvm/Analysis/LoopInfo.h"
-#include "llvm/Demangle/Demangle.h" //for getting function base name
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
@@ -125,10 +124,8 @@ private:
   void updateFuncVecMap(
       llvm::Function *function,
       llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions);
-  auto getDemagledName(llvm::Function *function);
-  auto getActualName(llvm::Function *function);
-  void secondUpdateFuncVecMap(const llvm::Function *function);
-  void updateRes(IR2Vec::Vector tmp);
+
+  void updateFuncVecMapWithCallee(const llvm::Function *function);
 
 public:
   IR2Vec_FA(llvm::Module &M) : M{M} {

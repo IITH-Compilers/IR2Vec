@@ -22,13 +22,12 @@
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 
 #include <algorithm> // for transform
-#include <cxxabi.h>
+
 #include <functional>
 #include <regex>
 
 using namespace llvm;
 using namespace IR2Vec;
-using abi::__cxa_demangle;
 
 void IR2Vec_FA::getTransitiveUse(
     const Instruction *root, const Instruction *def,
@@ -100,36 +99,8 @@ Vector IR2Vec_FA::getValue(std::string key) {
   return vec;
 }
 
-// Function to get demangled function name
-auto IR2Vec_FA::getDemagledName(llvm::Function *function) {
-  auto functionName = function->getName().str();
-  std::size_t sz = 17;
-  int status;
-  char *const readable_name =
-      __cxa_demangle(functionName.c_str(), 0, &sz, &status);
-  auto demangledName = status == 0 ? std::string(readable_name) : functionName;
-  return demangledName;
-}
-
-// Function to get actual function name
-auto IR2Vec_FA::getActualName(llvm::Function *function) {
-  auto functionName = function->getName().str();
-  auto demangledName = getDemagledName(function);
-  size_t Size = 1;
-  char *Buf = static_cast<char *>(std::malloc(Size));
-  const char *mangled = functionName.c_str();
-  char *baseName;
-  llvm::ItaniumPartialDemangler Mangler;
-  if (Mangler.partialDemangle(mangled)) {
-    baseName = &demangledName[0];
-  } else {
-    baseName = Mangler.getFunctionBaseName(Buf, &Size);
-  }
-  return baseName;
-}
-
 // Function to update funcVecMap of function with vectors of it's callee list
-void IR2Vec_FA::secondUpdateFuncVecMap(const llvm::Function *function) {
+void IR2Vec_FA::updateFuncVecMapWithCallee(const llvm::Function *function) {
   if (funcCallMap.find(function) != funcCallMap.end()) {
 
     auto calleelist = funcCallMap[function];
@@ -164,7 +135,7 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   }
 
   for (auto funcit : funcVecMap) {
-    secondUpdateFuncVecMap(funcit.first);
+    updateFuncVecMapWithCallee(funcit.first);
   }
 
   for (auto &f : M) {
@@ -174,20 +145,8 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
       tmp = funcVecMap[&f];
 
       if (level == 'f') {
-
-        auto demangledName = getDemagledName(&f);
-
-        res += M.getSourceFileName() + "__" + demangledName + "\t";
-
-        res += "=\t";
-        for (auto i : tmp) {
-          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-            i = 0;
-          }
-          res += std::to_string(i) + "\t";
-        }
+        res += updatedRes(tmp, &f, &M);
         res += "\n";
-
         noOfFunc++;
       }
 
@@ -238,7 +197,7 @@ void IR2Vec_FA::updateFuncVecMap(
   funcVecMap[function] = tmpParent;
   auto calledFunctions = funcCallMap[function];
   for (auto &calledFunction : calledFunctions) {
-    if (calledFunction != nullptr && !calledFunction->isDeclaration() &&
+    if (calledFunction && !calledFunction->isDeclaration() &&
         visitedFunctions.count(calledFunction) == 0) {
       // doing casting since calledFunctions is of type of const llvm::Function*
       // and we need llvm::Function* as argument
@@ -269,33 +228,20 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
   for (auto &f : M) {
     if (funcVecMap.find(&f) != funcVecMap.end()) {
       auto *function = const_cast<const Function *>(&f);
-      secondUpdateFuncVecMap(function);
+      updateFuncVecMapWithCallee(function);
     }
   }
 
   for (auto &f : M) {
-
-    // getting demangled function name
-    auto demangledName = getDemagledName(&f);
-    // getting actual function name
     auto Result = getActualName(&f);
     if (!f.isDeclaration() && Result == name) {
       Vector tmp;
       SmallVector<Function *, 15> funcStack;
       tmp = funcVecMap[&f];
+
       if (level == 'f') {
-
-        res += M.getSourceFileName() + "__" + demangledName + "\t";
-
-        res += "=\t";
-        for (auto i : tmp) {
-          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-            i = 0;
-          }
-          res += std::to_string(i) + "\t";
-        }
+        res += updatedRes(tmp, &f, &M);
         res += "\n";
-
         noOfFunc++;
       }
     }
