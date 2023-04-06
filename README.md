@@ -76,7 +76,7 @@ instructions.
     - `p` denotes `program level` encoding
     - `f` denotes `function level` encoding
 - `class` - non-mandatory argument. Used for the purpose of mentioning class labels for *classification tasks* (To be used with the `level p`). Defaults to *-1*.  When, not equal to -1, the pass prints `class-number` followed by the corresponding  embeddings
-- `funcName` - also a non-mandatory argument. Used for generating embeddings only for the functions with given name
+- `funcName` - also a non-mandatory argument. Used for generating embeddings only for the functions with given name. `level` should be `f` while using this option
 
 Please use `--help` for further details.
 
@@ -97,10 +97,10 @@ Please use `--help` for further details.
  * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
 
 #### On-demand Flow-Aware Embeddings
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level <p|f>  -class <class-number> -funcName=\<function-name\><input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### On-demand Symbolic Embeddings
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level <p|f> -class <class-number> -funcName=\<function-name\> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
