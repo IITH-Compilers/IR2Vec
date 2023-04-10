@@ -87,91 +87,21 @@ else
     exit 1
 fi
 
+functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" "insertionSort" "binomialCoeff" "find" "countParenth" "boruvkaMST" "maxStackHeight" "badCharHeuristic" "bpm"
+    "count" "getMaxUtil" "buildSuffixArray" "countOnes" "countStrings" "countRec" "countWays" "AP" "cutRod" "isCyclic" "isDivisible" "DFS" "editDist" "eggDrop" "isSC" "isConnected" "printClosest"
+	"findCrossOver" "isvalid" "getParty" "floydWarshall" "greedyColoring" "printSolution" "push" "swap" "multiply" "KMPSearch" "randomPartition" "LISS" "findRank"  "lis"  "printSubStr"
+  	"lps" "topologicalSortUtil" "isSafe" "kadane" "mergeSort" "SortedMerge" "min" "mTCDP" "bfs" "minJumps" "getCount" "solveNQ" "sortK" "sum" "fib" "minPalPartion" "quickSort" "solveMaze"
+	"selectKItems" "getMinDiceThrows" "countSort" "subset_sum" "SolveSudoku" "SCC" "solveKTUtil" "topologicalSort" "transitiveClosure" "insertSuffix" "tugOfWar" "isUgly" "Union" "printVertexCover"
+	 "findMaxProfit" "solveWordWrap")
 
 ORIG_FILE_ONDEMAND=oracle/${EncodingType}_${SEED_VERSION}_onDemand/ir2vec.txt
 VIR_FILE_ONDEMAND=ir2vec_onDemand.txt
 while IFS= read -r d
 do
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=main -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=buildMatchingMachine -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=search -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=BellamFord -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=BFS -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isBCUtil -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=insertionSort -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=binomialCoeff -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=find -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=countParenth -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=boruvkaMST -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=maxStackHeight -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=badCharHeuristic -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=bpm -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=count -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=getMaxUtil -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=buildSuffixArray -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=countOnes -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=countStrings -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=countRec -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=countWays -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=AP -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=cutRod -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isCyclic -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isDivisible -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=DFS -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=editDist -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=eggDrop -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isSC -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isConnected -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=printClosest -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=findCrossOver -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isvalid -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=getParty -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=floydWarshall -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=greedyColoring -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=printSolution -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=push -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=swap -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=multiply -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=KMPSearch -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=randomPartition -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=LISS -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=findRank -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=lis -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=printSubStr -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=lps -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=topologicalSortUtil -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isSafe -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=kadane -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=mergeSort -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=SortedMerge -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=min -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=mTCDP -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=bfs -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=minJumps -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=getCount -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=solveNQ -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=sortK -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=sum -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=fib -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=minPalPartion -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=quickSort -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=solveMaze -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=selectKItems -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=getMinDiceThrows -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=countSort -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=subset_sum -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=SolveSudoku -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=SCC -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=solveKTUtil -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=topologicalSort -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=transitiveClosure -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=insertSuffix -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=tugOfWar -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=isUgly -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=Union -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=printVertexCover -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=findMaxProfit -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=solveWordWrap -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
+for func in "${functions[@]}"
+do
+	../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
+done
 
 
 done < index-${SEED_VERSION}.files
