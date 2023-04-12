@@ -4,11 +4,12 @@
 # This software is available under the BSD 4-Clause License. Please see LICENSE
 # file in the top-level directory for more details.
 #
-SRC_WD="PE-benchmarks-llfiles-llvm12"
-DEST_FOLDER_SYM="oracle/SYM_llvm12_f"
-DEST_FOLDER_FA="oracle/FA_llvm12_f"
-DEST_FOLDER_SYM_ONDEMAND="oracle/SYM_llvm12_onDemand"
-DEST_FOLDER_FA_ONDEMAND="oracle/FA_llvm12_onDemand"
+SEED_VERSION="llvm12"
+# SRC_WD="PE-benchmarks-llfiles-llvm12"
+DEST_FOLDER_SYM="oracle/SYM_${SEED_VERSION}_f"
+DEST_FOLDER_FA="oracle/FA_${SEED_VERSION}_f"
+DEST_FOLDER_SYM_ONDEMAND="oracle/SYM_${SEED_VERSION}_onDemand"
+DEST_FOLDER_FA_ONDEMAND="oracle/FA_${SEED_VERSION}_onDemand"
 mkdir -p ${DEST_FOLDER_SYM}
 mkdir -p ${DEST_FOLDER_FA}
 mkdir -p ${DEST_FOLDER_SYM_ONDEMAND}
@@ -21,7 +22,7 @@ LLVM_BUILD=/home/cs20btech11029/repos/llvm-project/build
 IR2VEC_PATH=/home/cs20btech11029/repos/IR2Vec/build/bin/ir2vec
 
 #Update Vocabulary Path to use
-VOCAB_PATH=/home/cs20btech11029/repos/IR2Vec/vocabulary/seedEmbeddingVocab-300-llvm12.txt
+VOCAB_PATH=/home/cs20btech11029/repos/IR2Vec/vocabulary/seedEmbeddingVocab-300-${SEED_VERSION}.txt
 
 if [ -z ${LLVM_BUILD} ]; then
 	echo "Enter the llvm build path.."
@@ -43,15 +44,17 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 	"selectKItems" "getMinDiceThrows" "countSort" "subset_sum" "SolveSudoku" "SCC" "solveKTUtil" "topologicalSort" "transitiveClosure" "insertSuffix" "tugOfWar" "isUgly" "Union" "printVertexCover"
 	 "findMaxProfit" "solveWordWrap")
 
-for file in ${SRC_WD}/*.ll ; do
-	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM}/ir2vec.txt -level f ${file}
-	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA}/ir2vec.txt -level f ${file}
+while IFS= read -r d
+do
+
+	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM}/ir2vec.txt -level f ${d} &> /dev/null
+	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA}/ir2vec.txt -level f ${d} &> /dev/null
 	for func in "${functions[@]}"
 	do
-		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt -level f ${file} -funcName=$func
-		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt -level f ${file} -funcName=$func
+		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt -level f -funcName=$func ${d} &> /dev/null
+		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt -level f -funcName=$func ${d} &> /dev/null
 	done
 
 
-done
+done < index-${SEED_VERSION}.files
 wait
