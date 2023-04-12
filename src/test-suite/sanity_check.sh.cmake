@@ -45,6 +45,7 @@ then
     mkdir -p ${TEMP}
     mv *${VIR_FILE} ${TEMP}/
 
+
     d=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP}/${VIR_FILE}))
     if [ "$d" == "" ]
     then
@@ -60,10 +61,10 @@ fi
 
 
 ORIG_FILE_F=oracle/${EncodingType}_${SEED_VERSION}_f/ir2vec.txt
-VIR_FILE_F=ir2vec_f.txt
-while IFS= read -r d
+VIR_FILE_F=ir2vec.txt
+while IFS= read -r d_f
 do
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d} &> /dev/null
+../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d_f}
 done < index-${SEED_VERSION}.files
 
 TEMP_F=temp_${EncodingType}_${SEED_VERSION}_f
@@ -73,14 +74,16 @@ then
     mkdir -p ${TEMP_F}
     mv *${VIR_FILE_F} ${TEMP_F}/
 
-    d=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP}/${VIR_FILE}))
-    if [ "$d" == "" ]
+    d_f=$(diff -w <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_F}/${VIR_FILE_F}))
+
+    if [ "$d_f" == "" ]
     then
         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of f-level are Identical.${NC}"
 
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
-        exit 1
+
+     exit 1
     fi
 else
     echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
@@ -95,12 +98,12 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 	 "findMaxProfit" "solveWordWrap")
 
 ORIG_FILE_ONDEMAND=oracle/${EncodingType}_${SEED_VERSION}_onDemand/ir2vec.txt
-VIR_FILE_ONDEMAND=ir2vec_onDemand.txt
-while IFS= read -r d
+VIR_FILE_ONDEMAND=ir2vec.txt
+while IFS= read -r d_on
 do
 for func in "${functions[@]}"
 do
-	../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d} &> /dev/null
+	../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d_on} &> /dev/null
 done
 
 
@@ -113,8 +116,8 @@ then
     mkdir -p ${TEMP_ONDEMAND}
     mv *${VIR_FILE_ONDEMAND} ${TEMP_ONDEMAND}/
 
-    d=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP}/${VIR_FILE}))
-    if [ "$d" == "" ]
+    d_on=$(diff -w <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_ONDEMAND}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}))
+    if [ "$d_on" == "" ]
     then
         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of on-demand are Identical.${NC}"
         exit 0
