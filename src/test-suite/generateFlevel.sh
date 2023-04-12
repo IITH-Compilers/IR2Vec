@@ -38,23 +38,20 @@ if [ -z ${VOCAB_PATH} ]; then
 fi
 
 functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" "insertionSort" "binomialCoeff" "find" "countParenth" "boruvkaMST" "maxStackHeight" "badCharHeuristic" "bpm"
-    "count" "getMaxUtil" "buildSuffixArray" "countOnes" "countStrings" "countRec" "countWays" "AP" "cutRod" "isCyclic" "isDivisible" "DFS" "editDist" "eggDrop" "isSC" "isConnected" "printClosest"
-	"findCrossOver" "isvalid" "getParty" "floydWarshall" "greedyColoring" "printSolution" "push" "swap" "multiply" "KMPSearch" "randomPartition" "LISS" "findRank"  "lis"  "printSubStr"
-  	"lps" "topologicalSortUtil" "isSafe" "kadane" "mergeSort" "SortedMerge" "min" "mTCDP" "bfs" "minJumps" "getCount" "solveNQ" "sortK" "sum" "fib" "minPalPartion" "quickSort" "solveMaze"
+	"count" "getMaxUtil" "buildSuffixArray" "countOnes" "countStrings" "countRec" "countWays" "AP" "cutRod" "isCyclic" "isDivisible" "DFS" "editDist" "eggDrop" "isSC" "isConnected" "printClosest"
+	"findCrossOver" "isvalid" "getParty" "floydWarshall" "greedyColoring" "printSolution" "push" "swap" "multiply" "KMPSearch" "randomPartition" "LISS" "findRank" "lis" "printSubStr"
+	"lps" "topologicalSortUtil" "isSafe" "kadane" "mergeSort" "SortedMerge" "min" "mTCDP" "bfs" "minJumps" "getCount" "solveNQ" "sortK" "sum" "fib" "minPalPartion" "quickSort" "solveMaze"
 	"selectKItems" "getMinDiceThrows" "countSort" "subset_sum" "SolveSudoku" "SCC" "solveKTUtil" "topologicalSort" "transitiveClosure" "insertSuffix" "tugOfWar" "isUgly" "Union" "printVertexCover"
-	 "findMaxProfit" "solveWordWrap")
+	"findMaxProfit" "solveWordWrap")
 
-while IFS= read -r d
-do
+while IFS= read -r d; do
 
-	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM}/ir2vec.txt -level f ${d} &> /dev/null
-	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA}/ir2vec.txt -level f ${d} &> /dev/null
-	for func in "${functions[@]}"
-	do
-		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt -level f -funcName=$func ${d} &> /dev/null
-		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt -level f -funcName=$func ${d} &> /dev/null
+	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM}/ir2vec.txt -level f ${d} &>/dev/null
+	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA}/ir2vec.txt -level f ${d} &>/dev/null
+	for func in "${functions[@]}"; do
+		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt -level f -funcName=$func ${d} &>/dev/null
+		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt -level f -funcName=$func ${d} &>/dev/null
 	done
 
-
-done < index-${SEED_VERSION}.files
+done <index-${SEED_VERSION}.files
 wait

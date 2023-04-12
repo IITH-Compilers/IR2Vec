@@ -59,7 +59,6 @@ else
     exit 1
 fi
 
-
 ORIG_FILE_F=oracle/${EncodingType}_${SEED_VERSION}_f/ir2vec.txt
 VIR_FILE_F=ir2vec.txt
 while IFS= read -r d_f

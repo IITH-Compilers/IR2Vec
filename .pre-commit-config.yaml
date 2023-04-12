@@ -15,7 +15,11 @@ repos:
     hooks:
         - id: clang-format
           args: [-i]
--   repo: https://github.com/dfm/black_nbconvert
-    rev: v0.4.0
-    hooks:
-        - id: black_nbconvert
+# -   repo: https://github.com/dfm/black_nbconvert
+#     rev: v0.4.0
+#     hooks:
+#         - id: black_nbconvert
+- repo: https://github.com/maxwinterstein/shfmt-py
+  rev: v3.4.3.1
+  hooks:
+    - id: shfmt
