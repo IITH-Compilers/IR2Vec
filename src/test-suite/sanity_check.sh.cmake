@@ -60,43 +60,14 @@ else
     exit 1
 fi
 
-ORIG_FILE_F=oracle/${EncodingType}_${SEED_VERSION}_f/ir2vec.txt
-
-VIR_FILE_F=ir2vec_f.txt
-
-
-while IFS= read -r d
-do
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d} &> /dev/null
-done < index-${SEED_VERSION}.files
-
-TEMP_F=temp_${EncodingType}_${SEED_VERSION}_f
-
-if ls *${VIR_FILE_F} 1> /dev/null 2>&1
-then
-    mkdir -p ${TEMP_F}
-    mv *${VIR_FILE_F} ${TEMP_F}/
-
-    d_f=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_F}/${VIR_FILE_F}))
-    if [ "$d_f" == "" ]
-    then
-        echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of f-level are Identical.${NC}"
-        exit 0
-    else
-        echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
-
-        exit 1
-    fi
-else
-    echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
-    exit 1
-fi
-
 # ORIG_FILE_F=oracle/${EncodingType}_${SEED_VERSION}_f/ir2vec.txt
+
 # VIR_FILE_F=ir2vec_f.txt
-# while IFS= read -r d_f
+
+
+# while IFS= read -r d
 # do
-# ../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d_f} &> /dev/null
+# ../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d} &> /dev/null
 # done < index-${SEED_VERSION}.files
 
 # TEMP_F=temp_${EncodingType}_${SEED_VERSION}_f
@@ -106,16 +77,15 @@ fi
 #     mkdir -p ${TEMP_F}
 #     mv *${VIR_FILE_F} ${TEMP_F}/
 
-#     d_f=$(diff -w <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_F}/${VIR_FILE_F}))
-
+#     d_f=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_F}/${VIR_FILE_F}))
 #     if [ "$d_f" == "" ]
 #     then
 #         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of f-level are Identical.${NC}"
-
+#         exit 0
 #     else
 #         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
 
-#      exit 1
+#         exit 1
 #     fi
 # else
 #     echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
