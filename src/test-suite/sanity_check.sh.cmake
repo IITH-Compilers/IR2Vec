@@ -64,7 +64,7 @@ ORIG_FILE_F=oracle/${EncodingType}_${SEED_VERSION}_f/ir2vec.txt
 VIR_FILE_F=ir2vec.txt
 while IFS= read -r d_f
 do
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d_f}
+../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d_f} &> /dev/null
 done < index-${SEED_VERSION}.files
 
 TEMP_F=temp_${EncodingType}_${SEED_VERSION}_f
@@ -82,7 +82,7 @@ then
 
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
-         echo ${d:0:1000}
+
      exit 1
     fi
 else
