@@ -16,13 +16,13 @@ mkdir -p ${DEST_FOLDER_SYM_ONDEMAND}
 mkdir -p ${DEST_FOLDER_FA_ONDEMAND}
 
 # Update the BUILD to use
-LLVM_BUILD=/home/cs20btech11029/repos/llvm-project/build
+LLVM_BUILD=
 
 #Update IR2Vec Path to use
-IR2VEC_PATH=/home/cs20btech11029/repos/IR2Vec/build/bin/ir2vec
+IR2VEC_PATH=
 
 #Update Vocabulary Path to use
-VOCAB_PATH=/home/cs20btech11029/repos/IR2Vec/vocabulary/seedEmbeddingVocab-300-${SEED_VERSION}.txt
+VOCAB_PATH=
 
 if [ -z ${LLVM_BUILD} ]; then
 	echo "Enter the llvm build path.."

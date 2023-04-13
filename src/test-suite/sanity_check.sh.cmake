@@ -52,6 +52,7 @@ then
         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of p-level are Identical.${NC}"
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of p-level are Different.${NC}"
+
         exit 1
     fi
 else
@@ -81,7 +82,7 @@ then
 
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
-
+         echo ${d:0:1000}
      exit 1
     fi
 else
