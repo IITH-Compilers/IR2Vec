@@ -83,7 +83,7 @@ then
 
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
-        echo -e ${d_f:1:1000}
+        echo -e ${d_f:1:10000}
         exit 1
     fi
 else
