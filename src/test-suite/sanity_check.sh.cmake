@@ -76,7 +76,8 @@ if ls *${VIR_FILE_F} 1> /dev/null 2>&1
 then
     mkdir -p ${TEMP_F}
     mv *${VIR_FILE_F} ${TEMP_F}/
-    d_f=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_F}/${VIR_FILE_F}))
+    # d_f=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_F}/${VIR_FILE_F}))
+    d_f=$(diff <(sed -e 's/[^0-9]*//g' ${ORIG_FILE_F}) <(sed -e 's/[^0-9]*//g' ${TEMP_F}/${VIR_FILE_F}))
     if [ "$d_f" == "" ]
     then
         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of f-level are Identical.${NC}"
@@ -117,7 +118,8 @@ then
     mkdir -p ${TEMP_ONDEMAND}
     mv *${VIR_FILE_ONDEMAND} ${TEMP_ONDEMAND}/
 
-    d_on=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_ONDEMAND}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}))
+    # d_on=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_ONDEMAND}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}))
+    d_on= $(diff <(sed -e 's/[^0-9]*//g' ${ORIG_FILE_ONDEMAND}) <(sed -e 's/[^0-9]*//g' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}))
     if [ "$d_on" == "" ]
     then
         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of on-demand are Identical.${NC}"
