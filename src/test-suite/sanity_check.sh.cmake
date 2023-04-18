@@ -77,14 +77,13 @@ then
     mkdir -p ${TEMP_F}
     mv *${VIR_FILE_F} ${TEMP_F}/
     # d_f=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_F}/${VIR_FILE_F}))
-    # d_f=$(diff <(sed -e 's/[^0-9]*//g' ${ORIG_FILE_F}) <(sed -e 's/[^0-9]*//g' ${TEMP_F}/${VIR_FILE_F}))
-    # d_f=$(diff <(sed -e 's/[^0-9]*//g' ${ORIG_FILE_F} | sed -e 's/.*=//g') <(sed -e 's/[^0-9]*//g' ${TEMP_F}/${VIR_FILE_F} | sed -e 's/.*=//g'))
     #working
     # sed 's/.*=//' ${ORIG_FILE_F} > file1_clean.txt
     # sed 's/.*=//' ${TEMP_F}/${VIR_FILE_F}> file2_clean.txt
     # d_f=$(diff file1_clean.txt file2_clean.txt )
-    c++filt -n < ${TEMP_F}/${VIR_FILE_F} > file1_demangled.txt
-    d_f=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' file1_demangled.txt))
+
+    sed 's/`/__/g' < ${TEMP_F}/${VIR_FILE_F} | c++filt -n > demangled.txt
+    d_f=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_F}) <(sed -e 's/^ *#[0-9]* *//g' demangled.txt))
     if [ "$d_f" == "" ]
     then
         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of f-level are Identical.${NC}"
@@ -126,12 +125,12 @@ then
     mv *${VIR_FILE_ONDEMAND} ${TEMP_ONDEMAND}/
 
     # d_on=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_ONDEMAND}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}))
-    # d_on= $(diff <(sed -e 's/[^0-9]*//g' ${ORIG_FILE_ONDEMAND}) <(sed -e 's/[^0-9]*//g' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}))
-    # d_f=$(diff <(sed -e 's/[^0-9]*//g' ${ORIG_FILE_ONDEMAND} | sed -e 's/.*=//g') <(sed -e 's/[^0-9]*//g' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND} | sed -e 's/.*=//g'))
+    #working
     # sed 's/.*=//' ${ORIG_FILE_ONDEMAND} > file1.txt
     # sed 's/.*=//' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}> file2.txt
     # d_on=$(diff file1.txt file2.txt )
-    c++filt -n < ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND} > file2_demangled.txt
+
+    sed 's/`/__/g' < ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND} | c++filt -n > file2_demangled.txt
     d_on=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE_ONDEMAND}) <(sed -e 's/^ *#[0-9]* *//g' file2_demangled.txt))
     if [ "$d_on" == "" ]
     then
@@ -139,6 +138,7 @@ then
         exit 0
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of on-demand are Different.${NC}"
+        echo -e ${d_on}
         exit 1
     fi
 else
