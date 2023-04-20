@@ -195,7 +195,7 @@ d_f=$(diff <(echo "$demangled_output") <(echo "$clean_local_output"))
 
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
-        # echo -e ${d_f}
+        echo -e ${d_f}
         exit 1
     fi
 else
