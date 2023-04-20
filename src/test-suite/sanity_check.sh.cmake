@@ -156,12 +156,12 @@ std::string demangle(const char* symbol) {
         return result;
     } else {
         std::cerr << "Demangle failed: " << status << std::endl;
-        std::cerr << symbol;
+        std::cerr << symbol << std::endl;
         return symbol;
     }
 }
 int main() {
-
+    std::cerr << __cplusplus << '\n';
     std::string str = "$clean_output";
 
     // declare pos before the while loop
