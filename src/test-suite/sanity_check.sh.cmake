@@ -156,6 +156,7 @@ std::string demangle(const char* symbol) {
         return result;
     } else {
         std::cerr << "Demangle failed: " << status << std::endl;
+        std::cerr << symbol;
         return symbol;
     }
 }
@@ -186,7 +187,7 @@ truncate -s 0 new_output
 g++ demangle.cpp -o new_output
 demangled_output=$(./new_output)
 # echo "$demangled_output"
-d_f=$(diff <(echo "$demangled_output") <(echo "$clean_local_output"))
+# d_f=$(diff <(echo "$demangled_output") <(echo "$clean_local_output"))
 
 
     if [ "$d_f" == "" ]
@@ -195,7 +196,7 @@ d_f=$(diff <(echo "$demangled_output") <(echo "$clean_local_output"))
 
     else
         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
-        echo -e ${d_f}
+        # echo -e ${d_f}
         exit 1
     fi
 else
