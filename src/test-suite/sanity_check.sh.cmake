@@ -184,7 +184,7 @@ int main() {
 EOF
 
 truncate -s 0 new_output
-g++ demangle.cpp -o new_output
+clang++ demangle.cpp -o new_output
 demangled_output=$(./new_output)
 # echo "$demangled_output"
 # d_f=$(diff <(echo "$demangled_output") <(echo "$clean_local_output"))
