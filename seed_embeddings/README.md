@@ -15,7 +15,7 @@ If you have not done `make`, follow the following steps to build `ir2vec` binary
 ## Step 2: Generating Triplets
 #### Steps to collect the triplets
  Run `triplets.sh` script with the required parameters
-`bash triplets.sh <buildDir> <numOpt> <llFileList> <outputFileName>`
+`bash triplets.sh <buildDir> <numOpt> <llFileList> <outputFileName> <llvmBuildDir>`
 * `buildDir` points to the path of IR2Vec's build folder
 * `numOpt` is an integer between `1` and `6`
     * Determines number of optimization sequences to apply on each file.
@@ -24,6 +24,7 @@ If you have not done `make`, follow the following steps to build `ir2vec` binary
 * `outputFileName` is the file where the triplets would be written
     * New file would be created if the file with given name *does not* exist.
     * If file *exists* with the given name, the triplets would be **appended** on to the same file.
+* `llvmBuildDir` : For ubuntu systems, the directory is `/usr/bin/opt-14`. So, the input for this arg will be `/usr/`.
 
 Example Usage:
 > bash triplets.sh ../build 2 files_path.txt triplets.txt
