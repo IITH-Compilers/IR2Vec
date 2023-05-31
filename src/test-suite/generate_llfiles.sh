@@ -5,12 +5,12 @@
 # file in the top-level directory for more details.
 #
 SRC_WD="PE-benchmarks"
-DEST_FOLDER="PE-benchmarks-llfiles-llvm12"
+DEST_FOLDER="PE-benchmarks-llfiles-llvm14"
 
 mkdir -p ${DEST_FOLDER}
 
 # Update the BUILD to use
-LLVM_BUILD=
+LLVM_BUILD="/usr"
 
 if [ -z ${LLVM_BUILD} ]; then
 	echo "Enter the llvm build path.."
@@ -18,7 +18,7 @@ if [ -z ${LLVM_BUILD} ]; then
 fi
 
 for d in ${SRC_WD}/*.c ${SRC_WD}/*.cpp ${SRC_WD}/*.cc; do
-	name=$(basename ${d}) && oname=${name%.*} && ${LLVM_BUILD}/bin/clang -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER}/${oname}.ll &
+	name=$(basename ${d}) && oname=${name%.*} && ${LLVM_BUILD}/bin/clang-14 -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER}/${oname}.ll &
 
 done
 wait
