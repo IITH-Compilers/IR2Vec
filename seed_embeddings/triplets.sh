@@ -75,7 +75,7 @@ while read p; do
 		rm "$tmpfile"
 	done &
 	if [ $counter == 100 ]; then
-		# sleep 20
+		sleep 20
 		counter=0
 	fi
 
