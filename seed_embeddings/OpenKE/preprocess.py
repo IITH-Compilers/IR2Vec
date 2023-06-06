@@ -123,7 +123,10 @@ if __name__ == "__main__":
             config.preprocessed_dir = config.preprocessed_dir + str(i)
         os.makedirs(config.preprocessed_dir)
     ed = getEntityDict(config)
+    print("entity2id.txt is generated")
     rd = getRelationDict(config)
+    print("relation2id.txt is generated")
     createTrain2ID(ed, rd, config)
+    print("train2id.txt is generated")
 
     print("Files are generated at the path ", config.preprocessed_dir)
