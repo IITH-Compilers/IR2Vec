@@ -73,11 +73,12 @@ while read p; do
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
-	done &
-	if [ $counter == 100 ]; then
-		sleep 20
-		counter=0
-	fi
+	done
+	# # if counter is divisible by 100, then print counter, and sleep for 20 seconds
+	# if [ $counter == 100 ]; then
+	# 	echo "sleeping for 110 seconds"
+	# 	sleep 110
+	# fi
 
 done <$3
 
