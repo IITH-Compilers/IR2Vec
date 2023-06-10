@@ -45,7 +45,7 @@ fi
 counter=0
 while read p; do
 	let "counter++"
-	DEBUG echo "collecting data from $p"
+	echo "collecting data from $p"
 	NO_OF_OPT_FILES=$2
 	DEBUG echo "NO_OF_OPT_FILES from $NO_OF_OPT_FILES"
 	OPT_LEVELS=("O0" "O1" "O2" "O3" "Os" "Oz")
@@ -69,18 +69,18 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		DEBUG echo "opt from $opt"
-		${LLVM_BUILD}/bin/opt-12 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt-14 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
-	done &
-	if [ $counter == 100 ]; then
-		sleep 20
-		counter=0
-	fi
 
+		# sleep 2
+	done
 done <$3
 
 wait
+
+# print counter
+echo $counter
 echo $4
 echo "All ll files processed"
