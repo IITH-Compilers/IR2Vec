@@ -5,3 +5,4 @@ __pycache__/
 experiments/*/output
 
 seed_embeddings/triplets.txt
+seed_embeddings/preprocessed/*
