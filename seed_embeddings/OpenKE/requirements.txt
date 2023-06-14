@@ -82,7 +82,8 @@ six=1.15.0
 sqlite=3.33.0
 tensorboard=2.4.0
 tensorboard-plugin-wit=1.6.0
-tensorflow=2.2.0=mkl_py37h6e9ce2d_0
+# tensorflow=2.2.0=mkl_py37h6e9ce2d_0
+tensorflow-gpu=2.2.0
 tensorflow-base=2.2.0=mkl_py37hd506778_0
 tensorflow-estimator=2.2.0
 termcolor=1.1.0
