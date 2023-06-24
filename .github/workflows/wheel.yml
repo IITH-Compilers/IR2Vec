@@ -1,15 +1,6 @@
 name: Build wheels
 
-# Build on every branch push, tag push, and pull request change:
-on: [push, pull_request, workflow_dispatch]
-
-# Alternatively, to publish when a (published) GitHub Release is created, use the following:
-# on:
-#   push:
-#   pull_request:
-#   release:
-#     types:
-#       - published
+on: [push, workflow_dispatch, workflow_call]
 
 jobs:
   build_wheels:

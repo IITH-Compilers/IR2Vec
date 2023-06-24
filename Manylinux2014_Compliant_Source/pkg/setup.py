@@ -27,6 +27,7 @@ setup(
     author_email="cs22mtech02002@iith.ac.in",
     version="1.0.0",
     description="given input .ll/.bc generates corresponding IR2Vec embeddings in a file or on stdout",
+    long_description="given input .ll/.bc generates corresponding IR2Vec embeddings in a file or on stdout",
     ext_modules=[IR2Vec_core],  # A list of Python extensions to be built
     packages=["IR2Vec_pkg"],  # A list of Python packages that distutils will manipulate
     # package_data={'':['*.so*','./IR2Vec_include/*','./llvm/*','./llvm-c/*','seedEmbeddingVocab-300-llvm12.txt']},

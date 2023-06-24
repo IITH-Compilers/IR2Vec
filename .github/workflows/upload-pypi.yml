@@ -1,0 +1,47 @@
+name: Upload to PyPI
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    uses: ./.github/workflows/wheel.yml
+
+
+  build_sdist:
+    runs-on: ubuntu-latest
+    container: ghcr.io/necessary129/manylinux2014-llvm:12-x86_64
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build IR2Vec
+        run: bash Manylinux2014_Compliant_Source/pkg/build.sh
+
+      - name: Build sdist
+        run: cd Manylinux2014_Compliant_Source/pkg && pipx run build --sdist
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: Manylinux2014_Compliant_Source/pkg/dist/*.tar.gz
+
+
+  upload_pypi:
+    permissions:
+      id-token: write
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: dist
+
+      - name: Publish package to TestPyPI
+        uses: pypa/gh-action-pypi-publish@v1.8.5
+        with:
+          repository_url: https://test.pypi.org/legacy/
+
+      
