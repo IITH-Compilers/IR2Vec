@@ -27,9 +27,10 @@ jobs:
         with:
           package-dir: Manylinux2014_Compliant_Source/pkg
         env:
-          CIBW_SKIP: "pp* *musllinux*"
+          CIBW_SKIP: "pp*"
           CIBW_ARCHS: "x86_64"
           CIBW_MANYLINUX_X86_64_IMAGE: "ghcr.io/necessary129/manylinux2014-llvm:12-x86_64"
+          CIBW_MUSLLINUX_X86_64_IMAGE: "ghcr.io/necessary129/musllinux-llvm:12-x86_64"
           CIBW_BEFORE_ALL: "bash Manylinux2014_Compliant_Source/pkg/build.sh"
 
       - uses: actions/upload-artifact@v3
