@@ -1,5 +1,14 @@
 from setuptools import setup, Extension
 
+import subprocess as sp
+
+def get_llvm_files():
+    libs = "support core irreader analysis TransformUtils".split()
+    out = sp.run(['llvm-config', '--libfiles'] + libs, stdout=sp.PIPE)
+    files = out.stdout.decode('utf8').split()
+    return files
+
+
 IR2Vec_core = Extension(
     "IR2Vec_pkg.core",
     sources=["IR2Vec_pkg/core.cpp"],
@@ -8,7 +17,7 @@ IR2Vec_core = Extension(
         "./IR2Vec_pkg/IR2Vec_include",
     ],  # list of directories to search for C/C++ header files (in Unix form for portability)
     libraries=["z"],
-    extra_objects=["./libIR2Vec.a", "./libLLVMMother.a"],
+    extra_objects=["/usr/local/lib/libIR2Vec.a"] + get_llvm_files(),
     extra_compile_args=["-v"],
 )
 
@@ -24,8 +33,6 @@ setup(
     package_data={
         "": [
             "./IR2Vec_include/*",
-            "./llvm/*",
-            "./llvm-c/*",
             "seedEmbeddingVocab-300-llvm12.txt",
         ]
     },
