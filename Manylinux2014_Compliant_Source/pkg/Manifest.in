@@ -1,2 +1,1 @@
 include ./seedEmbeddingVocab-300-llvm12.txt
-recursive-include ./IR2Vec_include/*
