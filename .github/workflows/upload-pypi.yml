@@ -5,6 +5,7 @@ on:
     types:
       - published
   workflow_dispatch:
+  push:
 
 jobs:
   build_wheels:
@@ -43,5 +44,3 @@ jobs:
         uses: pypa/gh-action-pypi-publish@v1.8.5
         with:
           repository_url: https://test.pypi.org/legacy/
-
-      
