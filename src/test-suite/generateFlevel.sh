@@ -4,8 +4,8 @@
 # This software is available under the BSD 4-Clause License. Please see LICENSE
 # file in the top-level directory for more details.
 #
-SEED_VERSION="llvm12"
-# SRC_WD="PE-benchmarks-llfiles-llvm12"
+SEED_VERSION="llvm14"
+# SRC_WD="PE-benchmarks-llfiles-llvm14
 DEST_FOLDER_SYM="oracle/SYM_${SEED_VERSION}_f"
 DEST_FOLDER_FA="oracle/FA_${SEED_VERSION}_f"
 DEST_FOLDER_SYM_ONDEMAND="oracle/SYM_${SEED_VERSION}_onDemand"
@@ -16,13 +16,13 @@ mkdir -p ${DEST_FOLDER_SYM_ONDEMAND}
 mkdir -p ${DEST_FOLDER_FA_ONDEMAND}
 
 # Update the BUILD to use
-LLVM_BUILD=
+LLVM_BUILD="/usr"
 
 #Update IR2Vec Path to use
-IR2VEC_PATH=
+IR2VEC_PATH="/home/intern23002/iitH/ir2vec/IR2Vec/build/bin/ir2vec"
 
 #Update Vocabulary Path to use
-VOCAB_PATH=
+VOCAB_PATH="/home/intern23002/iitH/ir2vec/IR2Vec/seed_embeddings/preprocessed/embeddingsseedEmbedding_1500E_300D_250batches5.0margin.txt"
 
 if [ -z ${LLVM_BUILD} ]; then
 	echo "Enter the llvm build path.."
@@ -45,6 +45,7 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 	"findMaxProfit" "solveWordWrap")
 
 while IFS= read -r d; do
+	echo $d
 
 	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_SYM}/ir2vec.txt -level f ${d} &>/dev/null
 	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -o ${DEST_FOLDER_FA}/ir2vec.txt -level f ${d} &>/dev/null

@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
 
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
-list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
+list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm-14/")
 
 find_package(LLVM 14.0.0 REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -35,7 +35,7 @@ set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
 
-file(GLOB RESOURCE_FILES ../vocabulary/seedEmbeddingVocab-300-llvm12.txt)
+file(GLOB RESOURCE_FILES ../vocabulary/seedEmbedding_1500E_300D_250batches5.0margin.txt)
 
 # llvm_map_components_to_libnames(llvm_libs all)
 llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
@@ -68,7 +68,7 @@ install(TARGETS ${IR2VEC_LIB} ${IR2VEC_LIB_STATIC}
 add_subdirectory(test-suite)
 
 add_custom_target(verify-symbolic
- COMMAND bash ./sanity_check.sh SYM llvm12
+ COMMAND bash ./sanity_check.sh SYM llvm14
  COMMENT "Generating Symbolic IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
  DEPENDS ${PROJECT_NAME}
@@ -76,7 +76,7 @@ add_custom_target(verify-symbolic
  )
 
 add_custom_target(verify-flowaware
- COMMAND bash sanity_check.sh FA llvm12
+ COMMAND bash sanity_check.sh FA llvm14
  COMMENT "Generating Flow-Aware IR2Vec vectors and comparing with oracle..."
  WORKING_DIRECTORY ./test-suite
  DEPENDS ${PROJECT_NAME}
