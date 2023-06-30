@@ -5,7 +5,15 @@ on:
     types:
       - published
   workflow_dispatch:
-  push:
+    inputs:
+      pypi_repo:
+        description: 'Repo to upload to (testpypi or pypi)'
+        default: 'testpypi'
+        required: true
+        type: choice
+        options:
+          - testpypi
+          - pypi
 
 jobs:
   build_wheels:
@@ -43,4 +51,9 @@ jobs:
       - name: Publish package to TestPyPI
         uses: pypa/gh-action-pypi-publish@v1.8.5
         with:
-          repository_url: https://test.pypi.org/legacy/
+          repository-url: https://test.pypi.org/legacy/
+        if: ${{ github.event.inputs.pypi_repo != 'pypi' }}
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.8.5
+        if: ${{ github.event.inputs.pypi_repo == 'pypi' }}
