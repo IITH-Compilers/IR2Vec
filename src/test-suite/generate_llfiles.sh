@@ -17,7 +17,7 @@ LLVM_BUILD="/usr"
 # 	exit
 # fi
 
-for d in ${SRC_WD}/*.c ${SRC_WD}/*.cpp ${SRC_WD}/*.cc; do
+for d in ${SRC_WD}/*.cpp; do
 	name=$(basename ${d}) && oname=${name%.*} && ${LLVM_BUILD}/bin/clang-14 -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER}/${oname}.ll &
 
 done

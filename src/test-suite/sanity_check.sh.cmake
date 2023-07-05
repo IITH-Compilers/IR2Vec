@@ -25,78 +25,74 @@ else
 fi
 
 SEED_VERSION=$2
+VOCAB_PATH="/home/intern23002/iitH/ir2vec/IR2Vec/vocabulary/seedEmbedding_1500E_300D_250batches5.0margin.txt"
+IR2VEC_PATH="/home/intern23002/iitH/ir2vec/IR2Vec/build/bin/ir2vec"
 
-Absolute_path_of_RepresentationFile=./vocabulary/seedEmbedding_1500E_300D_250batches5.0margin.txt
+perform_vector_comparison() {
+    ORIG_FILE=oracle/${EncodingType}_${SEED_VERSION}/ir2vec.txt
+    VIR_FILE=ir2vec.txt
 
-# ORIG_FILE=oracle/${EncodingType}_${SEED_VERSION}/ir2vec.txt
+    while IFS= read -r d; do
+        ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level p -o ${VIR_FILE} ${d} &> /dev/null
+    done < index-${SEED_VERSION}.files
+    wait
 
-# VIR_FILE=ir2vec.txt
+    TEMP=temp_${EncodingType}_${SEED_VERSION}
 
+    if ls *${VIR_FILE} 1> /dev/null 2>&1; then
+        mkdir -p ${TEMP}
+        mv *${VIR_FILE} ${TEMP}/
 
-# while IFS= read -r d
-# do
-# ../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level p -o ${VIR_FILE} ${d} &> /dev/null
-# done < index-${SEED_VERSION}.files
-
-# TEMP=temp_${EncodingType}_${SEED_VERSION}
-
-# if ls *${VIR_FILE} 1> /dev/null 2>&1
-# then
-#     mkdir -p ${TEMP}
-#     mv *${VIR_FILE} ${TEMP}/
-
-
-#     d=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP}/${VIR_FILE}))
-#     if [ "$d" == "" ]
-#     then
-#         echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of p-level are Identical.${NC}"
-#     else
-#         echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of p-level are Different.${NC}"
-
-#         exit 1
-#     fi
-# else
-#     echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
-#     exit 1
-# fi
-
-ORIG_FILE_F=oracle/${EncodingType}_${SEED_VERSION}_f/ir2vec.txt
-
-VIR_FILE_F=ir2vec_f.txt
-
-
-while IFS= read -r d_f
-do
-../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -o ${VIR_FILE_F} ${d_f} &> /dev/null
-done < index-${SEED_VERSION}.files
-
-
-TEMP_F=temp_${EncodingType}_${SEED_VERSION}_f
-
-if ls *${VIR_FILE_F} 1> /dev/null 2>&1
-then
-    mkdir -p ${TEMP_F}
-    mv *${VIR_FILE_F} ${TEMP_F}/
-    # removing demangled file and function names before '='
-    sed 's/.*=//' ${ORIG_FILE_F} > orig_file_f.txt
-    sed 's/.*=//' ${TEMP_F}/${VIR_FILE_F}> vir_file_f.txt
-    d_f=$(diff orig_file_f.txt vir_file_f.txt )
-
-    if [ "$d_f" == "" ]
-    then
-        echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of f-level are Identical.${NC}"
-
+        d=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${ORIG_FILE}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP}/${VIR_FILE}))
+        if [ "$d" == "" ]; then
+            echo -e "${GREEN}${BOLD}[Test Passed] Vectors of Oracle and Current version of p-level are Identical.${NC}"
+        else
+            echo -e "$(tput bold)${RED}[Test Failed] Vectors of Oracle and Current version of p-level are Different.${NC}"
+            echo $d
+            exit 1
+        fi
     else
-        echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
+        echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
         exit 1
     fi
-else
-    echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
-    exit 1
-fi
+}
+perform_vector_comparison_f() {
+    ORIG_FILE_F=oracle/${EncodingType}_${SEED_VERSION}_f/ir2vec.txt
+
+    VIR_FILE_F=ir2vec_f.txt
 
 
+    while IFS= read -r d_f
+    do
+        ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level f -o ${VIR_FILE_F} ${d_f} &> /dev/null
+    done < index-${SEED_VERSION}.files
+    wait
 
+
+    TEMP_F=temp_${EncodingType}_${SEED_VERSION}_f
+
+    if ls *${VIR_FILE_F} 1> /dev/null 2>&1
+    then
+        mkdir -p ${TEMP_F}
+        mv *${VIR_FILE_F} ${TEMP_F}/
+        # removing demangled file and function names before '='
+        sed 's/.*=//' ${ORIG_FILE_F} > orig_file_f.txt
+        sed 's/.*=//' ${TEMP_F}/${VIR_FILE_F}> vir_file_f.txt
+        d_f=$(diff orig_file_f.txt vir_file_f.txt )
+
+        if [ "$d_f" == "" ]
+        then
+            echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of f-level are Identical.${NC}"
+
+        else
+            echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of f-level are Different.${NC}"
+            exit 1
+        fi
+    else
+        echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
+        exit 1
+    fi
+}
 functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" "insertionSort" "binomialCoeff" "find" "countParenth" "boruvkaMST" "maxStackHeight" "badCharHeuristic" "bpm"
     "count" "getMaxUtil" "buildSuffixArray" "countOnes" "countStrings" "countRec" "countWays" "AP" "cutRod" "isCyclic" "isDivisible" "DFS" "editDist" "eggDrop" "isSC" "isConnected" "printClosest"
 	"findCrossOver" "isvalid" "getParty" "floydWarshall" "greedyColoring" "printSolution" "push" "swap" "multiply" "KMPSearch" "randomPartition" "LISS" "findRank"  "lis"  "printSubStr"
@@ -104,38 +100,43 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 	"selectKItems" "getMinDiceThrows" "countSort" "subset_sum" "SolveSudoku" "SCC" "solveKTUtil" "topologicalSort" "transitiveClosure" "insertSuffix" "tugOfWar" "isUgly" "Union" "printVertexCover"
 	 "findMaxProfit" "solveWordWrap")
 
-ORIG_FILE_ONDEMAND=oracle/${EncodingType}_${SEED_VERSION}_onDemand/ir2vec.txt
-VIR_FILE_ONDEMAND=ir2vec_on.txt
-while IFS= read -r d_on
-do
-for func in "${functions[@]}"
-do
-	../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d_on} &> /dev/null
-done
+perform_vector_comparison_on_demand() {
+    ORIG_FILE_ONDEMAND=oracle/${EncodingType}_${SEED_VERSION}_onDemand/ir2vec.txt
+    VIR_FILE_ONDEMAND=ir2vec_on.txt
+    while IFS= read -r d_on
+    do
+        for func in "${functions[@]}"
+        do
+            ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d_on} &> /dev/null
+        done
+    done < index-${SEED_VERSION}.files
+    wait
 
+    TEMP_ONDEMAND=temp_${EncodingType}_${SEED_VERSION}_ONDEMAND
 
-done < index-${SEED_VERSION}.files
-
-TEMP_ONDEMAND=temp_${EncodingType}_${SEED_VERSION}_ONDEMAND
-
-if ls *${VIR_FILE_ONDEMAND} 1> /dev/null 2>&1
-then
-    mkdir -p ${TEMP_ONDEMAND}
-    mv *${VIR_FILE_ONDEMAND} ${TEMP_ONDEMAND}/
-    # removing demangled file and function names before '='
-    sed 's/.*=//' ${ORIG_FILE_ONDEMAND} > orig_file_on.txt
-    sed 's/.*=//' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}> vir_file_on.txt
-    d_on=$(diff orig_file_on.txt vir_file_on.txt )
-
-    if [ "$d_on" == "" ]
+    if ls *${VIR_FILE_ONDEMAND} 1> /dev/null 2>&1
     then
-        echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of on-demand are Identical.${NC}"
-        exit 0
+        mkdir -p ${TEMP_ONDEMAND}
+        mv *${VIR_FILE_ONDEMAND} ${TEMP_ONDEMAND}/
+        # removing demangled file and function names before '='
+        sed 's/.*=//' ${ORIG_FILE_ONDEMAND} > orig_file_on.txt
+        sed 's/.*=//' ${TEMP_ONDEMAND}/${VIR_FILE_ONDEMAND}> vir_file_on.txt
+        d_on=$(diff orig_file_on.txt vir_file_on.txt )
+
+        if [ "$d_on" == "" ]
+        then
+            echo -e "${GREEN}${BOLD}[Test Passed] Vectors of  Oracle and Current version of on-demand are Identical.${NC}"
+            exit 0
+        else
+            echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of on-demand are Different.${NC}"
+            exit 1
+        fi
     else
-        echo -e "$(tput bold)${RED}[Test Failed] Vectors of  Oracle and Current version of on-demand are Different.${NC}"
+        echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
         exit 1
     fi
-else
-    echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
-    exit 1
-fi
+}
+
+perform_vector_comparison
+perform_vector_comparison_f
+perform_vector_comparison_on_demand

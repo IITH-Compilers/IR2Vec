@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
 
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
-list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm-14/")
+list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
 find_package(LLVM 14.0.0 REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -24,7 +24,7 @@ include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 configure_file (./include/version.h.cmake version.h @ONLY)
 include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
 
-set(CMAKE_CXX_STANDARD 14 CACHE STRING "")
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 
 # LLVM is normally built without RTTI. Be consistent with that.
 if(NOT LLVM_ENABLE_RTTI)
@@ -35,7 +35,7 @@ set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
 
-file(GLOB RESOURCE_FILES ../vocabulary/seedEmbedding_1500E_300D_250batches5.0margin.txt)
+file(GLOB RESOURCE_FILES ../vocabulary/**.txt)
 
 # llvm_map_components_to_libnames(llvm_libs all)
 llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
