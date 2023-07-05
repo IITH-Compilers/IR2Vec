@@ -48,7 +48,6 @@ perform_vector_comparison() {
             echo -e "${GREEN}${BOLD}[Test Passed] Vectors of Oracle and Current version of p-level are Identical.${NC}"
         else
             echo -e "$(tput bold)${RED}[Test Failed] Vectors of Oracle and Current version of p-level are Different.${NC}"
-            echo $d
             exit 1
         fi
     else
@@ -107,7 +106,7 @@ perform_vector_comparison_on_demand() {
     do
         for func in "${functions[@]}"
         do
-            ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d_on} &> /dev/null
+            ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d_on}
         done
     done < index-${SEED_VERSION}.files
     wait

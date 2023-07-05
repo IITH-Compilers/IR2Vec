@@ -59,19 +59,27 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 
 # define a counter variable to count the number of files
 cat index-${SEED_VERSION}.files | wc -l
+echo "generating P level files"
+while IFS= read -r d; do
+	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_SYM_P}/ir2vec.txt ${d}
+	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_FA_P}/ir2vec.txt ${d}
+
+done <index-${SEED_VERSION}.files
+wait
+
+echo "generating F level files"
+while IFS= read -r d; do
+	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f  -o ${DEST_FOLDER_SYM}/ir2vec.txt ${d}
+	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f  -o ${DEST_FOLDER_FA}/ir2vec.txt ${d}
+done <index-${SEED_VERSION}.files
+wait
+
+echo "generating onDemand level files"
 while IFS= read -r d; do
 	echo $d
-
-	# ../bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -level p -o ${VIR_FILE} ${d} &> /dev/null
-	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_SYM_P}/ir2vec.txt ${d} &>/dev/null
-	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_FA_P}/ir2vec.txt ${d} &>/dev/null
-
-	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f  -o ${DEST_FOLDER_SYM}/ir2vec.txt ${d} &>/dev/null
-	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f  -o ${DEST_FOLDER_FA}/ir2vec.txt ${d} &>/dev/null
-
 	for func in "${functions[@]}"; do
-		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f -funcName=$func  -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt ${d} &>/dev/null
-		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f -funcName=$func  -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt ${d} &>/dev/null
+		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f -funcName=$func  -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt ${d}
+		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f -funcName=$func  -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt ${d}
 	done
 
 done <index-${SEED_VERSION}.files
