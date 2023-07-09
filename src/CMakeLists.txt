@@ -35,7 +35,7 @@ set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
 
-file(GLOB RESOURCE_FILES ../vocabulary/seedEmbedding_1500E_300D_250batches6.0margin.txt)
+file(GLOB RESOURCE_FILES ../vocabulary/seedEmbeddingVocab-llvm16.txt)
 
 # llvm_map_components_to_libnames(llvm_libs all)
 llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
