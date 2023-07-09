@@ -6,18 +6,15 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
-![LLVM](https://img.shields.io/badge/LLVM-v12.0.0-blue)
+![LLVM](https://img.shields.io/badge/LLVM-v14.0.0-blue)
 ![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
 ![pre-commit checks](https://github.com/IITH-Compilers/IR2Vec/workflows/pre-commit%20checks/badge.svg)
 
 ![Image](images/ir2vec.jpg)
 
-## { create a table that mentions the llvm version to be used in each branch/release }
-
 ## Table Of Contents
 - [IR2Vec](#ir2vec)
-  - [{ create a table that mentions the llvm version to be used in each branch/release }](#-create-a-table-that-mentions-the-llvm-version-to-be-used-in-each-branchrelease-)
   - [Table Of Contents](#table-of-contents)
   - [Requirements](#requirements)
   - [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
@@ -39,7 +36,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (12.0.0) - [src](https://github.com/llvm/llvm-project/tree/release/12.x), [release](https://releases.llvm.org/download.html#12.0.0)
+* LLVM (14.0.0) - [src](https://github.com/llvm/llvm-project/tree/release/14.x), [release](https://releases.llvm.org/download.html#14.0.0)
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7)
 * Python (3.6.7)
