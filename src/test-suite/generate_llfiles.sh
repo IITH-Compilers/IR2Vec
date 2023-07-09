@@ -18,6 +18,6 @@ LLVM_BUILD="/usr"
 # fi
 
 for d in ${SRC_WD}/*.cpp; do
-	name=$(basename ${d}) && oname=${name%.*} && ${LLVM_BUILD}/bin/clang-16 -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER}/${oname}.ll &
+	name=$(basename ${d}) && oname=${name%.*} && ${LLVM_BUILD}/bin/clang++-16 -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER}/${oname}.ll &
 done
 wait
