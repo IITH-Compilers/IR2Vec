@@ -42,8 +42,8 @@ The [`OpenKE`](./OpenKE) directory is a modified version of OpenKE repository (h
 Please see [OpenKE/README.md](./OpenKE/README.md) for further information on OpenKE.
 
 #### Requirements
-Create `conda` environment and install the packages given in [requirements.txt](./OpenKE/requirements.txt)
-* `conda create --name openKE --file ./OpenKE/requirements.txt`
+Create `conda` environment and install the packages given in [openKE.yaml](./OpenKE/requirements.txt)
+* `conda create -f ./OpenKE/openKE.yaml`
 * `conda activate openKE`
 
 #### Preprocessing the triplets
@@ -56,5 +56,7 @@ We preprocess the generated triplets from the [previous step](#step-2-generating
 #### Training TransE to generate embeddings
 Run  `python generate_embedding.py --index_dir=<Path of the directory containing the processed files>`
 * `--index_dir` points to the directory containing the processed files generated on preprocessing the triplets.
+* `--nbatches` Mentions the batch size. Default size is 100.
+* `--margin` Mentions the margin size. Default margin is 1.0
 
 The seed embedding vocabulary will be generated inside the same directory.

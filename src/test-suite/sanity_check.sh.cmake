@@ -25,8 +25,8 @@ else
 fi
 
 SEED_VERSION=$2
-VOCAB_PATH="/home/intern23002/iitH/ir2vec/IR2Vec/vocabulary/seedEmbedding_1500E_300D_250batches5.0margin.txt"
-IR2VEC_PATH="/home/intern23002/iitH/ir2vec/IR2Vec/build/bin/ir2vec"
+VOCAB_PATH="./vocabulary/seedEmbeddingVocab-llvm14.txt"
+IR2VEC_PATH="../bin/ir2vec"
 
 perform_vector_comparison() {
     ORIG_FILE=oracle/${EncodingType}_${SEED_VERSION}/ir2vec.txt
@@ -106,7 +106,7 @@ perform_vector_comparison_on_demand() {
     do
         for func in "${functions[@]}"
         do
-            ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d_on}
+            ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level f -funcName=$func -o ${VIR_FILE_ONDEMAND} ${d_on} &> /dev/null
         done
     done < index-${SEED_VERSION}.files
     wait

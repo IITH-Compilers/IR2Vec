@@ -13,17 +13,28 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ![Image](images/ir2vec.jpg)
 
+## { create a table that mentions the llvm version to be used in each branch/release }
+
 ## Table Of Contents
-* [Requirements](#requirements)
-* [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
-* [Building from Source](#building-from-source)
-* [Generating program representations](#generating-program-representations)
-   * [Using Binary](#using-binary)
-   * [Using Libraries](#using-libraries)
-* [Experiments](#experiments)
-* [Citation](#citation)
-* [Contributions](#contributions)
-* [License](#license)
+- [IR2Vec](#ir2vec)
+  - [{ create a table that mentions the llvm version to be used in each branch/release }](#-create-a-table-that-mentions-the-llvm-version-to-be-used-in-each-branchrelease-)
+  - [Table Of Contents](#table-of-contents)
+  - [Requirements](#requirements)
+  - [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
+  - [Building from source](#building-from-source)
+  - [Generating program representations](#generating-program-representations)
+    - [Using Binary](#using-binary)
+      - [Command-Line options](#command-line-options)
+      - [Flow-Aware Embeddings](#flow-aware-embeddings)
+      - [Symbolic Embeddings](#symbolic-embeddings)
+      - [On-demand Flow-Aware Embeddings](#on-demand-flow-aware-embeddings)
+      - [On-demand Symbolic Embeddings](#on-demand-symbolic-embeddings)
+  - [Using Libraries](#using-libraries)
+  - [Experiments](#experiments)
+    - [Note](#note)
+  - [Citation](#citation)
+  - [Contributions](#contributions)
+  - [License](#license)
 
 ## Requirements
 * cmake (>= 3.13.4)
