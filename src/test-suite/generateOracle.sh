@@ -6,8 +6,8 @@
 #
 SEED_VERSION="llvm14"
 # SRC_WD="PE-benchmarks-llfiles-llvm14
-DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}"
-DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}"
+DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}_p"
+DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}_p"
 
 DEST_FOLDER_SYM="oracle/SYM_${SEED_VERSION}_f"
 DEST_FOLDER_FA="oracle/FA_${SEED_VERSION}_f"
@@ -61,16 +61,15 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 cat index-${SEED_VERSION}.files | wc -l
 echo "generating P level files"
 while IFS= read -r d; do
-	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_SYM_P}/ir2vec.txt ${d} &> /dev/null
-	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_FA_P}/ir2vec.txt ${d} &> /dev/null
-
+	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_SYM_P}/ir2vec.txt ${d} &>/dev/null
+	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level p -o ${DEST_FOLDER_FA_P}/ir2vec.txt ${d} &>/dev/null
 done <index-${SEED_VERSION}.files
 wait
 
 echo "generating F level files"
 while IFS= read -r d; do
-	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f  -o ${DEST_FOLDER_SYM}/ir2vec.txt ${d} &> /dev/null
-	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f  -o ${DEST_FOLDER_FA}/ir2vec.txt ${d} &> /dev/null
+	${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f -o ${DEST_FOLDER_SYM}/ir2vec.txt ${d} &>/dev/null
+	${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f -o ${DEST_FOLDER_FA}/ir2vec.txt ${d} &>/dev/null
 done <index-${SEED_VERSION}.files
 wait
 
@@ -78,9 +77,8 @@ echo "generating onDemand level files"
 while IFS= read -r d; do
 	echo $d
 	for func in "${functions[@]}"; do
-		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f -funcName=$func  -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt ${d} &> /dev/null
-		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f -funcName=$func  -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt ${d} &> /dev/null
+		${IR2VEC_PATH} -sym -vocab=${VOCAB_PATH} -level f -funcName=$func -o ${DEST_FOLDER_SYM_ONDEMAND}/ir2vec.txt ${d} &>/dev/null
+		${IR2VEC_PATH} -fa -vocab=${VOCAB_PATH} -level f -funcName=$func -o ${DEST_FOLDER_FA_ONDEMAND}/ir2vec.txt ${d} &>/dev/null
 	done
-
 done <index-${SEED_VERSION}.files
 wait
