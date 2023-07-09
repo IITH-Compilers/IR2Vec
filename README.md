@@ -13,8 +13,17 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ![Image](images/ir2vec.jpg)
 
+## LLVM Version Archive
+
+| Ir2Vec Release | LLVM Version |
+| -------------- | ------------ |
+| v1.1.0 | LLVM 10.0.1 |
+| v1.0.0 | LLVM 10.0.1 |
+| v0.1.0 | LLVM 8.0.1 |
+
 ## Table Of Contents
 - [IR2Vec](#ir2vec)
+  - [LLVM Version Archive](#llvm-version-archive)
   - [Table Of Contents](#table-of-contents)
   - [Requirements](#requirements)
   - [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
