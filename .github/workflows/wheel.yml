@@ -23,6 +23,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: "ghcr.io/necessary129/manylinux2014-llvm:12-x86_64"
           CIBW_MUSLLINUX_X86_64_IMAGE: "ghcr.io/necessary129/musllinux-llvm:12-x86_64"
           CIBW_BEFORE_ALL: "bash Manylinux2014_Compliant_Source/pkg/build.sh"
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: "pytest {project}/Manylinux2014_Compliant_Source/pkg/tests"
 
       - uses: actions/upload-artifact@v3
         with:
