@@ -226,7 +226,7 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ using cout to dump the output
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     else {
-      IR2Vec::Embeddings Emb(*M, m, vocab_path, level[0], &cout);
+      IR2Vec::Embeddings Emb(*M, m, vocab_path, level[0], nullptr);
       llvm_inst_vec_map = Emb.getInstVecMap();
       llvm_func_vec_map = Emb.getFunctionVecMap();
       llvm_pgm_vec = Emb.getProgramVector();
