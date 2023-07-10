@@ -2,10 +2,11 @@
 
 set -eu
 
+rm -rf build || true
 mkdir build
 cd build
 
-wget -q https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz
+curl -sOJ https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz
 tar -xzf eigen-3.3.7.tar.gz
 mkdir eigen-build
 cd eigen-build

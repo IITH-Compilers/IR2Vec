@@ -75,7 +75,6 @@ PyObject *set_seed_embedding_path(PyObject *self, PyObject *args) {
     seed_emb_path = string(vocab_path2);
   }
 
-  cout << seed_emb_path;
   return PyUnicode_FromString("Seed Embedding Path is Set");
 }
 
@@ -233,11 +232,6 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
       llvm_pgm_vec = Emb.getProgramVector();
     }
 
-    cout << endl << endl;
-    cout << "------------------------------------------------------------------"
-            "--"
-         << endl;
-
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ copying data from LLVM ADT's to C++
     // Containers ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ now make a python
     // dictionary that will hold 2 SmallMapVector and 1  SmallVector . But first
@@ -266,7 +260,6 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
         readable_name =
             __cxxabiv1::__cxa_demangle(instName.c_str(), 0, &sz, &status);
         demangledName = status == 0 ? std::string(readable_name) : instName;
-        cout << demangledName << endl;
         InstVecMap[demangledName] = temp2;
       } else // if Value does not has a name
       {
@@ -299,7 +292,6 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
       readable_name =
           __cxxabiv1::__cxa_demangle(funcName.c_str(), 0, &sz, &status);
       demangledName = status == 0 ? std::string(readable_name) : funcName;
-      cout << demangledName << endl;
       FuncVecMap[demangledName] = temp2;
 
       temp2.clear();
@@ -319,10 +311,8 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
 
     for (auto Map_it1 : InstVecMap) {
       PyObject *temp3 = PyList_New(0);
-      cout << Map_it1.first << endl;
       for (auto &List_it1 : Map_it1.second)
         PyList_Append(temp3, PyFloat_FromDouble(List_it1));
-      // cout<<PyList_Size(temp3)<<endl;
       PyDict_SetDefault(InstVecDict,
                         PyUnicode_FromString((Map_it1.first).c_str()), Py_None);
       PyDict_SetItemString(InstVecDict, Map_it1.first.c_str(), temp3);
@@ -333,10 +323,8 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
     }
     for (auto Map_it1 : FuncVecMap) {
       PyObject *temp3 = PyList_New(0);
-      cout << Map_it1.first << endl;
       for (auto &List_it1 : Map_it1.second)
         PyList_Append(temp3, PyFloat_FromDouble(List_it1));
-      cout << PyList_Size(temp3) << endl;
       PyDict_SetDefault(FuncVecDict,
                         PyUnicode_FromString((Map_it1.first).c_str()), Py_None);
       PyDict_SetItemString(FuncVecDict, Map_it1.first.c_str(), temp3);
@@ -378,7 +366,7 @@ PyMethodDef IR2Vec_core_Methods[] = {
 };
 struct PyModuleDef IR2Vec_def = {
     PyModuleDef_HEAD_INIT,
-    "IR2Vec_pkg.core", /* name of module NOT THE NAME OF PACKAGE*/
+    "IR2Vec.core", /* name of module NOT THE NAME OF PACKAGE*/
     "take .bc/.ll as input and generates corresponding IR2VEc "
     "Embeddings", /* module documentation, may be NULL */
     -1,           /* size of per-interpreter state of the module,
