@@ -17,9 +17,9 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 | Ir2Vec Release | LLVM Version |
 | -------------- | ------------ |
-| v1.1.0 | LLVM 10.0.1 |
-| v1.0.0 | LLVM 10.0.1 |
-| v0.1.0 | LLVM 8.0.1 |
+| [v1.1.0](https://github.com/IITH-Compilers/IR2Vec/releases/tag/v1.1.0) | LLVM 10.0.1 |
+| [v1.0.0](https://github.com/IITH-Compilers/IR2Vec/releases/tag/v1.0.0) | LLVM 10.0.1 |
+| [v0.1.0](https://github.com/IITH-Compilers/IR2Vec/releases/tag/v0.1.0) | LLVM 8.0.1 |
 
 ## Table Of Contents
 - [IR2Vec](#ir2vec)
