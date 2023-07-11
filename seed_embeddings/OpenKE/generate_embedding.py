@@ -107,7 +107,9 @@ if __name__ == "__main__":
 
     seedfile = os.path.join(
         arg_conf.index_dir,
-        "embeddings/seedEmbedding_{}E_{}D_{}batches{}margin.txt".format(arg_conf.epoch, arg_conf.dim, arg_conf.nbatches, arg_conf.margin),
+        "embeddings/seedEmbedding_{}E_{}D_{}batches{}margin.txt".format(
+            arg_conf.epoch, arg_conf.dim, arg_conf.nbatches, arg_conf.margin
+        ),
     )
 
     findRep(outfilejson, seedfile, arg_conf.index_dir)
