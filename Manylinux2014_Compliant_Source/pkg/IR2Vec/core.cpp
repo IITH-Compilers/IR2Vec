@@ -241,7 +241,7 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
     vector<double> temp2;
     const char *readable_name = "";
     string demangledName;
-    size_t sz;
+    size_t sz = 17;
     int status;
     // coying llvm samll map vector data into c++ map
 
