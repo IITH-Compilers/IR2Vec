@@ -239,10 +239,10 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
     // containers
 
     vector<double> temp2;
-    const char *readable_name = "";
+    char *readable_name;
     string demangledName;
     size_t sz = 17;
-    int status;
+    int status = 0;
     // coying llvm samll map vector data into c++ map
 
     // for InstVecMap
@@ -260,6 +260,7 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
         readable_name =
             __cxxabiv1::__cxa_demangle(instName.c_str(), 0, &sz, &status);
         demangledName = status == 0 ? std::string(readable_name) : instName;
+        free(readable_name);
         InstVecMap[demangledName] = temp2;
       } else // if Value does not has a name
       {
@@ -286,12 +287,8 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
       for (auto &Vec_it : Func_it.second)
         temp2.push_back(Vec_it);
 
-      auto temp1 = Func_it.first->getName(); // getName returns StringRef
       // apply __cxx::demangle just to be cautious
-      auto funcName = temp1.str();
-      readable_name =
-          __cxxabiv1::__cxa_demangle(funcName.c_str(), 0, &sz, &status);
-      demangledName = status == 0 ? std::string(readable_name) : funcName;
+      demangledName = IR2Vec::getDemagledName(Func_it.first);
       FuncVecMap[demangledName] = temp2;
 
       temp2.clear();
