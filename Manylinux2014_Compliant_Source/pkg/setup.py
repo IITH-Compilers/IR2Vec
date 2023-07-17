@@ -14,7 +14,7 @@ LLVM_LIBS = []
 VERSION = ""
 DESCRIPTION = ""
 
-with (pl.Path(__file__).parents[2] / "src" / "CMakeLists.txt").open() as f:
+with (pl.Path(__file__).resolve().parents[2] / "src" / "CMakeLists.txt").open() as f:
     for line in f:
         if not VERSION:
             vmatch = version_regex.match(line)  # Not using walrus because Python3.6
@@ -34,7 +34,9 @@ with (pl.Path(__file__).parent / "IR2Vec" / "README.md").open() as f:
 
 
 def get_llvm_files():
-    out = sp.run(["llvm-config", "--libfiles"] + LLVM_LIBS, stdout=sp.PIPE)
+    out = sp.run(
+        ["llvm-config", "--link-static", "--libfiles"] + LLVM_LIBS, stdout=sp.PIPE
+    )
     files = out.stdout.decode("utf8").split()
     return files
 

@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -eu
+export CXX=clang++
+export CC=clang
 
 rm -rf build || true
 mkdir build
@@ -18,3 +20,5 @@ cmake -DCMAKE_BUILD_TYPE=Release ../src && make -j"$(nproc)" && make install
 cd ..
 cp src/include/utils.h Manylinux2014_Compliant_Source/pkg/IR2Vec/
 cp vocabulary/seedEmbeddingVocab-*.txt Manylinux2014_Compliant_Source/pkg/IR2Vec/
+
+bash Manylinux2014_Compliant_Source/pkg/regen-oracle.sh

@@ -6,7 +6,7 @@ from collections import defaultdict
 
 ABS_ACCURACY = 1e-4
 
-TEST_SUITE_DIR = pl.Path(__file__).parents[3] / "src" / "test-suite"
+TEST_SUITE_DIR = pl.Path(__file__).resolve().parents[3] / "src" / "test-suite"
 SEED_VERSION = (
     list(IR2Vec.preparation.install_loc.glob("seed*.txt"))[0]
     .name.split(".")[0]
