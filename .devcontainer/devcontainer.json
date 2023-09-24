@@ -3,7 +3,7 @@
 {
 	"name": "LLVM Manylinux",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/necessary129/manylinux2014-llvm:12-x86_64"
+	"image": "ghcr.io/iith-compilers/manylinux2014-llvm:x86-llvm12"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
