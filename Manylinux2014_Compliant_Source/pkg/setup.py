@@ -52,8 +52,7 @@ IR2Vec_core = Extension(
 
 setup(
     name="IR2Vec",
-    author="Shikhar Jain",
-    author_email="cs22mtech02002@iith.ac.in",
+    author="IR2Vec Developers",
     version=VERSION,
     description="given input .ll/.bc generates corresponding IR2Vec embeddings in a file or on stdout",
     long_description=DESCRIPTION,
