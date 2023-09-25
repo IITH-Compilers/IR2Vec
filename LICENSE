@@ -1,7 +1,8 @@
 BSD 4-Clause License
 
-Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-Department of Computer Science and Engineering, IIT Hyderabad
+Copyright (c) 2018-2023, S. VenkataKeerthy, Rohit Aggarwal
+Department of Computer Science and Engineering, IIT Hyderabad.
+All rights reserved.
 
 IR2Vec uses the following third party software packages:
 1. Modified version of OpenKE with MIT license which can be found under:
