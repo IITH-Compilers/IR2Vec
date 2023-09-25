@@ -60,7 +60,7 @@ setup(
     name="IR2Vec",
     author="IR2Vec Developers",
     version=VERSION,
-    description="given input .ll/.bc generates corresponding IR2Vec embeddings in a file or on stdout",
+    description="LLVM IR based Program Embeddings for Compiler Optimizations and Program Comprehension",
     long_description=DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/IITH-Compilers/IR2Vec",
