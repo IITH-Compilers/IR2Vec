@@ -1,3 +1,10 @@
+// Copyright(c) 2023, The Contributors of IR2Vec.
+//
+// Part of the IR2Vec project.This software is available under the BSD 4-Clause
+// License. Please see LICENSE file in the top - level directory for more
+// details.
+//
+
 #define PY_SSIZE_T_CLEAN
 #include "IR2Vec.h"
 #include "utils.h"
@@ -38,9 +45,9 @@
 
 #include <cxxabi.h>
 
-//#include "_dl_x86_cpu_features.c"
+// #include "_dl_x86_cpu_features.c"
 
-//#include "boost/python.hpp"
+// #include "boost/python.hpp"
 
 // utils.h is included because it provides with a function for conversion
 using namespace std;
