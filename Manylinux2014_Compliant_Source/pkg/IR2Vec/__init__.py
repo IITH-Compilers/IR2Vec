@@ -13,7 +13,7 @@ import re
 
 version_regex = re.compile(r"^project\(ir2vec VERSION (?P<version>[^)]+)\)$")
 VERSION = ""
-with (pl.Path(__file__).resolve().parents[2] / "src" / "CMakeLists.txt").open() as f:
+with (pl.Path(__file__).resolve().parents[3] / "src" / "CMakeLists.txt").open() as f:
     for line in f:
         if not VERSION:
             vmatch = version_regex.match(line)  # Not using walrus because Python3.6
