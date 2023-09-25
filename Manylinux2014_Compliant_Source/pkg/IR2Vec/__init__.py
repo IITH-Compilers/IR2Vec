@@ -21,7 +21,7 @@ with (pl.Path(__file__).resolve().parents[3] / "src" / "CMakeLists.txt").open() 
                 VERSION = vmatch.group("version")
                 continue
         break
-    
+
 __version__ = VERSION
 __copyright__ = "Copyright The Contributors of IR2Vec"
 __license__ = "BSD 4-Clause License"
