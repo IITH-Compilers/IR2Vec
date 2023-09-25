@@ -20,7 +20,7 @@ jobs:
         env:
           CIBW_SKIP: "pp* *-musllinux_*"
           CIBW_ARCHS: "x86_64"
-          CIBW_MANYLINUX_X86_64_IMAGE: "ghcr.io/necessary129/manylinux2014-llvm:12-x86_64"
+          CIBW_MANYLINUX_X86_64_IMAGE: "ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86-llvm12"
           CIBW_BEFORE_ALL: "bash Manylinux2014_Compliant_Source/pkg/build.sh"
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "pytest {project}/Manylinux2014_Compliant_Source/pkg/tests"
