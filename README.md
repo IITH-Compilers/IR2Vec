@@ -7,6 +7,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
 ![LLVM](https://img.shields.io/badge/LLVM-v12.0.0-blue)
+![PyPI Version](https://img.shields.io/pypi/v/your-package-name)
 ![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
 ![pre-commit checks](https://github.com/IITH-Compilers/IR2Vec/workflows/pre-commit%20checks/badge.svg)
@@ -14,9 +15,10 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 ![Image](images/ir2vec.jpg)
 
 ## Table Of Contents
-* [Requirements](#requirements)
+* [Installation](#installation)
+    * [Requirements](#requirements)
+    * [Building from Source](#building-from-source)
 * [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
-* [Building from Source](#building-from-source)
 * [Generating program representations](#generating-program-representations)
    * [Using Binary](#using-binary)
    * [Using Libraries](#using-libraries)
@@ -24,6 +26,15 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 * [Citation](#citation)
 * [Contributions](#contributions)
 * [License](#license)
+
+## Installation
+Install the Latest release of the Python package using:
+
+```
+pip install -U IR2Vec
+```
+However, building from source is also supported for which the requirements and steps are listed down below.
+
 
 ## Requirements
 * cmake (>= 3.13.4)
