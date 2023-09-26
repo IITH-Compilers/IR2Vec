@@ -6,7 +6,8 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
-![LLVM](https://img.shields.io/badge/LLVM-v16.0.0-blue)
+![LLVM](https://img.shields.io/badge/LLVM-v12.0.0-blue)
+![PyPI Version](https://img.shields.io/pypi/v/your-package-name)
 ![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
 ![pre-commit checks](https://github.com/IITH-Compilers/IR2Vec/workflows/pre-commit%20checks/badge.svg)
@@ -24,24 +25,34 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ## Table Of Contents
 - [IR2Vec](#ir2vec)
-  - [LLVM Version Archive](#llvm-version-archive)
-  - [Table Of Contents](#table-of-contents)
-  - [Requirements](#requirements)
-  - [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
-  - [Building from source](#building-from-source)
-  - [Generating program representations](#generating-program-representations)
-    - [Using Binary](#using-binary)
-      - [Command-Line options](#command-line-options)
-      - [Flow-Aware Embeddings](#flow-aware-embeddings)
-      - [Symbolic Embeddings](#symbolic-embeddings)
-      - [On-demand Flow-Aware Embeddings](#on-demand-flow-aware-embeddings)
-      - [On-demand Symbolic Embeddings](#on-demand-symbolic-embeddings)
-  - [Using Libraries](#using-libraries)
-  - [Experiments](#experiments)
-    - [Note](#note)
-  - [Citation](#citation)
-  - [Contributions](#contributions)
-  - [License](#license)
+    - [LLVM Version Archive](#llvm-version-archive)
+    - [Table Of Contents](#table-of-contents)
+    - [Installation](#installation)
+    - [Requirements](#requirements)
+    - [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
+    - [Building from source](#building-from-source)
+    - [Generating program representations](#generating-program-representations)
+        - [Using Binary](#using-binary)
+            - [Command-Line options](#command-line-options)
+            - [Flow-Aware Embeddings](#flow-aware-embeddings)
+            - [Symbolic Embeddings](#symbolic-embeddings)
+            - [On-demand Flow-Aware Embeddings](#on-demand-flow-aware-embeddings)
+            - [On-demand Symbolic Embeddings](#on-demand-symbolic-embeddings)
+    - [Using Libraries](#using-libraries)
+    - [Experiments](#experiments)
+        - [Note](#note)
+    - [Citation](#citation)
+    - [Contributions](#contributions)
+    - [License](#license)
+
+## Installation
+Install the Latest release of the Python package using:
+
+```
+pip install -U IR2Vec
+```
+However, building from source is also supported for which the requirements and steps are listed down below.
+
 
 ## Requirements
 * cmake (>= 3.13.4)
