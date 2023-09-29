@@ -31,6 +31,7 @@ private:
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
   std::string res;
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16> bbVecMap;
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
   std::map<std::string, IR2Vec::Vector> opcMap;
@@ -47,6 +48,11 @@ public:
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {
     return instVecMap;
+  }
+
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16>
+  getBBVecMap() {
+    return bbVecMap;
   }
 
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>

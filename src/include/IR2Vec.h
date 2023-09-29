@@ -25,6 +25,7 @@ class Embeddings {
                         float WT = 0.5);
 
   llvm::SmallMapVector<const llvm::Instruction *, Vector, 128> instVecMap;
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16> bbVecMap;
   llvm::SmallMapVector<const llvm::Function *, Vector, 16> funcVecMap;
   Vector pgmVector;
 
@@ -47,6 +48,14 @@ public:
   llvm::SmallMapVector<const llvm::Instruction *, Vector, 128> &
   getInstVecMap() {
     return instVecMap;
+  }
+
+  // Returns a map containing basic block and the corresponding vector
+  // representations for a given module corresponding to the IR2VecMode and
+  // other configurations that is set in constructor
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16>
+  getBBVecMap() {
+    return bbVecMap;
   }
 
   // Returns a map containing functions and the corresponding vector

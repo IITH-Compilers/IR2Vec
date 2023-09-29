@@ -24,6 +24,7 @@
 #include <cxxabi.h>
 #include <functional>
 #include <regex>
+#include <string>
 
 using namespace llvm;
 using namespace IR2Vec;
@@ -480,7 +481,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
                        bbVector.begin(), std::plus<double>());
       }
     }
-
+    bbVecMap[b] = bbVector;
     IR2VEC_DEBUG(outs() << "-------------------------------------------\n");
     for (auto i : bbVector) {
       if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
@@ -809,7 +810,7 @@ void IR2Vec_FA::getPartialVec(
   }
 
   Vector instVector(DIM, 0);
-  StringRef opcodeName = I.getOpcodeName();
+  std::string opcodeName = I.getOpcodeName();
   auto vec = getValue(opcodeName);
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
@@ -1187,7 +1188,7 @@ void IR2Vec_FA::inst2Vec(
   }
 
   Vector instVector(DIM, 0);
-  StringRef opcodeName = I.getOpcodeName();
+  std::string opcodeName = I.getOpcodeName();
   auto vec = getValue(opcodeName);
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),

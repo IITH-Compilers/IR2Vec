@@ -37,6 +37,7 @@ int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
     SYM.generateSymbolicEncodings(o);
     instVecMap = SYM.getInstVecMap();
     funcVecMap = SYM.getFuncVecMap();
+    bbVecMap = SYM.getBBVecMap();
     pgmVector = SYM.getProgramVector();
   }
 
