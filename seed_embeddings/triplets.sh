@@ -4,7 +4,7 @@
 # This software is available under the BSD 4-Clause License. Please see LICENSE
 # file in the top-level directory for more details.
 #
-#Usage: bash triplets.sh <build dir> <No of opt> <llFile list> <output FileName>
+#Usage: bash triplets.sh <build dir> <No of opt> <llFile alist> <output FileNme> <llvm_build>
 
 _DEBUG="off"
 function DEBUG() {
@@ -45,7 +45,7 @@ fi
 counter=0
 while read p; do
 	let "counter++"
-	DEBUG echo "collecting data from $p"
+	echo "collecting data from $p"
 	NO_OF_OPT_FILES=$2
 	DEBUG echo "NO_OF_OPT_FILES from $NO_OF_OPT_FILES"
 	OPT_LEVELS=("O0" "O1" "O2" "O3" "Os" "Oz")
@@ -69,15 +69,15 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		DEBUG echo "opt from $opt"
-		${LLVM_BUILD}/bin/opt-16 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt-17 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
-	done &
-	if [ $counter == 100 ]; then
-		sleep 20
-		counter=0
-	fi
+	done
+	# if [ $counter == 100 ]; then
+	# 	sleep 20
+	# 	counter=0
+	# fi
 
 done <$3
 

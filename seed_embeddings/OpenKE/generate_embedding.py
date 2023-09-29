@@ -32,7 +32,12 @@ def train(arg_conf):
 
     outfile = os.path.join(
         arg_conf.index_dir,
-        "embedding_{}E_{}D.json".format(arg_conf.epoch, arg_conf.dim),
+        "seedEmbedding_{}E_{}D_{}batches{}margin.json".format(
+            arg_conf.epoch,
+            arg_conf.dim,
+            arg_conf.nbatches,
+            arg_conf.margin,
+        )
     )
     con.set_out_files(outfile)
     con.init()
