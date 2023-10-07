@@ -8,6 +8,8 @@
 #define PY_SSIZE_T_CLEAN
 #include "IR2Vec.h"
 #include "utils.h"
+#include "version.h"
+
 #include <Python.h>
 #include <cstring>
 #include <fstream>
@@ -75,6 +77,13 @@ string seed_emb_path = "";
 // cout<<"fail2"<<endl;
 // return l.ptr();
 //  }
+
+static PyObject *getIR2VecVersion(PyObject *self, PyObject *args) {
+  return PyUnicode_DecodeUTF8(
+      IR2VEC_VERSION, sizeof(IR2VEC_VERSION) / sizeof(IR2VEC_VERSION[0]) - 1,
+      NULL);
+}
+
 PyObject *set_seed_embedding_path(PyObject *self, PyObject *args) {
   const char *vocab_path2 = "";
   if (PyArg_ParseTuple(args, "s", &vocab_path2)) {
@@ -361,11 +370,11 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
 }
 
 PyMethodDef IR2Vec_core_Methods[] = {
-
     {"generateEmbeddings", (PyCFunction)IR2Vec_generateEmbeddings, METH_VARARGS,
      "As specified"},
     {"setSeedEmbdPath", (PyCFunction)set_seed_embedding_path, METH_VARARGS,
      "As specified"},
+    {"getVersion", getIR2VecVersion, METH_VARARGS, "Get IR2Vec Version"},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 struct PyModuleDef IR2Vec_def = {
