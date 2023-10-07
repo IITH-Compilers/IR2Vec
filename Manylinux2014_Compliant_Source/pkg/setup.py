@@ -5,10 +5,8 @@
 #
 
 from setuptools import setup, Extension
-
 import subprocess as sp
 import pathlib as pl
-
 import re
 
 version_regex = re.compile(r"^project\(ir2vec VERSION (?P<version>[^)]+)\)$")
@@ -17,7 +15,7 @@ llvm_libs_regex = re.compile(
 )
 
 LLVM_LIBS = []
-VERSION = ""
+VERSION = ""  
 DESCRIPTION = ""
 
 with (pl.Path(__file__).resolve().parents[2] / "src" / "CMakeLists.txt").open() as f:
