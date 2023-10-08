@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "IR2Vec.h"
 #include <fstream>
+#include <string>
 
 using namespace llvm;
 using namespace IR2Vec;
@@ -69,13 +70,15 @@ void IR2Vec::scaleVector(Vector &vec, float factor) {
 }
 
 // Function to get demangled function name
-auto IR2Vec::getDemagledName(llvm::Function *function) {
+std::string IR2Vec::getDemagledName(const llvm::Function *function) {
   auto functionName = function->getName().str();
   std::size_t sz = 17;
   int status;
   char *const readable_name =
       __cxa_demangle(functionName.c_str(), 0, &sz, &status);
-  auto demangledName = status == 0 ? std::string(readable_name) : functionName;
+  auto demangledName =
+      status == 0 ? std::string(readable_name) : std::string(functionName);
+  free(readable_name);
   return demangledName;
 }
 
