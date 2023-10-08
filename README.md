@@ -55,6 +55,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 * [Generating program representations](#generating-program-representations)
    * [Using Binary](#using-binary)
    * [Using Libraries](#using-libraries)
+* [IR2Vec-Wheels](#ir2vec-wheels)
 * [Experiments](#experiments)
 * [Citation](#citation)
 * [Contributions](#contributions)
@@ -74,7 +75,7 @@ pip install -U ir2vec
 ```
 Now, you can import and use IR2Vec in your Python projects. Make sure you have a good understanding of Python and its package management system.
 
-## cpp
+## Cpp
 
 If you're a C++ developer and require low-level control, optimization, or integration with C++ projects, you can build IR2Vec from source. First ensure the requirements are satisfied, then follow the steps mentioned in the Building from source section.
 
@@ -212,6 +213,41 @@ auto pgmVec = ir2vec.getProgramVector();
 for (auto val : pgmVec)
     outs() << val << "\t";
 ```
+
+## IR2Vec-Wheels
+
+- Each manylinux wheel is specific to Python ABI version, hence install them accodingly
+
+- Input:
+  - .ll/.bc file for which embeddings are needed
+  - `fa` -> Flow-Aware Encoddings; `sym` -> Symbolic Encoddings
+  - `p` -> program level; `f` -> function level
+- Output:
+    - A dictionary containing:
+        - `Instruction_Dict`: Key: Instruction[String]; Value : Embedding Vector
+        - `Function_Dict`: Key: Function name[String]; Value : Embedding Vector
+        - `Program_List`: Program/Module Name[String]; Embedding Vector
+        - `Message`: [String] Appropriate debug message .
+        - `Status`: [Bool] True if everything went fine else False
+- The following code snippet contains an example to demonstrate the usage of the package.
+
+```python
+import IR2Vec as pp
+
+d = pp.generateEmbeddings("/path/to/file.ll", "fa", "f")
+
+if d["Status"]:
+    # print(d.keys())
+    for x in d["Function_Dict"]:
+        print("key: ", x)
+        print("Value: ", d["Function_Dict"][x])
+    print("\n\n")
+    print(d["Instruction_Dict"].keys())
+else:
+    print(d["Message"])
+
+```
+
 
 ## Experiments
 
