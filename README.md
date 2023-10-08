@@ -43,7 +43,7 @@ pip install -U ir2vec
 ```
 Now, you can import and use IR2Vec in your Python projects. Make sure you have a good understanding of Python and its package management system.
 
-We are actively working on improving the Python interfaces and providing better support. If you find any good-to-have interfaces that you may need for your use case missing, please feel free to raise a request. 
+We are actively working on improving the Python interfaces and providing better support. If you find any good-to-have interfaces that you may need for your use case missing, please feel free to raise a request.
 
 ## Cpp
 
