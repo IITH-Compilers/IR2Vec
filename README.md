@@ -31,7 +31,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
     - [Python](#python)
     - [C++](#cpp)
         - [Requirements](#requirements)
-        - [Building from Source](#building-from-source) 
+        - [Building from Source](#building-from-source)
   - [Generating program representations](#generating-program-representations)
     - [Using Binary](#using-binary)
     - [Using Libraries](#using-libraries)
