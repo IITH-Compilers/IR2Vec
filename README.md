@@ -61,7 +61,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
     * For running experiments are available in [experiments/exp_requirements.yaml](./experiments/exp_requirements.yaml)
     * Conda/Anaconda based virtual environment is assumed
 
-(Experiments are done on an Ubuntu 18.04 machine)
+(Experiments are done on an Ubuntu 20.04 machine)
 
 
 ## Building from source
