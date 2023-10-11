@@ -13,10 +13,13 @@ import sys
 import json
 import argparse
 
+import analogy
+
 import ray
 from ray import tune
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 
 def test_files(index_dir):
     entities = os.path.join(index_dir, "entity2id.txt")
@@ -86,8 +89,11 @@ def train(arg_conf):
         seedfile,
         arg_conf['index_dir']
     )
-
-    return seedfile
+    
+    return {
+        "seedFile": seedfile,
+        "AnalogiesScore": analogy.getAnalogyScore(seedfile),
+    }
 
 
 def findRep(src, dest, index_dir):
@@ -124,7 +130,8 @@ if __name__ == "__main__":
         dest="index_dir",
         metavar="DIRECTORY",
         help="Location of the directory entity2id.txt, train2id.txt and relation2id.txt",
-        required=True,
+        required=False,
+        default="/home/nishu/nishant/ir2vec/IR2Vec/seed_embeddings/preprocessed/"
     )
     parser.add_argument(
         "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1500
@@ -160,12 +167,12 @@ if __name__ == "__main__":
         "epoch": arg_conf.epoch,
         "dim": arg_conf.dim,
         "index_dir": arg_conf.index_dir,
-        "nbatches": tune.grid_search(
-            [x for x in range(100, 1000, 100)]
-        ),
-        "margin": tune.grid_search(
-            [x for x in np.arange(3.0, 6.0, 0.5)]
-        ),
+        "nbatches": tune.grid_search([300, 350]),
+        #     [x for x in range(300, 500, 100)]
+        # ),
+        "margin": tune.grid_search([3.5])
+        #     [x for x in np.arange(3.0, 5.0, 1)]
+        # ),
     }
 
     try:
