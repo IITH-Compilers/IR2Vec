@@ -49,7 +49,7 @@ std::unique_ptr<llvm::Module> getLLVMIR();
 void collectDataFromVocab(std::map<std::string, Vector> &opcMap);
 void scaleVector(Vector &vec, float factor);
 // newly added
-auto getDemagledName(llvm::Function *function);
+std::string getDemagledName(const llvm::Function *function);
 char *getActualName(llvm::Function *function);
 std::string updatedRes(IR2Vec::Vector tmp, llvm::Function *f, llvm::Module *M);
 } // namespace IR2Vec
