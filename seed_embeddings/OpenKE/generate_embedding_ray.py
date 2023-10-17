@@ -17,6 +17,7 @@ import analogy
 
 import ray
 from ray import tune
+from ray.tune.tune_config import TuneConfig
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -35,7 +36,7 @@ def test_files(index_dir):
     if not os.path.exists(train):
         raise Exception("train2id.txt not found")
 
-
+# TODO :: alpha, lmda, bern, opt_method
 def train(arg_conf):
     con = config.Config()
     con.set_in_path(arg_conf['index_dir'])
@@ -44,7 +45,7 @@ def train(arg_conf):
     con.set_nbatches(nbatches=arg_conf['nbatches'])
     con.set_alpha(0.001)
     con.set_margin(arg_conf['margin'])
-    con.set_bern(0)
+    con.set_bern(0) # either 0 or 1
     con.set_dimension(arg_conf['dim'])
     con.set_ent_neg_rate(1)
     con.set_rel_neg_rate(0)
@@ -89,6 +90,8 @@ def train(arg_conf):
         seedfile,
         arg_conf['index_dir']
     )
+
+    del con
     
     return {
         "seedFile": seedfile,
@@ -97,27 +100,23 @@ def train(arg_conf):
 
 
 def findRep(src, dest, index_dir):
-    fSource = open(src)
-    data = json.loads(
-        fSource.read()
-    )
-    rep = data["ent_embeddings"]
-    fSource.close()
+    with open(src) as fSource:
+        data = json.load(fSource)
+        rep = data["ent_embeddings"]
 
-    fEntity = open(os.path.join(index_dir, "entity2id.txt"))
-    content = fEntity.read()
-    fEntity.close()
+    with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
+        content = fEntity.read()
 
-    fDest = open(dest, "w")
-    entities = content.split("\n")
-    toTxt = ""
+    with open(dest, "w") as fDest:
+        entities = content.split("\n")
+        toTxt = ""
 
-    for i in range(1, int(entities[0])):
-        toTxt += entities[i].split("\t")[0] + ":" + str(rep[i - 1]) + ",\n"
-    toTxt += (
-        entities[int(entities[0])].split("\t")[0] + ":" + str(rep[int(entities[0]) - 1])
-    )
-    fDest.write(toTxt)
+        for i in range(1, int(entities[0])):
+            toTxt += entities[i].split("\t")[0] + ":" + str(rep[i - 1]) + ",\n"
+        toTxt += (
+            entities[int(entities[0])].split("\t")[0] + ":" + str(rep[int(entities[0]) - 1])
+        )
+        fDest.write(toTxt)
 
 
 if __name__ == "__main__":
@@ -131,7 +130,7 @@ if __name__ == "__main__":
         metavar="DIRECTORY",
         help="Location of the directory entity2id.txt, train2id.txt and relation2id.txt",
         required=False,
-        default="/home/nishu/nishant/ir2vec/IR2Vec/seed_embeddings/preprocessed/"
+        default="/home/intern23002/iitH/ir2vec/IR2Vec/seed_embeddings/preprocessed/"
     )
     parser.add_argument(
         "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1500
@@ -164,13 +163,16 @@ if __name__ == "__main__":
     arg_conf = parser.parse_args()
 
     search_space = {
+        # "epoch": tune.grid_search([x for x in range(1500, 2000, 100)]),
         "epoch": arg_conf.epoch,
         "dim": arg_conf.dim,
         "index_dir": arg_conf.index_dir,
-        "nbatches": tune.grid_search([300, 350]),
-        #     [x for x in range(300, 500, 100)]
+        "nbatches": tune.grid_search([2**x for x in range(7, 11)]),
+            # [300, 350]),
+        #     
         # ),
-        "margin": tune.grid_search([3.5])
+        "margin": tune.grid_search([x for x in np.arange(3, 5, 0.05)]),
+        # tune.grid_search([3.5])
         #     [x for x in np.arange(3.0, 5.0, 1)]
         # ),
     }
@@ -185,11 +187,19 @@ if __name__ == "__main__":
     tuner = tune.Tuner(
         train,
         param_space=search_space,
+        tune_config=TuneConfig(max_concurrent_trials=20),
     )
 
     results = tuner.fit()
+
+    # Write the best result to a file, best_result.txt
+    with open(os.path.join(search_space['index_dir'], "best_result.txt"), "a") as f:
+        f.write('\n' + str(results.get_best_result(metric='AnalogiesScore', mode='max')))
+
+    print("Best config: ", results.get_best_result(metric='AnalogiesScore', mode='max'))
     
-    for result in results:
-        print(result)
+    # for result in results:
+    #     print(result)
+    del results
 
     print("Training finished...")
