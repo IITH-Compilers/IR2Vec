@@ -56,8 +56,10 @@ def test_fa_p():
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
         output = IR2Vec.generateEmbeddings(full_path, "fa", "p")
         p_vectors.append(output["Program_List"])
+
+    print(TEST_SUITE_DIR)
     p_vectors_oracle = read_p_file(
-        TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}" / "ir2vec.txt"
+        TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_p" / "ir2vec.txt"
     )
     for idx, v in enumerate(p_vectors):
         assert v == pytest.approx(p_vectors_oracle[idx], abs=ABS_ACCURACY)
@@ -69,8 +71,10 @@ def test_sym_p():
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
         output = IR2Vec.generateEmbeddings(full_path, "sym", "p")
         p_vectors.append(output["Program_List"])
+
+    print(TEST_SUITE_DIR)
     p_vectors_oracle = read_p_file(
-        TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}" / "ir2vec.txt"
+        TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}_p" / "ir2vec.txt"
     )
     for idx, v in enumerate(p_vectors):
         assert v == pytest.approx(p_vectors_oracle[idx], abs=ABS_ACCURACY)
@@ -83,6 +87,8 @@ def test_fa_f():
         output = IR2Vec.generateEmbeddings(str(full_path).strip(), "fa", "f")
         for fun, vec in output["Function_Dict"].items():
             f_vecs[full_path.name.strip()][fun.strip()] = vec
+
+    print(TEST_SUITE_DIR)
     f_vecs_oracle = read_f_file(
         TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_f" / "ir2vec.txt"
     )
@@ -100,6 +106,8 @@ def test_sym_f():
         output = IR2Vec.generateEmbeddings(str(full_path).strip(), "sym", "f")
         for fun, vec in output["Function_Dict"].items():
             f_vecs[full_path.name.strip()][fun.strip()] = vec
+
+    print(TEST_SUITE_DIR)
     f_vecs_oracle = read_f_file(
         TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}_f" / "ir2vec.txt"
     )
