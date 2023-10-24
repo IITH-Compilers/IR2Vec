@@ -132,16 +132,16 @@ Please use `--help` for further details.
 
 #### Flow-Aware Embeddings
 For all functions
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm16.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
 
 For a specific function
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm16.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### Symbolic Embeddings
 For all functions
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm16.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
 For a specific function
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm16.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
@@ -170,7 +170,7 @@ The following example snippet shows how to query the exposed vector representati
 // Creating object to generate FlowAware representation
 auto ir2vec =
       IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware,
-                         "./vocabulary/seedEmbeddingVocab-llvm14.txt");
+                         "./vocabulary/seedEmbeddingVocab-llvm16.txt");
 
 // Getting Instruction vectors corresponding to the instructions in <LLVM Module>
 auto instVecMap = ir2vec.getInstVecMap();
