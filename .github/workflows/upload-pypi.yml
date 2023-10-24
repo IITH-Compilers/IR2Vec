@@ -8,7 +8,7 @@ on:
     inputs:
       pypi_repo:
         description: 'Repo to upload to (testpypi or pypi)'
-        default: 'testpypi'
+        default: 'pypi'
         required: true
         type: choice
         options:
@@ -56,4 +56,6 @@ jobs:
 
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.5
+        with:
+          repository-url: https://upload.pypi.org/legacy/
         if: ${{ github.event.inputs.pypi_repo == 'pypi' }}
