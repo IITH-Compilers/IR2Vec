@@ -22,7 +22,7 @@ jobs:
 
   build_sdist:
     runs-on: ubuntu-latest
-    container: ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86-llvm14
+    container: ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86-llvm16
     steps:
       - uses: actions/checkout@v3
 

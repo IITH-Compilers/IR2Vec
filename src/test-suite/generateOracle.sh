@@ -4,8 +4,13 @@
 # This software is available under the BSD 4-Clause License. Please see LICENSE
 # file in the top-level directory for more details.
 #
+<<<<<<< HEAD
 SEED_VERSION="llvm17"
 # SRC_WD="PE-benchmarks-llfiles-llvm14
+=======
+SEED_VERSION="llvm16"
+# SRC_WD="PE-benchmarks-llfiles-llvm16"
+>>>>>>> github workflow llvm16
 DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}_p"
 DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}_p"
 

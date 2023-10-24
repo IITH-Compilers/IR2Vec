@@ -29,7 +29,7 @@ AUTHORS : SHIKHAR JAIN (IITH COMPILERS) & ANILAVA KUNDU (IITH COMPILERS)
 		```
 	- Dir "llvm" : You can get this from llvm-project/llvm/include.
 	- Dir "llvm-c" : You can get this from llvm-project/llvm/include.
-	- "seedEmbeddingVocab-llvm14.txt" . You can get this from IR2Vec Source.
+	- "seedEmbeddingVocab-llvm16.txt" . You can get this from IR2Vec Source.
 
 ### In future we plan to automate wheel generation by integrating needed workflows in CI/CD pipeline. These wheels then will reflect changes in either IR2Vec or in LLVM project.
 
