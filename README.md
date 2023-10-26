@@ -6,7 +6,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
-![LLVM](https://img.shields.io/badge/LLVM-v12.0.0-blue)
+![LLVM](https://img.shields.io/badge/LLVM-v14.0.0-blue)
 ![PyPI Version](https://img.shields.io/pypi/v/your-package-name)
 ![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
@@ -14,21 +14,37 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ![Image](images/ir2vec.jpg)
 
+## LLVM Version Archive
+
+| LLVM Version | Branch |
+| ------------ | ------ |
+| LLVM 14.0.0 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 12.0.0 | [llvm12](https://github.com/IITH-Compilers/IR2Vec/tree/llvm12) |
+| LLVM 10.0.1 | [llvm10](https://github.com/IITH-Compilers/IR2Vec/tree/llvm10) |
+| LLVM 8.0.1 | [llvm8](https://github.com/IITH-Compilers/IR2Vec/tree/llvm8) |
+
 ## Table Of Contents
-* [Installation](#installation)
-    * [Python](#python)
-    * [C++](#cpp)
-        * [Requirements](#requirements)
-        * [Building from Source](#building-from-source)
-* [Generating program representations](#generating-program-representations)
-   * [Using Binary](#using-binary)
-   * [Using Libraries](#using-libraries)
-   * [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
-* [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
-* [Experiments](#experiments)
-* [Citation](#citation)
-* [Contributions](#contributions)
-* [License](#license)
+- [IR2Vec](#ir2vec)
+    - [LLVM Version Archive](#llvm-version-archive)
+    - [Table Of Contents](#table-of-contents)
+    - [Installation](#installation)
+    - [Python](#python)
+    - [Cpp](#cpp)
+    - [Requirements](#requirements)
+    - [Building from source](#building-from-source)
+    - [Generating program representations](#generating-program-representations)
+        - [Using Binary](#using-binary)
+            - [Command-Line options](#command-line-options)
+            - [Flow-Aware Embeddings](#flow-aware-embeddings)
+            - [Symbolic Embeddings](#symbolic-embeddings)
+    - [Using Libraries](#using-libraries)
+    - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
+    - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
+    - [Experiments](#experiments)
+        - [Note](#note)
+    - [Citation](#citation)
+    - [Contributions](#contributions)
+    - [License](#license)
 
 ## Installation
 
@@ -52,7 +68,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (12.0.0) - [src](https://github.com/llvm/llvm-project/tree/release/12.x), [release](https://releases.llvm.org/download.html#12.0.0)
+* LLVM (14.0.0) - [src](https://github.com/llvm/llvm-project/tree/release/14.x), [release](https://releases.llvm.org/download.html#14.0.0)
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7)
 * Python (3.6.7)
@@ -116,16 +132,16 @@ Please use `--help` for further details.
 
 #### Flow-Aware Embeddings
 For all functions
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
 
 For a specific function
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### Symbolic Embeddings
 For all functions
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
 For a specific function
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
@@ -154,7 +170,7 @@ The following example snippet shows how to query the exposed vector representati
 // Creating object to generate FlowAware representation
 auto ir2vec =
       IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware,
-                         "./vocabulary/seedEmbeddingVocab-300-llvm12.txt");
+                         "./vocabulary/seedEmbeddingVocab-llvm14.txt");
 
 // Getting Instruction vectors corresponding to the instructions in <LLVM Module>
 auto instVecMap = ir2vec.getInstVecMap();

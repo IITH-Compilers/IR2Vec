@@ -1,0 +1,7 @@
+name: openKE
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.7
+  - tensorflow-gpu==2.2.0
