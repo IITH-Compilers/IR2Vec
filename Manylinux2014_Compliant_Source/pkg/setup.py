@@ -33,7 +33,7 @@ with (pl.Path(__file__).resolve().parents[2] / "src" / "CMakeLists.txt").open() 
         if VERSION and LLVM_LIBS:
             break
 
-with (pl.Path(__file__).parent / "IR2Vec" / "README.md").open() as f:
+with (pl.Path(__file__).resolve().parents[2] / "README.md").open() as f:
     DESCRIPTION = f.read()
 
 
@@ -51,7 +51,7 @@ IR2Vec_core = Extension(
     include_dirs=["./IR2Vec"],
     libraries=["z"],
     extra_objects=["/usr/local/lib/libIR2Vec.a"] + get_llvm_files(),
-    extra_compile_args=["-v -std=c++17"],
+    extra_compile_args=["-v", "--std=c++17"],
 )
 
 setup(
