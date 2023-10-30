@@ -51,7 +51,7 @@ IR2Vec_core = Extension(
     include_dirs=["./IR2Vec"],
     libraries=["z"],
     extra_objects=["/usr/local/lib/libIR2Vec.a"] + get_llvm_files(),
-    extra_compile_args=["-v"],
+    extra_compile_args=["-v -std=c++17"],
 )
 
 setup(
