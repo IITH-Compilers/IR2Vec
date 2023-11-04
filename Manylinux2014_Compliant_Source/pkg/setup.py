@@ -47,7 +47,7 @@ def get_llvm_files():
 
 IR2Vec_core = Extension(
     "IR2Vec.core",
-    sources=["IR2Vec/core.cpp"],
+    sources=["IR2Vec/refactoredCore.cpp"],
     include_dirs=["./IR2Vec"],
     libraries=["z"],
     extra_objects=["/usr/local/lib/libIR2Vec.a"] + get_llvm_files(),
