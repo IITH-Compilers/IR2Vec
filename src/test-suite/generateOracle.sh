@@ -5,7 +5,6 @@
 # file in the top-level directory for more details.
 #
 SEED_VERSION="llvm17"
-# SRC_WD="PE-benchmarks-llfiles-llvm14
 DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}_p"
 DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}_p"
 

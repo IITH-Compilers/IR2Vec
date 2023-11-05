@@ -20,13 +20,13 @@ setup(
     description="given input .ll/.bc generates corresponding IR2Vec embeddings in a file or on stdout",
     ext_modules=[IR2Vec_core],  # A list of Python extensions to be built
     packages=["IR2Vec_pkg"],  # A list of Python packages that distutils will manipulate
-    # package_data={'':['*.so*','./IR2Vec_include/*','./llvm/*','./llvm-c/*','seedEmbeddingVocab-300-llvm12.txt']},
+    # package_data={'':['*.so*','./IR2Vec_include/*','./llvm/*','./llvm-c/*','seedEmbeddingVocab-llvm17.txt']},
     package_data={
         "": [
             "./IR2Vec_include/*",
             "./llvm/*",
             "./llvm-c/*",
-            "seedEmbeddingVocab-300-llvm12.txt",
+            "seedEmbeddingVocab-llvm17.txt",
         ]
     },
     include_package_data=True,

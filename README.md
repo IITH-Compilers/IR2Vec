@@ -17,6 +17,8 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 | LLVM Version | Branch |
 | ------------ | ------ |
+| LLVM 17.0.2 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 16.0.6 | [main](https://github.com/IITH-Compilers/IR2Vec) |
 | LLVM 14.0.0 | [main](https://github.com/IITH-Compilers/IR2Vec) |
 | LLVM 12.0.0 | [llvm12](https://github.com/IITH-Compilers/IR2Vec/tree/llvm12) |
 | LLVM 10.0.1 | [llvm10](https://github.com/IITH-Compilers/IR2Vec/tree/llvm10) |
@@ -109,16 +111,16 @@ Please use `--help` for further details.
 >     <function-name> = <Embeddings>
 
 #### Flow-Aware Embeddings
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm17.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
 
 #### Symbolic Embeddings
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm17.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
 
 #### On-demand Flow-Aware Embeddings
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm17.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### On-demand Symbolic Embeddings
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm12.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm17.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
@@ -147,7 +149,7 @@ The following example snippet shows how to query the exposed vector representati
 // Creating object to generate FlowAware representation
 auto ir2vec =
       IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware,
-                         "./vocabulary/seedEmbeddingVocab-300-llvm12.txt");
+                         "./vocabulary/seedEmbeddingVocab-llvm17.txt");
 
 // Getting Instruction vectors corresponding to the instructions in <LLVM Module>
 auto instVecMap = ir2vec.getInstVecMap();

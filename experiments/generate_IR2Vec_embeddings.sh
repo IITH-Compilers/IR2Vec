@@ -19,7 +19,7 @@ fi
 
 BUILD=$(realpath ${BUILD})
 
-Absolute_path_of_RepresentationFile=$(realpath ../vocabulary/seedEmbeddingVocab-300-llvm12.txt)
+Absolute_path_of_RepresentationFile=$(realpath ../vocabulary/seedEmbeddingVocab-llvm17.txt)
 
 TASK_DIR=$1
 if [ -z "${TASK_DIR}" ]; then
@@ -45,10 +45,10 @@ fi
 
 if [ $EncodingType = "SYM" ]; then
 	PASS="sym"
-	Trans_type="${TASK_DIR}_Symbolic_llvm12"
+	Trans_type="${TASK_DIR}_Symbolic_llvm17"
 elif [ $EncodingType = "FA" ]; then
 	PASS="fa"
-	Trans_type="${TASK_DIR}_FlowAware_llvm12"
+	Trans_type="${TASK_DIR}_FlowAware_llvm17"
 else
 	echo "Please enter SYM or FA for EncodingType"
 	exit

@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - name: Install LLVM-16.0.0
+    - name: Install LLVM-17.0.2
       run: |
         wget https://apt.llvm.org/llvm.sh
-        sudo bash llvm.sh 16
+        sudo bash llvm.sh 17
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |

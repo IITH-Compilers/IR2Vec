@@ -32,8 +32,8 @@ Device_Mapping
 |   |-- cgo17-nvidia.csv
 |-- output
 |   |-- embeddings
-|   |   |-- Device_Mapping_Symbolic_llvm12.txt
-|   |   |-- Device_Mapping_FlowAware_llvm12.txt
+|   |   |-- Device_Mapping_Symbolic_llvm17.txt
+|   |   |-- Device_Mapping_FlowAware_llvm17.txt
 |-- DevMap.ipynb
 ```
 ## Thread Coarsening
@@ -60,8 +60,8 @@ Thread_Coarsening
 |   |-- pact-2014-runtimes.csv
 |-- output
 |   |-- embeddings
-|   |   |-- Thread_Coarsening_Symbolic_llvm12.txt
-|   |   |-- Thread_Coarsening_FlowAware_llvm12.txt
+|   |   |-- Thread_Coarsening_Symbolic_llvm17.txt
+|   |   |-- Thread_Coarsening_FlowAware_llvm17.txt
 |-- ThreadCoarsening.ipynb
 ```
 ## Out_Of_Vocabulary

@@ -86,9 +86,9 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
                                // Thus , need to add one more .cpp in .so
   const char *mode = "\0";
 
-  string vocab_path = seed_emb_path + "/seedEmbeddingVocab-300-llvm12.txt";
+  string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm17.txt";
   // const char*
-  // vocab_path=(seed_emb_path+"/seedEmbeddingVocab-300-llvm12.txt").c_str(); //
+  // vocab_path=(seed_emb_path+"/seedEmbeddingVocab-llvm17.txt").c_str(); //
   // this should be exact path till .txt . *** NOT TAKING THIS AS USER
   // DEFINED/PROVIDED ARGS ***
   const char *level = "\0"; // remember that ir2vec accepts a char type for this
