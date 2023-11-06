@@ -88,7 +88,7 @@ static PyObject *getIR2VecVersion(PyObject *self, PyObject *args) {
         NULL);
 }
 
-PyObject *set_seed_embedding_path(PyObject *self, PyObject *args) {
+PyObject *setSeedEmbeddingPath(PyObject *self, PyObject *args) {
     const char *vocab_path2 = "";
     if (PyArg_ParseTuple(args, "s", &vocab_path2)) {
         seed_emb_path = string(vocab_path2);
@@ -110,13 +110,9 @@ bool fileNotValid(const char *filename) {
 // Function to get Program Vector List
 PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvm_pgm_vec) {
     // for PgmVector
-    vector<double> PgmVect;
-    for (auto &Pgm_it : llvm_pgm_vec)
-        PgmVect.push_back(Pgm_it);
-
     PyObject *PgmList = PyList_New(0);
-    for (auto &Vec_it1 : PgmVect)
-        PyList_Append(PgmList, PyFloat_FromDouble(Vec_it1));
+    for (auto &Pgm_it : llvm_pgm_vec)
+        PyList_Append(PgmList, PyFloat_FromDouble(Pgm_it));
     return PgmList;
 }
 
@@ -124,31 +120,22 @@ PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvm_pgm_vec) {
 PyObject *createFunctionVectorDict(
     llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
         llvm_func_vec_map) {
-    vector<double> temp2;
     map<string, vector<double>> FuncVecMap;
-    string demangledName;
-    // for FuncVecMap
-    for (auto Func_it : llvm_func_vec_map) {
-        for (auto &Vec_it : Func_it.second)
-            temp2.push_back(Vec_it);
-
-        demangledName = IR2Vec::getDemagledName(Func_it.first);
-        FuncVecMap[demangledName] = temp2;
-
-        temp2.clear();
-    }
 
     PyObject *FuncVecDict = PyDict_New();
 
     // for FuncVecMap
-    for (auto Map_it1 : FuncVecMap) {
+    for (auto Func_it : llvm_func_vec_map) {
         PyObject *temp3 = PyList_New(0);
-        for (auto &List_it1 : Map_it1.second)
-            PyList_Append(temp3, PyFloat_FromDouble(List_it1));
+        string demangledName = IR2Vec::getDemagledName(Func_it.first);
+        for (auto &Vec_it : Func_it.second){
+            PyList_Append(temp3, PyFloat_FromDouble(Vec_it));
+        }
         PyDict_SetDefault(FuncVecDict,
-                          PyUnicode_FromString((Map_it1.first).c_str()),
+                          PyUnicode_FromString(demangledName.c_str()),
                           Py_None);
-        PyDict_SetItemString(FuncVecDict, Map_it1.first.c_str(), temp3);
+        PyDict_SetItemString(FuncVecDict, demangledName.c_str(), temp3);
+
     }
     return FuncVecDict;
 }
@@ -157,75 +144,25 @@ PyObject *createFunctionVectorDict(
 PyObject *createInstructionVectorDict(
     llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
         llvm_inst_vec_map) {
-    map<string, vector<double>> InstVecMap;
     PyObject *InstVecDict = PyDict_New();
-
-    vector<double> temp2;
-    char *readable_name;
-    string demangledName;
-    size_t sz = 17;
-    int status = 0;
     for (auto Inst_it : llvm_inst_vec_map) {
+        string demangledName = IR2Vec::getDemagledName(Inst_it.first);
+
+        PyObject *temp3 = PyList_New(0);
         // copy this SmallVector into c++ Vector
         for (auto &Vec_it : Inst_it.second) {
-            // cout<<Vec_it<<endl;
-            temp2.push_back(Vec_it);
+           PyList_Append(temp3, PyFloat_FromDouble(Vec_it));
         }
-        auto temp1 = Inst_it.first->getName();
-        // cout<<temp1<<endl;
-        if (temp1.empty() == false) {
-            // apply __cxx::demangle just to be cautious
-            auto instName = temp1.str();
-            readable_name =
-                __cxxabiv1::__cxa_demangle(instName.c_str(), 0, &sz, &status);
-            demangledName = status == 0 ? std::string(readable_name) : instName;
-            free(readable_name);
-            InstVecMap[demangledName] = temp2;
-        } else {
-            // if Value does not has a name
-            no_name_inst_count++;
-            demangledName =
-                (((Inst_it.first)->getFunction())->getName().str()) +
-                "No_Name_Inst_" +
-                to_string(
-                    no_name_inst_count); // for instructiojn having no string
-                                         // rep ; the custom string rep will be
-                                         // like
-                                         // <function_name_>"No_Name_Inst"_2
-            InstVecMap[demangledName] = temp2;
-        }
-        temp2.clear();
-    }
-
-    // for InstVecMap
-    for (auto Map_it1 : InstVecMap) {
-        PyObject *temp3 = PyList_New(0);
-        for (auto &List_it1 : Map_it1.second)
-            PyList_Append(temp3, PyFloat_FromDouble(List_it1));
         PyDict_SetDefault(InstVecDict,
                           PyUnicode_FromString((Map_it1.first).c_str()),
                           Py_None);
         PyDict_SetItemString(InstVecDict, Map_it1.first.c_str(), temp3);
     }
-
     return InstVecDict;
 }
 
-PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
+PyObject *initEmbedding(PyObject *self, PyObject *args) {
     Py_Initialize();
-
-    PyObject *Embedding_dict = PyDict_New();
-
-    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("Instruction_Dict"),
-                      Py_None);
-    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("Function_Dict"),
-                      Py_None);
-    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("Program_List"),
-                      Py_None);
-    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("Message"),
-                      PyUnicode_FromString("NA"));
-    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("Status"), Py_False);
-
     const char *filename = "\0";
     const char *mode = "\0";
     std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm16.txt";
@@ -304,43 +241,78 @@ PyObject *IR2Vec_generateEmbeddings(PyObject *self, PyObject *args) {
             llvm_inst_vec_map = Emb.getInstVecMap();
             llvm_func_vec_map = Emb.getFunctionVecMap();
             llvm_pgm_vec = Emb.getProgramVector();
+            
+            // return Emb object in Emb
+            return PyObj_FromPtr(&Emb);
         } else {
             IR2Vec::Embeddings Emb(*Module, ir2vecMode, vocab_path, level[0],
                                    nullptr);
             llvm_inst_vec_map = Emb.getInstVecMap();
             llvm_func_vec_map = Emb.getFunctionVecMap();
             llvm_pgm_vec = Emb.getProgramVector();
+
+            // return Emb object in Emb
+            return PyObj_FromPtr(&Emb);
         }
-
-        PyDict_SetItemString(Embedding_dict, "Instruction_Dict",
-                             createInstructionVectorDict(llvm_inst_vec_map));
-        PyDict_SetItemString(Embedding_dict, "Function_Dict",
-                             createFunctionVectorDict(llvm_func_vec_map));
-        PyDict_SetItemString(Embedding_dict, "Program_List",
-                             createProgramVectorList(llvm_pgm_vec));
-        PyDict_SetItemString(
-            Embedding_dict, "Message",
-            PyUnicode_FromString("Generated Embeddings are dumped either in "
-                                 "output_file or on stdout"));
-        PyDict_SetItemString(Embedding_dict, "Status", Py_True);
-
-        return Embedding_dict;
     } else {
-        PyDict_SetItemString(
-            Embedding_dict, "Message",
-            PyUnicode_FromString("PyArgsParseTuple didnt worked"));
-        PyDict_SetItemString(Embedding_dict, "Status", Py_False);
-        return Embedding_dict;
+        return PyUnicode_FromString("Error in parsing arguments.");
     }
 }
+
+/*
+    Create the following functions
+
+    0. initEncodings()
+    1. getInstVecMap()
+    2. getFunctionVecMap()
+    3. getProgramVector()
+    4. getIR2VecVersion()
+    5. setSeedEmbdPath()
+*/
+
+PyObject* getInstVecMap(PyObject* self, PyObject* embedding_dict) {
+    PyObject* InstVecDict = PyDict_GetItemString(embedding_dict, "Instruction_Dict");
+    return InstVecDict;
+}
+
+PyObject* getFunctionVecMap(PyObject* self, PyObject* embedding_dict) {
+    PyObject* FuncVecDict = PyDict_GetItemString(embedding_dict, "Function_Dict");
+    return FuncVecDict;
+}
+
+PyObject* getProgramVector(PyObject* self, PyObject* embedding_dict) {
+    PyObject* PgmList = PyDict_GetItemString(embedding_dict, "Program_List");
+    return PgmList;
+}
+
 PyMethodDef IR2Vec_core_Methods[] = {
-    {"generateEmbeddings", (PyCFunction)IR2Vec_generateEmbeddings, METH_VARARGS,
-     "As specified"},
-    {"setSeedEmbdPath", (PyCFunction)set_seed_embedding_path, METH_VARARGS,
-     "As specified"},
-    {"getVersion", getIR2VecVersion, METH_VARARGS, "Get IR2Vec Version"},
+    {
+        "initEmbedding", (PyCFunction)initEmbedding, METH_VARARGS,
+        "As specified"
+    },
+    {
+        "getInstVecMap", (PyCFunction)getInstVecMap, METH_O,
+        "As specified"
+    },
+    {
+        "getFunctionVecMap", (PyCFunction)getFunctionVecMap, METH_O,
+        "As specified"
+    },
+    {
+        "getProgramVector", (PyCFunction)getProgramVector, METH_O,
+        "As specified"
+    },
+    {
+        "setSeedEmbdPath", (PyCFunction)setSeedEmbeddingPath, METH_VARARGS,
+        "As specified"
+    },
+    {
+        "getVersion", getIR2VecVersion, METH_VARARGS,
+        "Get IR2Vec Version"
+    },
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
+
 struct PyModuleDef IR2Vec_def = {
     PyModuleDef_HEAD_INIT,
     "IR2Vec.core", /* name of module NOT THE NAME OF PACKAGE*/
@@ -349,5 +321,6 @@ struct PyModuleDef IR2Vec_def = {
     -1,           /* size of per-interpreter state of the module,
                                     or -1 if the module keeps state in global variables.
                    */
-    IR2Vec_core_Methods};
+    IR2Vec_core_Methods
+};
 PyMODINIT_FUNC PyInit_core(void) { return PyModule_Create(&IR2Vec_def); }
