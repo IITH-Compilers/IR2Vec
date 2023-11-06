@@ -50,6 +50,7 @@ void collectDataFromVocab(std::map<std::string, Vector> &opcMap);
 void scaleVector(Vector &vec, float factor);
 // newly added
 std::string getDemagledName(const llvm::Function *function);
+std::string getDemagledName(const llvm::Instruction *instruction);
 char *getActualName(llvm::Function *function);
 std::string updatedRes(IR2Vec::Vector tmp, llvm::Function *f, llvm::Module *M);
 } // namespace IR2Vec

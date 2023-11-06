@@ -60,27 +60,6 @@ using namespace std;
 
 int no_name_inst_count = 0;
 string seed_emb_path = "";
-// need to wrap :-
-// generateEncodings()
-// getInstVecMap()
-// getFunctionVecMap()
-// getFunctionVecMap()
-
-// need to undesratnd argument semantics of generateEncodings() --->
-// LLVM::Module &M
-// IR2VecMode mode = can be symbolic[sym] or flowaware[fa]
-// vocab = path to seed emebedings
-// o= output file that will either be created or appended and contain
-// real-valued vectors representing embeddings level= can be either program
-// level[p] or function level[f] class = One and only Non mandatory Argument ;
-//  static PyObject* set_global_list_return_message(bp::list& l, string msg)
-//  {
-// l[1]=msg;
-// cout<<"fail1"<<endl;
-// //static PyObject* pp=(PyObject*)&l;
-// cout<<"fail2"<<endl;
-// return l.ptr();
-//  }
 
 static PyObject *getIR2VecVersion(PyObject *self, PyObject *args) {
     return PyUnicode_DecodeUTF8(
@@ -96,6 +75,7 @@ PyObject *setSeedEmbeddingPath(PyObject *self, PyObject *args) {
     return PyUnicode_FromString("Seed Embedding Path is Set");
 }
 
+
 bool fileNotValid(const char *filename) {
     ifstream temp;
     temp.open(filename, ios_base::in);
@@ -107,6 +87,7 @@ bool fileNotValid(const char *filename) {
     return false;
 }
 
+
 // Function to get Program Vector List
 PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvm_pgm_vec) {
     // for PgmVector
@@ -115,6 +96,7 @@ PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvm_pgm_vec) {
         PyList_Append(PgmList, PyFloat_FromDouble(Pgm_it));
     return PgmList;
 }
+
 
 // Function to get Function Vector Dictionary
 PyObject *createFunctionVectorDict(
@@ -140,6 +122,7 @@ PyObject *createFunctionVectorDict(
     return FuncVecDict;
 }
 
+
 // Function to get Instruction Vector Dictionary
 PyObject *createInstructionVectorDict(
     llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
@@ -154,25 +137,27 @@ PyObject *createInstructionVectorDict(
            PyList_Append(temp3, PyFloat_FromDouble(Vec_it));
         }
         PyDict_SetDefault(InstVecDict,
-                          PyUnicode_FromString((Map_it1.first).c_str()),
+                          PyUnicode_FromString(demangledName.c_str()),
                           Py_None);
-        PyDict_SetItemString(InstVecDict, Map_it1.first.c_str(), temp3);
+        PyDict_SetItemString(InstVecDict, demangledName.c_str(), temp3);
     }
     return InstVecDict;
 }
 
+
 PyObject *initEmbedding(PyObject *self, PyObject *args) {
     Py_Initialize();
+    PyObject *Embedding_dict = PyDict_New();
+    // setting default values
+    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("fileName"), Py_None);
+    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("outputFile"), Py_None);
+    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("Message"), PyUnicode_FromString(""));
+    PyDict_SetDefault(Embedding_dict, PyUnicode_FromString("Status"), Py_False);
+
     const char *filename = "\0";
-    const char *mode = "\0";
-    std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm16.txt";
-    const char *level =
-        "\0"; // remember that ir2vec accepts a char type for this
     const char *output_file = "\0";
 
-    if (PyArg_ParseTuple(args, "sss|s", &filename, &mode, &level,
-                         &output_file)) {
-        // Sanity Checks
+    if (PyArg_ParseTuple(args, "s", &filename, &output_file)) {
         if (fileNotValid(filename)) {
             PyDict_SetItemString(
                 Embedding_dict, "Message",
@@ -193,26 +178,61 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
             }
         }
 
+        PyDict_SetItemString(Embedding_dict, "fileName", PyUnicode_FromString(filename));
+        PyDict_SetItemString(Embedding_dict, "outputFile", PyUnicode_FromString(output_file));
+        PyDict_SetItemString(Embedding_dict, "Message", PyUnicode_FromString("Success"));
+        PyDict_SetItemString(Embedding_dict, "Status", Py_True);
+        return Embedding_dict;
+    } else {
+        PyDict_SetItemString(Embedding_dict, "Status", Py_False);
+        PyDict_SetItemString(Embedding_dict, "Message",
+                             PyUnicode_FromString("Invalid Arguments"));
+        return Embedding_dict;
+    }
+}
+
+
+PyObject *generateEncodings(PyObject *self, PyObject *args) {
+    Py_Initialize();
+
+    PyObject *EncodingDict = PyDict_New();
+    // setting default values
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Instruction_Dict"), Py_None);
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Function_Dict"), Py_None);
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Program_List"), Py_None);
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Status"), Py_False);
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Message"), PyUnicode_FromString(""));
+    // PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Status"), Py_False);
+
+    const char *fileName = "\0";
+    const char *outputFile = "\0";
+    const char *mode = "\0";
+    std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm16.txt";
+    const char *level = "\0";
+    // remember that ir2vec accepts a char type for this
+
+    if (PyArg_ParseTuple(args, "sss|s", &fileName, &outputFile, &mode, &level)) {
         if (string(mode) != string("sym") && string(mode) != string("fa")) {
             PyDict_SetItemString(
-                Embedding_dict, "Message",
+                EncodingDict, "Message",
                 PyUnicode_FromString("Eroneous mode entered . Either of sym, "
                                      "fa should be specified"));
-            PyDict_SetItemString(Embedding_dict, "Status", Py_False);
-            return Embedding_dict;
+            PyDict_SetItemString(EncodingDict, "Status", Py_False);
+            return EncodingDict;
         } else {
             if (level[0] != 'p' && level[0] != 'f') {
                 PyDict_SetItemString(
-                    Embedding_dict, "Message",
+                    EncodingDict, "Message",
                     PyUnicode_FromString(
                         "Invalid level specified: Use either p or f"));
-                PyDict_SetItemString(Embedding_dict, "Status", Py_False);
-                return Embedding_dict;
+                PyDict_SetItemString(EncodingDict, "Status", Py_False);
+                return EncodingDict;
             }
         }
 
         // Invokinng IR2Vec lib exposed functions
-        IR2Vec::iname = string(filename);
+        IR2Vec::iname = string(fileName);
+        // string(embeddingDict["fileName"]);
         IR2Vec::IR2VecMode ir2vecMode =
             (string(mode) == string("sym") ? IR2Vec::Symbolic
                                            : IR2Vec::FlowAware);
@@ -230,13 +250,17 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
         Module = IR2Vec::getLLVMIR();
 
         // if output file is provided
-        if (string(output_file) != "") {
-            string outFile = string(output_file);
-            ofstream o;
-            o.open(outFile, ios_base::app);
-            IR2Vec::Embeddings Emb(*Module, ir2vecMode, vocab_path, level[0],
-                                   &o);
-
+        if (string(outputFile) != "") {
+            string outFile = string(outputFile);
+            ofstream output;
+            output.open(outFile, ios_base::app);
+            IR2Vec::Embeddings Emb(
+                *Module,
+                ir2vecMode, 
+                vocab_path, 
+                level[0],
+                &output
+            );
             // Emb is genertaed and intialized
             llvm_inst_vec_map = Emb.getInstVecMap();
             llvm_func_vec_map = Emb.getFunctionVecMap();
@@ -245,45 +269,141 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
             // return Emb object in Emb
             return PyObj_FromPtr(&Emb);
         } else {
-            IR2Vec::Embeddings Emb(*Module, ir2vecMode, vocab_path, level[0],
-                                   nullptr);
+            IR2Vec::Embeddings Emb(
+                *Module,
+                ir2vecMode,
+                vocab_path,
+                level[0],
+                nullptr
+            );
             llvm_inst_vec_map = Emb.getInstVecMap();
             llvm_func_vec_map = Emb.getFunctionVecMap();
             llvm_pgm_vec = Emb.getProgramVector();
 
-            // return Emb object in Emb
-            return PyObj_FromPtr(&Emb);
-        }
+        // Creating Python Objects
+        PyObject *InstVecDict = createInstructionVectorDict(llvm_inst_vec_map);
+        PyObject *FuncVecDict = createFunctionVectorDict(llvm_func_vec_map);
+        PyObject *PgmList = createProgramVectorList(llvm_pgm_vec);
+
+        // Adding Python Objects to EncodingDict
+        PyDict_SetItemString(EncodingDict, "Instruction_Dict", InstVecDict);
+        PyDict_SetItemString(EncodingDict, "Function_Dict", FuncVecDict);
+        PyDict_SetItemString(EncodingDict, "Program_List", PgmList);
+        PyDict_SetItemString(EncodingDict, "Status", Py_True);
+        PyDict_SetItemString(EncodingDict, "Message",
+                             PyUnicode_FromString("Success"));
+        return EncodingDict;
     } else {
-        return PyUnicode_FromString("Error in parsing arguments.");
+        PyDict_SetItemString(EncodingDict, "Status", Py_False);
+        PyDict_SetItemString(EncodingDict, "Message",
+                             PyUnicode_FromString("Invalid Arguments"));
+        return EncodingDict;
     }
 }
 
-/*
-    Create the following functions
 
-    0. initEncodings()
-    1. getInstVecMap()
-    2. getFunctionVecMap()
-    3. getProgramVector()
-    4. getIR2VecVersion()
-    5. setSeedEmbdPath()
-*/
+PyObject *generateFunctionEncodings(PyObject *self, PyObject* embeddingDict, PyObject *args) {
+    Py_Initialize();
 
-PyObject* getInstVecMap(PyObject* self, PyObject* embedding_dict) {
-    PyObject* InstVecDict = PyDict_GetItemString(embedding_dict, "Instruction_Dict");
-    return InstVecDict;
+    PyObject *EncodingDict = PyDict_New();
+    // setting default values
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Instruction_Dict"), Py_None);
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Function_Dict"), Py_None);
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Status"), Py_False);
+    PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Message"),PyUnicode_FromString(""));
+
+    const char *mode = "\0";
+    std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm16.txt";
+    const char *level = "\0";
+    const char *funcName = "\0";
+    // remember that ir2vec accepts a char type for this
+
+    if (PyArg_ParseTuple(args, "sss|s", &mode, &level, &funcName)) {
+        if (string(mode) != string("sym") && string(mode) != string("fa")) {
+            PyDict_SetItemString(
+                EncodingDict, "Message",
+                PyUnicode_FromString("Eroneous mode entered . Either of sym, "
+                                     "fa should be specified"));
+            PyDict_SetItemString(EncodingDict, "Status", Py_False);
+            return EncodingDict;
+        } else {
+            if (level[0] != 'p' && level[0] != 'f') {
+                PyDict_SetItemString(
+                    EncodingDict, "Message",
+                    PyUnicode_FromString(
+                        "Invalid level specified: Use either p or f"));
+                PyDict_SetItemString(EncodingDict, "Status", Py_False);
+                return EncodingDict;
+            }
+        }
+
+        // Invokinng IR2Vec lib exposed functions
+        IR2Vec::iname = string(PyUnicode_AsUTF8(PyDict_GetItemString(embeddingDict, "fileName")));
+        IR2Vec::IR2VecMode ir2vecMode =
+            (string(mode) == string("sym") ? IR2Vec::Symbolic
+                                           : IR2Vec::FlowAware);
+
+        // Temporary LLVM ADT's need to hold returned ADt's by IR2vec lib
+        llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128> llvm_inst_vec_map;
+        // IR2Vec::Embeddings::obj.getInstVecMap();
+        llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> llvm_func_vec_map;
+        // IR2Vec::Embeddings::obj.getFunctionVecMap();
+
+        // The scope of this Module object is extremely crucial
+        std::unique_ptr<llvm::Module> Module;
+        Module = IR2Vec::getLLVMIR();
+
+        // if output file is provided
+        std::string outputFile = string(PyUnicode_AsUTF8(PyDict_GetItemString(embeddingDict, "outputFile")));
+        if (outputFile != "") {
+            string outFile = outputFile;
+            ofstream output;
+            output.open(outFile, ios_base::app);
+            IR2Vec::Embeddings Emb(
+                *Module,
+                ir2vecMode,
+                vocab_path,
+                level[0],
+                &output,
+                funcName
+            );
+
+            // Emb is genertaed and intialized
+            llvm_inst_vec_map = Emb.getInstVecMap();
+            llvm_func_vec_map = Emb.getFunctionVecMap();
+        } else {
+            IR2Vec::Embeddings Emb(
+                *Module, 
+                ir2vecMode,
+                vocab_path,
+                level[0],
+                nullptr,
+                funcName
+            );
+            llvm_inst_vec_map = Emb.getInstVecMap();
+            llvm_func_vec_map = Emb.getFunctionVecMap();
+        }
+
+        // Creating Python Objects
+        PyObject *InstVecDict = createInstructionVectorDict(llvm_inst_vec_map);
+        PyObject *FuncVecDict = createFunctionVectorDict(llvm_func_vec_map);
+        
+
+        // Adding Python Objects to EncodingDict
+        PyDict_SetItemString(EncodingDict, "Instruction_Dict", InstVecDict);
+        PyDict_SetItemString(EncodingDict, "Function_Dict", FuncVecDict);
+        PyDict_SetItemString(EncodingDict, "Status", Py_True);
+        PyDict_SetItemString(EncodingDict, "Message",
+                             PyUnicode_FromString("Success"));
+        return EncodingDict;
+    } else {
+        PyDict_SetItemString(EncodingDict, "Status", Py_False);
+        PyDict_SetItemString(EncodingDict, "Message",
+                             PyUnicode_FromString("Invalid Arguments"));
+        return EncodingDict;
+    }
 }
 
-PyObject* getFunctionVecMap(PyObject* self, PyObject* embedding_dict) {
-    PyObject* FuncVecDict = PyDict_GetItemString(embedding_dict, "Function_Dict");
-    return FuncVecDict;
-}
-
-PyObject* getProgramVector(PyObject* self, PyObject* embedding_dict) {
-    PyObject* PgmList = PyDict_GetItemString(embedding_dict, "Program_List");
-    return PgmList;
-}
 
 PyMethodDef IR2Vec_core_Methods[] = {
     {
@@ -291,15 +411,11 @@ PyMethodDef IR2Vec_core_Methods[] = {
         "As specified"
     },
     {
-        "getInstVecMap", (PyCFunction)getInstVecMap, METH_O,
-        "As specified"
+        "generateEncodings", (PyCFunction)generateEncodings, METH_VARARGS,
+        "Generates Instruction Encodings, Function Encodings and Program."
     },
     {
-        "getFunctionVecMap", (PyCFunction)getFunctionVecMap, METH_O,
-        "As specified"
-    },
-    {
-        "getProgramVector", (PyCFunction)getProgramVector, METH_O,
+        "generateFunctionEncodings", (PyCFunction)generateFunctionEncodings, METH_O,
         "As specified"
     },
     {
@@ -323,4 +439,5 @@ struct PyModuleDef IR2Vec_def = {
                    */
     IR2Vec_core_Methods
 };
+
 PyMODINIT_FUNC PyInit_core(void) { return PyModule_Create(&IR2Vec_def); }
