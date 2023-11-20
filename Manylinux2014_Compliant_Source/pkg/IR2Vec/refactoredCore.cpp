@@ -300,7 +300,7 @@ PyObject *generateEncodings(PyObject *self, PyObject *args) {
 }
 
 
-PyObject *generateFunctionEncodings(PyObject *self, PyObject* embeddingDict, PyObject *args) {
+PyObject *generateFunctionEncodings(PyObject *self, PyObject *args) {
     Py_Initialize();
 
     PyObject *EncodingDict = PyDict_New();
@@ -310,13 +310,15 @@ PyObject *generateFunctionEncodings(PyObject *self, PyObject* embeddingDict, PyO
     PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Status"), Py_False);
     PyDict_SetDefault(EncodingDict, PyUnicode_FromString("Message"),PyUnicode_FromString(""));
 
+    const char *fileName = "\0";
+    const char *outputFile = "\0";
     const char *mode = "\0";
     std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm16.txt";
     const char *level = "\0";
     const char *funcName = "\0";
     // remember that ir2vec accepts a char type for this
 
-    if (PyArg_ParseTuple(args, "sss|s", &mode, &level, &funcName)) {
+    if (PyArg_ParseTuple(args, "sss|s", &fileName, &mode, &level, &funcName)) {
         if (string(mode) != string("sym") && string(mode) != string("fa")) {
             PyDict_SetItemString(
                 EncodingDict, "Message",
@@ -336,7 +338,7 @@ PyObject *generateFunctionEncodings(PyObject *self, PyObject* embeddingDict, PyO
         }
 
         // Invokinng IR2Vec lib exposed functions
-        IR2Vec::iname = string(PyUnicode_AsUTF8(PyDict_GetItemString(embeddingDict, "fileName")));
+        IR2Vec::iname = string(fileName);
         IR2Vec::IR2VecMode ir2vecMode =
             (string(mode) == string("sym") ? IR2Vec::Symbolic
                                            : IR2Vec::FlowAware);
@@ -352,9 +354,8 @@ PyObject *generateFunctionEncodings(PyObject *self, PyObject* embeddingDict, PyO
         Module = IR2Vec::getLLVMIR();
 
         // if output file is provided
-        std::string outputFile = string(PyUnicode_AsUTF8(PyDict_GetItemString(embeddingDict, "outputFile")));
-        if (outputFile != "") {
-            string outFile = outputFile;
+        if (string(outputFile) != "") {
+            string outFile = string(outputFile);
             ofstream output;
             output.open(outFile, ios_base::app);
             IR2Vec::Embeddings Emb(
@@ -413,7 +414,7 @@ PyMethodDef IR2Vec_core_Methods[] = {
         "Generates Instruction Encodings, Function Encodings and Program."
     },
     {
-        "generateFunctionEncodings", (PyCFunction)generateFunctionEncodings, METH_O,
+        "generateFunctionEncodings", (PyCFunction)generateFunctionEncodings, METH_VARARGS,
         "As specified"
     },
     {
