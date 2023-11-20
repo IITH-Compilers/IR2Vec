@@ -82,6 +82,19 @@ std::string IR2Vec::getDemagledName(const llvm::Function *function) {
     return demangledName;
 }
 
+// Function to get demanged instruction name
+std::string IR2Vec::getDemagledName(const llvm::Instruction *instruction) {
+    auto instructionName = instruction->getName().str();
+    std::size_t sz = 17;
+    int status;
+    char *const readable_name =
+        __cxa_demangle(instructionName.c_str(), 0, &sz, &status);
+    auto demangledName = status == 0 ? std::string(readable_name)
+                                     : std::string(instructionName);
+    free(readable_name);
+    return demangledName;
+}
+
 // Function to get actual function name
 char *IR2Vec::getActualName(llvm::Function *function) {
     auto functionName = function->getName().str();

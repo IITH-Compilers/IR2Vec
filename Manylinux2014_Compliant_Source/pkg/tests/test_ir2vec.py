@@ -54,7 +54,8 @@ def test_fa_p():
     p_vectors = []
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
-        output = IR2Vec.generateEmbeddings(full_path, "fa", "p")
+        initObj = IR2Vec.initEmbedding(full_path)
+        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "fa", "p")
         p_vectors.append(output["Program_List"])
 
     print(TEST_SUITE_DIR)
@@ -69,7 +70,8 @@ def test_sym_p():
     p_vectors = []
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
-        output = IR2Vec.generateEmbeddings(full_path, "sym", "p")
+        initObj = IR2Vec.initEmbedding(full_path)
+        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "sym", "p")
         p_vectors.append(output["Program_List"])
 
     print(TEST_SUITE_DIR)
@@ -84,7 +86,8 @@ def test_fa_f():
     f_vecs = defaultdict(dict)
     for file in ll_files:
         full_path = (TEST_SUITE_DIR / file).resolve()
-        output = IR2Vec.generateEmbeddings(str(full_path).strip(), "fa", "f")
+        initObj = IR2Vec.initEmbedding(str(full_path).strip())
+        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "fa", "f")
         for fun, vec in output["Function_Dict"].items():
             f_vecs[full_path.name.strip()][fun.strip()] = vec
 
@@ -103,7 +106,8 @@ def test_sym_f():
     f_vecs = defaultdict(dict)
     for file in ll_files:
         full_path = (TEST_SUITE_DIR / file).resolve()
-        output = IR2Vec.generateEmbeddings(str(full_path).strip(), "sym", "f")
+        initObj = IR2Vec.initEmbedding(str(full_path).strip())
+        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "sym", "f")
         for fun, vec in output["Function_Dict"].items():
             f_vecs[full_path.name.strip()][fun.strip()] = vec
 
