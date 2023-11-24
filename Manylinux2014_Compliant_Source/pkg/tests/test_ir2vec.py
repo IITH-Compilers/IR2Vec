@@ -54,13 +54,9 @@ def test_fa_p():
     p_vectors = []
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
-        initObj = IR2Vec.initEmbedding(full_path)
-        assert(initObj["Status"] == True)
-
-        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "fa", "p")
-        assert(output["Status"] == True)
-
-        p_vectors.append(output["Program_List"])
+        initObj = IR2Vec.initEmbedding(full_path, "fa", "p")
+        progVector = IR2Vec.getProgramVector(initObj)
+        p_vectors.append(progVector)
 
     print(TEST_SUITE_DIR)
     p_vectors_oracle = read_p_file(
@@ -74,13 +70,9 @@ def test_sym_p():
     p_vectors = []
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
-        initObj = IR2Vec.initEmbedding(full_path)
-        assert(initObj["Status"] == True)
-
-        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "sym", "p")
-        assert(output["Status"] == True)
-
-        p_vectors.append(output["Program_List"])
+        initObj = IR2Vec.initEmbedding(full_path, "sym", "p")
+        progVector = IR2Vec.getProgramVector(initObj)
+        p_vectors.append(progVector)
 
     print(TEST_SUITE_DIR)
     p_vectors_oracle = read_p_file(
@@ -93,34 +85,24 @@ def test_sym_p():
 def test_fa_f():
     f_vecs = defaultdict(dict)
     for file in ll_files:
-        full_path = (TEST_SUITE_DIR / file).resolve()
-        initObj = IR2Vec.initEmbedding(str(full_path).strip())
-        assert(initObj["Status"] == True)
-        
-        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "fa", "f")
-        assert(output["Status"] == True)
+        path = (TEST_SUITE_DIR / file).resolve()
+        full_path = str(path).strip()
+        initObj = IR2Vec.initEmbedding(full_path, "fa", "f")
+        functionVectorMap = IR2Vec.getFunctionVectors(initObj)
 
-        for fun, vec in output["Function_Dict"].items():
-            f_vecs[full_path.name.strip()][fun.strip()] = vec
+        for fun, vec in functionVectorMap.items():
+            f_vecs[path.name.strip()][fun.strip()] = vec
 
-            functionOutput = IR2Vec.generateFunctionEncodings(
-                initObj["fileName"], "fa", "f", fun
-            )
-            assert(functionOutput["Status"] == True)
-
-            # check if the function vector is the same as the one in the Function_Dict
-
-            functionOutputFuncs = list(functionOutput["Function_Dict"].keys())
-
+            functionOutput = IR2Vec.getFunctionVectors(initObj, fun)
+            functionOutputFuncs = list(functionOutput.keys())
             if fun in functionOutputFuncs:
                 assert (
-                    vec == pytest.approx(functionOutput["Function_Dict"][fun], abs=ABS_ACCURACY)
+                    vec == pytest.approx(functionOutput[fun], abs=ABS_ACCURACY)
                 )
             elif fun.strip() in functionOutputFuncs:
                 assert (
-                    vec == pytest.approx(functionOutput["Function_Dict"][fun.strip()], abs=ABS_ACCURACY)
+                    vec == pytest.approx(functionOutput[fun.strip()], abs=ABS_ACCURACY)
                 )
-
 
     print(TEST_SUITE_DIR)
     f_vecs_oracle = read_f_file(
@@ -136,32 +118,24 @@ def test_fa_f():
 def test_sym_f():
     f_vecs = defaultdict(dict)
     for file in ll_files:
-        full_path = (TEST_SUITE_DIR / file).resolve()
-        initObj = IR2Vec.initEmbedding(str(full_path).strip())
-        assert(initObj["Status"] == True)
+        path = (TEST_SUITE_DIR / file).resolve()
+        full_path = str(path).strip()
+        initObj = IR2Vec.initEmbedding(full_path, "sym", "f")
+        functionVectorMap = IR2Vec.getFunctionVectors(initObj)
 
-        output = IR2Vec.generateEncodings(initObj["fileName"], initObj["outputFile"], "sym", "f")
-        assert(output["Status"] == True)
+        for fun, vec in functionVectorMap.items():
+            f_vecs[path.name.strip()][fun.strip()] = vec
 
-        for fun, vec in output["Function_Dict"].items():
-            f_vecs[full_path.name.strip()][fun.strip()] = vec
-
-            functionOutput = IR2Vec.generateFunctionEncodings(
-                initObj["fileName"], "sym", "f", fun
-            )
-            assert(functionOutput["Status"] == True)
-
-            # check if the function vector is the same as the one in the Function_Dict
-
-            functionOutputFuncs = list(functionOutput["Function_Dict"].keys())
+            functionOutput = IR2Vec.getFunctionVectors(initObj, fun)
+            functionOutputFuncs = list(functionOutput.keys())
 
             if fun in functionOutputFuncs:
                 assert (
-                    vec == pytest.approx(functionOutput["Function_Dict"][fun], abs=ABS_ACCURACY)
+                    vec == pytest.approx(functionOutput[fun], abs=ABS_ACCURACY)
                 )
             elif fun.strip() in functionOutputFuncs:
                 assert (
-                    vec == pytest.approx(functionOutput["Function_Dict"][fun.strip()], abs=ABS_ACCURACY)
+                    vec == pytest.approx(functionOutput[fun.strip()], abs=ABS_ACCURACY)
                 )
 
     print(TEST_SUITE_DIR)
