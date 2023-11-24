@@ -29,6 +29,7 @@ class Embeddings {
     Vector pgmVector;
 
   public:
+    Embeddings() = default;
     Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab,
                std::string funcName = "", float WO = 1, float WA = 0.2,
                float WT = 0.5) {
