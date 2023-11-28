@@ -93,7 +93,9 @@ def test_fa_f():
         for fun, vec in functionVectorMap.items():
             f_vecs[path.name.strip()][fun.strip()] = vec
 
+            ## TODO :: get function name from Demangled name
             functionOutput = IR2Vec.getFunctionVectors(initObj, fun)
+
             functionOutputFuncs = list(functionOutput.keys())
             if fun in functionOutputFuncs:
                 assert (
@@ -120,13 +122,20 @@ def test_sym_f():
     for file in ll_files:
         path = (TEST_SUITE_DIR / file).resolve()
         full_path = str(path).strip()
+
         initObj = IR2Vec.initEmbedding(full_path, "sym", "f")
+        assert(initObj is not None)
+
         functionVectorMap = IR2Vec.getFunctionVectors(initObj)
+        assert(functionVectorMap is not None)
 
         for fun, vec in functionVectorMap.items():
             f_vecs[path.name.strip()][fun.strip()] = vec
 
-            functionOutput = IR2Vec.getFunctionVectors(initObj, fun)
+            ## TODO :: get function name from Demangled name
+            functionOutput = IR2Vec.getFunctionVectors(initObj, fun.strip())
+            assert(functionOutput is not None)
+
             functionOutputFuncs = list(functionOutput.keys())
 
             if fun in functionOutputFuncs:
