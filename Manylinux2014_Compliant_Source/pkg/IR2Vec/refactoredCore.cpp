@@ -232,6 +232,53 @@ typedef struct {
     ir2vecHandler *ir2vecObj;
 } ir2vecHandlerObject;
 
+PyObject *getInstructionVectorMap(ir2vecHandlerObject *self, PyObject* args) {
+    // check for args, and null etc
+    if ((self->ir2vecObj) == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
+        return NULL;
+    }
+    return (self->ir2vecObj)->generateEncodings(OpType::Instruction);
+}
+
+PyObject *getProgram(ir2vecHandlerObject *self, PyObject* args) {
+    if ((self->ir2vecObj) == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
+        return NULL;
+    }
+    return (self->ir2vecObj)->generateEncodings(OpType::Program);
+}
+
+PyObject *getFunctionVectorMap(ir2vecHandlerObject *self, PyObject* args) {
+    if ((self->ir2vecObj) == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
+        return NULL;
+    }
+
+    const char *funcName = "\0";
+    if (!PyArg_ParseTuple(args, "|s", &funcName)) {
+        return NULL;
+    }
+
+    return (self->ir2vecObj)->generateEncodings(OpType::Function, string(funcName));
+}
+
+PyMethodDef ir2vecObjMethods[] = {
+    {
+        "getInstructionVectorMap", (PyCFunction)getInstructionVectorMap, METH_VARARGS,
+        "Get Instruction Vectors"
+    },
+    {
+        "getProgram", (PyCFunction)getProgram, METH_VARARGS,
+        "Get Program Vector"
+    },
+    {
+        "getFunctionVectorMap", (PyCFunction)getFunctionVectorMap, METH_VARARGS,
+        "Get Function Vectors"
+    },
+    {NULL, NULL, 0, NULL} /* Sentinel */
+};
+
 // static void ir2vecHandler_dealloc(ir2vecHandlerObject *self) {
 //     if (self->ir2vecObj != NULL)
 //         delete self->ir2vecObj;
@@ -262,6 +309,7 @@ static PyTypeObject ir2vecHandlerType = {
     0,                                      // tp_as_buffer
     Py_TPFLAGS_DEFAULT,                     // tp_flags
     "ir2vecHandlerObject",                  // tp_doc
+    .tp_methods = ir2vecObjMethods,         // tp_methods
 };
 
 ir2vecHandlerObject *createIR2VECObject(const char *filename, const char *output_file, const char *mode, const char *level) {
@@ -289,6 +337,11 @@ PyObject *runEncodings(PyObject *args, OpType type) {
         PyErr_SetString(PyExc_TypeError,
                         "Function name can only be specified for Function "
                         "Vectors");
+        return NULL;
+    }
+
+    if (ir2vecHandlerobj == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
         return NULL;
     }
 
@@ -412,5 +465,6 @@ PyMODINIT_FUNC PyInit_core(void) {
     Py_INCREF(&ir2vecHandlerType);
     PyModule_AddObject(module, "ir2vecHandlerObject", (PyObject *)&ir2vecHandlerType);
     PyModule_AddFunctions(module, IR2Vec_core_Methods);
+    PyModule_AddFunctions(module, ir2vecObjMethods);
     return module;
 }
