@@ -55,6 +55,8 @@ def test_fa_p():
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
         initObj = IR2Vec.initEmbedding(full_path, "fa", "p")
+        # _ = initObj.testFunction()
+
         progVector = IR2Vec.getProgramVector(initObj)
         p_vectors.append(progVector)
 
