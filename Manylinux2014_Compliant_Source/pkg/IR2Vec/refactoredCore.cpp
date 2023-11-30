@@ -58,9 +58,32 @@
 // utils.h is included because it provides with a function for conversion
 using namespace std;
 
-int no_name_inst_count = 0;
 string seed_emb_path = "";
 
+static PyObject *getIR2VecVersion(PyObject *self, PyObject *args) {
+    return PyUnicode_DecodeUTF8(
+        IR2VEC_VERSION, sizeof(IR2VEC_VERSION) / sizeof(IR2VEC_VERSION[0]) - 1,
+        NULL);
+}
+
+PyObject *setSeedEmbeddingPath(PyObject *self, PyObject *args) {
+    const char *vocab_path2 = "";
+    if (PyArg_ParseTuple(args, "s", &vocab_path2)) {
+        seed_emb_path = string(vocab_path2);
+    }
+    return PyUnicode_FromString("Seed Embedding Path is Set");
+}
+
+bool fileNotValid(const char *filename) {
+    ifstream temp;
+    temp.open(filename, ios_base::in);
+    if (temp.peek() == ifstream::traits_type::eof() || temp.bad() == true ||
+        temp.fail() == true) {
+        return true;
+    }
+    temp.close();
+    return false;
+}
 
 // create Enum with three options : Program, Function, Instruction
 enum class OpType { Program, Function, Instruction };
@@ -79,7 +102,13 @@ public:
     std::string getOutputFile() { return outputFile; }
     std::string getMode() { return mode; }
     std::string getLevel() { return level; }
-        
+
+    PyObject *testFunction() {
+        PyObject *list = PyList_New(0);
+        PyList_Append(list, PyUnicode_FromString("Hello"));
+        PyList_Append(list, PyUnicode_FromString("World"));
+        return list;
+    }
         
     // Function to get Program Vector List
     PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvm_pgm_vec) {
@@ -138,7 +167,7 @@ public:
 
 
     // generateEncodings
-    PyObject *generateEncodings(IR2Vec::Embeddings* emb, OpType type, std::string funcName = "") {
+    PyObject *generateEncodings(OpType type, std::string funcName = "") {
         // Invokinng IR2Vec lib exposed functions
         IR2Vec::iname = this->fileName;
         IR2Vec::IR2VecMode ir2vecMode =
@@ -149,7 +178,7 @@ public:
         Module = IR2Vec::getLLVMIR();
         std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm16.txt";
 
-
+        IR2Vec::Embeddings* emb = new IR2Vec::Embeddings();
         // if output file is provided
         if (this->outputFile != "") {
             string outFile = this->outputFile;
@@ -198,31 +227,93 @@ public:
     }
 };
 
-static PyObject *getIR2VecVersion(PyObject *self, PyObject *args) {
-    return PyUnicode_DecodeUTF8(
-        IR2VEC_VERSION, sizeof(IR2VEC_VERSION) / sizeof(IR2VEC_VERSION[0]) - 1,
-        NULL);
-}
+typedef struct {
+    PyObject_VAR_HEAD
+    ir2vecHandler *ir2vecObj;
+} ir2vecHandlerObject;
 
-PyObject *setSeedEmbeddingPath(PyObject *self, PyObject *args) {
-    const char *vocab_path2 = "";
-    if (PyArg_ParseTuple(args, "s", &vocab_path2)) {
-        seed_emb_path = string(vocab_path2);
+// static void ir2vecHandler_dealloc(ir2vecHandlerObject *self) {
+//     if (self->ir2vecObj != NULL)
+//         delete self->ir2vecObj;
+    
+//     Py_TYPE(self)->tp_free((PyObject *)self);
+// }
+
+// Define the ExampleObject type
+static PyTypeObject ir2vecHandlerType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "ir2vecHandler.ir2vecHandlerObject",    // tp_name
+    sizeof(ir2vecHandlerObject),            // tp_basicsize
+    0,                                      // tp_itemsize
+    0,                                      // tp_dealloc
+    0,                                      // tp_print
+    0,                                      // tp_getattr
+    0,                                      // tp_setattr
+    0,                                      // tp_reserved
+    0,                                      // tp_repr
+    0,                                      // tp_as_number
+    0,                                      // tp_as_sequence
+    0,                                      // tp_as_mapping
+    0,                                      // tp_hash
+    0,                                      // tp_call
+    0,                                      // tp_str
+    0,                                      // tp_getattro
+    0,                                      // tp_setattro
+    0,                                      // tp_as_buffer
+    Py_TPFLAGS_DEFAULT,                     // tp_flags
+    "ir2vecHandlerObject",                  // tp_doc
+};
+
+ir2vecHandlerObject *createIR2VECObject(const char *filename, const char *output_file, const char *mode, const char *level) {
+    ir2vecHandler *ir2vecObj = new ir2vecHandler(filename, output_file, mode, level);
+    if (ir2vecObj == NULL) {
+        return NULL;
     }
-    return PyUnicode_FromString("Seed Embedding Path is Set");
-}
-
-bool fileNotValid(const char *filename) {
-    ifstream temp;
-    temp.open(filename, ios_base::in);
-    if (temp.peek() == ifstream::traits_type::eof() || temp.bad() == true ||
-        temp.fail() == true) {
-        return true;
+    ir2vecHandlerObject *ir2vecHandlerObj = PyObject_New(ir2vecHandlerObject, &ir2vecHandlerType);
+    if (ir2vecHandlerObj == NULL) {
+        return NULL;
     }
-    temp.close();
-    return false;
+    ir2vecHandlerObj->ir2vecObj = ir2vecObj;
+    return ir2vecHandlerObj;
 }
 
+PyObject *runEncodings(PyObject *args, OpType type) {
+    const char *funcName = "\0";
+    ir2vecHandlerObject *ir2vecHandlerobj = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|s", &ir2vecHandlerobj, &funcName)) {
+        return NULL;
+    }
+
+    if (string(funcName).empty() == false && type != OpType::Function) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Function name can only be specified for Function "
+                        "Vectors");
+        return NULL;
+    }
+
+    if (ir2vecHandlerobj->ir2vecObj == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
+        return NULL;
+    } else {
+        ir2vecHandler *ir2vecObj = ir2vecHandlerobj->ir2vecObj;
+        return ir2vecObj->generateEncodings(
+            type, string(funcName)
+        );
+    }
+}
+
+PyObject *getInstructionVectors(PyObject *self, PyObject* args) {
+    return runEncodings(args, OpType::Instruction);
+}
+
+PyObject *getProgramVector(PyObject* self, PyObject* args) {
+    return runEncodings(args, OpType::Program);
+}
+
+PyObject *getFunctionVectors(PyObject *self, PyObject* args) {
+    return runEncodings(args, OpType::Function);
+}
 
 PyObject *initEmbedding(PyObject *self, PyObject *args) {
     Py_Initialize();
@@ -262,82 +353,36 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    // initializing the ir2vecHandler object
-    ir2vecHandler *ir2vecObj = new ir2vecHandler(
-        string(filename),
-        string(output_file),
-        string(mode),
-        string(level)
-    );
-    return PyCapsule_New(ir2vecObj, "ir2vecHandler", NULL);
-}
+    ir2vecHandlerObject *ir2vecObj = createIR2VECObject(filename, output_file, mode, level);
 
-
-PyObject *runEncodings(PyObject *args, OpType type) {
-    PyObject *capsule;
-    const char *funcName = "\0";
-
-    if (!PyArg_ParseTuple(args, "O|s", &capsule, &funcName)) {
+    if (ir2vecObj == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
         return NULL;
     }
 
-    if (string(funcName).empty() == false && type != OpType::Function) {
-        PyErr_SetString(PyExc_TypeError,
-                        "Function name can only be specified for Function "
-                        "Vectors");
-        return NULL;
-    }
-
-    ir2vecHandler *ir2vecObj =
-        static_cast<ir2vecHandler *>(PyCapsule_GetPointer(capsule, "ir2vecHandler"));
-    if (!ir2vecObj) {
-        // set error here
-        PyErr_SetString(PyExc_TypeError, "Invalid Arguments");
-        return NULL;
-    }
-
-    IR2Vec::Embeddings *embObj = new IR2Vec::Embeddings();
-    return ir2vecObj->generateEncodings(
-        embObj, type, string(funcName)
-    );
+    return (PyObject*)ir2vecObj;
 }
-
-
-PyObject *getInstructionVectors(PyObject *self, PyObject* args) {
-    return runEncodings(args, OpType::Instruction);
-}
-
-
-PyObject *getProgramVector(PyObject *self, PyObject* args) {
-    return runEncodings(args, OpType::Program);
-}
-
-
-PyObject *getFunctionVectors(PyObject *self, PyObject* args) {
-    return runEncodings(args, OpType::Function);
-}
-
 
 PyMethodDef IR2Vec_core_Methods[] = {
     {
         "initEmbedding", (PyCFunction)initEmbedding, METH_VARARGS,
-        "As specified"
+        "Create an Embedding Object"
     },
     {
         "getInstructionVectors", (PyCFunction)getInstructionVectors, METH_VARARGS,
-        "As specified"
+        "Get Instruction Vectors"
     },
     {
         "getProgramVector", (PyCFunction)getProgramVector, METH_VARARGS,
-        "As specified"
+        "Get Program Vector"
     },
     {
         "getFunctionVectors", (PyCFunction)getFunctionVectors, METH_VARARGS,
-        "As specified"
+        "Get Function Vectors"
     },
     {
         "setSeedEmbdPath", (PyCFunction)setSeedEmbeddingPath, METH_VARARGS,
-        "As specified"
+        "Set Seed Embedding Path"
     },
     {
         "getVersion", getIR2VecVersion, METH_VARARGS,
@@ -354,7 +399,18 @@ struct PyModuleDef IR2Vec_def = {
     -1,           /* size of per-interpreter state of the module,
                                     or -1 if the module keeps state in global variables.
                    */
-    IR2Vec_core_Methods
+    NULL,         /* m_methods */
 };
 
-PyMODINIT_FUNC PyInit_core(void) { return PyModule_Create(&IR2Vec_def); }
+PyMODINIT_FUNC PyInit_core(void) {
+    PyObject* module = PyModule_Create(&IR2Vec_def);
+
+    if (PyType_Ready(&ir2vecHandlerType) < 0) {
+        return NULL;
+    }
+
+    Py_INCREF(&ir2vecHandlerType);
+    PyModule_AddObject(module, "ir2vecHandlerObject", (PyObject *)&ir2vecHandlerType);
+    PyModule_AddFunctions(module, IR2Vec_core_Methods);
+    return module;
+}
