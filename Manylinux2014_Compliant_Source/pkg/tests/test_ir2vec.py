@@ -54,11 +54,20 @@ def test_fa_p():
     p_vectors = []
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
-        initObj = IR2Vec.initEmbedding(full_path, "fa", "p")
-        # _ = initObj.testFunction()
 
-        progVector = IR2Vec.getProgramVector(initObj)
-        p_vectors.append(progVector)
+        initObj = IR2Vec.initEmbedding(full_path, "fa", "p")
+        assert(initObj is not None)
+
+        progVector1 = IR2Vec.getProgramVector(initObj)
+        assert(progVector1 is not None)
+
+        progVector2 = initObj.getProgram()
+        assert(progVector2 is not None)
+
+        for idx, v in enumerate(progVector1):
+            assert v == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
+
+        p_vectors.append(progVector1)
 
     print(TEST_SUITE_DIR)
     p_vectors_oracle = read_p_file(
@@ -72,9 +81,20 @@ def test_sym_p():
     p_vectors = []
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
+
         initObj = IR2Vec.initEmbedding(full_path, "sym", "p")
-        progVector = IR2Vec.getProgramVector(initObj)
-        p_vectors.append(progVector)
+        assert(initObj is not None)
+        
+        progVector1 = IR2Vec.getProgramVector(initObj)
+        assert(progVector1 is not None)
+
+        progVector2 = initObj.getProgram()
+        assert(progVector2 is not None)
+
+        for idx, v in enumerate(progVector1):
+            assert v == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
+
+        p_vectors.append(progVector1)
 
     print(TEST_SUITE_DIR)
     p_vectors_oracle = read_p_file(
@@ -89,14 +109,30 @@ def test_fa_f():
     for file in ll_files:
         path = (TEST_SUITE_DIR / file).resolve()
         full_path = str(path).strip()
+
         initObj = IR2Vec.initEmbedding(full_path, "fa", "f")
+        assert(initObj is not None)
+
         functionVectorMap = IR2Vec.getFunctionVectors(initObj)
+        assert(functionVectorMap is not None)
+
+        functionVectorMap2 = initObj.getFunctionVectorMap()
+        assert(functionVectorMap2 is not None)
 
         for fun, vec in functionVectorMap.items():
+            assert vec == pytest.approx(functionVectorMap2[fun], abs=ABS_ACCURACY)
+
             f_vecs[path.name.strip()][fun.strip()] = vec
 
-            ## TODO :: get function name from Demangled name
+            ## TODO :: get function name from Demangled name fun
             functionOutput = IR2Vec.getFunctionVectors(initObj, fun)
+            assert(functionOutput is not None)
+
+            functionOutput2 = initObj.getFunctionVectorMap(fun)
+            assert(functionOutput2 is not None)
+
+            for idx, v in functionOutput.items():
+                assert v == pytest.approx(functionOutput2[idx], abs=ABS_ACCURACY)
 
             functionOutputFuncs = list(functionOutput.keys())
             if fun in functionOutputFuncs:
@@ -131,15 +167,25 @@ def test_sym_f():
         functionVectorMap = IR2Vec.getFunctionVectors(initObj)
         assert(functionVectorMap is not None)
 
+        functionVectorMap2 = initObj.getFunctionVectorMap()
+        assert(functionVectorMap2 is not None)
+
         for fun, vec in functionVectorMap.items():
+            assert vec == pytest.approx(functionVectorMap2[fun], abs=ABS_ACCURACY)
+
             f_vecs[path.name.strip()][fun.strip()] = vec
 
             ## TODO :: get function name from Demangled name
-            functionOutput = IR2Vec.getFunctionVectors(initObj, fun.strip())
+            functionOutput = IR2Vec.getFunctionVectors(initObj, fun)
             assert(functionOutput is not None)
 
-            functionOutputFuncs = list(functionOutput.keys())
+            functionOutput2 = initObj.getFunctionVectorMap(fun)
+            assert(functionOutput2 is not None)
 
+            for idx, v in functionOutput.items():
+                assert v == pytest.approx(functionOutput2[idx], abs=ABS_ACCURACY)
+
+            functionOutputFuncs = list(functionOutput.keys())
             if fun in functionOutputFuncs:
                 assert (
                     vec == pytest.approx(functionOutput[fun], abs=ABS_ACCURACY)
