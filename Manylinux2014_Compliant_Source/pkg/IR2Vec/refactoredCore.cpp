@@ -279,14 +279,6 @@ PyMethodDef ir2vecObjMethods[] = {
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
-// static void ir2vecHandler_dealloc(ir2vecHandlerObject *self) {
-//     if (self->ir2vecObj != NULL)
-//         delete self->ir2vecObj;
-    
-//     Py_TYPE(self)->tp_free((PyObject *)self);
-// }
-
-// Define the ExampleObject type
 static PyTypeObject ir2vecHandlerType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "ir2vecHandler.ir2vecHandlerObject",    // tp_name
@@ -311,19 +303,6 @@ static PyTypeObject ir2vecHandlerType = {
     "ir2vecHandlerObject",                  // tp_doc
     .tp_methods = ir2vecObjMethods,         // tp_methods
 };
-
-ir2vecHandlerObject *createIR2VECObject(const char *filename, const char *output_file, const char *mode, const char *level) {
-    ir2vecHandler *ir2vecObj = new ir2vecHandler(filename, output_file, mode, level);
-    if (ir2vecObj == NULL) {
-        return NULL;
-    }
-    ir2vecHandlerObject *ir2vecHandlerObj = PyObject_New(ir2vecHandlerObject, &ir2vecHandlerType);
-    if (ir2vecHandlerObj == NULL) {
-        return NULL;
-    }
-    ir2vecHandlerObj->ir2vecObj = ir2vecObj;
-    return ir2vecHandlerObj;
-}
 
 PyObject *runEncodings(PyObject *args, OpType type) {
     const char *funcName = "\0";
@@ -366,6 +345,19 @@ PyObject *getProgramVector(PyObject* self, PyObject* args) {
 
 PyObject *getFunctionVectors(PyObject *self, PyObject* args) {
     return runEncodings(args, OpType::Function);
+}
+
+ir2vecHandlerObject *createIR2VECObject(const char *filename, const char *output_file, const char *mode, const char *level) {
+    ir2vecHandler *ir2vecObj = new ir2vecHandler(filename, output_file, mode, level);
+    if (ir2vecObj == NULL) {
+        return NULL;
+    }
+    ir2vecHandlerObject *ir2vecHandlerObj = PyObject_New(ir2vecHandlerObject, &ir2vecHandlerType);
+    if (ir2vecHandlerObj == NULL) {
+        return NULL;
+    }
+    ir2vecHandlerObj->ir2vecObj = ir2vecObj;
+    return ir2vecHandlerObj;
 }
 
 PyObject *initEmbedding(PyObject *self, PyObject *args) {
