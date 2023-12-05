@@ -232,7 +232,7 @@ typedef struct {
     ir2vecHandler *ir2vecObj;
 } ir2vecHandlerObject;
 
-PyObject *getInstructionVectorMap(ir2vecHandlerObject *self, PyObject* args) {
+PyObject *getInstructionVectors(ir2vecHandlerObject *self, PyObject* args) {
     // check for args, and null etc
     if ((self->ir2vecObj) == NULL) {
         PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
@@ -241,7 +241,7 @@ PyObject *getInstructionVectorMap(ir2vecHandlerObject *self, PyObject* args) {
     return (self->ir2vecObj)->generateEncodings(OpType::Instruction);
 }
 
-PyObject *getProgram(ir2vecHandlerObject *self, PyObject* args) {
+PyObject *getProgramVector(ir2vecHandlerObject *self, PyObject* args) {
     if ((self->ir2vecObj) == NULL) {
         PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
         return NULL;
@@ -249,7 +249,7 @@ PyObject *getProgram(ir2vecHandlerObject *self, PyObject* args) {
     return (self->ir2vecObj)->generateEncodings(OpType::Program);
 }
 
-PyObject *getFunctionVectorMap(ir2vecHandlerObject *self, PyObject* args) {
+PyObject *getFunctionVectors(ir2vecHandlerObject *self, PyObject* args) {
     if ((self->ir2vecObj) == NULL) {
         PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
         return NULL;
@@ -265,15 +265,15 @@ PyObject *getFunctionVectorMap(ir2vecHandlerObject *self, PyObject* args) {
 
 PyMethodDef ir2vecObjMethods[] = {
     {
-        "getInstructionVectorMap", (PyCFunction)getInstructionVectorMap, METH_VARARGS,
+        "getInstructionVectors", (PyCFunction)getInstructionVectors, METH_VARARGS,
         "Get Instruction Vectors"
     },
     {
-        "getProgram", (PyCFunction)getProgram, METH_VARARGS,
+        "getProgramVector", (PyCFunction)getProgramVector, METH_VARARGS,
         "Get Program Vector"
     },
     {
-        "getFunctionVectorMap", (PyCFunction)getFunctionVectorMap, METH_VARARGS,
+        "getFunctionVectors", (PyCFunction)getFunctionVectors, METH_VARARGS,
         "Get Function Vectors"
     },
     {NULL, NULL, 0, NULL} /* Sentinel */
@@ -455,8 +455,7 @@ PyMODINIT_FUNC PyInit_core(void) {
     }
 
     Py_INCREF(&ir2vecHandlerType);
-    PyModule_AddObject(module, "ir2vecHandlerObject", (PyObject *)&ir2vecHandlerType);
+    // PyModule_AddObject(module, "ir2vecHandlerObject", (PyObject *)&ir2vecHandlerType);
     PyModule_AddFunctions(module, IR2Vec_core_Methods);
-    PyModule_AddFunctions(module, ir2vecObjMethods);
     return module;
 }
