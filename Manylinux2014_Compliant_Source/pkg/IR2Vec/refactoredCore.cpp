@@ -103,13 +103,6 @@ public:
     std::string getMode() { return mode; }
     std::string getLevel() { return level; }
 
-    PyObject *testFunction() {
-        PyObject *list = PyList_New(0);
-        PyList_Append(list, PyUnicode_FromString("Hello"));
-        PyList_Append(list, PyUnicode_FromString("World"));
-        return list;
-    }
-        
     // Function to get Program Vector List
     PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvm_pgm_vec) {
         // for PgmVector
@@ -129,14 +122,24 @@ public:
 
         for (auto &Func_it : funcMap) {
             PyObject *temp3 = PyList_New(0);
-            std::string demangledName = IR2Vec::getDemagledName(Func_it.first);
             for (auto &Vec_it : Func_it.second){
                 PyList_Append(temp3, PyFloat_FromDouble(Vec_it));
             }
-            PyDict_SetDefault(FuncVecDict,
-                            PyUnicode_FromString(demangledName.c_str()),
-                            Py_None);
-            PyDict_SetItemString(FuncVecDict, demangledName.c_str(), temp3);
+
+            std::string demagledName = IR2Vec::getDemagledName(Func_it.first);
+            std::string actualName = string(
+                IR2Vec::getActualName(const_cast<llvm::Function*>(Func_it.first))
+            );
+
+            PyDict_SetItem(
+                FuncVecDict,
+                PyUnicode_FromString(demagledName.c_str()),
+                PyTuple_Pack(
+                    2,
+                    PyUnicode_FromString(actualName.c_str()),
+                    temp3
+                )
+            );
         }
         return FuncVecDict;
     }
@@ -281,27 +284,11 @@ PyMethodDef ir2vecObjMethods[] = {
 
 static PyTypeObject ir2vecHandlerType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "ir2vecHandler.ir2vecHandlerObject",    // tp_name
-    sizeof(ir2vecHandlerObject),            // tp_basicsize
-    0,                                      // tp_itemsize
-    0,                                      // tp_dealloc
-    0,                                      // tp_print
-    0,                                      // tp_getattr
-    0,                                      // tp_setattr
-    0,                                      // tp_reserved
-    0,                                      // tp_repr
-    0,                                      // tp_as_number
-    0,                                      // tp_as_sequence
-    0,                                      // tp_as_mapping
-    0,                                      // tp_hash
-    0,                                      // tp_call
-    0,                                      // tp_str
-    0,                                      // tp_getattro
-    0,                                      // tp_setattro
-    0,                                      // tp_as_buffer
-    Py_TPFLAGS_DEFAULT,                     // tp_flags
-    "ir2vecHandlerObject",                  // tp_doc
-    .tp_methods = ir2vecObjMethods,         // tp_methods
+    .tp_name = "ir2vecHandler.ir2vecHandlerObject",
+    .tp_basicsize = sizeof(ir2vecHandlerObject),
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_doc = "ir2vecHandlerObject",   
+    .tp_methods = ir2vecObjMethods,
 };
 
 PyObject *runEncodings(PyObject *args, OpType type) {
@@ -455,7 +442,7 @@ PyMODINIT_FUNC PyInit_core(void) {
     }
 
     Py_INCREF(&ir2vecHandlerType);
-    // PyModule_AddObject(module, "ir2vecHandlerObject", (PyObject *)&ir2vecHandlerType);
+
     PyModule_AddFunctions(module, IR2Vec_core_Methods);
     return module;
 }
