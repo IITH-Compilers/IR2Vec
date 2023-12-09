@@ -51,11 +51,6 @@
 
 #include <cxxabi.h>
 
-// #include "_dl_x86_cpu_features.c"
-
-// #include "boost/python.hpp"
-
-// utils.h is included because it provides with a function for conversion
 using namespace std;
 
 string seed_emb_path = "";
@@ -77,8 +72,11 @@ PyObject *setSeedEmbeddingPath(PyObject *self, PyObject *args) {
 bool fileNotValid(const char *filename) {
     ifstream temp;
     temp.open(filename, ios_base::in);
-    if (temp.peek() == ifstream::traits_type::eof() || temp.bad() == true ||
-        temp.fail() == true) {
+    if (
+        temp.peek() == ifstream::traits_type::eof() ||
+        temp.bad() == true ||
+        temp.fail() == true
+    ) {
         return true;
     }
     temp.close();
@@ -121,25 +119,33 @@ public:
         PyObject *FuncVecDict = PyDict_New();
 
         for (auto &Func_it : funcMap) {
+            const llvm::Function *func = Func_it.first;
+            std::string demangledName = IR2Vec::getDemagledName(func);
+            std::string actualName = IR2Vec::getActualName(
+                const_cast<llvm::Function*>(func)
+            );
+
             PyObject *temp3 = PyList_New(0);
-            for (auto &Vec_it : Func_it.second){
+            for (auto &Vec_it : Func_it.second) {
                 PyList_Append(temp3, PyFloat_FromDouble(Vec_it));
             }
 
-            std::string demagledName = IR2Vec::getDemagledName(Func_it.first);
-            std::string actualName = string(
-                IR2Vec::getActualName(const_cast<llvm::Function*>(Func_it.first))
+            PyObject *funcDict = PyDict_New();
+            PyDict_SetDefault(funcDict, PyUnicode_FromString("demangledName"), Py_None);
+            PyDict_SetDefault(funcDict, PyUnicode_FromString("actualName"), Py_None);
+            PyDict_SetDefault(funcDict, PyUnicode_FromString("vector"), Py_None);
+
+            PyDict_SetItemString(funcDict, "demangledName", PyUnicode_FromString(demangledName.c_str()));
+            PyDict_SetItemString(funcDict, "actualName", PyUnicode_FromString(actualName.c_str()));
+            PyDict_SetItemString(funcDict, "vector", temp3);
+
+            PyDict_SetItemString(
+                FuncVecDict,
+                demangledName.c_str(),
+                funcDict
             );
 
-            PyDict_SetItem(
-                FuncVecDict,
-                PyUnicode_FromString(demagledName.c_str()),
-                PyTuple_Pack(
-                    2,
-                    PyUnicode_FromString(actualName.c_str()),
-                    temp3
-                )
-            );
+            Py_DECREF(funcDict);
         }
         return FuncVecDict;
     }
@@ -158,7 +164,7 @@ public:
             PyObject *temp3 = PyList_New(0);
             // copy this SmallVector into c++ Vector
             for (auto &Vec_it : Inst_it.second) {
-            PyList_Append(temp3, PyFloat_FromDouble(Vec_it));
+                PyList_Append(temp3, PyFloat_FromDouble(Vec_it));
             }
             PyDict_SetDefault(InstVecDict,
                             PyUnicode_FromString(demangledName.c_str()),
@@ -431,7 +437,7 @@ struct PyModuleDef IR2Vec_def = {
     -1,           /* size of per-interpreter state of the module,
                                     or -1 if the module keeps state in global variables.
                    */
-    NULL,         /* m_methods */
+    IR2Vec_core_Methods
 };
 
 PyMODINIT_FUNC PyInit_core(void) {
@@ -442,7 +448,5 @@ PyMODINIT_FUNC PyInit_core(void) {
     }
 
     Py_INCREF(&ir2vecHandlerType);
-
-    PyModule_AddFunctions(module, IR2Vec_core_Methods);
     return module;
 }
