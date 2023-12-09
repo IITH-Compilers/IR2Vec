@@ -89,8 +89,8 @@ std::string IR2Vec::getDemagledName(const llvm::Instruction *instruction) {
     int status;
     char *const readable_name =
         __cxa_demangle(instructionName.c_str(), 0, &sz, &status);
-    auto demangledName = status == 0 ? std::string(readable_name)
-                                     : std::string(instructionName);
+    auto demangledName =
+        status == 0 ? std::string(readable_name) : std::string(instructionName);
     free(readable_name);
     return demangledName;
 }
