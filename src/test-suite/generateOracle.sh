@@ -4,13 +4,8 @@
 # This software is available under the BSD 4-Clause License. Please see LICENSE
 # file in the top-level directory for more details.
 #
-<<<<<<< HEAD
-SEED_VERSION="llvm17"
+SEED_VERSION="llvm14"
 # SRC_WD="PE-benchmarks-llfiles-llvm14
-=======
-SEED_VERSION="llvm16"
-# SRC_WD="PE-benchmarks-llfiles-llvm16"
->>>>>>> github workflow llvm16
 DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}_p"
 DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}_p"
 
@@ -34,7 +29,7 @@ LLVM_BUILD="/usr"
 IR2VEC_PATH="../../build/bin/ir2vec"
 
 #Update Vocabulary Path to use
-VOCAB_PATH="../../vocabulary/seedEmbeddingVocab-llvm17.txt"
+VOCAB_PATH="../../vocabulary/seedEmbeddingVocab-llvm14.txt"
 
 # does the VOCAB_PATH exist?
 if [ ! -f ${VOCAB_PATH} ]; then

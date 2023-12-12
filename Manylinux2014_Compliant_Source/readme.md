@@ -2,11 +2,11 @@ AUTHORS : SHIKHAR JAIN (IITH COMPILERS) & ANILAVA KUNDU (IITH COMPILERS)
 
 - This package help users to use exposed ir2vec api in python environment.
 - The Source code of packgae is larger than expected . Reason: The source is manylinux 2014 compliant.
-- Hence we need to have static linking for every library ex(ir2vec,llvm-16,stdc++ etc.) to be present and linked statically.
+- Hence we need to have static linking for every library ex(ir2vec,llvm-14,stdc++ etc.) to be present and linked statically.
 - In order to build from source you need to initiate a manylinux 2014 docker image and then use this source dir accordingly.
 - While building source it is necessary to have a static library of LLVM that has all other static libs within it.
 - These wheel files generated are specific for python abi versions as reflected by their names . But they will work on old/new *nix OSs.
-- The package is specific for LLVM-16 and current IR2Vec main branch (2.1.0 verion)
+- The package is specific for LLVM-14 and current IR2Vec main branch (2.1.0 verion)
 
 - Inorder to use source on a MANYLINUX2014 Docker image and build it , there are several dependencies w.r.t static libs and header files .
 	- A static lib containing all the static libs of LLVM which can be found in llvm/buid_dir/lib.
@@ -29,7 +29,7 @@ AUTHORS : SHIKHAR JAIN (IITH COMPILERS) & ANILAVA KUNDU (IITH COMPILERS)
 		```
 	- Dir "llvm" : You can get this from llvm-project/llvm/include.
 	- Dir "llvm-c" : You can get this from llvm-project/llvm/include.
-	- "seedEmbeddingVocab-llvm16.txt" . You can get this from IR2Vec Source.
+	- "seedEmbeddingVocab-llvm14.txt" . You can get this from IR2Vec Source.
 
 ### In future we plan to automate wheel generation by integrating needed workflows in CI/CD pipeline. These wheels then will reflect changes in either IR2Vec or in LLVM project.
 

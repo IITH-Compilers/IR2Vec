@@ -185,7 +185,7 @@ public:
         // The scope of this Module object is extremely crucial
         std::unique_ptr<llvm::Module> Module;
         Module = IR2Vec::getLLVMIR();
-        std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm16.txt";
+        std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab-llvm14.txt";
 
         IR2Vec::Embeddings* emb = new IR2Vec::Embeddings();
         // if output file is provided

@@ -163,18 +163,16 @@ if __name__ == "__main__":
     arg_conf = parser.parse_args()
 
     search_space = {
-        # "epoch": tune.grid_search([x for x in range(1500, 2000, 100)]),
+        "epoch": tune.grid_search([1500, 2000, 2500, 3000]),
         "epoch": arg_conf.epoch,
         "dim": arg_conf.dim,
         "index_dir": arg_conf.index_dir,
-        "nbatches": tune.grid_search([2**x for x in range(7, 11)]),
-            # [300, 350]),
-        #     
-        # ),
-        "margin": tune.grid_search([x for x in np.arange(3, 5, 0.05)]),
-        # tune.grid_search([3.5])
-        #     [x for x in np.arange(3.0, 5.0, 1)]
-        # ),
+        "nbatches": tune.grid_search(
+            [2**x for x in range(5, 9)]
+        ),
+        "margin": tune.grid_search(
+            [x for x in np.arange(3.0, 4.0, 0.5)]
+        ),
     }
 
     try:

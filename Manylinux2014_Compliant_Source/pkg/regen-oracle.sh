@@ -6,7 +6,7 @@ cd src/test-suite
 
 rm -rf oracle
 
-SEED_VERSION="llvm16"
+SEED_VERSION="llvm14"
 SRC_WD="PE-benchmarks"
 DEST_FOLDER_LL="PE-benchmarks-llfiles-${SEED_VERSION}"
 DEST_FOLDER_SYM="oracle/SYM_${SEED_VERSION}_f"
@@ -18,7 +18,7 @@ mkdir -p ${DEST_FOLDER_LL}
 
 for d in ${SRC_WD}/*.c ${SRC_WD}/*.cpp ${SRC_WD}/*.cc; do
 	echo "Compiling ${d} to IR"
-	name=$(basename ${d}) && oname=${name%.*} && clang-16 -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER_LL}/${oname}.ll &
+	name=$(basename ${d}) && oname=${name%.*} && clang-14 -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER_LL}/${oname}.ll &
 done
 wait
 

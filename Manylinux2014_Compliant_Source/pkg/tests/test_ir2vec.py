@@ -116,8 +116,8 @@ def test_fa_p():
         progVector2 = initObj.getProgramVector()
         assert_valid_progVector(progVector2)
 
-        for idx, v in enumerate(progVector1):
-            assert v == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
+        for idx, vec in enumerate(progVector1):
+            assert vec == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
 
         p_vectors.append(progVector1)
 
@@ -125,9 +125,9 @@ def test_fa_p():
     p_vectors_oracle = read_p_file(
         TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_p" / "ir2vec.txt"
     )
-    for idx, v in enumerate(p_vectors):
-        assert v == pytest.approx(p_vectors_oracle[idx], abs=ABS_ACCURACY)
 
+    for idx, vec in enumerate(p_vectors_oracle):
+        assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
 
 def test_sym_p():
     p_vectors = []
@@ -138,13 +138,13 @@ def test_sym_p():
         assert(initObj is not None)
         
         progVector1 = IR2Vec.getProgramVector(initObj)
-        assert(progVector1 is not None)
+        assert_valid_progVector(progVector1)
 
         progVector2 = initObj.getProgramVector()
-        assert(progVector2 is not None)
+        assert_valid_progVector(progVector2)
 
-        for idx, v in enumerate(progVector1):
-            assert v == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
+        for idx, vec in enumerate(progVector1):
+            assert vec == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
 
         p_vectors.append(progVector1)
 
@@ -152,9 +152,9 @@ def test_sym_p():
     p_vectors_oracle = read_p_file(
         TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}_p" / "ir2vec.txt"
     )
-    for idx, v in enumerate(p_vectors):
-        assert v == pytest.approx(p_vectors_oracle[idx], abs=ABS_ACCURACY)
 
+    for idx, vec in enumerate(p_vectors_oracle):
+        assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
 
 def test_fa_f():
     f_vecs = defaultdict(dict)

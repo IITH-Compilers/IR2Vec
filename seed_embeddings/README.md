@@ -15,7 +15,7 @@ If you have not done `make`, follow the following steps to build `ir2vec` binary
 ## Step 2: Generating Triplets
 #### Steps to collect the triplets
  Run `triplets.sh` script with the required parameters
-`bash triplets.sh <buildDir> <numOpt> <llFileList> <outputFileName>`
+ Usage: `bash triplets.sh <build dir> <No of opt> <llFile alist> <output FileNme>`
 * `buildDir` points to the path of IR2Vec's build folder
 * `numOpt` is an integer between `1` and `6`
     * Determines number of optimization sequences to apply on each file.
