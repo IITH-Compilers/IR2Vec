@@ -101,7 +101,6 @@ def assert_valid_functionVector(functionVectorMap):
     
     return True
 
-
 def test_fa_p():
     p_vectors = []
     for file in ll_files:
@@ -194,14 +193,13 @@ def test_fa_f():
             assert(
                 funcObj["vector"] == pytest.approx(functionOutput1[fun]["vector"], abs=ABS_ACCURACY)
             )
-            
+
     print(TEST_SUITE_DIR)
     f_vecs_oracle = read_f_file(
         TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_f" / "ir2vec.txt"
     )
     for pname, funs in f_vecs_oracle.items():
         for fname, vec in funs.items():
-
             assert vec == pytest.approx(
                 f_vecs[pname][fname], abs=ABS_ACCURACY
             ), f"Checking {pname}: {fname}"
@@ -256,7 +254,6 @@ def test_sym_f():
     )
     for pname, funs in f_vecs_oracle.items():
         for fname, vec in funs.items():
-
             assert vec == pytest.approx(
                 f_vecs[pname][fname], abs=ABS_ACCURACY
             ), f"Checking {pname}: {fname}"
