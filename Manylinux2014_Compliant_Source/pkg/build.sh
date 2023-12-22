@@ -18,8 +18,8 @@ cd ..
 cmake -DCMAKE_BUILD_TYPE=Release ../src && make -j"$(nproc)" && make install
 
 cd ..
-cp src/include/utils.h Manylinux2014_Compliant_Source/pkg/IR2Vec/
-cp build/version.h Manylinux2014_Compliant_Source/pkg/IR2Vec/
-cp vocabulary/seedEmbeddingVocab-*.txt Manylinux2014_Compliant_Source/pkg/IR2Vec/
+cp src/include/*.h Manylinux2014_Compliant_Source/pkg/IR2Vec_pkg/
+cp build/version.h Manylinux2014_Compliant_Source/pkg/IR2Vec_pkg/
+cp vocabulary/seedEmbeddingVocab-llvm17.txt Manylinux2014_Compliant_Source/pkg/IR2Vec_pkg/
 
 bash Manylinux2014_Compliant_Source/pkg/regen-oracle.sh

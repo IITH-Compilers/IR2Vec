@@ -16,7 +16,7 @@ DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}_p"
 
 mkdir -p ${DEST_FOLDER_LL}
 
-for d in ${SRC_WD}/*.c ${SRC_WD}/*.cpp ${SRC_WD}/*.cc; do
+for d in ${SRC_WD}/*.cpp; do
 	echo "Compiling ${d} to IR"
 	name=$(basename ${d}) && oname=${name%.*} && clang-17 -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER_LL}/${oname}.ll &
 done
