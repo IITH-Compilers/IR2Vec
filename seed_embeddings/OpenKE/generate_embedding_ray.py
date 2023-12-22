@@ -36,23 +36,24 @@ def test_files(index_dir):
     if not os.path.exists(train):
         raise Exception("train2id.txt not found")
 
+
 # TODO :: alpha, lmda, bern, opt_method
 def train(arg_conf):
     con = config.Config()
-    con.set_in_path(arg_conf['index_dir'])
+    con.set_in_path(arg_conf["index_dir"])
     con.set_work_threads(4)
-    con.set_train_times(arg_conf['epoch'])
-    con.set_nbatches(nbatches=arg_conf['nbatches'])
+    con.set_train_times(arg_conf["epoch"])
+    con.set_nbatches(nbatches=arg_conf["nbatches"])
     con.set_alpha(0.001)
-    con.set_margin(arg_conf['margin'])
-    con.set_bern(0) # either 0 or 1
-    con.set_dimension(arg_conf['dim'])
+    con.set_margin(arg_conf["margin"])
+    con.set_bern(0)  # either 0 or 1
+    con.set_dimension(arg_conf["dim"])
     con.set_ent_neg_rate(1)
     con.set_rel_neg_rate(0)
     con.set_opt_method("SGD")
 
     try:
-        test_files(arg_conf['index_dir'])
+        test_files(arg_conf["index_dir"])
         print("Files are OK")
     except:
         print(arg_conf)
@@ -60,13 +61,13 @@ def train(arg_conf):
         raise Exception("Error in files")
 
     outfile = os.path.join(
-        arg_conf['index_dir'],
+        arg_conf["index_dir"],
         "seedEmbedding_{}E_{}D_{}batches{}margin.json".format(
-            arg_conf['epoch'],
-            arg_conf['dim'],
-            arg_conf['nbatches'],
-            arg_conf['margin'],
-        )
+            arg_conf["epoch"],
+            arg_conf["dim"],
+            arg_conf["nbatches"],
+            arg_conf["margin"],
+        ),
     )
     con.set_out_files(outfile)
     con.init()
@@ -76,23 +77,16 @@ def train(arg_conf):
     con.run()
 
     seedfile = os.path.join(
-        arg_conf['index_dir'],
+        arg_conf["index_dir"],
         "embeddings/seedEmbedding_{}E_{}D_{}batches{}margin.txt".format(
-            arg_conf['epoch'],
-            arg_conf['dim'],
-            arg_conf['nbatches'],
-            arg_conf['margin']
+            arg_conf["epoch"], arg_conf["dim"], arg_conf["nbatches"], arg_conf["margin"]
         ),
     )
 
-    findRep(
-        outfile,
-        seedfile,
-        arg_conf['index_dir']
-    )
+    findRep(outfile, seedfile, arg_conf["index_dir"])
 
     del con
-    
+
     return {
         "seedFile": seedfile,
         "AnalogiesScore": analogy.getAnalogyScore(seedfile),
@@ -114,7 +108,9 @@ def findRep(src, dest, index_dir):
         for i in range(1, int(entities[0])):
             toTxt += entities[i].split("\t")[0] + ":" + str(rep[i - 1]) + ",\n"
         toTxt += (
-            entities[int(entities[0])].split("\t")[0] + ":" + str(rep[int(entities[0]) - 1])
+            entities[int(entities[0])].split("\t")[0]
+            + ":"
+            + str(rep[int(entities[0]) - 1])
         )
         fDest.write(toTxt)
 
@@ -130,7 +126,7 @@ if __name__ == "__main__":
         metavar="DIRECTORY",
         help="Location of the directory entity2id.txt, train2id.txt and relation2id.txt",
         required=False,
-        default="/home/intern23002/iitH/ir2vec/IR2Vec/seed_embeddings/preprocessed/"
+        default="/home/intern23002/iitH/ir2vec/IR2Vec/seed_embeddings/preprocessed/",
     )
     parser.add_argument(
         "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1500
@@ -167,16 +163,12 @@ if __name__ == "__main__":
         "epoch": arg_conf.epoch,
         "dim": arg_conf.dim,
         "index_dir": arg_conf.index_dir,
-        "nbatches": tune.grid_search(
-            [2**x for x in range(5, 9)]
-        ),
-        "margin": tune.grid_search(
-            [x for x in np.arange(3.0, 4.0, 0.5)]
-        ),
+        "nbatches": tune.grid_search([2**x for x in range(5, 9)]),
+        "margin": tune.grid_search([x for x in np.arange(3.0, 4.0, 0.5)]),
     }
 
     try:
-        test_files(search_space['index_dir'])
+        test_files(search_space["index_dir"])
         print("Files are OK")
     except:
         print("Error in files")
@@ -191,11 +183,13 @@ if __name__ == "__main__":
     results = tuner.fit()
 
     # Write the best result to a file, best_result.txt
-    with open(os.path.join(search_space['index_dir'], "best_result.txt"), "a") as f:
-        f.write('\n' + str(results.get_best_result(metric='AnalogiesScore', mode='max')))
+    with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
+        f.write(
+            "\n" + str(results.get_best_result(metric="AnalogiesScore", mode="max"))
+        )
 
-    print("Best config: ", results.get_best_result(metric='AnalogiesScore', mode='max'))
-    
+    print("Best config: ", results.get_best_result(metric="AnalogiesScore", mode="max"))
+
     # for result in results:
     #     print(result)
     del results

@@ -14,9 +14,9 @@ int dp[R][C];
 
 // check whether mat[i][j] is a valid cell or not.
 bool isvalid(int i, int j) {
-    if (i < 0 || j < 0 || i >= R || j >= C)
-        return false;
-    return true;
+  if (i < 0 || j < 0 || i >= R || j >= C)
+    return false;
+  return true;
 }
 
 // Check whether current character is adjacent to previous
@@ -27,25 +27,25 @@ bool isadjacent(char prev, char curr) { return ((curr - prev) == 1); }
 // character processed in the parent call.. also mat[i][j]
 // is our current character.
 int getLenUtil(char mat[R][C], int i, int j, char prev) {
-    // If this cell is not valid or current character is not
-    // adjacent to previous one (e.g. d is not adjacent to b )
-    // or if this cell is already included in the path than return 0.
-    if (!isvalid(i, j) || !isadjacent(prev, mat[i][j]))
-        return 0;
+  // If this cell is not valid or current character is not
+  // adjacent to previous one (e.g. d is not adjacent to b )
+  // or if this cell is already included in the path than return 0.
+  if (!isvalid(i, j) || !isadjacent(prev, mat[i][j]))
+    return 0;
 
-    // If this subproblem is already solved , return the answer
-    if (dp[i][j] != -1)
-        return dp[i][j];
+  // If this subproblem is already solved , return the answer
+  if (dp[i][j] != -1)
+    return dp[i][j];
 
-    int ans = 0; // Initialize answer
+  int ans = 0; // Initialize answer
 
-    // recur for paths with different adjacent cells and store
-    // the length of longest path.
-    for (int k = 0; k < 8; k++)
-        ans = max(ans, 1 + getLenUtil(mat, i + x[k], j + y[k], mat[i][j]));
+  // recur for paths with different adjacent cells and store
+  // the length of longest path.
+  for (int k = 0; k < 8; k++)
+    ans = max(ans, 1 + getLenUtil(mat, i + x[k], j + y[k], mat[i][j]));
 
-    // save the answer and return
-    return dp[i][j] = ans;
+  // save the answer and return
+  return dp[i][j] = ans;
 }
 
 // Returns length of the longest path with all characters consecutive
@@ -53,31 +53,31 @@ int getLenUtil(char mat[R][C], int i, int j, char prev) {
 // is used to store results of subproblems, then it calls
 // recursive DFS based function getLenUtil() to find max length path
 int getLen(char mat[R][C], char s) {
-    memset(dp, -1, sizeof dp);
-    int ans = 0;
+  memset(dp, -1, sizeof dp);
+  int ans = 0;
 
-    for (int i = 0; i < R; i++) {
-        for (int j = 0; j < C; j++) {
-            // check for each possible starting point
-            if (mat[i][j] == s) {
+  for (int i = 0; i < R; i++) {
+    for (int j = 0; j < C; j++) {
+      // check for each possible starting point
+      if (mat[i][j] == s) {
 
-                // recur for all eight adjacent cells
-                for (int k = 0; k < 8; k++)
-                    ans = max(ans, 1 + getLenUtil(mat, i + x[k], j + y[k], s));
-            }
-        }
+        // recur for all eight adjacent cells
+        for (int k = 0; k < 8; k++)
+          ans = max(ans, 1 + getLenUtil(mat, i + x[k], j + y[k], s));
+      }
     }
-    return ans;
+  }
+  return ans;
 }
 
 // Driver program
 int main() {
 
-    char mat[R][C] = {{'a', 'c', 'd'}, {'h', 'b', 'a'}, {'i', 'g', 'f'}};
+  char mat[R][C] = {{'a', 'c', 'd'}, {'h', 'b', 'a'}, {'i', 'g', 'f'}};
 
-    cout << getLen(mat, 'a') << endl;
-    cout << getLen(mat, 'e') << endl;
-    cout << getLen(mat, 'b') << endl;
-    cout << getLen(mat, 'f') << endl;
-    return 0;
+  cout << getLen(mat, 'a') << endl;
+  cout << getLen(mat, 'e') << endl;
+  cout << getLen(mat, 'b') << endl;
+  cout << getLen(mat, 'f') << endl;
+  return 0;
 }

@@ -4,6 +4,5 @@ __pycache__/
 .vscode
 experiments/*/output
 seed_embeddings/triplets.txt
-seed_embeddings/triplets14.txt
 seed_embeddings/preprocessed/*
 .cache/

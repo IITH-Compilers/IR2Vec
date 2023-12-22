@@ -29,7 +29,7 @@ LLVM_BUILD="/usr"
 IR2VEC_PATH="../../build/bin/ir2vec"
 
 #Update Vocabulary Path to use
-VOCAB_PATH="../../vocabulary/seedEmbeddingVocab-llvm14.txt"
+VOCAB_PATH="../../vocabulary/seedEmbeddingVocab.txt"
 
 # does the VOCAB_PATH exist?
 if [ ! -f ${VOCAB_PATH} ]; then

@@ -35,7 +35,7 @@ if [ -z $4 ]; then
 	exit
 fi
 
-LLVM_BUILD="/usr"
+LLVM_BUILD=$5
 
 if [ -z $LLVM_BUILD ]; then
 	echo "5st arg should have a valid Build path"
@@ -45,8 +45,8 @@ fi
 counter=0
 while read p; do
 	let "counter++"
-	echo "collecting data from $p"
-	# printo out the line count of the file
+	DEBUG echo "collecting data from $p"
+	# print out the line count of the file
 	echo "Line count of $p is $(wc -l $p)"
 	NO_OF_OPT_FILES=$2
 	DEBUG echo "NO_OF_OPT_FILES from $NO_OF_OPT_FILES"
@@ -75,9 +75,9 @@ while read p; do
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
-	done
+	done &
 	if [ $counter == 100 ]; then
-		sleep 10
+		sleep 20
 		counter=0
 	fi
 
