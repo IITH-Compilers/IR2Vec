@@ -37,7 +37,7 @@ def train(arg_conf):
             arg_conf.dim,
             arg_conf.nbatches,
             arg_conf.margin,
-        )
+        ),
     )
     con.set_out_files(outfile)
     con.init()

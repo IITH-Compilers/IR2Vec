@@ -49,18 +49,20 @@ def read_p_file(path):
             p_vectors.append(list(map(float, line.strip().split())))
     return p_vectors
 
+
 def assert_valid_progVector(progVector):
-    assert(progVector is not None)
-    assert(isinstance(progVector, list))
-    assert(all(isinstance(x, float) for x in progVector))
+    assert progVector is not None
+    assert isinstance(progVector, list)
+    assert all(isinstance(x, float) for x in progVector)
     return True
 
+
 def assert_valid_insructionVectors(insVecMap):
-    assert(insVecMap is not None)
+    assert insVecMap is not None
 
     keys = list(insVecMap.keys())
     assert len(keys) > 0
-    
+
     values = list(insVecMap.values())
     assert len(values) > 0
 
@@ -69,16 +71,16 @@ def assert_valid_insructionVectors(insVecMap):
         assert vec is not None
         assert isinstance(vec, list)
         assert all(isinstance(x, float) for x in vec)
-    
+
     return True
 
 
 def assert_valid_functionVector(functionVectorMap):
-    assert(functionVectorMap is not None)
+    assert functionVectorMap is not None
 
     keys = list(functionVectorMap.keys())
     assert len(keys) > 0
-    
+
     values = list(functionVectorMap.values())
     assert len(values) > 0
 
@@ -89,7 +91,7 @@ def assert_valid_functionVector(functionVectorMap):
         assert vec is not None
         assert isinstance(vec, list)
         assert all(isinstance(x, float) for x in vec)
-        
+
         demagName = funcObj["demangledName"]
         assert isinstance(demagName, str)
         assert demagName is not None
@@ -98,8 +100,9 @@ def assert_valid_functionVector(functionVectorMap):
         actName = funcObj["actualName"]
         assert isinstance(actName, str)
         assert actName is not None
-    
+
     return True
+
 
 def test_fa_p():
     p_vectors = []
@@ -107,7 +110,7 @@ def test_fa_p():
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
 
         initObj = IR2Vec.initEmbedding(full_path, "fa", "p")
-        assert(initObj is not None)
+        assert initObj is not None
 
         progVector1 = IR2Vec.getProgramVector(initObj)
         assert_valid_progVector(progVector1)
@@ -128,14 +131,15 @@ def test_fa_p():
     for idx, vec in enumerate(p_vectors_oracle):
         assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
 
+
 def test_sym_p():
     p_vectors = []
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
 
         initObj = IR2Vec.initEmbedding(full_path, "sym", "p")
-        assert(initObj is not None)
-        
+        assert initObj is not None
+
         progVector1 = IR2Vec.getProgramVector(initObj)
         assert_valid_progVector(progVector1)
 
@@ -155,6 +159,7 @@ def test_sym_p():
     for idx, vec in enumerate(p_vectors_oracle):
         assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
 
+
 def test_fa_f():
     f_vecs = defaultdict(dict)
     for file in ll_files:
@@ -162,7 +167,7 @@ def test_fa_f():
         full_path = str(path).strip()
 
         initObj = IR2Vec.initEmbedding(full_path, "fa", "f")
-        assert(initObj is not None)
+        assert initObj is not None
 
         functionVectorMap = IR2Vec.getFunctionVectors(initObj)
         assert_valid_functionVector(functionVectorMap)
@@ -181,17 +186,15 @@ def test_fa_f():
             )
             assert_valid_functionVector(functionOutput1)
 
-            functionOutput2 = initObj.getFunctionVectors(
-                funcObj["actualName"]
-            )
+            functionOutput2 = initObj.getFunctionVectors(funcObj["actualName"])
             assert_valid_functionVector(functionOutput2)
 
-            assert(
-                functionOutput1[fun]["vector"] == pytest.approx(functionOutput2[fun]["vector"], abs=ABS_ACCURACY)
+            assert functionOutput1[fun]["vector"] == pytest.approx(
+                functionOutput2[fun]["vector"], abs=ABS_ACCURACY
             )
 
-            assert(
-                funcObj["vector"] == pytest.approx(functionOutput1[fun]["vector"], abs=ABS_ACCURACY)
+            assert funcObj["vector"] == pytest.approx(
+                functionOutput1[fun]["vector"], abs=ABS_ACCURACY
             )
 
     print(TEST_SUITE_DIR)
@@ -212,14 +215,14 @@ def test_sym_f():
         full_path = str(path).strip()
 
         initObj = IR2Vec.initEmbedding(full_path, "sym", "f")
-        assert(initObj is not None)
+        assert initObj is not None
 
         functionVectorMap = IR2Vec.getFunctionVectors(initObj)
         assert_valid_functionVector(functionVectorMap)
 
         functionVectorMap2 = initObj.getFunctionVectors()
         assert_valid_functionVector(functionVectorMap2)
-        
+
         for fun, funcObj in functionVectorMap.items():
             assert fun == funcObj["demangledName"]
 
@@ -231,21 +234,15 @@ def test_sym_f():
             )
             assert_valid_functionVector(functionOutput1)
 
-            functionOutput2 = initObj.getFunctionVectors(
-                funcObj["actualName"]
-            )
+            functionOutput2 = initObj.getFunctionVectors(funcObj["actualName"])
             assert_valid_functionVector(functionOutput2)
 
-            assert(
-                functionOutput1[fun]["vector"] == pytest.approx(
-                    functionOutput2[fun]["vector"], abs=ABS_ACCURACY
-                )
+            assert functionOutput1[fun]["vector"] == pytest.approx(
+                functionOutput2[fun]["vector"], abs=ABS_ACCURACY
             )
 
-            assert(
-                funcObj["vector"] == pytest.approx(
-                    functionOutput1[fun]["vector"], abs=ABS_ACCURACY
-                )
+            assert funcObj["vector"] == pytest.approx(
+                functionOutput1[fun]["vector"], abs=ABS_ACCURACY
             )
 
     print(TEST_SUITE_DIR)
