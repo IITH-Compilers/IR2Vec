@@ -28,7 +28,7 @@ mkdir -p ${DEST_FOLDER_SYM_P}
 mkdir -p ${DEST_FOLDER_FA_P}
 
 IR2VEC_PATH=../../build/bin/ir2vec
-VOCAB_PATH="../../vocabulary/seedEmbeddingVocab-${SEED_VERSION}.txt"
+VOCAB_PATH="../../vocabulary/seedEmbeddingVocab.txt"
 
 while IFS= read -r d; do
 	echo "Generating embeddings for ${d}"

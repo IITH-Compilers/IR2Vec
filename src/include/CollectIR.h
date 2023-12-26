@@ -16,17 +16,17 @@
 
 class CollectIR {
 
-  private:
-    void collectData();
-    std::string res;
-    llvm::Module &M;
+private:
+  void collectData();
+  std::string res;
+  llvm::Module &M;
 
-    void traverseBasicBlock(llvm::BasicBlock &B);
+  void traverseBasicBlock(llvm::BasicBlock &B);
 
-  public:
-    CollectIR(std::unique_ptr<llvm::Module> &M) : M{*M} { res = ""; }
+public:
+  CollectIR(std::unique_ptr<llvm::Module> &M) : M{*M} { res = ""; }
 
-    void generateTriplets(std::ostream &out);
+  void generateTriplets(std::ostream &out);
 };
 
 #endif

@@ -19,7 +19,7 @@ fi
 
 BUILD=$(realpath ${BUILD})
 
-Absolute_path_of_RepresentationFile=$(realpath ../vocabulary/seedEmbeddingVocab-llvm14.txt)
+Absolute_path_of_RepresentationFile=$(realpath ../vocabulary/seedEmbeddingVocab.txt)
 
 TASK_DIR=$1
 if [ -z "${TASK_DIR}" ]; then

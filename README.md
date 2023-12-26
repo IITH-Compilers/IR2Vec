@@ -6,7 +6,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
-[![LLVM](https://img.shields.io/badge/LLVM-v14.0.0-blue)](https://github.com/llvm/llvm-project/releases/tag/llvmorg-14.0.1)
+[![LLVM](https://img.shields.io/badge/LLVM-v14.0.1-blue)](https://github.com/llvm/llvm-project/releases/tag/llvmorg-14.0.1)
 [![PyPI Version](https://img.shields.io/pypi/v/IR2Vec)](https://pypi.org/project/IR2Vec/)
 ![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
@@ -28,17 +28,15 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
     - [LLVM Version Archive](#llvm-version-archive)
     - [Table Of Contents](#table-of-contents)
     - [Installation](#installation)
-
+    - [Python](#python)
+    - [Cpp](#cpp)
     - [Requirements](#requirements)
-    - [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
     - [Building from source](#building-from-source)
     - [Generating program representations](#generating-program-representations)
         - [Using Binary](#using-binary)
             - [Command-Line options](#command-line-options)
             - [Flow-Aware Embeddings](#flow-aware-embeddings)
             - [Symbolic Embeddings](#symbolic-embeddings)
-            - [On-demand Flow-Aware Embeddings](#on-demand-flow-aware-embeddings)
-            - [On-demand Symbolic Embeddings](#on-demand-symbolic-embeddings)
     - [Using Libraries](#using-libraries)
     - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
     - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
@@ -49,17 +47,28 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
     - [License](#license)
 
 ## Installation
-Install the Latest release of the Python package using:
+
+`IR2Vec` can be installed in different ways to accommodate individual preferences and requirements effectively. You may select to install via a user-friendly Python wheel setup if you are a Python user, or opt for a C++ based installation if you are looking to integrate with a compiler pass or necessitate advanced control and enhanced integration capabilities. The detailed setup steps are mentioned in the following sections.
+
+## Python
+
+If you prefer working with Python, you can easily install `IR2Vec` using `pip`.
 
 ```
-pip install -U IR2Vec
+pip install -U ir2vec
 ```
-However, building from source is also supported for which the requirements and steps are listed down below.
+Now, you can import and use IR2Vec in your Python projects. Make sure you have a good understanding of Python and its package management system.
+
+We are actively working on improving the Python interfaces and providing better support. If you find any good-to-have interfaces that you may need for your use case missing, please feel free to raise a request.
+
+## Cpp
+
+If you're a C++ developer and require low-level control, optimization, or integration with C++ projects, you can build `IR2Vec` from source. First, ensure the below requirements are satisfied, then follow the steps mentioned in the [Building from source](#building-from-source) section.
 
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (14.0.1) - [src](https://github.com/llvm/llvm-project/tree/release/14.x), [release](https://releases.llvm.org/download.html#14.0.0)
+* LLVM (14.0.1) - [src](https://github.com/llvm/llvm-project/tree/release/14.x), [release](https://releases.llvm.org/download.html#14.0.1)
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7)
 * Python (3.6.7)
@@ -123,16 +132,16 @@ Please use `--help` for further details.
 
 #### Flow-Aware Embeddings
 For all functions
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
 
 For a specific function
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
+* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### Symbolic Embeddings
 For all functions
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
 For a specific function
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-llvm14.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
+ * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
@@ -161,7 +170,7 @@ The following example snippet shows how to query the exposed vector representati
 // Creating object to generate FlowAware representation
 auto ir2vec =
       IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware,
-                         "./vocabulary/seedEmbeddingVocab-llvm14.txt");
+                         "./vocabulary/seedEmbeddingVocab.txt");
 
 // Getting Instruction vectors corresponding to the instructions in <LLVM Module>
 auto instVecMap = ir2vec.getInstVecMap();
@@ -208,7 +217,7 @@ for (auto val : pgmVec)
 ```python
 import IR2Vec
 
-initObj = IR2Vec.initEmbedding(full_path, "fa", "p")
+initObj = IR2Vec.initEmbedding("/path/to/file.ll", "fa", "p")
 progVector1 = IR2Vec.getProgramVector(initObj)
 functionVectorMap1 = IR2Vec.getFunctionVectors(initObj)
 instructionVectorsMap1 = IR2Vec.getInstructionVectors(initObj)

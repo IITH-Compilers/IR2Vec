@@ -47,8 +47,8 @@ def get_llvm_files():
 
 IR2Vec_core = Extension(
     "IR2Vec.core",
-    sources=["IR2Vec/refactoredCore.cpp"],
-    include_dirs=["./IR2Vec"],
+    sources=["ir2vec/core.cpp"],
+    include_dirs=["./ir2vec/"],
     libraries=["z"],
     extra_objects=["/usr/local/lib/libIR2Vec.a"] + get_llvm_files(),
     extra_compile_args=["-v", "--std=c++17"],
@@ -80,7 +80,7 @@ setup(
         "Topic :: Software Development :: Compilers",
     ],
     ext_modules=[IR2Vec_core],
-    packages=["IR2Vec"],
-    package_data={"": ["seedEmbeddingVocab-*.txt"]},
+    packages=["ir2vec"],
+    package_data={"": ["seedEmbeddingVocab.txt"]},
     include_package_data=True,
 )

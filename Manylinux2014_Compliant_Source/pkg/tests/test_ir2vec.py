@@ -5,7 +5,7 @@
 #
 
 import pathlib as pl
-import IR2Vec
+import ir2vec
 import pytest
 
 from collections import defaultdict
@@ -13,11 +13,7 @@ from collections import defaultdict
 ABS_ACCURACY = 1e-4
 
 TEST_SUITE_DIR = pl.Path(__file__).resolve().parents[3] / "src" / "test-suite"
-SEED_VERSION = (
-    list(IR2Vec.preparation.install_loc.glob("seed*.txt"))[0]
-    .name.split(".")[0]
-    .split("-")[-1]
-)
+SEED_VERSION = "llvm14"
 
 ll_files = []
 path = TEST_SUITE_DIR / f"index-{SEED_VERSION}.files"
@@ -109,10 +105,10 @@ def test_fa_p():
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
 
-        initObj = IR2Vec.initEmbedding(full_path, "fa", "p")
+        initObj = ir2vec.initEmbedding(full_path, "fa", "p")
         assert initObj is not None
 
-        progVector1 = IR2Vec.getProgramVector(initObj)
+        progVector1 = ir2vec.getProgramVector(initObj)
         assert_valid_progVector(progVector1)
 
         progVector2 = initObj.getProgramVector()
@@ -137,10 +133,10 @@ def test_sym_p():
     for file in ll_files:
         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
 
-        initObj = IR2Vec.initEmbedding(full_path, "sym", "p")
+        initObj = ir2vec.initEmbedding(full_path, "sym", "p")
         assert initObj is not None
 
-        progVector1 = IR2Vec.getProgramVector(initObj)
+        progVector1 = ir2vec.getProgramVector(initObj)
         assert_valid_progVector(progVector1)
 
         progVector2 = initObj.getProgramVector()
@@ -166,10 +162,10 @@ def test_fa_f():
         path = (TEST_SUITE_DIR / file).resolve()
         full_path = str(path).strip()
 
-        initObj = IR2Vec.initEmbedding(full_path, "fa", "f")
+        initObj = ir2vec.initEmbedding(full_path, "fa", "f")
         assert initObj is not None
 
-        functionVectorMap = IR2Vec.getFunctionVectors(initObj)
+        functionVectorMap = ir2vec.getFunctionVectors(initObj)
         assert_valid_functionVector(functionVectorMap)
 
         functionVectorMap2 = initObj.getFunctionVectors()
@@ -180,7 +176,7 @@ def test_fa_f():
 
             f_vecs[path.name.strip()][fun] = funcObj["vector"]
 
-            functionOutput1 = IR2Vec.getFunctionVectors(
+            functionOutput1 = ir2vec.getFunctionVectors(
                 initObj,
                 funcObj["actualName"],
             )
@@ -214,10 +210,10 @@ def test_sym_f():
         path = (TEST_SUITE_DIR / file).resolve()
         full_path = str(path).strip()
 
-        initObj = IR2Vec.initEmbedding(full_path, "sym", "f")
+        initObj = ir2vec.initEmbedding(full_path, "sym", "f")
         assert initObj is not None
 
-        functionVectorMap = IR2Vec.getFunctionVectors(initObj)
+        functionVectorMap = ir2vec.getFunctionVectors(initObj)
         assert_valid_functionVector(functionVectorMap)
 
         functionVectorMap2 = initObj.getFunctionVectors()
@@ -228,7 +224,7 @@ def test_sym_f():
 
             f_vecs[path.name.strip()][fun] = funcObj["vector"]
 
-            functionOutput1 = IR2Vec.getFunctionVectors(
+            functionOutput1 = ir2vec.getFunctionVectors(
                 initObj,
                 funcObj["actualName"],
             )

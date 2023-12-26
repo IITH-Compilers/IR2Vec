@@ -10,19 +10,19 @@ std::string inPath = "../data/FB15K/";
 std::string outPath = "../data/FB15K/";
 
 extern "C" void setInPath(char *path) {
-    INT len = strlen(path);
-    inPath = "";
-    for (INT i = 0; i < len; i++)
-        inPath = inPath + path[i];
-    printf("Input Files Path : %s\n", inPath.c_str());
+  INT len = strlen(path);
+  inPath = "";
+  for (INT i = 0; i < len; i++)
+    inPath = inPath + path[i];
+  printf("Input Files Path : %s\n", inPath.c_str());
 }
 
 extern "C" void setOutPath(char *path) {
-    INT len = strlen(path);
-    outPath = "";
-    for (INT i = 0; i < len; i++)
-        outPath = outPath + path[i];
-    printf("Output Files Path : %s\n", outPath.c_str());
+  INT len = strlen(path);
+  outPath = "";
+  for (INT i = 0; i < len; i++)
+    outPath = outPath + path[i];
+  printf("Output Files Path : %s\n", outPath.c_str());
 }
 
 /*

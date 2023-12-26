@@ -20,11 +20,11 @@
 namespace IR2Vec {
 
 #define IR2VEC_DEBUG(X)                                                        \
-    ({                                                                         \
-        if (IR2Vec::debug) {                                                   \
-            X;                                                                 \
-        }                                                                      \
-    })
+  ({                                                                           \
+    if (IR2Vec::debug) {                                                       \
+      X;                                                                       \
+    }                                                                          \
+  })
 
 #define DIM 300
 using Vector = llvm::SmallVector<double, DIM>;
