@@ -53,17 +53,10 @@ def assert_valid_progVector(progVector):
     return True
 
 
-def assert_valid_insructionVectors(insVecMap):
-    assert insVecMap is not None
+def assert_valid_instructionVectors(instVecList):
+    assert instVecList is not None
 
-    keys = list(insVecMap.keys())
-    assert len(keys) > 0
-
-    values = list(insVecMap.values())
-    assert len(values) > 0
-
-    for ins, vec in insVecMap.items():
-        assert ins is not None
+    for vec in instVecList:
         assert vec is not None
         assert isinstance(vec, list)
         assert all(isinstance(x, float) for x in vec)
@@ -141,6 +134,12 @@ def test_sym_p():
 
         progVector2 = initObj.getProgramVector()
         assert_valid_progVector(progVector2)
+
+        instVecList = ir2vec.getInstructionVectors(initObj)
+        assert_valid_instructionVectors(instVecList)
+
+        instVecList2 = initObj.getInstructionVectors()
+        assert_valid_instructionVectors(instVecList2)
 
         for idx, vec in enumerate(progVector1):
             assert vec == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)

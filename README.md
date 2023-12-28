@@ -215,12 +215,12 @@ for (auto val : pgmVec)
 - The following code snippet contains an example to demonstrate the usage of the package.
 
 ```python
-import IR2Vec
+import ir2vec
 
-initObj = IR2Vec.initEmbedding("/path/to/file.ll", "fa", "p")
-progVector1 = IR2Vec.getProgramVector(initObj)
-functionVectorMap1 = IR2Vec.getFunctionVectors(initObj)
-instructionVectorsMap1 = IR2Vec.getInstructionVectors(initObj)
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+progVector1 = ir2vec.getProgramVector(initObj)
+functionVectorMap1 = ir2vec.getFunctionVectors(initObj)
+instructionVectorsMap1 = ir2vec.getInstructionVectors(initObj)
 
 progVector2 = initObj.getProgramVector()
 functionVectorMap2 = initObj.getFunctionVectors()
@@ -229,7 +229,7 @@ instructionVectorMap2 = initObj.getInstructionVectors()
 for fun, funcObj in functionVectorMap.items():
     assert fun == funcObj["demangledName"]
 
-    functionOutput1 = IR2Vec.getFunctionVectors(
+    functionOutput1 = ir2vec.getFunctionVectors(
         initObj,
         funcObj["actualName"],
     )
