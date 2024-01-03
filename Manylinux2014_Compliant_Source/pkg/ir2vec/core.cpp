@@ -217,7 +217,7 @@ PyObject *getInstructionVectors(IR2VecHandlerObject *self, PyObject *args) {
   // check for args, and null etc
   if ((self->ir2vecObj) == nullptr) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    return NULL;
+    Py_RETURN_NONE;
   }
   return (self->ir2vecObj)->generateEncodings(OpType::Instruction);
 }
@@ -225,7 +225,7 @@ PyObject *getInstructionVectors(IR2VecHandlerObject *self, PyObject *args) {
 PyObject *getProgramVector(IR2VecHandlerObject *self, PyObject *args) {
   if ((self->ir2vecObj) == nullptr) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    return NULL;
+    Py_RETURN_NONE;
   }
   return (self->ir2vecObj)->generateEncodings(OpType::Program);
 }
@@ -233,12 +233,12 @@ PyObject *getProgramVector(IR2VecHandlerObject *self, PyObject *args) {
 PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
   if ((self->ir2vecObj) == nullptr) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   const char *funcName = "\0";
   if (!PyArg_ParseTuple(args, "|s", &funcName)) {
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   return (self->ir2vecObj)
@@ -269,24 +269,24 @@ PyObject *runEncodings(PyObject *args, OpType type) {
   IR2VecHandlerObject *IR2VecHandlerobj = NULL;
 
   if (!PyArg_ParseTuple(args, "O|s", &IR2VecHandlerobj, &funcName)) {
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   if (string(funcName).empty() == false && type != OpType::Function) {
     PyErr_SetString(PyExc_TypeError,
                     "Function name can only be specified for Function "
                     "Vectors");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   if (IR2VecHandlerobj == nullptr) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   if (IR2VecHandlerobj->ir2vecObj == nullptr) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    return NULL;
+    Py_RETURN_NONE;
   } else {
     IR2VecHandler *ir2vecObj = IR2VecHandlerobj->ir2vecObj;
     return ir2vecObj->generateEncodings(type, string(funcName));
@@ -311,12 +311,12 @@ IR2VecHandlerObject *createIR2VECObject(const char *filename,
   IR2VecHandler *ir2vecObj =
       new IR2VecHandler(filename, output_file, mode, level);
   if (ir2vecObj == nullptr) {
-    return NULL;
+    return nullptr;
   }
   IR2VecHandlerObject *IR2VecHandlerObj =
       PyObject_New(IR2VecHandlerObject, &IR2VecHandlerType);
   if (IR2VecHandlerObj == nullptr) {
-    return NULL;
+    return nullptr;
   }
   IR2VecHandlerObj->ir2vecObj = ir2vecObj;
   return IR2VecHandlerObj;
@@ -333,18 +333,18 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
                         &output_file)) {
     // raise error here
     PyErr_SetString(PyExc_TypeError, "Invalid Arguments");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   if (fileNotValid(filename)) {
     PyErr_SetString(PyExc_TypeError, "Invalid File Path");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   if (string(output_file).empty() == false) {
     if (fileNotValid(output_file)) {
       PyErr_SetString(PyExc_TypeError, "Invalid Output File Path");
-      return NULL;
+      Py_RETURN_NONE;
     }
   }
 
@@ -352,13 +352,13 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
     PyErr_SetString(PyExc_TypeError,
                     "Eroneous mode entered . Either of sym, fa should be "
                     "specified");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   if (level[0] != 'p' && level[0] != 'f') {
     PyErr_SetString(PyExc_TypeError,
                     "Invalid level specified: Use either p or f");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   IR2VecHandlerObject *ir2vecObj =
@@ -366,7 +366,7 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
 
   if (ir2vecObj == nullptr) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   return (PyObject *)ir2vecObj;
@@ -401,7 +401,7 @@ PyMODINIT_FUNC PyInit_core(void) {
   PyObject *module = PyModule_Create(&IR2Vec_def);
 
   if (PyType_Ready(&IR2VecHandlerType) < 0) {
-    return NULL;
+    Py_RETURN_NONE;
   }
 
   Py_INCREF(&IR2VecHandlerType);
