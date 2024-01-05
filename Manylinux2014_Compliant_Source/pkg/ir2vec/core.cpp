@@ -266,9 +266,9 @@ static PyTypeObject IR2VecHandlerType = {
 
 PyObject *runEncodings(PyObject *args, OpType type) {
   const char *funcName = "\0";
-  IR2VecHandlerObject *IR2VecHandlerobj = nullptr;
+  IR2VecHandlerObject *ir2vecHandlerobj = nullptr;
 
-  if (!PyArg_ParseTuple(args, "O|s", &IR2VecHandlerobj, &funcName)) {
+  if (!PyArg_ParseTuple(args, "O|s", &ir2vecHandlerobj, &funcName)) {
     Py_RETURN_NONE;
   }
 
@@ -279,16 +279,16 @@ PyObject *runEncodings(PyObject *args, OpType type) {
     Py_RETURN_NONE;
   }
 
-  if (!IR2VecHandlerobj) {
+  if (!ir2vecHandlerobj) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
     Py_RETURN_NONE;
   }
 
-  if (!(IR2VecHandlerobj->ir2vecObj)) {
+  if (!(ir2vecHandlerobj->ir2vecObj)) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
     Py_RETURN_NONE;
   } else {
-    IR2VecHandler *ir2vecObj = IR2VecHandlerobj->ir2vecObj;
+    IR2VecHandler *ir2vecObj = ir2vecHandlerobj->ir2vecObj;
     return ir2vecObj->generateEncodings(type, string(funcName));
   }
 }
