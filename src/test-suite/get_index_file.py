@@ -1,9 +1,9 @@
-# Copyright (c) 2024, S. VenkataKeerthy, Nishant Sachdeva
-# Department of Computer Science and Engineering, IIT Hyderabad
-
-# This software is available under the BSD 4-Clause License. Please see LICENSE
-# file in the top-level directory for more details.
-
+# Copyright(c) 2023, The Contributors of IR2Vec.
+#
+# Part of the IR2Vec project.This software is available under the BSD 4-Clause
+# License. Please see LICENSE file in the top - level directory for more
+# details.
+#
 import os
 import sys
 
