@@ -1,4 +1,8 @@
-# get a list of all the files in ./PE-benchmarks-llfiles-llvm14/
+# Copyright (c) 2024, S. VenkataKeerthy, Nishant Sachdeva
+# Department of Computer Science and Engineering, IIT Hyderabad
+
+# This software is available under the BSD 4-Clause License. Please see LICENSE
+# file in the top-level directory for more details.
 
 import os
 import sys
