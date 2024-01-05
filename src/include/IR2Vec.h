@@ -29,17 +29,19 @@ class Embeddings {
   Vector pgmVector;
 
 public:
+  Embeddings() = default;
   Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab,
              std::string funcName = "", float WO = 1, float WA = 0.2,
              float WT = 0.5) {
     generateEncodings(M, mode, vocab, '\0', funcName, nullptr, -1, WO, WA, WT);
   }
 
-  // Use this constructor if the representations ought to be written to a file.
-  // Analogous to the command line options that are being used in IR2Vec binary.
+  // Use this constructor if the representations ought to be written to a
+  // file. Analogous to the command line options that are being used in IR2Vec
+  // binary.
   Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab, char level,
-             std::ostream *o, float WO = 1, float WA = 0.2, float WT = 0.5,
-             std::string funcName = "") {
+             std::ostream *o, std::string funcName = "", float WO = 1,
+             float WA = 0.2, float WT = 0.5) {
     generateEncodings(M, mode, vocab, level, funcName, o, -1, WO, WA, WT);
   }
 

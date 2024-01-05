@@ -32,23 +32,18 @@ int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
     FA.generateFlowAwareEncodingsForFunction(o, funcName);
     instVecMap = FA.getInstVecMap();
     funcVecMap = FA.getFuncVecMap();
-
   } else if (mode == IR2Vec::IR2VecMode::FlowAware) {
     IR2Vec_FA FA(M);
     FA.generateFlowAwareEncodings(o);
     instVecMap = FA.getInstVecMap();
     funcVecMap = FA.getFuncVecMap();
     pgmVector = FA.getProgramVector();
-  }
-
-  else if (mode == IR2Vec::IR2VecMode::Symbolic && !funcName.empty()) {
+  } else if (mode == IR2Vec::IR2VecMode::Symbolic && !funcName.empty()) {
     IR2Vec_Symbolic SYM(M);
     SYM.generateSymbolicEncodingsForFunction(0, funcName);
     instVecMap = SYM.getInstVecMap();
     funcVecMap = SYM.getFuncVecMap();
-  }
-
-  else if (mode == IR2Vec::IR2VecMode::Symbolic) {
+  } else if (mode == IR2Vec::IR2VecMode::Symbolic) {
     IR2Vec_Symbolic SYM(M);
     SYM.generateSymbolicEncodings(o);
     instVecMap = SYM.getInstVecMap();

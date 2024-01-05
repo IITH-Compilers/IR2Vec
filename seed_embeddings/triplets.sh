@@ -4,7 +4,7 @@
 # This software is available under the BSD 4-Clause License. Please see LICENSE
 # file in the top-level directory for more details.
 #
-#Usage: bash triplets.sh <build dir> <No of opt> <llFile list> <output FileName>
+#Usage: bash triplets.sh <build dir> <No of opt> <llFile alist> <output FileNme> <llvm_build>
 
 _DEBUG="off"
 function DEBUG() {
@@ -46,6 +46,8 @@ counter=0
 while read p; do
 	let "counter++"
 	DEBUG echo "collecting data from $p"
+	# print out the line count of the file
+	echo "Line count of $p is $(wc -l $p)"
 	NO_OF_OPT_FILES=$2
 	DEBUG echo "NO_OF_OPT_FILES from $NO_OF_OPT_FILES"
 	OPT_LEVELS=("O0" "O1" "O2" "O3" "Os" "Oz")

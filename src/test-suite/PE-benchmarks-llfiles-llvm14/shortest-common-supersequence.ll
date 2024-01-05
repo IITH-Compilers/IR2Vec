@@ -3,7 +3,8 @@ source_filename = "PE-benchmarks/shortest-common-supersequence.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-%"class.std::ios_base::Init" = type { i8 }
+module asm ".globl _ZSt21ios_base_library_initv"
+
 %"class.std::basic_ostream" = type { i32 (...)**, %"class.std::basic_ios" }
 %"class.std::basic_ios" = type { %"class.std::ios_base", %"class.std::basic_ostream"*, i8, i8, %"class.std::basic_streambuf"*, %"class.std::ctype"*, %"class.std::num_put"*, %"class.std::num_get"* }
 %"class.std::ios_base" = type { i32 (...)**, i64, i64, i32, i32, i32, %"struct.std::ios_base::_Callback_list"*, %"struct.std::ios_base::_Words", [8 x %"struct.std::ios_base::_Words"], i32, %"struct.std::ios_base::_Words"*, %"class.std::locale" }
@@ -22,31 +23,13 @@ target triple = "x86_64-pc-linux-gnu"
 
 $_ZSt3minIiERKT_S2_S2_ = comdat any
 
-@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
-@__dso_handle = external hidden global i8
 @__const.main.X = private unnamed_addr constant [7 x i8] c"AGGTAB\00", align 1
 @__const.main.Y = private unnamed_addr constant [8 x i8] c"GXTXAYB\00", align 1
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [41 x i8] c"Length of the shortest supersequence is \00", align 1
-@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_shortest_common_supersequence.cpp, i8* null }]
-
-; Function Attrs: noinline uwtable
-define internal void @__cxx_global_var_init() #0 section ".text.startup" {
-  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
-  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
-  ret void
-}
-
-declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
-
-; Function Attrs: nounwind
-declare void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-; Function Attrs: nounwind
-declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef i32 @_Z8superSeqPcS_ii(i8* noundef %0, i8* noundef %1, i32 noundef %2, i32 noundef %3) #4 {
+define dso_local noundef i32 @_Z8superSeqPcS_ii(i8* noundef %0, i8* noundef %1, i32 noundef %2, i32 noundef %3) #0 {
   %5 = alloca i8*, align 8
   %6 = alloca i8*, align 8
   %7 = alloca i32, align 4
@@ -234,10 +217,10 @@ define dso_local noundef i32 @_Z8superSeqPcS_ii(i8* noundef %0, i8* noundef %1, 
 }
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare i8* @llvm.stacksave() #5
+declare i8* @llvm.stacksave() #1
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZSt3minIiERKT_S2_S2_(i32* noundef nonnull align 4 dereferenceable(4) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #6 comdat {
+define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZSt3minIiERKT_S2_S2_(i32* noundef nonnull align 4 dereferenceable(4) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #2 comdat {
   %3 = alloca i32*, align 8
   %4 = alloca i32*, align 8
   %5 = alloca i32*, align 8
@@ -266,10 +249,10 @@ define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_
 }
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare void @llvm.stackrestore(i8*) #5
+declare void @llvm.stackrestore(i8*) #1
 
 ; Function Attrs: mustprogress noinline norecurse uwtable
-define dso_local noundef i32 @main() #7 {
+define dso_local noundef i32 @main() #3 {
   %1 = alloca i32, align 4
   %2 = alloca [7 x i8], align 1
   %3 = alloca [8 x i8], align 1
@@ -282,10 +265,10 @@ define dso_local noundef i32 @main() #7 {
   %7 = getelementptr inbounds [7 x i8], [7 x i8]* %2, i64 0, i64 0
   %8 = getelementptr inbounds [8 x i8], [8 x i8]* %3, i64 0, i64 0
   %9 = getelementptr inbounds [7 x i8], [7 x i8]* %2, i64 0, i64 0
-  %10 = call i64 @strlen(i8* noundef %9) #10
+  %10 = call i64 @strlen(i8* noundef %9) #7
   %11 = trunc i64 %10 to i32
   %12 = getelementptr inbounds [8 x i8], [8 x i8]* %3, i64 0, i64 0
-  %13 = call i64 @strlen(i8* noundef %12) #10
+  %13 = call i64 @strlen(i8* noundef %12) #7
   %14 = trunc i64 %13 to i32
   %15 = call noundef i32 @_Z8superSeqPcS_ii(i8* noundef %7, i8* noundef %8, i32 noundef %11, i32 noundef %14)
   %16 = call noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %6, i32 noundef %15)
@@ -293,32 +276,23 @@ define dso_local noundef i32 @main() #7 {
 }
 
 ; Function Attrs: argmemonly nofree nounwind willreturn
-declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #8
+declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #4
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #5
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i32 noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i32 noundef) #5
 
 ; Function Attrs: nounwind readonly willreturn
-declare i64 @strlen(i8* noundef) #9
+declare i64 @strlen(i8* noundef) #6
 
-; Function Attrs: noinline uwtable
-define internal void @_GLOBAL__sub_I_shortest_common_supersequence.cpp() #0 section ".text.startup" {
-  call void @__cxx_global_var_init()
-  ret void
-}
-
-attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { nofree nosync nounwind willreturn }
-attributes #6 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #7 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #8 = { argmemonly nofree nounwind willreturn }
-attributes #9 = { nounwind readonly willreturn "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #10 = { nounwind readonly willreturn }
+attributes #0 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { nofree nosync nounwind willreturn }
+attributes #2 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #3 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #4 = { argmemonly nofree nounwind willreturn }
+attributes #5 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #6 = { nounwind readonly willreturn "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #7 = { nounwind readonly willreturn }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}

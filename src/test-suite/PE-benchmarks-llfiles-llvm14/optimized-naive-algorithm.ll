@@ -3,7 +3,8 @@ source_filename = "PE-benchmarks/optimized-naive-algorithm.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-%"class.std::ios_base::Init" = type { i8 }
+module asm ".globl _ZSt21ios_base_library_initv"
+
 %"class.std::basic_ostream" = type { i32 (...)**, %"class.std::basic_ios" }
 %"class.std::basic_ios" = type { %"class.std::ios_base", %"class.std::basic_ostream"*, i8, i8, %"class.std::basic_streambuf"*, %"class.std::ctype"*, %"class.std::num_put"*, %"class.std::num_get"* }
 %"class.std::ios_base" = type { i32 (...)**, i64, i64, i32, i32, i32, %"struct.std::ios_base::_Callback_list"*, %"struct.std::ios_base::_Words", [8 x %"struct.std::ios_base::_Words"], i32, %"struct.std::ios_base::_Words"*, %"class.std::locale" }
@@ -22,41 +23,26 @@ target triple = "x86_64-pc-linux-gnu"
 %"class.std::__cxx11::basic_string" = type { %"struct.std::__cxx11::basic_string<char>::_Alloc_hider", i64, %union.anon }
 %"struct.std::__cxx11::basic_string<char>::_Alloc_hider" = type { i8* }
 %union.anon = type { i64, [8 x i8] }
+%"class.std::__new_allocator" = type { i8 }
 %"class.std::allocator" = type { i8 }
 
-@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
-@__dso_handle = external hidden global i8
+$_ZNSt15__new_allocatorIcED2Ev = comdat any
+
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [24 x i8] c"Pattern found at index \00", align 1
 @.str.1 = private unnamed_addr constant [17 x i8] c"ABCEABCDABCEABCD\00", align 1
 @.str.2 = private unnamed_addr constant [5 x i8] c"ABCD\00", align 1
-@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_optimized_naive_algorithm.cpp, i8* null }]
-
-; Function Attrs: noinline uwtable
-define internal void @__cxx_global_var_init() #0 section ".text.startup" {
-  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
-  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
-  ret void
-}
-
-declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
-
-; Function Attrs: nounwind
-declare void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-; Function Attrs: nounwind
-declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local void @_Z6searchNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES4_(%"class.std::__cxx11::basic_string"* noundef %0, %"class.std::__cxx11::basic_string"* noundef %1) #4 {
+define dso_local void @_Z6searchNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES4_(%"class.std::__cxx11::basic_string"* noundef %0, %"class.std::__cxx11::basic_string"* noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
   %6 = alloca i32, align 4
-  %7 = call noundef i64 @_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4sizeEv(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %0) #3
+  %7 = call noundef i64 @_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4sizeEv(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %0) #5
   %8 = trunc i64 %7 to i32
   store i32 %8, i32* %3, align 4
-  %9 = call noundef i64 @_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4sizeEv(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %1) #3
+  %9 = call noundef i64 @_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4sizeEv(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %1) #5
   %10 = trunc i64 %9 to i32
   store i32 %10, i32* %4, align 4
   store i32 0, i32* %5, align 4
@@ -154,157 +140,181 @@ define dso_local void @_Z6searchNSt7__cxx1112basic_stringIcSt11char_traitsIcESaI
 }
 
 ; Function Attrs: nounwind
-declare noundef i64 @_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4sizeEv(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32)) #2
+declare noundef i64 @_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4sizeEv(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32)) #1
 
-declare noundef nonnull align 1 dereferenceable(1) i8* @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEixEm(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32), i64 noundef) #1
+declare noundef nonnull align 1 dereferenceable(1) i8* @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEixEm(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32), i64 noundef) #2
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #2
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i32 noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i32 noundef) #2
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* noundef) #2
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8)) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8)) #2
 
-; Function Attrs: mustprogress noinline norecurse uwtable
-define dso_local noundef i32 @main() #5 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
-  %1 = alloca i32, align 4
-  %2 = alloca %"class.std::__cxx11::basic_string", align 8
-  %3 = alloca %"class.std::allocator", align 1
-  %4 = alloca i8*, align 8
-  %5 = alloca i32, align 4
-  %6 = alloca %"class.std::__cxx11::basic_string", align 8
-  %7 = alloca %"class.std::allocator", align 1
-  %8 = alloca %"class.std::__cxx11::basic_string", align 8
-  %9 = alloca %"class.std::__cxx11::basic_string", align 8
-  store i32 0, i32* %1, align 4
-  call void @_ZNSaIcEC1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %3) #3
-  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcRKS3_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %2, i8* noundef getelementptr inbounds ([17 x i8], [17 x i8]* @.str.1, i64 0, i64 0), %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %3)
-          to label %10 unwind label %16
+; Function Attrs: noinline norecurse uwtable
+define dso_local noundef i32 @main() #3 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
+  %1 = alloca %"class.std::__new_allocator"*, align 8
+  %2 = alloca %"class.std::__new_allocator"*, align 8
+  %3 = alloca %"class.std::allocator"*, align 8
+  %4 = alloca %"class.std::allocator"*, align 8
+  %5 = alloca %"class.std::allocator"*, align 8
+  %6 = alloca %"class.std::allocator"*, align 8
+  %7 = alloca %"class.std::allocator"*, align 8
+  %8 = alloca %"class.std::allocator"*, align 8
+  %9 = alloca i32, align 4
+  %10 = alloca %"class.std::__cxx11::basic_string", align 8
+  %11 = alloca %"class.std::allocator", align 1
+  %12 = alloca i8*, align 8
+  %13 = alloca i32, align 4
+  %14 = alloca %"class.std::__cxx11::basic_string", align 8
+  %15 = alloca %"class.std::allocator", align 1
+  %16 = alloca %"class.std::__cxx11::basic_string", align 8
+  %17 = alloca %"class.std::__cxx11::basic_string", align 8
+  store i32 0, i32* %9, align 4
+  store %"class.std::allocator"* %11, %"class.std::allocator"** %8, align 8
+  %18 = load %"class.std::allocator"*, %"class.std::allocator"** %8, align 8
+  %19 = bitcast %"class.std::allocator"* %18 to %"class.std::__new_allocator"*
+  store %"class.std::__new_allocator"* %19, %"class.std::__new_allocator"** %1, align 8
+  %20 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %1, align 8
+  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcRKS3_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %10, i8* noundef getelementptr inbounds ([17 x i8], [17 x i8]* @.str.1, i64 0, i64 0), %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %11)
+          to label %21 unwind label %34
 
-10:                                               ; preds = %0
-  call void @_ZNSaIcED1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %3) #3
-  call void @_ZNSaIcEC1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %7) #3
-  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcRKS3_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %6, i8* noundef getelementptr inbounds ([5 x i8], [5 x i8]* @.str.2, i64 0, i64 0), %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %7)
-          to label %11 unwind label %20
+21:                                               ; preds = %0
+  store %"class.std::allocator"* %11, %"class.std::allocator"** %6, align 8
+  %22 = load %"class.std::allocator"*, %"class.std::allocator"** %6, align 8
+  %23 = bitcast %"class.std::allocator"* %22 to %"class.std::__new_allocator"*
+  call void @_ZNSt15__new_allocatorIcED2Ev(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %23) #5
+  store %"class.std::allocator"* %15, %"class.std::allocator"** %7, align 8
+  %24 = load %"class.std::allocator"*, %"class.std::allocator"** %7, align 8
+  %25 = bitcast %"class.std::allocator"* %24 to %"class.std::__new_allocator"*
+  store %"class.std::__new_allocator"* %25, %"class.std::__new_allocator"** %2, align 8
+  %26 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %2, align 8
+  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcRKS3_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %14, i8* noundef getelementptr inbounds ([5 x i8], [5 x i8]* @.str.2, i64 0, i64 0), %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %15)
+          to label %27 unwind label %40
 
-11:                                               ; preds = %10
-  call void @_ZNSaIcED1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %7) #3
-  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %8, %"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %6)
-          to label %12 unwind label %24
+27:                                               ; preds = %21
+  store %"class.std::allocator"* %15, %"class.std::allocator"** %4, align 8
+  %28 = load %"class.std::allocator"*, %"class.std::allocator"** %4, align 8
+  %29 = bitcast %"class.std::allocator"* %28 to %"class.std::__new_allocator"*
+  call void @_ZNSt15__new_allocatorIcED2Ev(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %29) #5
+  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %16, %"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %14)
+          to label %30 unwind label %46
 
-12:                                               ; preds = %11
-  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %9, %"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %2)
-          to label %13 unwind label %28
+30:                                               ; preds = %27
+  invoke void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %17, %"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %10)
+          to label %31 unwind label %50
 
-13:                                               ; preds = %12
-  invoke void @_Z6searchNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES4_(%"class.std::__cxx11::basic_string"* noundef %8, %"class.std::__cxx11::basic_string"* noundef %9)
-          to label %14 unwind label %32
+31:                                               ; preds = %30
+  invoke void @_Z6searchNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES4_(%"class.std::__cxx11::basic_string"* noundef %16, %"class.std::__cxx11::basic_string"* noundef %17)
+          to label %32 unwind label %54
 
-14:                                               ; preds = %13
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %9) #3
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %8) #3
-  store i32 0, i32* %1, align 4
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %6) #3
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %2) #3
-  %15 = load i32, i32* %1, align 4
-  ret i32 %15
+32:                                               ; preds = %31
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %17) #5
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %16) #5
+  store i32 0, i32* %9, align 4
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %14) #5
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %10) #5
+  %33 = load i32, i32* %9, align 4
+  ret i32 %33
 
-16:                                               ; preds = %0
-  %17 = landingpad { i8*, i32 }
+34:                                               ; preds = %0
+  %35 = landingpad { i8*, i32 }
           cleanup
-  %18 = extractvalue { i8*, i32 } %17, 0
-  store i8* %18, i8** %4, align 8
-  %19 = extractvalue { i8*, i32 } %17, 1
-  store i32 %19, i32* %5, align 4
-  call void @_ZNSaIcED1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %3) #3
-  br label %39
+  %36 = extractvalue { i8*, i32 } %35, 0
+  store i8* %36, i8** %12, align 8
+  %37 = extractvalue { i8*, i32 } %35, 1
+  store i32 %37, i32* %13, align 4
+  store %"class.std::allocator"* %11, %"class.std::allocator"** %5, align 8
+  %38 = load %"class.std::allocator"*, %"class.std::allocator"** %5, align 8
+  %39 = bitcast %"class.std::allocator"* %38 to %"class.std::__new_allocator"*
+  call void @_ZNSt15__new_allocatorIcED2Ev(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %39) #5
+  br label %61
 
-20:                                               ; preds = %10
-  %21 = landingpad { i8*, i32 }
+40:                                               ; preds = %21
+  %41 = landingpad { i8*, i32 }
           cleanup
-  %22 = extractvalue { i8*, i32 } %21, 0
-  store i8* %22, i8** %4, align 8
-  %23 = extractvalue { i8*, i32 } %21, 1
-  store i32 %23, i32* %5, align 4
-  call void @_ZNSaIcED1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %7) #3
-  br label %38
+  %42 = extractvalue { i8*, i32 } %41, 0
+  store i8* %42, i8** %12, align 8
+  %43 = extractvalue { i8*, i32 } %41, 1
+  store i32 %43, i32* %13, align 4
+  store %"class.std::allocator"* %15, %"class.std::allocator"** %3, align 8
+  %44 = load %"class.std::allocator"*, %"class.std::allocator"** %3, align 8
+  %45 = bitcast %"class.std::allocator"* %44 to %"class.std::__new_allocator"*
+  call void @_ZNSt15__new_allocatorIcED2Ev(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %45) #5
+  br label %60
 
-24:                                               ; preds = %11
-  %25 = landingpad { i8*, i32 }
+46:                                               ; preds = %27
+  %47 = landingpad { i8*, i32 }
           cleanup
-  %26 = extractvalue { i8*, i32 } %25, 0
-  store i8* %26, i8** %4, align 8
-  %27 = extractvalue { i8*, i32 } %25, 1
-  store i32 %27, i32* %5, align 4
-  br label %37
+  %48 = extractvalue { i8*, i32 } %47, 0
+  store i8* %48, i8** %12, align 8
+  %49 = extractvalue { i8*, i32 } %47, 1
+  store i32 %49, i32* %13, align 4
+  br label %59
 
-28:                                               ; preds = %12
-  %29 = landingpad { i8*, i32 }
+50:                                               ; preds = %30
+  %51 = landingpad { i8*, i32 }
           cleanup
-  %30 = extractvalue { i8*, i32 } %29, 0
-  store i8* %30, i8** %4, align 8
-  %31 = extractvalue { i8*, i32 } %29, 1
-  store i32 %31, i32* %5, align 4
-  br label %36
+  %52 = extractvalue { i8*, i32 } %51, 0
+  store i8* %52, i8** %12, align 8
+  %53 = extractvalue { i8*, i32 } %51, 1
+  store i32 %53, i32* %13, align 4
+  br label %58
 
-32:                                               ; preds = %13
-  %33 = landingpad { i8*, i32 }
+54:                                               ; preds = %31
+  %55 = landingpad { i8*, i32 }
           cleanup
-  %34 = extractvalue { i8*, i32 } %33, 0
-  store i8* %34, i8** %4, align 8
-  %35 = extractvalue { i8*, i32 } %33, 1
-  store i32 %35, i32* %5, align 4
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %9) #3
-  br label %36
+  %56 = extractvalue { i8*, i32 } %55, 0
+  store i8* %56, i8** %12, align 8
+  %57 = extractvalue { i8*, i32 } %55, 1
+  store i32 %57, i32* %13, align 4
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %17) #5
+  br label %58
 
-36:                                               ; preds = %32, %28
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %8) #3
-  br label %37
+58:                                               ; preds = %54, %50
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %16) #5
+  br label %59
 
-37:                                               ; preds = %36, %24
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %6) #3
-  br label %38
+59:                                               ; preds = %58, %46
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %14) #5
+  br label %60
 
-38:                                               ; preds = %37, %20
-  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %2) #3
-  br label %39
+60:                                               ; preds = %59, %40
+  call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32) %10) #5
+  br label %61
 
-39:                                               ; preds = %38, %16
-  %40 = load i8*, i8** %4, align 8
-  %41 = load i32, i32* %5, align 4
-  %42 = insertvalue { i8*, i32 } undef, i8* %40, 0
-  %43 = insertvalue { i8*, i32 } %42, i32 %41, 1
-  resume { i8*, i32 } %43
+61:                                               ; preds = %60, %34
+  %62 = load i8*, i8** %12, align 8
+  %63 = load i32, i32* %13, align 4
+  %64 = insertvalue { i8*, i32 } undef, i8* %62, 0
+  %65 = insertvalue { i8*, i32 } %64, i32 %63, 1
+  resume { i8*, i32 } %65
 }
 
-; Function Attrs: nounwind
-declare void @_ZNSaIcEC1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-declare void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcRKS3_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32), i8* noundef, %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
+declare void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcRKS3_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32), i8* noundef, %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
 
 declare i32 @__gxx_personality_v0(...)
 
-; Function Attrs: nounwind
-declare void @_ZNSaIcED1Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-declare void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32), %"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32)) unnamed_addr #1
+declare void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32), %"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32)) unnamed_addr #2
 
 ; Function Attrs: nounwind
-declare void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32)) unnamed_addr #2
+declare void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(%"class.std::__cxx11::basic_string"* noundef nonnull align 8 dereferenceable(32)) unnamed_addr #1
 
-; Function Attrs: noinline uwtable
-define internal void @_GLOBAL__sub_I_optimized_naive_algorithm.cpp() #0 section ".text.startup" {
-  call void @__cxx_global_var_init()
+; Function Attrs: noinline nounwind uwtable
+define linkonce_odr dso_local void @_ZNSt15__new_allocatorIcED2Ev(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #4 comdat align 2 {
+  %2 = alloca %"class.std::__new_allocator"*, align 8
+  store %"class.std::__new_allocator"* %0, %"class.std::__new_allocator"** %2, align 8
+  %3 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %2, align 8
   ret void
 }
 
-attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #0 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #2 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #3 = { noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #4 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}

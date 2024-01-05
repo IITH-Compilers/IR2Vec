@@ -199,8 +199,8 @@ void IR2Vec_FA::updateFuncVecMap(
   for (auto &calledFunction : calledFunctions) {
     if (calledFunction && !calledFunction->isDeclaration() &&
         visitedFunctions.count(calledFunction) == 0) {
-      // doing casting since calledFunctions is of type of const llvm::Function*
-      // and we need llvm::Function* as argument
+      // doing casting since calledFunctions is of type of const
+      // llvm::Function* and we need llvm::Function* as argument
       auto *callee = const_cast<Function *>(calledFunction);
       // This function is called recursively to update funcVecMap
       updateFuncVecMap(callee, visitedFunctions);
@@ -217,8 +217,8 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
 
     auto Result = getActualName(&f);
     if (!f.isDeclaration() && Result == name) {
-      // If funcName is matched with one of the functions in module, we will
-      // update funcVecMap of it and it's child functions recursively
+      // If funcName is matched with one of the functions in module, we
+      // will update funcVecMap of it and it's child functions recursively
       llvm::SmallSet<const Function *, 16> visitedFunctions;
       updateFuncVecMap(&f, visitedFunctions);
     }
@@ -502,8 +502,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
       solveSingleComponent(*defs, partialInstValMap);
       partialInstValMap.erase(defs);
     } else {
-      cyclicCounter++; // for components with length more than 1 will represent
-                       // cycles
+      cyclicCounter++; // for components with length more than 1 will
+                       // represent cycles
       for (auto defs : component) {
         partialInstValMap[defs] = {};
         getPartialVec(*defs, partialInstValMap);
@@ -605,9 +605,10 @@ bool isPotentiallyReachableFromMany(
     if (LI) {
       Outer = getOutermostLoop(LI, BB);
       // If we're in a loop with a hole, not all blocks in the loop are
-      // reachable from all other blocks. That implies we can't simply jump to
-      // the loop's exit blocks, as that exit might need to pass through an
-      // excluded block. Clear Outer so we process BB's successors.
+      // reachable from all other blocks. That implies we can't simply
+      // jump to the loop's exit blocks, as that exit might need to pass
+      // through an excluded block. Clear Outer so we process BB's
+      // successors.
       if (LoopsWithHoles.count(Outer))
         Outer = nullptr;
       if (StopLoop && Outer == StopLoop)
@@ -615,15 +616,15 @@ bool isPotentiallyReachableFromMany(
     }
 
     if (!--Limit) {
-      // We haven't been able to prove it one way or the other. Conservatively
-      // answer true -- that there is potentially a path.
+      // We haven't been able to prove it one way or the other.
+      // Conservatively answer true -- that there is potentially a path.
       return true;
     }
 
     if (Outer) {
-      // All blocks in a single loop are reachable from all other blocks. From
-      // any of these blocks, we can skip directly to the exits of the loop,
-      // ignoring any other blocks inside the loop body.
+      // All blocks in a single loop are reachable from all other blocks.
+      // From any of these blocks, we can skip directly to the exits of
+      // the loop, ignoring any other blocks inside the loop body.
       Outer->getExitBlocks(Worklist);
     } else {
       Worklist.append(succ_begin(BB), succ_end(BB));
@@ -645,11 +646,11 @@ bool isPotentiallyReachable(
   SmallVector<BasicBlock *, 32> Worklist;
 
   if (A->getParent() == B->getParent()) {
-    // The same block case is special because it's the only time we're looking
-    // within a single block to see which instruction comes first. Once we
-    // start looking at multiple blocks, the first instruction of the block is
-    // reachable, so we only need to determine reachability between whole
-    // blocks.
+    // The same block case is special because it's the only time we're
+    // looking within a single block to see which instruction comes first.
+    // Once we start looking at multiple blocks, the first instruction of
+    // the block is reachable, so we only need to determine reachability
+    // between whole blocks.
     BasicBlock *BB = const_cast<BasicBlock *>(A->getParent());
 
     // If the block is in a loop then we can reach any instruction in the
@@ -745,8 +746,8 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
     });
 
     // If there is a reachable write within I's basic block only that defn
-    // would reach always If there are more than one defn, take the immediate
-    // defn before I
+    // would reach always If there are more than one defn, take the
+    // immediate defn before I
     if (!bbInstMap[I->getParent()].empty()) {
       IR2VEC_DEBUG(outs() << "--------Within BB--------\n");
       IR2VEC_DEBUG(I->print(outs()); outs() << "\n");
@@ -1172,8 +1173,8 @@ void IR2Vec_FA::solveSingleComponent(
       // Check if value of RD is precomputed
       if (instVecMap.find(i) == instVecMap.end()) {
 
-        /*Some phi instructions reach themselves and hence may not be in the
-        instVecMap but should be in the partialInstValMap*/
+        /*Some phi instructions reach themselves and hence may not be in
+        the instVecMap but should be in the partialInstValMap*/
 
         if (partialInstValMap.find(i) == partialInstValMap.end()) {
           assert(partialInstValMap.find(i) != partialInstValMap.end() &&

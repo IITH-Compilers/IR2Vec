@@ -3,7 +3,8 @@ source_filename = "PE-benchmarks/minimum-cost-polygon-triangulation.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-%"class.std::ios_base::Init" = type { i8 }
+module asm ".globl _ZSt21ios_base_library_initv"
+
 %"class.std::basic_ostream" = type { i32 (...)**, %"class.std::basic_ios" }
 %"class.std::basic_ios" = type { %"class.std::ios_base", %"class.std::basic_ostream"*, i8, i8, %"class.std::basic_streambuf"*, %"class.std::ctype"*, %"class.std::num_put"*, %"class.std::num_get"* }
 %"class.std::ios_base" = type { i32 (...)**, i64, i64, i32, i32, i32, %"struct.std::ios_base::_Callback_list"*, %"struct.std::ios_base::_Words", [8 x %"struct.std::ios_base::_Words"], i32, %"struct.std::ios_base::_Words"*, %"class.std::locale" }
@@ -23,28 +24,10 @@ target triple = "x86_64-pc-linux-gnu"
 
 $_ZSt4sqrtIiEN9__gnu_cxx11__enable_ifIXsr12__is_integerIT_EE7__valueEdE6__typeES2_ = comdat any
 
-@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
-@__dso_handle = external hidden global i8
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
-@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_minimum_cost_polygon_triangulation.cpp, i8* null }]
-
-; Function Attrs: noinline uwtable
-define internal void @__cxx_global_var_init() #0 section ".text.startup" {
-  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
-  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
-  ret void
-}
-
-declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
-
-; Function Attrs: nounwind
-declare void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-; Function Attrs: nounwind
-declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define dso_local noundef double @_Z3mindd(double noundef %0, double noundef %1) #4 {
+define dso_local noundef double @_Z3mindd(double noundef %0, double noundef %1) #0 {
   %3 = alloca double, align 8
   %4 = alloca double, align 8
   store double %0, double* %3, align 8
@@ -68,7 +51,7 @@ define dso_local noundef double @_Z3mindd(double noundef %0, double noundef %1) 
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef double @_Z4dist5PointS_(i64 %0, i64 %1) #5 {
+define dso_local noundef double @_Z4dist5PointS_(i64 %0, i64 %1) #1 {
   %3 = alloca %struct.Point, align 4
   %4 = alloca %struct.Point, align 4
   %5 = bitcast %struct.Point* %3 to i64*
@@ -103,17 +86,17 @@ define dso_local noundef double @_Z4dist5PointS_(i64 %0, i64 %1) #5 {
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef double @_ZSt4sqrtIiEN9__gnu_cxx11__enable_ifIXsr12__is_integerIT_EE7__valueEdE6__typeES2_(i32 noundef %0) #4 comdat {
+define linkonce_odr dso_local noundef double @_ZSt4sqrtIiEN9__gnu_cxx11__enable_ifIXsr12__is_integerIT_EE7__valueEdE6__typeES2_(i32 noundef %0) #0 comdat {
   %2 = alloca i32, align 4
   store i32 %0, i32* %2, align 4
   %3 = load i32, i32* %2, align 4
   %4 = sitofp i32 %3 to double
-  %5 = call double @sqrt(double noundef %4) #3
+  %5 = call double @sqrt(double noundef %4) #8
   ret double %5
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef double @_Z4costP5Pointiii(%struct.Point* noundef %0, i32 noundef %1, i32 noundef %2, i32 noundef %3) #5 {
+define dso_local noundef double @_Z4costP5Pointiii(%struct.Point* noundef %0, i32 noundef %1, i32 noundef %2, i32 noundef %3) #1 {
   %5 = alloca %struct.Point*, align 8
   %6 = alloca i32, align 4
   %7 = alloca i32, align 4
@@ -191,10 +174,10 @@ define dso_local noundef double @_Z4costP5Pointiii(%struct.Point* noundef %0, i3
 }
 
 ; Function Attrs: argmemonly nofree nounwind willreturn
-declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #6
+declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #2
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef double @_Z5mTCDPP5Pointi(%struct.Point* noundef %0, i32 noundef %1) #5 {
+define dso_local noundef double @_Z5mTCDPP5Pointi(%struct.Point* noundef %0, i32 noundef %1) #1 {
   %3 = alloca double, align 8
   %4 = alloca %struct.Point*, align 8
   %5 = alloca i32, align 4
@@ -387,13 +370,13 @@ define dso_local noundef double @_Z5mTCDPP5Pointi(%struct.Point* noundef %0, i32
 }
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare i8* @llvm.stacksave() #7
+declare i8* @llvm.stacksave() #3
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare void @llvm.stackrestore(i8*) #7
+declare void @llvm.stackrestore(i8*) #3
 
 ; Function Attrs: mustprogress noinline norecurse uwtable
-define dso_local noundef i32 @main() #8 {
+define dso_local noundef i32 @main() #4 {
   %1 = alloca i32, align 4
   %2 = alloca [5 x %struct.Point], align 16
   %3 = alloca i32, align 4
@@ -426,29 +409,22 @@ define dso_local noundef i32 @main() #8 {
 }
 
 ; Function Attrs: argmemonly nofree nounwind willreturn writeonly
-declare void @llvm.memset.p0i8.i64(i8* nocapture writeonly, i8, i64, i1 immarg) #9
+declare void @llvm.memset.p0i8.i64(i8* nocapture writeonly, i8, i64, i1 immarg) #5
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEd(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), double noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEd(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), double noundef) #6
 
 ; Function Attrs: nounwind
-declare double @sqrt(double noundef) #2
+declare double @sqrt(double noundef) #7
 
-; Function Attrs: noinline uwtable
-define internal void @_GLOBAL__sub_I_minimum_cost_polygon_triangulation.cpp() #0 section ".text.startup" {
-  call void @__cxx_global_var_init()
-  ret void
-}
-
-attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #6 = { argmemonly nofree nounwind willreturn }
-attributes #7 = { nofree nosync nounwind willreturn }
-attributes #8 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #9 = { argmemonly nofree nounwind willreturn writeonly }
+attributes #0 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #2 = { argmemonly nofree nounwind willreturn }
+attributes #3 = { nofree nosync nounwind willreturn }
+attributes #4 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { argmemonly nofree nounwind willreturn writeonly }
+attributes #6 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #7 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #8 = { nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}

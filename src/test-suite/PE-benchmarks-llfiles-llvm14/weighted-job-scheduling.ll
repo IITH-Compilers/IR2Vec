@@ -3,7 +3,8 @@ source_filename = "PE-benchmarks/weighted-job-scheduling.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-%"class.std::ios_base::Init" = type { i8 }
+module asm ".globl _ZSt21ios_base_library_initv"
+
 %struct.Job = type { i32, i32, i32 }
 %"class.std::basic_ostream" = type { i32 (...)**, %"class.std::basic_ios" }
 %"class.std::basic_ios" = type { %"class.std::ios_base", %"class.std::basic_ostream"*, i8, i8, %"class.std::basic_streambuf"*, %"class.std::ctype"*, %"class.std::num_put"*, %"class.std::num_get"* }
@@ -34,7 +35,7 @@ $_ZN9__gnu_cxx5__ops16__iter_comp_iterIPFb3JobS2_EEENS0_15_Iter_comp_iterIT_EES6
 
 $_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_T1_ = comdat any
 
-$_ZSt4__lgl = comdat any
+$_ZSt4__lgIlET_S0_ = comdat any
 
 $_ZSt22__final_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_ = comdat any
 
@@ -74,6 +75,10 @@ $_ZSt9iter_swapIP3JobS1_EvT_T0_ = comdat any
 
 $_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_ = comdat any
 
+$_ZSt11__bit_widthImEiT_ = comdat any
+
+$_ZSt13__countl_zeroImEiT_ = comdat any
+
 $_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_ = comdat any
 
 $_ZSt26__unguarded_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_ = comdat any
@@ -96,7 +101,9 @@ $_ZSt12__niter_baseIP3JobET_S2_ = comdat any
 
 $_ZSt23__copy_move_backward_a2ILb1EP3JobS1_ET1_T0_S3_S2_ = comdat any
 
-$_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobEEPT_PKS4_S7_S5_ = comdat any
+$_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobS3_EEPT0_PT_S7_S5_ = comdat any
+
+$_ZNSt11__copy_moveILb1ELb0ESt26random_access_iterator_tagE12__assign_oneI3JobS3_EEvPT_PT0_ = comdat any
 
 $_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEclIS2_PS2_EEbRT_T0_ = comdat any
 
@@ -104,30 +111,12 @@ $_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE
 
 $_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEC2ES4_ = comdat any
 
-@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
-@__dso_handle = external hidden global i8
 @__const.main.arr = private unnamed_addr constant [4 x %struct.Job] [%struct.Job { i32 3, i32 10, i32 20 }, %struct.Job { i32 1, i32 2, i32 50 }, %struct.Job { i32 6, i32 19, i32 100 }, %struct.Job { i32 2, i32 100, i32 200 }], align 16
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [23 x i8] c"The optimal profit is \00", align 1
-@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_weighted_job_scheduling.cpp, i8* null }]
-
-; Function Attrs: noinline uwtable
-define internal void @__cxx_global_var_init() #0 section ".text.startup" {
-  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
-  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
-  ret void
-}
-
-declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
-
-; Function Attrs: nounwind
-declare void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-; Function Attrs: nounwind
-declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define dso_local noundef zeroext i1 @_Z14jobComparataor3JobS_(i64 %0, i32 %1, i64 %2, i32 %3) #4 {
+define dso_local noundef zeroext i1 @_Z14jobComparataor3JobS_(i64 %0, i32 %1, i64 %2, i32 %3) #0 {
   %5 = alloca %struct.Job, align 4
   %6 = alloca { i64, i32 }, align 4
   %7 = alloca %struct.Job, align 4
@@ -155,10 +144,10 @@ define dso_local noundef zeroext i1 @_Z14jobComparataor3JobS_(i64 %0, i32 %1, i6
 }
 
 ; Function Attrs: argmemonly nofree nounwind willreturn
-declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #5
+declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #1
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define dso_local noundef i32 @_Z17latestNonConflictP3Jobi(%struct.Job* noundef %0, i32 noundef %1) #4 {
+define dso_local noundef i32 @_Z17latestNonConflictP3Jobi(%struct.Job* noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca %struct.Job*, align 8
   %5 = alloca i32, align 4
@@ -215,7 +204,7 @@ define dso_local noundef i32 @_Z17latestNonConflictP3Jobi(%struct.Job* noundef %
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(%struct.Job* noundef %0, i32 noundef %1) #6 {
+define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(%struct.Job* noundef %0, i32 noundef %1) #2 {
   %3 = alloca %struct.Job*, align 8
   %4 = alloca i32, align 4
   %5 = alloca i32*, align 8
@@ -237,7 +226,7 @@ define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(%struct.Job* noundef %0, i
   %18 = extractvalue { i64, i1 } %17, 1
   %19 = extractvalue { i64, i1 } %17, 0
   %20 = select i1 %18, i64 -1, i64 %19
-  %21 = call noalias noundef nonnull i8* @_Znam(i64 noundef %20) #12
+  %21 = call noalias noundef nonnull i8* @_Znam(i64 noundef %20) #9
   %22 = bitcast i8* %21 to i32*
   store i32* %22, i32** %5, align 8
   %23 = load %struct.Job*, %struct.Job** %3, align 8
@@ -318,7 +307,7 @@ define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(%struct.Job* noundef %0, i
 
 77:                                               ; preds = %68
   %78 = bitcast i32* %75 to i8*
-  call void @_ZdaPv(i8* noundef %78) #13
+  call void @_ZdaPv(i8* noundef %78) #10
   br label %79
 
 79:                                               ; preds = %77, %68
@@ -327,7 +316,7 @@ define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(%struct.Job* noundef %0, i
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt4sortIP3JobPFbS0_S0_EEvT_S4_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* noundef %2) #6 comdat {
+define linkonce_odr dso_local void @_ZSt4sortIP3JobPFbS0_S0_EEvT_S4_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* noundef %2) #2 comdat {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca i1 (i64, i32, i64, i32)*, align 8
@@ -348,13 +337,13 @@ define linkonce_odr dso_local void @_ZSt4sortIP3JobPFbS0_S0_EEvT_S4_T0_(%struct.
 }
 
 ; Function Attrs: nofree nosync nounwind readnone speculatable willreturn
-declare { i64, i1 } @llvm.umul.with.overflow.i64(i64, i64) #7
+declare { i64, i1 } @llvm.umul.with.overflow.i64(i64, i64) #3
 
 ; Function Attrs: nobuiltin allocsize(0)
-declare noundef nonnull i8* @_Znam(i64 noundef) #8
+declare noundef nonnull i8* @_Znam(i64 noundef) #4
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZSt3maxIiERKT_S2_S2_(i32* noundef nonnull align 4 dereferenceable(4) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #4 comdat {
+define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZSt3maxIiERKT_S2_S2_(i32* noundef nonnull align 4 dereferenceable(4) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #0 comdat {
   %3 = alloca i32*, align 8
   %4 = alloca i32*, align 8
   %5 = alloca i32*, align 8
@@ -383,10 +372,10 @@ define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_
 }
 
 ; Function Attrs: nobuiltin nounwind
-declare void @_ZdaPv(i8* noundef) #9
+declare void @_ZdaPv(i8* noundef) #5
 
 ; Function Attrs: mustprogress noinline norecurse uwtable
-define dso_local noundef i32 @main() #10 {
+define dso_local noundef i32 @main() #6 {
   %1 = alloca i32, align 4
   %2 = alloca [4 x %struct.Job], align 16
   %3 = alloca i32, align 4
@@ -402,12 +391,12 @@ define dso_local noundef i32 @main() #10 {
   ret i32 0
 }
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #7
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i32 noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i32 noundef) #7
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #6 comdat {
+define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #2 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -431,7 +420,7 @@ define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_co
   %19 = ptrtoint %struct.Job* %17 to i64
   %20 = sub i64 %18, %19
   %21 = sdiv exact i64 %20, 12
-  %22 = call noundef i64 @_ZSt4__lgl(i64 noundef %21)
+  %22 = call noundef i64 @_ZSt4__lgIlET_S0_(i64 noundef %21)
   %23 = mul nsw i64 %22, 2
   %24 = bitcast %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %7 to i8*
   %25 = bitcast %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %4 to i8*
@@ -454,11 +443,11 @@ define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_co
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local i1 (i64, i32, i64, i32)* @_ZN9__gnu_cxx5__ops16__iter_comp_iterIPFb3JobS2_EEENS0_15_Iter_comp_iterIT_EES6_(i1 (i64, i32, i64, i32)* noundef %0) #6 comdat {
+define linkonce_odr dso_local i1 (i64, i32, i64, i32)* @_ZN9__gnu_cxx5__ops16__iter_comp_iterIPFb3JobS2_EEENS0_15_Iter_comp_iterIT_EES6_(i1 (i64, i32, i64, i32)* noundef %0) #2 comdat {
   %2 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %3 = alloca i1 (i64, i32, i64, i32)*, align 8
   store i1 (i64, i32, i64, i32)* %0, i1 (i64, i32, i64, i32)** %3, align 8
-  %4 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %3) #3
+  %4 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %3) #11
   %5 = load i1 (i64, i32, i64, i32)*, i1 (i64, i32, i64, i32)** %4, align 8
   call void @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEC2ES4_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %2, i1 (i64, i32, i64, i32)* noundef %5)
   %6 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %2, i32 0, i32 0
@@ -467,7 +456,7 @@ define linkonce_odr dso_local i1 (i64, i32, i64, i32)* @_ZN9__gnu_cxx5__ops16__i
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_T1_(%struct.Job* noundef %0, %struct.Job* noundef %1, i64 noundef %2, i1 (i64, i32, i64, i32)* %3) #6 comdat {
+define linkonce_odr dso_local void @_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_T1_(%struct.Job* noundef %0, %struct.Job* noundef %1, i64 noundef %2, i1 (i64, i32, i64, i32)* %3) #2 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca %struct.Job*, align 8
   %7 = alloca %struct.Job*, align 8
@@ -541,19 +530,18 @@ define linkonce_odr dso_local void @_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__o
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i64 @_ZSt4__lgl(i64 noundef %0) #4 comdat {
+define linkonce_odr dso_local noundef i64 @_ZSt4__lgIlET_S0_(i64 noundef %0) #0 comdat {
   %2 = alloca i64, align 8
   store i64 %0, i64* %2, align 8
   %3 = load i64, i64* %2, align 8
-  %4 = call i64 @llvm.ctlz.i64(i64 %3, i1 true)
-  %5 = trunc i64 %4 to i32
-  %6 = sub nsw i32 63, %5
-  %7 = sext i32 %6 to i64
-  ret i64 %7
+  %4 = call noundef i32 @_ZSt11__bit_widthImEiT_(i64 noundef %3) #11
+  %5 = sub nsw i32 %4, 1
+  %6 = sext i32 %5 to i64
+  ret i64 %6
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt22__final_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #6 comdat {
+define linkonce_odr dso_local void @_ZSt22__final_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #2 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -610,7 +598,7 @@ define linkonce_odr dso_local void @_ZSt22__final_insertion_sortIP3JobN9__gnu_cx
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt14__partial_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, i1 (i64, i32, i64, i32)* %3) #6 comdat {
+define linkonce_odr dso_local void @_ZSt14__partial_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, i1 (i64, i32, i64, i32)* %3) #2 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca %struct.Job*, align 8
   %7 = alloca %struct.Job*, align 8
@@ -637,7 +625,7 @@ define linkonce_odr dso_local void @_ZSt14__partial_sortIP3JobN9__gnu_cxx5__ops1
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt27__unguarded_partition_pivotIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #6 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt27__unguarded_partition_pivotIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #2 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -684,7 +672,7 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt27__unguarded_partition_
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt13__heap_selectIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, i1 (i64, i32, i64, i32)* %3) #6 comdat {
+define linkonce_odr dso_local void @_ZSt13__heap_selectIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, i1 (i64, i32, i64, i32)* %3) #2 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca %struct.Job*, align 8
   %7 = alloca %struct.Job*, align 8
@@ -735,7 +723,7 @@ define linkonce_odr dso_local void @_ZSt13__heap_selectIP3JobN9__gnu_cxx5__ops15
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt11__sort_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %2) #6 comdat {
+define linkonce_odr dso_local void @_ZSt11__sort_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %2) #2 comdat {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, align 8
@@ -770,7 +758,7 @@ define linkonce_odr dso_local void @_ZSt11__sort_heapIP3JobN9__gnu_cxx5__ops15_I
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt11__make_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %2) #6 comdat {
+define linkonce_odr dso_local void @_ZSt11__make_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %2) #2 comdat {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, align 8
@@ -813,14 +801,14 @@ define linkonce_odr dso_local void @_ZSt11__make_heapIP3JobN9__gnu_cxx5__ops15_I
   %32 = load %struct.Job*, %struct.Job** %4, align 8
   %33 = load i64, i64* %8, align 8
   %34 = getelementptr inbounds %struct.Job, %struct.Job* %32, i64 %33
-  %35 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %34) #3
+  %35 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %34) #11
   %36 = bitcast %struct.Job* %9 to i8*
   %37 = bitcast %struct.Job* %35 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %36, i8* align 4 %37, i64 12, i1 false)
   %38 = load %struct.Job*, %struct.Job** %4, align 8
   %39 = load i64, i64* %8, align 8
   %40 = load i64, i64* %7, align 8
-  %41 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %9) #3
+  %41 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %9) #11
   %42 = bitcast %struct.Job* %10 to i8*
   %43 = bitcast %struct.Job* %41 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %42, i8* align 4 %43, i64 12, i1 false)
@@ -856,7 +844,7 @@ define linkonce_odr dso_local void @_ZSt11__make_heapIP3JobN9__gnu_cxx5__ops15_I
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEclIPS2_S7_EEbT_T0_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #6 comdat align 2 {
+define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEclIPS2_S7_EEbT_T0_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #2 comdat align 2 {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -897,7 +885,7 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops15_Iter_com
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_RT0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %3) #6 comdat {
+define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_RT0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %3) #2 comdat {
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
   %7 = alloca %struct.Job*, align 8
@@ -911,12 +899,12 @@ define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_It
   store %struct.Job* %2, %struct.Job** %7, align 8
   store %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %3, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"** %8, align 8
   %13 = load %struct.Job*, %struct.Job** %7, align 8
-  %14 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %13) #3
+  %14 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %13) #11
   %15 = bitcast %struct.Job* %9 to i8*
   %16 = bitcast %struct.Job* %14 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %15, i8* align 4 %16, i64 12, i1 false)
   %17 = load %struct.Job*, %struct.Job** %5, align 8
-  %18 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %17) #3
+  %18 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %17) #11
   %19 = load %struct.Job*, %struct.Job** %7, align 8
   %20 = bitcast %struct.Job* %19 to i8*
   %21 = bitcast %struct.Job* %18 to i8*
@@ -928,7 +916,7 @@ define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_It
   %26 = ptrtoint %struct.Job* %24 to i64
   %27 = sub i64 %25, %26
   %28 = sdiv exact i64 %27, 12
-  %29 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %9) #3
+  %29 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %9) #11
   %30 = bitcast %struct.Job* %10 to i8*
   %31 = bitcast %struct.Job* %29 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %30, i8* align 4 %31, i64 12, i1 false)
@@ -950,7 +938,7 @@ define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_It
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %0) #4 comdat {
+define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %0) #0 comdat {
   %2 = alloca %struct.Job*, align 8
   store %struct.Job* %0, %struct.Job** %2, align 8
   %3 = load %struct.Job*, %struct.Job** %2, align 8
@@ -958,7 +946,7 @@ define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(12) %struc
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_T0_S9_T1_T2_(%struct.Job* noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, i1 (i64, i32, i64, i32)* %5) #6 comdat {
+define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_T0_S9_T1_T2_(%struct.Job* noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, i1 (i64, i32, i64, i32)* %5) #2 comdat {
   %7 = alloca %struct.Job, align 4
   %8 = alloca { i64, i32 }, align 4
   %9 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
@@ -1021,7 +1009,7 @@ define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__o
   %47 = load %struct.Job*, %struct.Job** %10, align 8
   %48 = load i64, i64* %14, align 8
   %49 = getelementptr inbounds %struct.Job, %struct.Job* %47, i64 %48
-  %50 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %49) #3
+  %50 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %49) #11
   %51 = load %struct.Job*, %struct.Job** %10, align 8
   %52 = load i64, i64* %11, align 8
   %53 = getelementptr inbounds %struct.Job, %struct.Job* %51, i64 %52
@@ -1055,7 +1043,7 @@ define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__o
   %72 = load i64, i64* %14, align 8
   %73 = sub nsw i64 %72, 1
   %74 = getelementptr inbounds %struct.Job, %struct.Job* %71, i64 %73
-  %75 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %74) #3
+  %75 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %74) #11
   %76 = load %struct.Job*, %struct.Job** %10, align 8
   %77 = load i64, i64* %11, align 8
   %78 = getelementptr inbounds %struct.Job, %struct.Job* %76, i64 %77
@@ -1068,12 +1056,12 @@ define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__o
   br label %83
 
 83:                                               ; preds = %67, %61, %57
-  %84 = call noundef nonnull align 8 dereferenceable(8) %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* @_ZSt4moveIRN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS3_EEEEONSt16remove_referenceIT_E4typeEOS9_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %9) #3
+  %84 = call noundef nonnull align 8 dereferenceable(8) %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* @_ZSt4moveIRN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS3_EEEEONSt16remove_referenceIT_E4typeEOS9_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %9) #11
   call void @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(%"struct.__gnu_cxx::__ops::_Iter_comp_val"* noundef nonnull align 8 dereferenceable(8) %15, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %84)
   %85 = load %struct.Job*, %struct.Job** %10, align 8
   %86 = load i64, i64* %11, align 8
   %87 = load i64, i64* %13, align 8
-  %88 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %7) #3
+  %88 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %7) #11
   %89 = bitcast %struct.Job* %16 to i8*
   %90 = bitcast %struct.Job* %88 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %89, i8* align 4 %90, i64 12, i1 false)
@@ -1089,7 +1077,7 @@ define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__o
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* @_ZSt4moveIRN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS3_EEEEONSt16remove_referenceIT_E4typeEOS9_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0) #4 comdat {
+define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* @_ZSt4moveIRN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS3_EEEEONSt16remove_referenceIT_E4typeEOS9_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0) #0 comdat {
   %2 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, align 8
   store %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %0, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"** %2, align 8
   %3 = load %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"** %2, align 8
@@ -1097,7 +1085,7 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) %"struc
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(%"struct.__gnu_cxx::__ops::_Iter_comp_val"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #11 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(%"struct.__gnu_cxx::__ops::_Iter_comp_val"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #8 comdat align 2 {
   %3 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_val"*, align 8
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, align 8
   store %"struct.__gnu_cxx::__ops::_Iter_comp_val"* %0, %"struct.__gnu_cxx::__ops::_Iter_comp_val"** %3, align 8
@@ -1106,14 +1094,14 @@ define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS
   %6 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_val", %"struct.__gnu_cxx::__ops::_Iter_comp_val"* %5, i32 0, i32 0
   %7 = load %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"** %4, align 8
   %8 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %7, i32 0, i32 0
-  %9 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %8) #3
+  %9 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %8) #11
   %10 = load i1 (i64, i32, i64, i32)*, i1 (i64, i32, i64, i32)** %9, align 8
   store i1 (i64, i32, i64, i32)* %10, i1 (i64, i32, i64, i32)** %6, align 8
   ret void
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops14_Iter_comp_valIPFbS0_S0_EEEEvT_T0_S9_T1_RT2_(%struct.Job* noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, %"struct.__gnu_cxx::__ops::_Iter_comp_val"* noundef nonnull align 8 dereferenceable(8) %5) #6 comdat {
+define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops14_Iter_comp_valIPFbS0_S0_EEEEvT_T0_S9_T1_RT2_(%struct.Job* noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, %"struct.__gnu_cxx::__ops::_Iter_comp_val"* noundef nonnull align 8 dereferenceable(8) %5) #2 comdat {
   %7 = alloca %struct.Job, align 4
   %8 = alloca { i64, i32 }, align 4
   %9 = alloca %struct.Job*, align 8
@@ -1160,7 +1148,7 @@ define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops
   %34 = load %struct.Job*, %struct.Job** %9, align 8
   %35 = load i64, i64* %13, align 8
   %36 = getelementptr inbounds %struct.Job, %struct.Job* %34, i64 %35
-  %37 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %36) #3
+  %37 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %36) #11
   %38 = load %struct.Job*, %struct.Job** %9, align 8
   %39 = load i64, i64* %10, align 8
   %40 = getelementptr inbounds %struct.Job, %struct.Job* %38, i64 %39
@@ -1176,7 +1164,7 @@ define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops
   br label %21, !llvm.loop !14
 
 47:                                               ; preds = %31
-  %48 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %7) #3
+  %48 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %7) #11
   %49 = load %struct.Job*, %struct.Job** %9, align 8
   %50 = load i64, i64* %10, align 8
   %51 = getelementptr inbounds %struct.Job, %struct.Job* %49, i64 %50
@@ -1187,7 +1175,7 @@ define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %0) #4 comdat {
+define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %0) #0 comdat {
   %2 = alloca i1 (i64, i32, i64, i32)**, align 8
   store i1 (i64, i32, i64, i32)** %0, i1 (i64, i32, i64, i32)*** %2, align 8
   %3 = load i1 (i64, i32, i64, i32)**, i1 (i64, i32, i64, i32)*** %2, align 8
@@ -1195,7 +1183,7 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) i1 (i64
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEclIPS2_S2_EEbT_RT0_(%"struct.__gnu_cxx::__ops::_Iter_comp_val"* noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef %1, %struct.Job* noundef nonnull align 4 dereferenceable(12) %2) #6 comdat align 2 {
+define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEclIPS2_S2_EEbT_RT0_(%"struct.__gnu_cxx::__ops::_Iter_comp_val"* noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef %1, %struct.Job* noundef nonnull align 4 dereferenceable(12) %2) #2 comdat align 2 {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_val"*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1236,7 +1224,7 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Iter_com
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt22__move_median_to_firstIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, %struct.Job* noundef %3, i1 (i64, i32, i64, i32)* %4) #6 comdat {
+define linkonce_odr dso_local void @_ZSt22__move_median_to_firstIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, %struct.Job* noundef %3, i1 (i64, i32, i64, i32)* %4) #2 comdat {
   %6 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %7 = alloca %struct.Job*, align 8
   %8 = alloca %struct.Job*, align 8
@@ -1330,7 +1318,7 @@ define linkonce_odr dso_local void @_ZSt22__move_median_to_firstIP3JobN9__gnu_cx
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt21__unguarded_partitionIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, i1 (i64, i32, i64, i32)* %3) #6 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt21__unguarded_partitionIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2, i1 (i64, i32, i64, i32)* %3) #2 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca %struct.Job*, align 8
   %7 = alloca %struct.Job*, align 8
@@ -1396,36 +1384,36 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt21__unguarded_partitionI
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZSt9iter_swapIP3JobS1_EvT_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1) #4 comdat {
+define linkonce_odr dso_local void @_ZSt9iter_swapIP3JobS1_EvT_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1) #0 comdat {
   %3 = alloca %struct.Job*, align 8
   %4 = alloca %struct.Job*, align 8
   store %struct.Job* %0, %struct.Job** %3, align 8
   store %struct.Job* %1, %struct.Job** %4, align 8
   %5 = load %struct.Job*, %struct.Job** %3, align 8
   %6 = load %struct.Job*, %struct.Job** %4, align 8
-  call void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %5, %struct.Job* noundef nonnull align 4 dereferenceable(12) %6) #3
+  call void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %5, %struct.Job* noundef nonnull align 4 dereferenceable(12) %6) #11
   ret void
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %0, %struct.Job* noundef nonnull align 4 dereferenceable(12) %1) #4 comdat {
+define linkonce_odr dso_local void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %0, %struct.Job* noundef nonnull align 4 dereferenceable(12) %1) #0 comdat {
   %3 = alloca %struct.Job*, align 8
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job, align 4
   store %struct.Job* %0, %struct.Job** %3, align 8
   store %struct.Job* %1, %struct.Job** %4, align 8
   %6 = load %struct.Job*, %struct.Job** %3, align 8
-  %7 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %6) #3
+  %7 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %6) #11
   %8 = bitcast %struct.Job* %5 to i8*
   %9 = bitcast %struct.Job* %7 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %8, i8* align 4 %9, i64 12, i1 false)
   %10 = load %struct.Job*, %struct.Job** %4, align 8
-  %11 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %10) #3
+  %11 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %10) #11
   %12 = load %struct.Job*, %struct.Job** %3, align 8
   %13 = bitcast %struct.Job* %12 to i8*
   %14 = bitcast %struct.Job* %11 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %13, i8* align 4 %14, i64 12, i1 false)
-  %15 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %5) #3
+  %15 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %5) #11
   %16 = load %struct.Job*, %struct.Job** %4, align 8
   %17 = bitcast %struct.Job* %16 to i8*
   %18 = bitcast %struct.Job* %15 to i8*
@@ -1433,11 +1421,59 @@ define linkonce_odr dso_local void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6_
   ret void
 }
 
+; Function Attrs: mustprogress noinline nounwind uwtable
+define linkonce_odr dso_local noundef i32 @_ZSt11__bit_widthImEiT_(i64 noundef %0) #0 comdat {
+  %2 = alloca i64, align 8
+  %3 = alloca i32, align 4
+  store i64 %0, i64* %2, align 8
+  store i32 64, i32* %3, align 4
+  %4 = load i64, i64* %2, align 8
+  %5 = call noundef i32 @_ZSt13__countl_zeroImEiT_(i64 noundef %4) #11
+  %6 = sub nsw i32 64, %5
+  ret i32 %6
+}
+
+; Function Attrs: mustprogress noinline nounwind uwtable
+define linkonce_odr dso_local noundef i32 @_ZSt13__countl_zeroImEiT_(i64 noundef %0) #0 comdat {
+  %2 = alloca i32, align 4
+  %3 = alloca i64, align 8
+  %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
+  %6 = alloca i32, align 4
+  %7 = alloca i32, align 4
+  %8 = alloca i32, align 4
+  store i64 %0, i64* %3, align 8
+  store i32 64, i32* %4, align 4
+  %9 = load i64, i64* %3, align 8
+  %10 = icmp eq i64 %9, 0
+  br i1 %10, label %11, label %12
+
+11:                                               ; preds = %1
+  store i32 64, i32* %2, align 4
+  br label %17
+
+12:                                               ; preds = %1
+  store i32 64, i32* %5, align 4
+  store i32 64, i32* %6, align 4
+  store i32 32, i32* %7, align 4
+  store i32 0, i32* %8, align 4
+  %13 = load i64, i64* %3, align 8
+  %14 = call i64 @llvm.ctlz.i64(i64 %13, i1 true)
+  %15 = trunc i64 %14 to i32
+  %16 = sub nsw i32 %15, 0
+  store i32 %16, i32* %2, align 4
+  br label %17
+
+17:                                               ; preds = %12, %11
+  %18 = load i32, i32* %2, align 4
+  ret i32 %18
+}
+
 ; Function Attrs: nofree nosync nounwind readnone speculatable willreturn
-declare i64 @llvm.ctlz.i64(i64, i1 immarg) #7
+declare i64 @llvm.ctlz.i64(i64, i1 immarg) #3
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #6 comdat {
+define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #2 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1477,7 +1513,7 @@ define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__op
 
 27:                                               ; preds = %23
   %28 = load %struct.Job*, %struct.Job** %7, align 8
-  %29 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %28) #3
+  %29 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %28) #11
   %30 = bitcast %struct.Job* %8 to i8*
   %31 = bitcast %struct.Job* %29 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %30, i8* align 4 %31, i64 12, i1 false)
@@ -1486,7 +1522,7 @@ define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__op
   %34 = load %struct.Job*, %struct.Job** %7, align 8
   %35 = getelementptr inbounds %struct.Job, %struct.Job* %34, i64 1
   %36 = call noundef %struct.Job* @_ZSt13move_backwardIP3JobS1_ET0_T_S3_S2_(%struct.Job* noundef %32, %struct.Job* noundef %33, %struct.Job* noundef %35)
-  %37 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %8) #3
+  %37 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %8) #11
   %38 = load %struct.Job*, %struct.Job** %5, align 8
   %39 = bitcast %struct.Job* %38 to i8*
   %40 = bitcast %struct.Job* %37 to i8*
@@ -1522,7 +1558,7 @@ define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__op
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt26__unguarded_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #6 comdat {
+define linkonce_odr dso_local void @_ZSt26__unguarded_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(%struct.Job* noundef %0, %struct.Job* noundef %1, i1 (i64, i32, i64, i32)* %2) #2 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1569,7 +1605,7 @@ define linkonce_odr dso_local void @_ZSt26__unguarded_insertion_sortIP3JobN9__gn
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt13move_backwardIP3JobS1_ET0_T_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #6 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt13move_backwardIP3JobS1_ET0_T_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #2 comdat {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1586,7 +1622,7 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt13move_backwardIP3JobS1_
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu_cxx5__ops14_Val_comp_iterIPFbS0_S0_EEEEvT_T0_(%struct.Job* noundef %0, i1 (i64, i32, i64, i32)* %1) #6 comdat {
+define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu_cxx5__ops14_Val_comp_iterIPFbS0_S0_EEEEvT_T0_(%struct.Job* noundef %0, i1 (i64, i32, i64, i32)* %1) #2 comdat {
   %3 = alloca %"struct.__gnu_cxx::__ops::_Val_comp_iter", align 8
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job, align 4
@@ -1595,7 +1631,7 @@ define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu
   store i1 (i64, i32, i64, i32)* %1, i1 (i64, i32, i64, i32)** %7, align 8
   store %struct.Job* %0, %struct.Job** %4, align 8
   %8 = load %struct.Job*, %struct.Job** %4, align 8
-  %9 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %8) #3
+  %9 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %8) #11
   %10 = bitcast %struct.Job* %5 to i8*
   %11 = bitcast %struct.Job* %9 to i8*
   call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %10, i8* align 4 %11, i64 12, i1 false)
@@ -1613,7 +1649,7 @@ define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu
 
 18:                                               ; preds = %15
   %19 = load %struct.Job*, %struct.Job** %6, align 8
-  %20 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %19) #3
+  %20 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %19) #11
   %21 = load %struct.Job*, %struct.Job** %4, align 8
   %22 = bitcast %struct.Job* %21 to i8*
   %23 = bitcast %struct.Job* %20 to i8*
@@ -1626,7 +1662,7 @@ define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu
   br label %15, !llvm.loop !20
 
 27:                                               ; preds = %15
-  %28 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %5) #3
+  %28 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %5) #11
   %29 = load %struct.Job*, %struct.Job** %4, align 8
   %30 = bitcast %struct.Job* %29 to i8*
   %31 = bitcast %struct.Job* %28 to i8*
@@ -1635,12 +1671,12 @@ define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local i1 (i64, i32, i64, i32)* @_ZN9__gnu_cxx5__ops15__val_comp_iterIPFb3JobS2_EEENS0_14_Val_comp_iterIT_EENS0_15_Iter_comp_iterIS6_EE(i1 (i64, i32, i64, i32)* %0) #6 comdat {
+define linkonce_odr dso_local i1 (i64, i32, i64, i32)* @_ZN9__gnu_cxx5__ops15__val_comp_iterIPFb3JobS2_EEENS0_14_Val_comp_iterIT_EENS0_15_Iter_comp_iterIS6_EE(i1 (i64, i32, i64, i32)* %0) #2 comdat {
   %2 = alloca %"struct.__gnu_cxx::__ops::_Val_comp_iter", align 8
   %3 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %4 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %3, i32 0, i32 0
   store i1 (i64, i32, i64, i32)* %0, i1 (i64, i32, i64, i32)** %4, align 8
-  %5 = call noundef nonnull align 8 dereferenceable(8) %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* @_ZSt4moveIRN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS3_EEEEONSt16remove_referenceIT_E4typeEOS9_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %3) #3
+  %5 = call noundef nonnull align 8 dereferenceable(8) %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* @_ZSt4moveIRN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS3_EEEEONSt16remove_referenceIT_E4typeEOS9_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %3) #11
   call void @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(%"struct.__gnu_cxx::__ops::_Val_comp_iter"* noundef nonnull align 8 dereferenceable(8) %2, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %5)
   %6 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Val_comp_iter", %"struct.__gnu_cxx::__ops::_Val_comp_iter"* %2, i32 0, i32 0
   %7 = load i1 (i64, i32, i64, i32)*, i1 (i64, i32, i64, i32)** %6, align 8
@@ -1648,7 +1684,7 @@ define linkonce_odr dso_local i1 (i64, i32, i64, i32)* @_ZN9__gnu_cxx5__ops15__v
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt22__copy_move_backward_aILb1EP3JobS1_ET1_T0_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #6 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt22__copy_move_backward_aILb1EP3JobS1_ET1_T0_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #2 comdat {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1656,18 +1692,18 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt22__copy_move_backward_a
   store %struct.Job* %1, %struct.Job** %5, align 8
   store %struct.Job* %2, %struct.Job** %6, align 8
   %7 = load %struct.Job*, %struct.Job** %4, align 8
-  %8 = call noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %7) #3
+  %8 = call noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %7) #11
   %9 = load %struct.Job*, %struct.Job** %5, align 8
-  %10 = call noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %9) #3
+  %10 = call noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %9) #11
   %11 = load %struct.Job*, %struct.Job** %6, align 8
-  %12 = call noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %11) #3
+  %12 = call noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %11) #11
   %13 = call noundef %struct.Job* @_ZSt23__copy_move_backward_a1ILb1EP3JobS1_ET1_T0_S3_S2_(%struct.Job* noundef %8, %struct.Job* noundef %10, %struct.Job* noundef %12)
   %14 = call noundef %struct.Job* @_ZSt12__niter_wrapIP3JobET_RKS2_S2_(%struct.Job** noundef nonnull align 8 dereferenceable(8) %6, %struct.Job* noundef %13)
   ret %struct.Job* %14
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__miter_baseIP3JobET_S2_(%struct.Job* noundef %0) #4 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__miter_baseIP3JobET_S2_(%struct.Job* noundef %0) #0 comdat {
   %2 = alloca %struct.Job*, align 8
   store %struct.Job* %0, %struct.Job** %2, align 8
   %3 = load %struct.Job*, %struct.Job** %2, align 8
@@ -1675,7 +1711,7 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__miter_baseIP3JobET_S
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__niter_wrapIP3JobET_RKS2_S2_(%struct.Job** noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef %1) #4 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__niter_wrapIP3JobET_RKS2_S2_(%struct.Job** noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef %1) #0 comdat {
   %3 = alloca %struct.Job**, align 8
   %4 = alloca %struct.Job*, align 8
   store %struct.Job** %0, %struct.Job*** %3, align 8
@@ -1685,7 +1721,7 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__niter_wrapIP3JobET_R
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt23__copy_move_backward_a1ILb1EP3JobS1_ET1_T0_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #6 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt23__copy_move_backward_a1ILb1EP3JobS1_ET1_T0_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #2 comdat {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1700,7 +1736,7 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt23__copy_move_backward_a
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %0) #4 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S2_(%struct.Job* noundef %0) #0 comdat {
   %2 = alloca %struct.Job*, align 8
   store %struct.Job* %0, %struct.Job** %2, align 8
   %3 = load %struct.Job*, %struct.Job** %2, align 8
@@ -1708,7 +1744,7 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt12__niter_baseIP3JobET_S
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZSt23__copy_move_backward_a2ILb1EP3JobS1_ET1_T0_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #6 comdat {
+define linkonce_odr dso_local noundef %struct.Job* @_ZSt23__copy_move_backward_a2ILb1EP3JobS1_ET1_T0_S3_S2_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #2 comdat {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1718,12 +1754,12 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZSt23__copy_move_backward_a
   %7 = load %struct.Job*, %struct.Job** %4, align 8
   %8 = load %struct.Job*, %struct.Job** %5, align 8
   %9 = load %struct.Job*, %struct.Job** %6, align 8
-  %10 = call noundef %struct.Job* @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobEEPT_PKS4_S7_S5_(%struct.Job* noundef %7, %struct.Job* noundef %8, %struct.Job* noundef %9)
+  %10 = call noundef %struct.Job* @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobS3_EEPT0_PT_S7_S5_(%struct.Job* noundef %7, %struct.Job* noundef %8, %struct.Job* noundef %9)
   ret %struct.Job* %10
 }
 
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef %struct.Job* @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobEEPT_PKS4_S7_S5_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #4 comdat align 2 {
+; Function Attrs: mustprogress noinline uwtable
+define linkonce_odr dso_local noundef %struct.Job* @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobS3_EEPT0_PT_S7_S5_(%struct.Job* noundef %0, %struct.Job* noundef %1, %struct.Job* noundef %2) #2 comdat align 2 {
   %4 = alloca %struct.Job*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1739,7 +1775,7 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZNSt20__copy_move_backwardI
   %13 = sdiv exact i64 %12, 12
   store i64 %13, i64* %7, align 8
   %14 = load i64, i64* %7, align 8
-  %15 = icmp ne i64 %14, 0
+  %15 = icmp sgt i64 %14, 1
   br i1 %15, label %16, label %26
 
 16:                                               ; preds = %3
@@ -1753,21 +1789,51 @@ define linkonce_odr dso_local noundef %struct.Job* @_ZNSt20__copy_move_backwardI
   %24 = load i64, i64* %7, align 8
   %25 = mul i64 12, %24
   call void @llvm.memmove.p0i8.p0i8.i64(i8* align 4 %21, i8* align 4 %23, i64 %25, i1 false)
-  br label %26
+  br label %34
 
-26:                                               ; preds = %16, %3
-  %27 = load %struct.Job*, %struct.Job** %6, align 8
-  %28 = load i64, i64* %7, align 8
-  %29 = sub i64 0, %28
-  %30 = getelementptr inbounds %struct.Job, %struct.Job* %27, i64 %29
-  ret %struct.Job* %30
+26:                                               ; preds = %3
+  %27 = load i64, i64* %7, align 8
+  %28 = icmp eq i64 %27, 1
+  br i1 %28, label %29, label %33
+
+29:                                               ; preds = %26
+  %30 = load %struct.Job*, %struct.Job** %6, align 8
+  %31 = getelementptr inbounds %struct.Job, %struct.Job* %30, i64 -1
+  %32 = load %struct.Job*, %struct.Job** %4, align 8
+  call void @_ZNSt11__copy_moveILb1ELb0ESt26random_access_iterator_tagE12__assign_oneI3JobS3_EEvPT_PT0_(%struct.Job* noundef %31, %struct.Job* noundef %32)
+  br label %33
+
+33:                                               ; preds = %29, %26
+  br label %34
+
+34:                                               ; preds = %33, %16
+  %35 = load %struct.Job*, %struct.Job** %6, align 8
+  %36 = load i64, i64* %7, align 8
+  %37 = sub i64 0, %36
+  %38 = getelementptr inbounds %struct.Job, %struct.Job* %35, i64 %37
+  ret %struct.Job* %38
 }
 
 ; Function Attrs: argmemonly nofree nounwind willreturn
-declare void @llvm.memmove.p0i8.p0i8.i64(i8* nocapture writeonly, i8* nocapture readonly, i64, i1 immarg) #5
+declare void @llvm.memmove.p0i8.p0i8.i64(i8* nocapture writeonly, i8* nocapture readonly, i64, i1 immarg) #1
+
+; Function Attrs: mustprogress noinline nounwind uwtable
+define linkonce_odr dso_local void @_ZNSt11__copy_moveILb1ELb0ESt26random_access_iterator_tagE12__assign_oneI3JobS3_EEvPT_PT0_(%struct.Job* noundef %0, %struct.Job* noundef %1) #0 comdat align 2 {
+  %3 = alloca %struct.Job*, align 8
+  %4 = alloca %struct.Job*, align 8
+  store %struct.Job* %0, %struct.Job** %3, align 8
+  store %struct.Job* %1, %struct.Job** %4, align 8
+  %5 = load %struct.Job*, %struct.Job** %4, align 8
+  %6 = call noundef nonnull align 4 dereferenceable(12) %struct.Job* @_ZSt4moveIR3JobEONSt16remove_referenceIT_E4typeEOS3_(%struct.Job* noundef nonnull align 4 dereferenceable(12) %5) #11
+  %7 = load %struct.Job*, %struct.Job** %3, align 8
+  %8 = bitcast %struct.Job* %7 to i8*
+  %9 = bitcast %struct.Job* %6 to i8*
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 4 %8, i8* align 4 %9, i64 12, i1 false)
+  ret void
+}
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEclIS2_PS2_EEbRT_T0_(%"struct.__gnu_cxx::__ops::_Val_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef nonnull align 4 dereferenceable(12) %1, %struct.Job* noundef %2) #6 comdat align 2 {
+define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEclIS2_PS2_EEbRT_T0_(%"struct.__gnu_cxx::__ops::_Val_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, %struct.Job* noundef nonnull align 4 dereferenceable(12) %1, %struct.Job* noundef %2) #2 comdat align 2 {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Val_comp_iter"*, align 8
   %5 = alloca %struct.Job*, align 8
   %6 = alloca %struct.Job*, align 8
@@ -1808,7 +1874,7 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Val_comp
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(%"struct.__gnu_cxx::__ops::_Val_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #11 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(%"struct.__gnu_cxx::__ops::_Val_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #8 comdat align 2 {
   %3 = alloca %"struct.__gnu_cxx::__ops::_Val_comp_iter"*, align 8
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, align 8
   store %"struct.__gnu_cxx::__ops::_Val_comp_iter"* %0, %"struct.__gnu_cxx::__ops::_Val_comp_iter"** %3, align 8
@@ -1817,46 +1883,38 @@ define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS
   %6 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Val_comp_iter", %"struct.__gnu_cxx::__ops::_Val_comp_iter"* %5, i32 0, i32 0
   %7 = load %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"** %4, align 8
   %8 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %7, i32 0, i32 0
-  %9 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %8) #3
+  %9 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %8) #11
   %10 = load i1 (i64, i32, i64, i32)*, i1 (i64, i32, i64, i32)** %9, align 8
   store i1 (i64, i32, i64, i32)* %10, i1 (i64, i32, i64, i32)** %6, align 8
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEC2ES4_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, i1 (i64, i32, i64, i32)* noundef %1) unnamed_addr #11 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEC2ES4_(%"struct.__gnu_cxx::__ops::_Iter_comp_iter"* noundef nonnull align 8 dereferenceable(8) %0, i1 (i64, i32, i64, i32)* noundef %1) unnamed_addr #8 comdat align 2 {
   %3 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, align 8
   %4 = alloca i1 (i64, i32, i64, i32)*, align 8
   store %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %0, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"** %3, align 8
   store i1 (i64, i32, i64, i32)* %1, i1 (i64, i32, i64, i32)** %4, align 8
   %5 = load %"struct.__gnu_cxx::__ops::_Iter_comp_iter"*, %"struct.__gnu_cxx::__ops::_Iter_comp_iter"** %3, align 8
   %6 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", %"struct.__gnu_cxx::__ops::_Iter_comp_iter"* %5, i32 0, i32 0
-  %7 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %4) #3
+  %7 = call noundef nonnull align 8 dereferenceable(8) i1 (i64, i32, i64, i32)** @_ZSt4moveIRPFb3JobS0_EEONSt16remove_referenceIT_E4typeEOS5_(i1 (i64, i32, i64, i32)** noundef nonnull align 8 dereferenceable(8) %4) #11
   %8 = load i1 (i64, i32, i64, i32)*, i1 (i64, i32, i64, i32)** %7, align 8
   store i1 (i64, i32, i64, i32)* %8, i1 (i64, i32, i64, i32)** %6, align 8
   ret void
 }
 
-; Function Attrs: noinline uwtable
-define internal void @_GLOBAL__sub_I_weighted_job_scheduling.cpp() #0 section ".text.startup" {
-  call void @__cxx_global_var_init()
-  ret void
-}
-
-attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { argmemonly nofree nounwind willreturn }
-attributes #6 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #7 = { nofree nosync nounwind readnone speculatable willreturn }
-attributes #8 = { nobuiltin allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #9 = { nobuiltin nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #10 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #11 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #12 = { builtin allocsize(0) }
-attributes #13 = { builtin nounwind }
+attributes #0 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { argmemonly nofree nounwind willreturn }
+attributes #2 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #3 = { nofree nosync nounwind readnone speculatable willreturn }
+attributes #4 = { nobuiltin allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { nobuiltin nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #6 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #7 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #8 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #9 = { builtin allocsize(0) }
+attributes #10 = { builtin nounwind }
+attributes #11 = { nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}

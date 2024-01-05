@@ -33,7 +33,7 @@ with (pl.Path(__file__).resolve().parents[2] / "src" / "CMakeLists.txt").open() 
         if VERSION and LLVM_LIBS:
             break
 
-with (pl.Path(__file__).parent / "IR2Vec" / "README.md").open() as f:
+with (pl.Path(__file__).resolve().parents[2] / "README.md").open() as f:
     DESCRIPTION = f.read()
 
 
@@ -47,11 +47,11 @@ def get_llvm_files():
 
 IR2Vec_core = Extension(
     "IR2Vec.core",
-    sources=["IR2Vec/core.cpp"],
-    include_dirs=["./IR2Vec"],
+    sources=["ir2vec/core.cpp"],
+    include_dirs=["./ir2vec/"],
     libraries=["z"],
     extra_objects=["/usr/local/lib/libIR2Vec.a"] + get_llvm_files(),
-    extra_compile_args=["-v"],
+    extra_compile_args=["-v", "--std=c++17"],
 )
 
 setup(
@@ -80,7 +80,7 @@ setup(
         "Topic :: Software Development :: Compilers",
     ],
     ext_modules=[IR2Vec_core],
-    packages=["IR2Vec"],
-    package_data={"": ["seedEmbeddingVocab-*.txt"]},
+    packages=["ir2vec"],
+    package_data={"": ["seedEmbeddingVocab.txt"]},
     include_package_data=True,
 )

@@ -3,32 +3,14 @@ source_filename = "PE-benchmarks/kmp-algorithm.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-%"class.std::ios_base::Init" = type { i8 }
+module asm ".globl _ZSt21ios_base_library_initv"
 
-@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
-@__dso_handle = external hidden global i8
 @.str = private unnamed_addr constant [27 x i8] c"Found pattern at index %d \00", align 1
 @__const.main.txt = private unnamed_addr constant [20 x i8] c"ABABDABACDABABCABAB\00", align 16
 @__const.main.pat = private unnamed_addr constant [10 x i8] c"ABABCABAB\00", align 1
-@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_kmp_algorithm.cpp, i8* null }]
-
-; Function Attrs: noinline uwtable
-define internal void @__cxx_global_var_init() #0 section ".text.startup" {
-  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
-  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
-  ret void
-}
-
-declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
-
-; Function Attrs: nounwind
-declare void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-; Function Attrs: nounwind
-declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local void @_Z9KMPSearchPcS_(i8* noundef %0, i8* noundef %1) #4 {
+define dso_local void @_Z9KMPSearchPcS_(i8* noundef %0, i8* noundef %1) #0 {
   %3 = alloca i8*, align 8
   %4 = alloca i8*, align 8
   %5 = alloca i32, align 4
@@ -40,11 +22,11 @@ define dso_local void @_Z9KMPSearchPcS_(i8* noundef %0, i8* noundef %1) #4 {
   store i8* %0, i8** %3, align 8
   store i8* %1, i8** %4, align 8
   %11 = load i8*, i8** %3, align 8
-  %12 = call i64 @strlen(i8* noundef %11) #10
+  %12 = call i64 @strlen(i8* noundef %11) #7
   %13 = trunc i64 %12 to i32
   store i32 %13, i32* %5, align 4
   %14 = load i8*, i8** %4, align 8
-  %15 = call i64 @strlen(i8* noundef %14) #10
+  %15 = call i64 @strlen(i8* noundef %14) #7
   %16 = trunc i64 %15 to i32
   store i32 %16, i32* %6, align 4
   %17 = load i32, i32* %5, align 4
@@ -168,13 +150,13 @@ define dso_local void @_Z9KMPSearchPcS_(i8* noundef %0, i8* noundef %1) #4 {
 }
 
 ; Function Attrs: nounwind readonly willreturn
-declare i64 @strlen(i8* noundef) #5
+declare i64 @strlen(i8* noundef) #1
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare i8* @llvm.stacksave() #6
+declare i8* @llvm.stacksave() #2
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define dso_local void @_Z15computeLPSArrayPciPi(i8* noundef %0, i32 noundef %1, i32* noundef %2) #7 {
+define dso_local void @_Z15computeLPSArrayPciPi(i8* noundef %0, i32 noundef %1, i32* noundef %2) #3 {
   %4 = alloca i8*, align 8
   %5 = alloca i32, align 4
   %6 = alloca i32*, align 8
@@ -263,13 +245,13 @@ define dso_local void @_Z15computeLPSArrayPciPi(i8* noundef %0, i32 noundef %1, 
   ret void
 }
 
-declare i32 @printf(i8* noundef, ...) #1
+declare i32 @printf(i8* noundef, ...) #4
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare void @llvm.stackrestore(i8*) #6
+declare void @llvm.stackrestore(i8*) #2
 
 ; Function Attrs: mustprogress noinline norecurse uwtable
-define dso_local noundef i32 @main() #8 {
+define dso_local noundef i32 @main() #5 {
   %1 = alloca i32, align 4
   %2 = alloca [20 x i8], align 16
   %3 = alloca [10 x i8], align 1
@@ -285,25 +267,16 @@ define dso_local noundef i32 @main() #8 {
 }
 
 ; Function Attrs: argmemonly nofree nounwind willreturn
-declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #9
+declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #6
 
-; Function Attrs: noinline uwtable
-define internal void @_GLOBAL__sub_I_kmp_algorithm.cpp() #0 section ".text.startup" {
-  call void @__cxx_global_var_init()
-  ret void
-}
-
-attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { nounwind readonly willreturn "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #6 = { nofree nosync nounwind willreturn }
-attributes #7 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #8 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #9 = { argmemonly nofree nounwind willreturn }
-attributes #10 = { nounwind readonly willreturn }
+attributes #0 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { nounwind readonly willreturn "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #2 = { nofree nosync nounwind willreturn }
+attributes #3 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #4 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #6 = { argmemonly nofree nounwind willreturn }
+attributes #7 = { nounwind readonly willreturn }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}

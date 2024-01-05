@@ -3,7 +3,8 @@ source_filename = "PE-benchmarks/eulerian-path-and-circuit.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-%"class.std::ios_base::Init" = type { i8 }
+module asm ".globl _ZSt21ios_base_library_initv"
+
 %"class.std::basic_ostream" = type { i32 (...)**, %"class.std::basic_ios" }
 %"class.std::basic_ios" = type { %"class.std::ios_base", %"class.std::basic_ostream"*, i8, i8, %"class.std::basic_streambuf"*, %"class.std::ctype"*, %"class.std::num_put"*, %"class.std::num_get"* }
 %"class.std::ios_base" = type { i32 (...)**, i64, i64, i32, i32, i32, %"struct.std::ios_base::_Callback_list"*, %"struct.std::ios_base::_Words", [8 x %"struct.std::ios_base::_Words"], i32, %"struct.std::ios_base::_Words"*, %"class.std::locale" }
@@ -28,8 +29,8 @@ target triple = "x86_64-pc-linux-gnu"
 %"struct.std::_List_iterator" = type { %"struct.std::__detail::_List_node_base"* }
 %"struct.std::_List_node" = type <{ %"struct.std::__detail::_List_node_base", %"struct.__gnu_cxx::__aligned_membuf", [4 x i8] }>
 %"struct.__gnu_cxx::__aligned_membuf" = type { [4 x i8] }
+%"class.std::__new_allocator" = type { i8 }
 %"class.std::allocator" = type { i8 }
-%"class.__gnu_cxx::new_allocator" = type { i8 }
 %"struct.std::__allocated_ptr" = type { %"class.std::allocator"*, %"struct.std::_List_node"* }
 
 $_ZNSt7__cxx114listIiSaIiEE9push_backERKi = comdat any
@@ -58,11 +59,7 @@ $_ZNSt7__cxx1110_List_baseIiSaIiEEC2Ev = comdat any
 
 $_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implC2Ev = comdat any
 
-$_ZNSaISt10_List_nodeIiEEC2Ev = comdat any
-
 $_ZNSt8__detail17_List_node_headerC2Ev = comdat any
-
-$_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEEC2Ev = comdat any
 
 $_ZNSt8__detail17_List_node_header7_M_initEv = comdat any
 
@@ -78,8 +75,6 @@ $_ZNSt10_List_nodeIiE9_M_valptrEv = comdat any
 
 $__clang_call_terminate = comdat any
 
-$_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE7destroyIiEEvRS2_PT_ = comdat any
-
 $_ZNSt7__cxx1110_List_baseIiSaIiEE21_M_get_Node_allocatorEv = comdat any
 
 $_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_put_nodeEPSt10_List_nodeIiE = comdat any
@@ -88,15 +83,9 @@ $_ZN9__gnu_cxx16__aligned_membufIiE6_M_ptrEv = comdat any
 
 $_ZN9__gnu_cxx16__aligned_membufIiE7_M_addrEv = comdat any
 
-$_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE7destroyIiEEvPT_ = comdat any
+$_ZNSt15__new_allocatorISt10_List_nodeIiEE10deallocateEPS1_m = comdat any
 
-$_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE10deallocateERS2_PS1_m = comdat any
-
-$_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE10deallocateEPS2_m = comdat any
-
-$_ZNSaISt10_List_nodeIiEED2Ev = comdat any
-
-$_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEED2Ev = comdat any
+$_ZNSt15__new_allocatorISt10_List_nodeIiEED2Ev = comdat any
 
 $_ZNSt7__cxx114listIiSaIiEE9_M_insertIJRKiEEEvSt14_List_iteratorIiEDpOT_ = comdat any
 
@@ -110,21 +99,13 @@ $_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_get_nodeEv = comdat any
 
 $_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEC2ERS2_PS1_ = comdat any
 
-$_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE9constructIiJRKiEEEvRS2_PT_DpOT0_ = comdat any
-
 $_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEaSEDn = comdat any
 
 $_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEED2Ev = comdat any
 
-$_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE8allocateERS2_m = comdat any
-
-$_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE8allocateEmPKv = comdat any
-
-$_ZNK9__gnu_cxx13new_allocatorISt10_List_nodeIiEE11_M_max_sizeEv = comdat any
+$_ZNSt15__new_allocatorISt10_List_nodeIiEE8allocateEmPKv = comdat any
 
 $_ZSt11__addressofISaISt10_List_nodeIiEEEPT_RS3_ = comdat any
-
-$_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE9constructIiJRKiEEEvPT_DpOT0_ = comdat any
 
 $_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_List_node_baseE = comdat any
 
@@ -132,31 +113,13 @@ $_ZNKSt7__cxx114listIiSaIiEE13_M_node_countEv = comdat any
 
 $_ZNKSt7__cxx1110_List_baseIiSaIiEE11_M_get_sizeEv = comdat any
 
-@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
-@__dso_handle = external hidden global i8
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [23 x i8] c"graph is not Eulerian\0A\00", align 1
 @.str.1 = private unnamed_addr constant [24 x i8] c"graph has a Euler path\0A\00", align 1
 @.str.2 = private unnamed_addr constant [25 x i8] c"graph has a Euler cycle\0A\00", align 1
-@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_eulerian_path_and_circuit.cpp, i8* null }]
-
-; Function Attrs: noinline uwtable
-define internal void @__cxx_global_var_init() #0 section ".text.startup" {
-  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
-  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
-  ret void
-}
-
-declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
-
-; Function Attrs: nounwind
-declare void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
-
-; Function Attrs: nounwind
-declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local void @_ZN5Graph7addEdgeEii(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0, i32 noundef %1, i32 noundef %2) #4 align 2 {
+define dso_local void @_ZN5Graph7addEdgeEii(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0, i32 noundef %1, i32 noundef %2) #0 align 2 {
   %4 = alloca %class.Graph*, align 8
   %5 = alloca i32, align 4
   %6 = alloca i32, align 4
@@ -180,14 +143,14 @@ define dso_local void @_ZN5Graph7addEdgeEii(%class.Graph* noundef nonnull align 
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEE9push_backERKi(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #4 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEE9push_backERKi(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #0 comdat align 2 {
   %3 = alloca %"class.std::__cxx11::list"*, align 8
   %4 = alloca i32*, align 8
   %5 = alloca %"struct.std::_List_iterator", align 8
   store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %3, align 8
   store i32* %1, i32** %4, align 8
   %6 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %3, align 8
-  %7 = call %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE3endEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %6) #3
+  %7 = call %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE3endEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %6) #14
   %8 = getelementptr inbounds %"struct.std::_List_iterator", %"struct.std::_List_iterator"* %5, i32 0, i32 0
   store %"struct.std::__detail::_List_node_base"* %7, %"struct.std::__detail::_List_node_base"** %8, align 8
   %9 = load i32*, i32** %4, align 8
@@ -198,7 +161,7 @@ define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEE9push_backERKi(%"c
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0, i32 noundef %1, i8* noundef %2) #4 align 2 {
+define dso_local void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0, i32 noundef %1, i8* noundef %2) #0 align 2 {
   %4 = alloca %class.Graph*, align 8
   %5 = alloca i32, align 4
   %6 = alloca i8*, align 8
@@ -214,13 +177,13 @@ define dso_local void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align
   %13 = sext i32 %12 to i64
   %14 = getelementptr inbounds i8, i8* %11, i64 %13
   store i8 1, i8* %14, align 1
-  call void @_ZNSt14_List_iteratorIiEC2Ev(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #3
+  call void @_ZNSt14_List_iteratorIiEC2Ev(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #14
   %15 = getelementptr inbounds %class.Graph, %class.Graph* %10, i32 0, i32 1
   %16 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %15, align 8
   %17 = load i32, i32* %5, align 4
   %18 = sext i32 %17 to i64
   %19 = getelementptr inbounds %"class.std::__cxx11::list", %"class.std::__cxx11::list"* %16, i64 %18
-  %20 = call %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE5beginEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %19) #3
+  %20 = call %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE5beginEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %19) #14
   %21 = getelementptr inbounds %"struct.std::_List_iterator", %"struct.std::_List_iterator"* %8, i32 0, i32 0
   store %"struct.std::__detail::_List_node_base"* %20, %"struct.std::__detail::_List_node_base"** %21, align 8
   %22 = bitcast %"struct.std::_List_iterator"* %7 to i8*
@@ -234,15 +197,15 @@ define dso_local void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align
   %27 = load i32, i32* %5, align 4
   %28 = sext i32 %27 to i64
   %29 = getelementptr inbounds %"class.std::__cxx11::list", %"class.std::__cxx11::list"* %26, i64 %28
-  %30 = call %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE3endEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %29) #3
+  %30 = call %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE3endEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %29) #14
   %31 = getelementptr inbounds %"struct.std::_List_iterator", %"struct.std::_List_iterator"* %9, i32 0, i32 0
   store %"struct.std::__detail::_List_node_base"* %30, %"struct.std::__detail::_List_node_base"** %31, align 8
-  %32 = call noundef zeroext i1 @_ZStneRKSt14_List_iteratorIiES2_(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7, %"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %9) #3
+  %32 = call noundef zeroext i1 @_ZStneRKSt14_List_iteratorIiES2_(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7, %"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %9) #14
   br i1 %32, label %33, label %48
 
 33:                                               ; preds = %24
   %34 = load i8*, i8** %6, align 8
-  %35 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZNKSt14_List_iteratorIiEdeEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #3
+  %35 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZNKSt14_List_iteratorIiEdeEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #14
   %36 = load i32, i32* %35, align 4
   %37 = sext i32 %36 to i64
   %38 = getelementptr inbounds i8, i8* %34, i64 %37
@@ -251,7 +214,7 @@ define dso_local void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align
   br i1 %40, label %45, label %41
 
 41:                                               ; preds = %33
-  %42 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZNKSt14_List_iteratorIiEdeEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #3
+  %42 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZNKSt14_List_iteratorIiEdeEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #14
   %43 = load i32, i32* %42, align 4
   %44 = load i8*, i8** %6, align 8
   call void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align 8 dereferenceable(16) %10, i32 noundef %43, i8* noundef %44)
@@ -261,7 +224,7 @@ define dso_local void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align
   br label %46
 
 46:                                               ; preds = %45
-  %47 = call noundef nonnull align 8 dereferenceable(8) %"struct.std::_List_iterator"* @_ZNSt14_List_iteratorIiEppEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #3
+  %47 = call noundef nonnull align 8 dereferenceable(8) %"struct.std::_List_iterator"* @_ZNSt14_List_iteratorIiEppEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %7) #14
   br label %24, !llvm.loop !6
 
 48:                                               ; preds = %24
@@ -269,7 +232,7 @@ define dso_local void @_ZN5Graph7DFSUtilEiPb(%class.Graph* noundef nonnull align
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt14_List_iteratorIiEC2Ev(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt14_List_iteratorIiEC2Ev(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0) unnamed_addr #1 comdat align 2 {
   %2 = alloca %"struct.std::_List_iterator"*, align 8
   store %"struct.std::_List_iterator"* %0, %"struct.std::_List_iterator"** %2, align 8
   %3 = load %"struct.std::_List_iterator"*, %"struct.std::_List_iterator"** %2, align 8
@@ -279,7 +242,7 @@ define linkonce_odr dso_local void @_ZNSt14_List_iteratorIiEC2Ev(%"struct.std::_
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE5beginEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #6 comdat align 2 {
+define linkonce_odr dso_local %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE5beginEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #2 comdat align 2 {
   %2 = alloca %"struct.std::_List_iterator", align 8
   %3 = alloca %"class.std::__cxx11::list"*, align 8
   store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %3, align 8
@@ -290,17 +253,17 @@ define linkonce_odr dso_local %"struct.std::__detail::_List_node_base"* @_ZNSt7_
   %8 = bitcast %"struct.std::__detail::_List_node_header"* %7 to %"struct.std::__detail::_List_node_base"*
   %9 = getelementptr inbounds %"struct.std::__detail::_List_node_base", %"struct.std::__detail::_List_node_base"* %8, i32 0, i32 0
   %10 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %9, align 8
-  call void @_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_List_node_baseE(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %2, %"struct.std::__detail::_List_node_base"* noundef %10) #3
+  call void @_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_List_node_baseE(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %2, %"struct.std::__detail::_List_node_base"* noundef %10) #14
   %11 = getelementptr inbounds %"struct.std::_List_iterator", %"struct.std::_List_iterator"* %2, i32 0, i32 0
   %12 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %11, align 8
   ret %"struct.std::__detail::_List_node_base"* %12
 }
 
 ; Function Attrs: argmemonly nofree nounwind willreturn
-declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #7
+declare void @llvm.memcpy.p0i8.p0i8.i64(i8* noalias nocapture writeonly, i8* noalias nocapture readonly, i64, i1 immarg) #3
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef zeroext i1 @_ZStneRKSt14_List_iteratorIiES2_(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %1) #6 comdat {
+define linkonce_odr dso_local noundef zeroext i1 @_ZStneRKSt14_List_iteratorIiES2_(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %1) #2 comdat {
   %3 = alloca %"struct.std::_List_iterator"*, align 8
   %4 = alloca %"struct.std::_List_iterator"*, align 8
   store %"struct.std::_List_iterator"* %0, %"struct.std::_List_iterator"** %3, align 8
@@ -316,7 +279,7 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZStneRKSt14_List_iteratorIiES
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE3endEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #6 comdat align 2 {
+define linkonce_odr dso_local %"struct.std::__detail::_List_node_base"* @_ZNSt7__cxx114listIiSaIiEE3endEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #2 comdat align 2 {
   %2 = alloca %"struct.std::_List_iterator", align 8
   %3 = alloca %"class.std::__cxx11::list"*, align 8
   store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %3, align 8
@@ -325,14 +288,14 @@ define linkonce_odr dso_local %"struct.std::__detail::_List_node_base"* @_ZNSt7_
   %6 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %5, i32 0, i32 0
   %7 = getelementptr inbounds %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl", %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %6, i32 0, i32 0
   %8 = bitcast %"struct.std::__detail::_List_node_header"* %7 to %"struct.std::__detail::_List_node_base"*
-  call void @_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_List_node_baseE(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %2, %"struct.std::__detail::_List_node_base"* noundef %8) #3
+  call void @_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_List_node_baseE(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %2, %"struct.std::__detail::_List_node_base"* noundef %8) #14
   %9 = getelementptr inbounds %"struct.std::_List_iterator", %"struct.std::_List_iterator"* %2, i32 0, i32 0
   %10 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %9, align 8
   ret %"struct.std::__detail::_List_node_base"* %10
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZNKSt14_List_iteratorIiEdeEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0) #6 comdat align 2 {
+define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZNKSt14_List_iteratorIiEdeEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0) #2 comdat align 2 {
   %2 = alloca %"struct.std::_List_iterator"*, align 8
   store %"struct.std::_List_iterator"* %0, %"struct.std::_List_iterator"** %2, align 8
   %3 = load %"struct.std::_List_iterator"*, %"struct.std::_List_iterator"** %2, align 8
@@ -344,7 +307,7 @@ define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) %"struct.std::_List_iterator"* @_ZNSt14_List_iteratorIiEppEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0) #6 comdat align 2 {
+define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) %"struct.std::_List_iterator"* @_ZNSt14_List_iteratorIiEppEv(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0) #2 comdat align 2 {
   %2 = alloca %"struct.std::_List_iterator"*, align 8
   store %"struct.std::_List_iterator"* %0, %"struct.std::_List_iterator"** %2, align 8
   %3 = load %"struct.std::_List_iterator"*, %"struct.std::_List_iterator"** %2, align 8
@@ -358,7 +321,7 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(8) %"struc
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef zeroext i1 @_ZN5Graph11isConnectedEv(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) #4 align 2 {
+define dso_local noundef zeroext i1 @_ZN5Graph11isConnectedEv(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) #0 align 2 {
   %2 = alloca i1, align 1
   %3 = alloca %class.Graph*, align 8
   %4 = alloca i8*, align 8
@@ -414,7 +377,7 @@ define dso_local noundef zeroext i1 @_ZN5Graph11isConnectedEv(%class.Graph* noun
   %35 = load i32, i32* %6, align 4
   %36 = sext i32 %35 to i64
   %37 = getelementptr inbounds %"class.std::__cxx11::list", %"class.std::__cxx11::list"* %34, i64 %36
-  %38 = call noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %37) #3
+  %38 = call noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %37) #14
   %39 = icmp ne i64 %38, 0
   br i1 %39, label %40, label %41
 
@@ -471,7 +434,7 @@ define dso_local noundef zeroext i1 @_ZN5Graph11isConnectedEv(%class.Graph* noun
   %69 = load i32, i32* %6, align 4
   %70 = sext i32 %69 to i64
   %71 = getelementptr inbounds %"class.std::__cxx11::list", %"class.std::__cxx11::list"* %68, i64 %70
-  %72 = call noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %71) #3
+  %72 = call noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %71) #14
   %73 = icmp ugt i64 %72, 0
   br i1 %73, label %74, label %75
 
@@ -502,10 +465,10 @@ define dso_local noundef zeroext i1 @_ZN5Graph11isConnectedEv(%class.Graph* noun
 }
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare i8* @llvm.stacksave() #8
+declare i8* @llvm.stacksave() #4
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #6 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
+define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #2 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
   %2 = alloca %"class.std::__cxx11::list"*, align 8
   store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %2, align 8
   %3 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %2, align 8
@@ -524,10 +487,10 @@ define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"
 }
 
 ; Function Attrs: nofree nosync nounwind willreturn
-declare void @llvm.stackrestore(i8*) #8
+declare void @llvm.stackrestore(i8*) #4
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef i32 @_ZN5Graph10isEulerianEv(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) #4 align 2 {
+define dso_local noundef i32 @_ZN5Graph10isEulerianEv(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) #0 align 2 {
   %2 = alloca i32, align 4
   %3 = alloca %class.Graph*, align 8
   %4 = alloca i32, align 4
@@ -561,7 +524,7 @@ define dso_local noundef i32 @_ZN5Graph10isEulerianEv(%class.Graph* noundef nonn
   %20 = load i32, i32* %5, align 4
   %21 = sext i32 %20 to i64
   %22 = getelementptr inbounds %"class.std::__cxx11::list", %"class.std::__cxx11::list"* %19, i64 %21
-  %23 = call noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %22) #3
+  %23 = call noundef i64 @_ZNKSt7__cxx114listIiSaIiEE4sizeEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %22) #14
   %24 = and i64 %23, 1
   %25 = icmp ne i64 %24, 0
   br i1 %25, label %26, label %29
@@ -604,7 +567,7 @@ define dso_local noundef i32 @_ZN5Graph10isEulerianEv(%class.Graph* noundef nonn
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local void @_Z4testR5Graph(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) #4 {
+define dso_local void @_Z4testR5Graph(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) #0 {
   %2 = alloca %class.Graph*, align 8
   %3 = alloca i32, align 4
   store %class.Graph* %0, %class.Graph** %2, align 8
@@ -639,10 +602,10 @@ define dso_local void @_Z4testR5Graph(%class.Graph* noundef nonnull align 8 dere
   ret void
 }
 
-declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #1
+declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8), i8* noundef) #5
 
 ; Function Attrs: mustprogress noinline norecurse uwtable
-define dso_local noundef i32 @main() #9 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
+define dso_local noundef i32 @main() #6 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
   %1 = alloca i32, align 4
   %2 = alloca %class.Graph, align 8
   %3 = alloca i8*, align 8
@@ -770,11 +733,11 @@ define dso_local noundef i32 @main() #9 personality i8* bitcast (i32 (...)* @__g
 
 37:                                               ; preds = %36
   store i32 0, i32* %1, align 4
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %8) #3
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %7) #3
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %6) #3
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %5) #3
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %2) #3
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %8) #14
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %7) #14
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %6) #14
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %5) #14
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %2) #14
   %38 = load i32, i32* %1, align 4
   ret i32 %38
 
@@ -821,23 +784,23 @@ define dso_local noundef i32 @main() #9 personality i8* bitcast (i32 (...)* @__g
   store i8* %57, i8** %3, align 8
   %58 = extractvalue { i8*, i32 } %56, 1
   store i32 %58, i32* %4, align 4
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %8) #3
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %8) #14
   br label %59
 
 59:                                               ; preds = %55, %51
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %7) #3
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %7) #14
   br label %60
 
 60:                                               ; preds = %59, %47
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %6) #3
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %6) #14
   br label %61
 
 61:                                               ; preds = %60, %43
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %5) #3
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %5) #14
   br label %62
 
 62:                                               ; preds = %61, %39
-  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %2) #3
+  call void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %2) #14
   br label %63
 
 63:                                               ; preds = %62
@@ -849,7 +812,7 @@ define dso_local noundef i32 @main() #9 personality i8* bitcast (i32 (...)* @__g
 }
 
 ; Function Attrs: noinline uwtable
-define linkonce_odr dso_local void @_ZN5GraphC2Ei(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0, i32 noundef %1) unnamed_addr #0 comdat align 2 {
+define linkonce_odr dso_local void @_ZN5GraphC2Ei(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0, i32 noundef %1) unnamed_addr #7 comdat align 2 {
   %3 = alloca %class.Graph*, align 8
   %4 = alloca i32, align 4
   store %class.Graph* %0, %class.Graph** %3, align 8
@@ -882,7 +845,7 @@ define linkonce_odr dso_local void @_ZN5GraphC2Ei(%class.Graph* noundef nonnull 
 
 25:                                               ; preds = %25, %23
   %26 = phi %"class.std::__cxx11::list"* [ %21, %23 ], [ %27, %25 ]
-  call void @_ZNSt7__cxx114listIiSaIiEEC2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %26) #3
+  call void @_ZNSt7__cxx114listIiSaIiEEC2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %26) #14
   %27 = getelementptr inbounds %"class.std::__cxx11::list", %"class.std::__cxx11::list"* %26, i64 1
   %28 = icmp eq %"class.std::__cxx11::list"* %27, %24
   br i1 %28, label %29, label %25
@@ -896,7 +859,7 @@ define linkonce_odr dso_local void @_ZN5GraphC2Ei(%class.Graph* noundef nonnull 
 declare i32 @__gxx_personality_v0(...)
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull align 8 dereferenceable(16) %0) unnamed_addr #1 comdat align 2 {
   %2 = alloca %class.Graph*, align 8
   store %class.Graph* %0, %class.Graph** %2, align 8
   %3 = load %class.Graph*, %class.Graph** %2, align 8
@@ -917,7 +880,7 @@ define linkonce_odr dso_local void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull 
 14:                                               ; preds = %14, %7
   %15 = phi %"class.std::__cxx11::list"* [ %12, %7 ], [ %16, %14 ]
   %16 = getelementptr inbounds %"class.std::__cxx11::list", %"class.std::__cxx11::list"* %15, i64 -1
-  call void @_ZNSt7__cxx114listIiSaIiEED2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %16) #3
+  call void @_ZNSt7__cxx114listIiSaIiEED2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %16) #14
   %17 = icmp eq %"class.std::__cxx11::list"* %16, %5
   br i1 %17, label %18, label %14
 
@@ -930,76 +893,64 @@ define linkonce_odr dso_local void @_ZN5GraphD2Ev(%class.Graph* noundef nonnull 
 }
 
 ; Function Attrs: nofree nosync nounwind readnone speculatable willreturn
-declare { i64, i1 } @llvm.umul.with.overflow.i64(i64, i64) #10
+declare { i64, i1 } @llvm.umul.with.overflow.i64(i64, i64) #8
 
 ; Function Attrs: nofree nosync nounwind readnone speculatable willreturn
-declare { i64, i1 } @llvm.uadd.with.overflow.i64(i64, i64) #10
+declare { i64, i1 } @llvm.uadd.with.overflow.i64(i64, i64) #8
 
 ; Function Attrs: nobuiltin allocsize(0)
-declare noundef nonnull i8* @_Znam(i64 noundef) #11
+declare noundef nonnull i8* @_Znam(i64 noundef) #9
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEEC2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEEC2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #1 comdat align 2 {
   %2 = alloca %"class.std::__cxx11::list"*, align 8
   store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %2, align 8
   %3 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %2, align 8
   %4 = bitcast %"class.std::__cxx11::list"* %3 to %"class.std::__cxx11::_List_base"*
-  call void @_ZNSt7__cxx1110_List_baseIiSaIiEEC2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %4) #3
+  call void @_ZNSt7__cxx1110_List_baseIiSaIiEEC2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %4) #14
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEEC2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEEC2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #1 comdat align 2 {
   %2 = alloca %"class.std::__cxx11::_List_base"*, align 8
   store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %2, align 8
   %3 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %2, align 8
   %4 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %3, i32 0, i32 0
-  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implC2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %4) #3
+  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implC2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %4) #14
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implC2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
-  %2 = alloca %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, align 8
-  store %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %0, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %2, align 8
-  %3 = load %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %2, align 8
-  %4 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %3 to %"class.std::allocator"*
-  call void @_ZNSaISt10_List_nodeIiEEC2Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %4) #3
-  %5 = getelementptr inbounds %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl", %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %3, i32 0, i32 0
-  call void @_ZNSt8__detail17_List_node_headerC2Ev(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %5) #3
+define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implC2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #1 comdat align 2 {
+  %2 = alloca %"class.std::__new_allocator"*, align 8
+  %3 = alloca %"class.std::allocator"*, align 8
+  %4 = alloca %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, align 8
+  store %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %0, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %4, align 8
+  %5 = load %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %4, align 8
+  %6 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %5 to %"class.std::allocator"*
+  store %"class.std::allocator"* %6, %"class.std::allocator"** %3, align 8
+  %7 = load %"class.std::allocator"*, %"class.std::allocator"** %3, align 8
+  %8 = bitcast %"class.std::allocator"* %7 to %"class.std::__new_allocator"*
+  store %"class.std::__new_allocator"* %8, %"class.std::__new_allocator"** %2, align 8
+  %9 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %2, align 8
+  %10 = getelementptr inbounds %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl", %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %5, i32 0, i32 0
+  call void @_ZNSt8__detail17_List_node_headerC2Ev(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %10) #14
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSaISt10_List_nodeIiEEC2Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #5 comdat align 2 {
-  %2 = alloca %"class.std::allocator"*, align 8
-  store %"class.std::allocator"* %0, %"class.std::allocator"** %2, align 8
-  %3 = load %"class.std::allocator"*, %"class.std::allocator"** %2, align 8
-  %4 = bitcast %"class.std::allocator"* %3 to %"class.__gnu_cxx::new_allocator"*
-  call void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEEC2Ev(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %4) #3
-  ret void
-}
-
-; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt8__detail17_List_node_headerC2Ev(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt8__detail17_List_node_headerC2Ev(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #1 comdat align 2 {
   %2 = alloca %"struct.std::__detail::_List_node_header"*, align 8
   store %"struct.std::__detail::_List_node_header"* %0, %"struct.std::__detail::_List_node_header"** %2, align 8
   %3 = load %"struct.std::__detail::_List_node_header"*, %"struct.std::__detail::_List_node_header"** %2, align 8
   %4 = bitcast %"struct.std::__detail::_List_node_header"* %3 to %"struct.std::__detail::_List_node_base"*
-  call void @_ZNSt8__detail17_List_node_header7_M_initEv(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %3) #3
-  ret void
-}
-
-; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEEC2Ev(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #5 comdat align 2 {
-  %2 = alloca %"class.__gnu_cxx::new_allocator"*, align 8
-  store %"class.__gnu_cxx::new_allocator"* %0, %"class.__gnu_cxx::new_allocator"** %2, align 8
-  %3 = load %"class.__gnu_cxx::new_allocator"*, %"class.__gnu_cxx::new_allocator"** %2, align 8
+  call void @_ZNSt8__detail17_List_node_header7_M_initEv(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %3) #14
   ret void
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt8__detail17_List_node_header7_M_initEv(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %0) #6 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt8__detail17_List_node_header7_M_initEv(%"struct.std::__detail::_List_node_header"* noundef nonnull align 8 dereferenceable(24) %0) #2 comdat align 2 {
   %2 = alloca %"struct.std::__detail::_List_node_header"*, align 8
   store %"struct.std::__detail::_List_node_header"* %0, %"struct.std::__detail::_List_node_header"** %2, align 8
   %3 = load %"struct.std::__detail::_List_node_header"*, %"struct.std::__detail::_List_node_header"** %2, align 8
@@ -1016,109 +967,125 @@ define linkonce_odr dso_local void @_ZNSt8__detail17_List_node_header7_M_initEv(
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEED2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEED2Ev(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #1 comdat align 2 {
   %2 = alloca %"class.std::__cxx11::list"*, align 8
   store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %2, align 8
   %3 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %2, align 8
   %4 = bitcast %"class.std::__cxx11::list"* %3 to %"class.std::__cxx11::_List_base"*
-  call void @_ZNSt7__cxx1110_List_baseIiSaIiEED2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %4) #3
+  call void @_ZNSt7__cxx1110_List_baseIiSaIiEED2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %4) #14
   ret void
 }
 
 ; Function Attrs: nobuiltin nounwind
-declare void @_ZdaPv(i8* noundef) #12
+declare void @_ZdaPv(i8* noundef) #10
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEED2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEED2Ev(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #1 comdat align 2 {
   %2 = alloca %"class.std::__cxx11::_List_base"*, align 8
   store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %2, align 8
   %3 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %2, align 8
-  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE8_M_clearEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %3) #3
+  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE8_M_clearEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %3) #14
   %4 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %3, i32 0, i32 0
-  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implD2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %4) #3
+  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implD2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %4) #14
   ret void
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE8_M_clearEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #6 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
-  %2 = alloca %"class.std::__cxx11::_List_base"*, align 8
-  %3 = alloca %"struct.std::__detail::_List_node_base"*, align 8
-  %4 = alloca %"struct.std::_List_node"*, align 8
+define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE8_M_clearEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #2 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
+  %2 = alloca %"class.std::__new_allocator"*, align 8
+  %3 = alloca i32*, align 8
+  %4 = alloca %"class.std::allocator"*, align 8
   %5 = alloca i32*, align 8
-  store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %2, align 8
-  %6 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %2, align 8
-  %7 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %6, i32 0, i32 0
-  %8 = getelementptr inbounds %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl", %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %7, i32 0, i32 0
-  %9 = bitcast %"struct.std::__detail::_List_node_header"* %8 to %"struct.std::__detail::_List_node_base"*
-  %10 = getelementptr inbounds %"struct.std::__detail::_List_node_base", %"struct.std::__detail::_List_node_base"* %9, i32 0, i32 0
-  %11 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %10, align 8
-  store %"struct.std::__detail::_List_node_base"* %11, %"struct.std::__detail::_List_node_base"** %3, align 8
-  br label %12
+  %6 = alloca %"class.std::__cxx11::_List_base"*, align 8
+  %7 = alloca %"struct.std::__detail::_List_node_base"*, align 8
+  %8 = alloca %"struct.std::_List_node"*, align 8
+  %9 = alloca i32*, align 8
+  store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %6, align 8
+  %10 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %6, align 8
+  %11 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %10, i32 0, i32 0
+  %12 = getelementptr inbounds %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl", %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %11, i32 0, i32 0
+  %13 = bitcast %"struct.std::__detail::_List_node_header"* %12 to %"struct.std::__detail::_List_node_base"*
+  %14 = getelementptr inbounds %"struct.std::__detail::_List_node_base", %"struct.std::__detail::_List_node_base"* %13, i32 0, i32 0
+  %15 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %14, align 8
+  store %"struct.std::__detail::_List_node_base"* %15, %"struct.std::__detail::_List_node_base"** %7, align 8
+  br label %16
 
-12:                                               ; preds = %27, %1
-  %13 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %3, align 8
-  %14 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %6, i32 0, i32 0
-  %15 = getelementptr inbounds %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl", %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %14, i32 0, i32 0
-  %16 = bitcast %"struct.std::__detail::_List_node_header"* %15 to %"struct.std::__detail::_List_node_base"*
-  %17 = icmp ne %"struct.std::__detail::_List_node_base"* %13, %16
-  br i1 %17, label %18, label %31
+16:                                               ; preds = %31, %1
+  %17 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %7, align 8
+  %18 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %10, i32 0, i32 0
+  %19 = getelementptr inbounds %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl", %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %18, i32 0, i32 0
+  %20 = bitcast %"struct.std::__detail::_List_node_header"* %19 to %"struct.std::__detail::_List_node_base"*
+  %21 = icmp ne %"struct.std::__detail::_List_node_base"* %17, %20
+  br i1 %21, label %22, label %40
 
-18:                                               ; preds = %12
-  %19 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %3, align 8
-  %20 = bitcast %"struct.std::__detail::_List_node_base"* %19 to %"struct.std::_List_node"*
-  store %"struct.std::_List_node"* %20, %"struct.std::_List_node"** %4, align 8
-  %21 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %4, align 8
-  %22 = bitcast %"struct.std::_List_node"* %21 to %"struct.std::__detail::_List_node_base"*
-  %23 = getelementptr inbounds %"struct.std::__detail::_List_node_base", %"struct.std::__detail::_List_node_base"* %22, i32 0, i32 0
-  %24 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %23, align 8
-  store %"struct.std::__detail::_List_node_base"* %24, %"struct.std::__detail::_List_node_base"** %3, align 8
-  %25 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %4, align 8
-  %26 = invoke noundef i32* @_ZNSt10_List_nodeIiE9_M_valptrEv(%"struct.std::_List_node"* noundef nonnull align 8 dereferenceable(20) %25)
-          to label %27 unwind label %32
+22:                                               ; preds = %16
+  %23 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %7, align 8
+  %24 = bitcast %"struct.std::__detail::_List_node_base"* %23 to %"struct.std::_List_node"*
+  store %"struct.std::_List_node"* %24, %"struct.std::_List_node"** %8, align 8
+  %25 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %8, align 8
+  %26 = bitcast %"struct.std::_List_node"* %25 to %"struct.std::__detail::_List_node_base"*
+  %27 = getelementptr inbounds %"struct.std::__detail::_List_node_base", %"struct.std::__detail::_List_node_base"* %26, i32 0, i32 0
+  %28 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %27, align 8
+  store %"struct.std::__detail::_List_node_base"* %28, %"struct.std::__detail::_List_node_base"** %7, align 8
+  %29 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %8, align 8
+  %30 = invoke noundef i32* @_ZNSt10_List_nodeIiE9_M_valptrEv(%"struct.std::_List_node"* noundef nonnull align 8 dereferenceable(20) %29)
+          to label %31 unwind label %41
 
-27:                                               ; preds = %18
-  store i32* %26, i32** %5, align 8
-  %28 = call noundef nonnull align 1 dereferenceable(1) %"class.std::allocator"* @_ZNSt7__cxx1110_List_baseIiSaIiEE21_M_get_Node_allocatorEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %6) #3
-  %29 = load i32*, i32** %5, align 8
-  call void @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE7destroyIiEEvRS2_PT_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %28, i32* noundef %29) #3
-  %30 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %4, align 8
-  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_put_nodeEPSt10_List_nodeIiE(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %6, %"struct.std::_List_node"* noundef %30) #3
-  br label %12, !llvm.loop !12
+31:                                               ; preds = %22
+  store i32* %30, i32** %9, align 8
+  %32 = call noundef nonnull align 1 dereferenceable(1) %"class.std::allocator"* @_ZNSt7__cxx1110_List_baseIiSaIiEE21_M_get_Node_allocatorEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %10) #14
+  %33 = load i32*, i32** %9, align 8
+  store %"class.std::allocator"* %32, %"class.std::allocator"** %4, align 8
+  store i32* %33, i32** %5, align 8
+  %34 = load %"class.std::allocator"*, %"class.std::allocator"** %4, align 8
+  %35 = bitcast %"class.std::allocator"* %34 to %"class.std::__new_allocator"*
+  %36 = load i32*, i32** %5, align 8
+  store %"class.std::__new_allocator"* %35, %"class.std::__new_allocator"** %2, align 8
+  store i32* %36, i32** %3, align 8
+  %37 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %2, align 8
+  %38 = load i32*, i32** %3, align 8
+  %39 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %8, align 8
+  call void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_put_nodeEPSt10_List_nodeIiE(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %10, %"struct.std::_List_node"* noundef %39) #14
+  br label %16, !llvm.loop !12
 
-31:                                               ; preds = %12
+40:                                               ; preds = %16
   ret void
 
-32:                                               ; preds = %18
-  %33 = landingpad { i8*, i32 }
+41:                                               ; preds = %22
+  %42 = landingpad { i8*, i32 }
           catch i8* null
-  %34 = extractvalue { i8*, i32 } %33, 0
-  call void @__clang_call_terminate(i8* %34) #15
+  %43 = extractvalue { i8*, i32 } %42, 0
+  call void @__clang_call_terminate(i8* %43) #15
   unreachable
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implD2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
-  %2 = alloca %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, align 8
-  store %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %0, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %2, align 8
-  %3 = load %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %2, align 8
-  %4 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %3 to %"class.std::allocator"*
-  call void @_ZNSaISt10_List_nodeIiEED2Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %4) #3
+define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE10_List_implD2Ev(%"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* noundef nonnull align 8 dereferenceable(24) %0) unnamed_addr #1 comdat align 2 {
+  %2 = alloca %"class.std::allocator"*, align 8
+  %3 = alloca %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, align 8
+  store %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %0, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %3, align 8
+  %4 = load %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"*, %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"** %3, align 8
+  %5 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %4 to %"class.std::allocator"*
+  store %"class.std::allocator"* %5, %"class.std::allocator"** %2, align 8
+  %6 = load %"class.std::allocator"*, %"class.std::allocator"** %2, align 8
+  %7 = bitcast %"class.std::allocator"* %6 to %"class.std::__new_allocator"*
+  call void @_ZNSt15__new_allocatorISt10_List_nodeIiEED2Ev(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %7) #14
   ret void
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i32* @_ZNSt10_List_nodeIiE9_M_valptrEv(%"struct.std::_List_node"* noundef nonnull align 8 dereferenceable(20) %0) #6 comdat align 2 {
+define linkonce_odr dso_local noundef i32* @_ZNSt10_List_nodeIiE9_M_valptrEv(%"struct.std::_List_node"* noundef nonnull align 8 dereferenceable(20) %0) #2 comdat align 2 {
   %2 = alloca %"struct.std::_List_node"*, align 8
   store %"struct.std::_List_node"* %0, %"struct.std::_List_node"** %2, align 8
   %3 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %2, align 8
   %4 = getelementptr inbounds %"struct.std::_List_node", %"struct.std::_List_node"* %3, i32 0, i32 1
-  %5 = call noundef i32* @_ZN9__gnu_cxx16__aligned_membufIiE6_M_ptrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %4) #3
+  %5 = call noundef i32* @_ZN9__gnu_cxx16__aligned_membufIiE6_M_ptrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %4) #14
   ret i32* %5
 }
 
 ; Function Attrs: noinline noreturn nounwind
-define linkonce_odr hidden void @__clang_call_terminate(i8* %0) #13 comdat {
-  %2 = call i8* @__cxa_begin_catch(i8* %0) #3
+define linkonce_odr hidden void @__clang_call_terminate(i8* %0) #11 comdat {
+  %2 = call i8* @__cxa_begin_catch(i8* %0) #14
   call void @_ZSt9terminatev() #15
   unreachable
 }
@@ -1128,20 +1095,7 @@ declare i8* @__cxa_begin_catch(i8*)
 declare void @_ZSt9terminatev()
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE7destroyIiEEvRS2_PT_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0, i32* noundef %1) #6 comdat align 2 {
-  %3 = alloca %"class.std::allocator"*, align 8
-  %4 = alloca i32*, align 8
-  store %"class.std::allocator"* %0, %"class.std::allocator"** %3, align 8
-  store i32* %1, i32** %4, align 8
-  %5 = load %"class.std::allocator"*, %"class.std::allocator"** %3, align 8
-  %6 = bitcast %"class.std::allocator"* %5 to %"class.__gnu_cxx::new_allocator"*
-  %7 = load i32*, i32** %4, align 8
-  call void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE7destroyIiEEvPT_(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %6, i32* noundef %7) #3
-  ret void
-}
-
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 1 dereferenceable(1) %"class.std::allocator"* @_ZNSt7__cxx1110_List_baseIiSaIiEE21_M_get_Node_allocatorEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #6 comdat align 2 {
+define linkonce_odr dso_local noundef nonnull align 1 dereferenceable(1) %"class.std::allocator"* @_ZNSt7__cxx1110_List_baseIiSaIiEE21_M_get_Node_allocatorEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #2 comdat align 2 {
   %2 = alloca %"class.std::__cxx11::_List_base"*, align 8
   store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %2, align 8
   %3 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %2, align 8
@@ -1151,41 +1105,51 @@ define linkonce_odr dso_local noundef nonnull align 1 dereferenceable(1) %"class
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_put_nodeEPSt10_List_nodeIiE(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0, %"struct.std::_List_node"* noundef %1) #6 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
-  %3 = alloca %"class.std::__cxx11::_List_base"*, align 8
+define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_put_nodeEPSt10_List_nodeIiE(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0, %"struct.std::_List_node"* noundef %1) #2 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
+  %3 = alloca %"class.std::allocator"*, align 8
   %4 = alloca %"struct.std::_List_node"*, align 8
-  store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %3, align 8
-  store %"struct.std::_List_node"* %1, %"struct.std::_List_node"** %4, align 8
-  %5 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %3, align 8
-  %6 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %5, i32 0, i32 0
-  %7 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %6 to %"class.std::allocator"*
-  %8 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %4, align 8
-  invoke void @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE10deallocateERS2_PS1_m(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %7, %"struct.std::_List_node"* noundef %8, i64 noundef 1)
-          to label %9 unwind label %10
+  %5 = alloca i64, align 8
+  %6 = alloca %"class.std::__cxx11::_List_base"*, align 8
+  %7 = alloca %"struct.std::_List_node"*, align 8
+  store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %6, align 8
+  store %"struct.std::_List_node"* %1, %"struct.std::_List_node"** %7, align 8
+  %8 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %6, align 8
+  %9 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %8, i32 0, i32 0
+  %10 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %9 to %"class.std::allocator"*
+  %11 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %7, align 8
+  store %"class.std::allocator"* %10, %"class.std::allocator"** %3, align 8
+  store %"struct.std::_List_node"* %11, %"struct.std::_List_node"** %4, align 8
+  store i64 1, i64* %5, align 8
+  %12 = load %"class.std::allocator"*, %"class.std::allocator"** %3, align 8
+  %13 = bitcast %"class.std::allocator"* %12 to %"class.std::__new_allocator"*
+  %14 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %4, align 8
+  %15 = load i64, i64* %5, align 8
+  call void @_ZNSt15__new_allocatorISt10_List_nodeIiEE10deallocateEPS1_m(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %13, %"struct.std::_List_node"* noundef %14, i64 noundef %15)
+  br label %16
 
-9:                                                ; preds = %2
+16:                                               ; preds = %2
   ret void
 
-10:                                               ; preds = %2
-  %11 = landingpad { i8*, i32 }
+17:                                               ; No predecessors!
+  %18 = landingpad { i8*, i32 }
           catch i8* null
-  %12 = extractvalue { i8*, i32 } %11, 0
-  call void @__clang_call_terminate(i8* %12) #15
+  %19 = extractvalue { i8*, i32 } %18, 0
+  call void @__clang_call_terminate(i8* %19) #15
   unreachable
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i32* @_ZN9__gnu_cxx16__aligned_membufIiE6_M_ptrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %0) #6 comdat align 2 {
+define linkonce_odr dso_local noundef i32* @_ZN9__gnu_cxx16__aligned_membufIiE6_M_ptrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %0) #2 comdat align 2 {
   %2 = alloca %"struct.__gnu_cxx::__aligned_membuf"*, align 8
   store %"struct.__gnu_cxx::__aligned_membuf"* %0, %"struct.__gnu_cxx::__aligned_membuf"** %2, align 8
   %3 = load %"struct.__gnu_cxx::__aligned_membuf"*, %"struct.__gnu_cxx::__aligned_membuf"** %2, align 8
-  %4 = call noundef i8* @_ZN9__gnu_cxx16__aligned_membufIiE7_M_addrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %3) #3
+  %4 = call noundef i8* @_ZN9__gnu_cxx16__aligned_membufIiE7_M_addrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %3) #14
   %5 = bitcast i8* %4 to i32*
   ret i32* %5
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i8* @_ZN9__gnu_cxx16__aligned_membufIiE7_M_addrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %0) #6 comdat align 2 {
+define linkonce_odr dso_local noundef i8* @_ZN9__gnu_cxx16__aligned_membufIiE7_M_addrEv(%"struct.__gnu_cxx::__aligned_membuf"* noundef nonnull align 4 dereferenceable(4) %0) #2 comdat align 2 {
   %2 = alloca %"struct.__gnu_cxx::__aligned_membuf"*, align 8
   store %"struct.__gnu_cxx::__aligned_membuf"* %0, %"struct.__gnu_cxx::__aligned_membuf"** %2, align 8
   %3 = load %"struct.__gnu_cxx::__aligned_membuf"*, %"struct.__gnu_cxx::__aligned_membuf"** %2, align 8
@@ -1195,70 +1159,33 @@ define linkonce_odr dso_local noundef i8* @_ZN9__gnu_cxx16__aligned_membufIiE7_M
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE7destroyIiEEvPT_(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %0, i32* noundef %1) #6 comdat align 2 {
-  %3 = alloca %"class.__gnu_cxx::new_allocator"*, align 8
-  %4 = alloca i32*, align 8
-  store %"class.__gnu_cxx::new_allocator"* %0, %"class.__gnu_cxx::new_allocator"** %3, align 8
-  store i32* %1, i32** %4, align 8
-  %5 = load %"class.__gnu_cxx::new_allocator"*, %"class.__gnu_cxx::new_allocator"** %3, align 8
-  %6 = load i32*, i32** %4, align 8
-  ret void
-}
-
-; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE10deallocateERS2_PS1_m(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0, %"struct.std::_List_node"* noundef %1, i64 noundef %2) #4 comdat align 2 {
-  %4 = alloca %"class.std::allocator"*, align 8
+define linkonce_odr dso_local void @_ZNSt15__new_allocatorISt10_List_nodeIiEE10deallocateEPS1_m(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %0, %"struct.std::_List_node"* noundef %1, i64 noundef %2) #2 comdat align 2 {
+  %4 = alloca %"class.std::__new_allocator"*, align 8
   %5 = alloca %"struct.std::_List_node"*, align 8
   %6 = alloca i64, align 8
-  store %"class.std::allocator"* %0, %"class.std::allocator"** %4, align 8
+  store %"class.std::__new_allocator"* %0, %"class.std::__new_allocator"** %4, align 8
   store %"struct.std::_List_node"* %1, %"struct.std::_List_node"** %5, align 8
   store i64 %2, i64* %6, align 8
-  %7 = load %"class.std::allocator"*, %"class.std::allocator"** %4, align 8
-  %8 = bitcast %"class.std::allocator"* %7 to %"class.__gnu_cxx::new_allocator"*
-  %9 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %5, align 8
-  %10 = load i64, i64* %6, align 8
-  call void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE10deallocateEPS2_m(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %8, %"struct.std::_List_node"* noundef %9, i64 noundef %10)
-  ret void
-}
-
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE10deallocateEPS2_m(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %0, %"struct.std::_List_node"* noundef %1, i64 noundef %2) #6 comdat align 2 {
-  %4 = alloca %"class.__gnu_cxx::new_allocator"*, align 8
-  %5 = alloca %"struct.std::_List_node"*, align 8
-  %6 = alloca i64, align 8
-  store %"class.__gnu_cxx::new_allocator"* %0, %"class.__gnu_cxx::new_allocator"** %4, align 8
-  store %"struct.std::_List_node"* %1, %"struct.std::_List_node"** %5, align 8
-  store i64 %2, i64* %6, align 8
-  %7 = load %"class.__gnu_cxx::new_allocator"*, %"class.__gnu_cxx::new_allocator"** %4, align 8
+  %7 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %4, align 8
   %8 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %5, align 8
   %9 = bitcast %"struct.std::_List_node"* %8 to i8*
-  call void @_ZdlPv(i8* noundef %9) #3
+  call void @_ZdlPv(i8* noundef %9) #17
   ret void
 }
 
 ; Function Attrs: nobuiltin nounwind
-declare void @_ZdlPv(i8* noundef) #12
+declare void @_ZdlPv(i8* noundef) #10
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSaISt10_List_nodeIiEED2Ev(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #5 comdat align 2 {
-  %2 = alloca %"class.std::allocator"*, align 8
-  store %"class.std::allocator"* %0, %"class.std::allocator"** %2, align 8
-  %3 = load %"class.std::allocator"*, %"class.std::allocator"** %2, align 8
-  %4 = bitcast %"class.std::allocator"* %3 to %"class.__gnu_cxx::new_allocator"*
-  call void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEED2Ev(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %4) #3
-  ret void
-}
-
-; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEED2Ev(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #5 comdat align 2 {
-  %2 = alloca %"class.__gnu_cxx::new_allocator"*, align 8
-  store %"class.__gnu_cxx::new_allocator"* %0, %"class.__gnu_cxx::new_allocator"** %2, align 8
-  %3 = load %"class.__gnu_cxx::new_allocator"*, %"class.__gnu_cxx::new_allocator"** %2, align 8
+define linkonce_odr dso_local void @_ZNSt15__new_allocatorISt10_List_nodeIiEED2Ev(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #1 comdat align 2 {
+  %2 = alloca %"class.std::__new_allocator"*, align 8
+  store %"class.std::__new_allocator"* %0, %"class.std::__new_allocator"** %2, align 8
+  %3 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %2, align 8
   ret void
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEE9_M_insertIJRKiEEEvSt14_List_iteratorIiEDpOT_(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0, %"struct.std::__detail::_List_node_base"* %1, i32* noundef nonnull align 4 dereferenceable(4) %2) #4 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEE9_M_insertIJRKiEEEvSt14_List_iteratorIiEDpOT_(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0, %"struct.std::__detail::_List_node_base"* %1, i32* noundef nonnull align 4 dereferenceable(4) %2) #0 comdat align 2 {
   %4 = alloca %"struct.std::_List_iterator", align 8
   %5 = alloca %"class.std::__cxx11::list"*, align 8
   %6 = alloca i32*, align 8
@@ -1269,52 +1196,75 @@ define linkonce_odr dso_local void @_ZNSt7__cxx114listIiSaIiEE9_M_insertIJRKiEEE
   store i32* %2, i32** %6, align 8
   %9 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %5, align 8
   %10 = load i32*, i32** %6, align 8
-  %11 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %10) #3
+  %11 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %10) #14
   %12 = call noundef %"struct.std::_List_node"* @_ZNSt7__cxx114listIiSaIiEE14_M_create_nodeIJRKiEEEPSt10_List_nodeIiEDpOT_(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %9, i32* noundef nonnull align 4 dereferenceable(4) %11)
   store %"struct.std::_List_node"* %12, %"struct.std::_List_node"** %7, align 8
   %13 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %7, align 8
   %14 = bitcast %"struct.std::_List_node"* %13 to %"struct.std::__detail::_List_node_base"*
   %15 = getelementptr inbounds %"struct.std::_List_iterator", %"struct.std::_List_iterator"* %4, i32 0, i32 0
   %16 = load %"struct.std::__detail::_List_node_base"*, %"struct.std::__detail::_List_node_base"** %15, align 8
-  call void @_ZNSt8__detail15_List_node_base7_M_hookEPS0_(%"struct.std::__detail::_List_node_base"* noundef nonnull align 8 dereferenceable(16) %14, %"struct.std::__detail::_List_node_base"* noundef %16) #3
+  call void @_ZNSt8__detail15_List_node_base7_M_hookEPS0_(%"struct.std::__detail::_List_node_base"* noundef nonnull align 8 dereferenceable(16) %14, %"struct.std::__detail::_List_node_base"* noundef %16) #14
   %17 = bitcast %"class.std::__cxx11::list"* %9 to %"class.std::__cxx11::_List_base"*
   call void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_inc_sizeEm(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %17, i64 noundef 1)
   ret void
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %"struct.std::_List_node"* @_ZNSt7__cxx114listIiSaIiEE14_M_create_nodeIJRKiEEEPSt10_List_nodeIiEDpOT_(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #4 comdat align 2 {
-  %3 = alloca %"class.std::__cxx11::list"*, align 8
+define linkonce_odr dso_local noundef %"struct.std::_List_node"* @_ZNSt7__cxx114listIiSaIiEE14_M_create_nodeIJRKiEEEPSt10_List_nodeIiEDpOT_(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0, i32* noundef nonnull align 4 dereferenceable(4) %1) #0 comdat align 2 {
+  %3 = alloca %"class.std::__new_allocator"*, align 8
   %4 = alloca i32*, align 8
-  %5 = alloca %"struct.std::_List_node"*, align 8
+  %5 = alloca i32*, align 8
   %6 = alloca %"class.std::allocator"*, align 8
-  %7 = alloca %"struct.std::__allocated_ptr", align 8
-  store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %3, align 8
-  store i32* %1, i32** %4, align 8
-  %8 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %3, align 8
-  %9 = bitcast %"class.std::__cxx11::list"* %8 to %"class.std::__cxx11::_List_base"*
-  %10 = call noundef %"struct.std::_List_node"* @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_get_nodeEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %9)
-  store %"struct.std::_List_node"* %10, %"struct.std::_List_node"** %5, align 8
-  %11 = bitcast %"class.std::__cxx11::list"* %8 to %"class.std::__cxx11::_List_base"*
-  %12 = call noundef nonnull align 1 dereferenceable(1) %"class.std::allocator"* @_ZNSt7__cxx1110_List_baseIiSaIiEE21_M_get_Node_allocatorEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %11) #3
-  store %"class.std::allocator"* %12, %"class.std::allocator"** %6, align 8
-  %13 = load %"class.std::allocator"*, %"class.std::allocator"** %6, align 8
-  %14 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %5, align 8
-  call void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEC2ERS2_PS1_(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %7, %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %13, %"struct.std::_List_node"* noundef %14) #3
-  %15 = load %"class.std::allocator"*, %"class.std::allocator"** %6, align 8
-  %16 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %5, align 8
-  %17 = call noundef i32* @_ZNSt10_List_nodeIiE9_M_valptrEv(%"struct.std::_List_node"* noundef nonnull align 8 dereferenceable(20) %16)
-  %18 = load i32*, i32** %4, align 8
-  %19 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %18) #3
-  call void @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE9constructIiJRKiEEEvRS2_PT_DpOT0_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %15, i32* noundef %17, i32* noundef nonnull align 4 dereferenceable(4) %19) #3
-  %20 = call noundef nonnull align 8 dereferenceable(16) %"struct.std::__allocated_ptr"* @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEaSEDn(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %7, i8* null) #3
-  %21 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %5, align 8
-  call void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEED2Ev(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %7) #3
-  ret %"struct.std::_List_node"* %21
+  %7 = alloca i32*, align 8
+  %8 = alloca i32*, align 8
+  %9 = alloca %"class.std::__cxx11::list"*, align 8
+  %10 = alloca i32*, align 8
+  %11 = alloca %"struct.std::_List_node"*, align 8
+  %12 = alloca %"class.std::allocator"*, align 8
+  %13 = alloca %"struct.std::__allocated_ptr", align 8
+  store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %9, align 8
+  store i32* %1, i32** %10, align 8
+  %14 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %9, align 8
+  %15 = bitcast %"class.std::__cxx11::list"* %14 to %"class.std::__cxx11::_List_base"*
+  %16 = call noundef %"struct.std::_List_node"* @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_get_nodeEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %15)
+  store %"struct.std::_List_node"* %16, %"struct.std::_List_node"** %11, align 8
+  %17 = bitcast %"class.std::__cxx11::list"* %14 to %"class.std::__cxx11::_List_base"*
+  %18 = call noundef nonnull align 1 dereferenceable(1) %"class.std::allocator"* @_ZNSt7__cxx1110_List_baseIiSaIiEE21_M_get_Node_allocatorEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %17) #14
+  store %"class.std::allocator"* %18, %"class.std::allocator"** %12, align 8
+  %19 = load %"class.std::allocator"*, %"class.std::allocator"** %12, align 8
+  %20 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %11, align 8
+  call void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEC2ERS2_PS1_(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %13, %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %19, %"struct.std::_List_node"* noundef %20) #14
+  %21 = load %"class.std::allocator"*, %"class.std::allocator"** %12, align 8
+  %22 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %11, align 8
+  %23 = call noundef i32* @_ZNSt10_List_nodeIiE9_M_valptrEv(%"struct.std::_List_node"* noundef nonnull align 8 dereferenceable(20) %22)
+  %24 = load i32*, i32** %10, align 8
+  %25 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %24) #14
+  store %"class.std::allocator"* %21, %"class.std::allocator"** %6, align 8
+  store i32* %23, i32** %7, align 8
+  store i32* %25, i32** %8, align 8
+  %26 = load %"class.std::allocator"*, %"class.std::allocator"** %6, align 8
+  %27 = bitcast %"class.std::allocator"* %26 to %"class.std::__new_allocator"*
+  %28 = load i32*, i32** %7, align 8
+  %29 = load i32*, i32** %8, align 8
+  %30 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %29) #14
+  store %"class.std::__new_allocator"* %27, %"class.std::__new_allocator"** %3, align 8
+  store i32* %28, i32** %4, align 8
+  store i32* %30, i32** %5, align 8
+  %31 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %3, align 8
+  %32 = load i32*, i32** %4, align 8
+  %33 = bitcast i32* %32 to i8*
+  %34 = load i32*, i32** %5, align 8
+  %35 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %34) #14
+  %36 = load i32, i32* %35, align 4
+  store i32 %36, i32* %32, align 4
+  %37 = call noundef nonnull align 8 dereferenceable(16) %"struct.std::__allocated_ptr"* @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEaSEDn(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %13, i8* null) #14
+  %38 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %11, align 8
+  call void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEED2Ev(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %13) #14
+  ret %"struct.std::_List_node"* %38
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %0) #6 comdat {
+define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %0) #2 comdat {
   %2 = alloca i32*, align 8
   store i32* %0, i32** %2, align 8
   %3 = load i32*, i32** %2, align 8
@@ -1322,10 +1272,10 @@ define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) i32* @_
 }
 
 ; Function Attrs: nounwind
-declare void @_ZNSt8__detail15_List_node_base7_M_hookEPS0_(%"struct.std::__detail::_List_node_base"* noundef nonnull align 8 dereferenceable(16), %"struct.std::__detail::_List_node_base"* noundef) #2
+declare void @_ZNSt8__detail15_List_node_base7_M_hookEPS0_(%"struct.std::__detail::_List_node_base"* noundef nonnull align 8 dereferenceable(16), %"struct.std::__detail::_List_node_base"* noundef) #12
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_inc_sizeEm(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0, i64 noundef %1) #6 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_inc_sizeEm(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0, i64 noundef %1) #2 comdat align 2 {
   %3 = alloca %"class.std::__cxx11::_List_base"*, align 8
   %4 = alloca i64, align 8
   store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %3, align 8
@@ -1342,18 +1292,25 @@ define linkonce_odr dso_local void @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_inc_si
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %"struct.std::_List_node"* @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_get_nodeEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #4 comdat align 2 {
-  %2 = alloca %"class.std::__cxx11::_List_base"*, align 8
-  store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %2, align 8
-  %3 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %2, align 8
-  %4 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %3, i32 0, i32 0
-  %5 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %4 to %"class.std::allocator"*
-  %6 = call noundef %"struct.std::_List_node"* @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE8allocateERS2_m(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %5, i64 noundef 1)
-  ret %"struct.std::_List_node"* %6
+define linkonce_odr dso_local noundef %"struct.std::_List_node"* @_ZNSt7__cxx1110_List_baseIiSaIiEE11_M_get_nodeEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #0 comdat align 2 {
+  %2 = alloca %"class.std::allocator"*, align 8
+  %3 = alloca i64, align 8
+  %4 = alloca %"class.std::__cxx11::_List_base"*, align 8
+  store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %4, align 8
+  %5 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %4, align 8
+  %6 = getelementptr inbounds %"class.std::__cxx11::_List_base", %"class.std::__cxx11::_List_base"* %5, i32 0, i32 0
+  %7 = bitcast %"struct.std::__cxx11::_List_base<int, std::allocator<int>>::_List_impl"* %6 to %"class.std::allocator"*
+  store %"class.std::allocator"* %7, %"class.std::allocator"** %2, align 8
+  store i64 1, i64* %3, align 8
+  %8 = load %"class.std::allocator"*, %"class.std::allocator"** %2, align 8
+  %9 = bitcast %"class.std::allocator"* %8 to %"class.std::__new_allocator"*
+  %10 = load i64, i64* %3, align 8
+  %11 = call noundef %"struct.std::_List_node"* @_ZNSt15__new_allocatorISt10_List_nodeIiEE8allocateEmPKv(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %9, i64 noundef %10, i8* noundef null)
+  ret %"struct.std::_List_node"* %11
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEC2ERS2_PS1_(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %0, %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %1, %"struct.std::_List_node"* noundef %2) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEC2ERS2_PS1_(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %0, %"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %1, %"struct.std::_List_node"* noundef %2) unnamed_addr #1 comdat align 2 {
   %4 = alloca %"struct.std::__allocated_ptr"*, align 8
   %5 = alloca %"class.std::allocator"*, align 8
   %6 = alloca %"struct.std::_List_node"*, align 8
@@ -1363,7 +1320,7 @@ define linkonce_odr dso_local void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEE
   %7 = load %"struct.std::__allocated_ptr"*, %"struct.std::__allocated_ptr"** %4, align 8
   %8 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %7, i32 0, i32 0
   %9 = load %"class.std::allocator"*, %"class.std::allocator"** %5, align 8
-  %10 = call noundef %"class.std::allocator"* @_ZSt11__addressofISaISt10_List_nodeIiEEEPT_RS3_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %9) #3
+  %10 = call noundef %"class.std::allocator"* @_ZSt11__addressofISaISt10_List_nodeIiEEEPT_RS3_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %9) #14
   store %"class.std::allocator"* %10, %"class.std::allocator"** %8, align 8
   %11 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %7, i32 0, i32 1
   %12 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %6, align 8
@@ -1372,24 +1329,7 @@ define linkonce_odr dso_local void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEE
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE9constructIiJRKiEEEvRS2_PT_DpOT0_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0, i32* noundef %1, i32* noundef nonnull align 4 dereferenceable(4) %2) #6 comdat align 2 {
-  %4 = alloca %"class.std::allocator"*, align 8
-  %5 = alloca i32*, align 8
-  %6 = alloca i32*, align 8
-  store %"class.std::allocator"* %0, %"class.std::allocator"** %4, align 8
-  store i32* %1, i32** %5, align 8
-  store i32* %2, i32** %6, align 8
-  %7 = load %"class.std::allocator"*, %"class.std::allocator"** %4, align 8
-  %8 = bitcast %"class.std::allocator"* %7 to %"class.__gnu_cxx::new_allocator"*
-  %9 = load i32*, i32** %5, align 8
-  %10 = load i32*, i32** %6, align 8
-  %11 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %10) #3
-  call void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE9constructIiJRKiEEEvPT_DpOT0_(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %8, i32* noundef %9, i32* noundef nonnull align 4 dereferenceable(4) %11) #3
-  ret void
-}
-
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(16) %"struct.std::__allocated_ptr"* @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEaSEDn(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %0, i8* %1) #6 comdat align 2 {
+define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(16) %"struct.std::__allocated_ptr"* @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEEaSEDn(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %0, i8* %1) #2 comdat align 2 {
   %3 = alloca %"struct.std::__allocated_ptr"*, align 8
   %4 = alloca i8*, align 8
   store %"struct.std::__allocated_ptr"* %0, %"struct.std::__allocated_ptr"** %3, align 8
@@ -1401,131 +1341,103 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(16) %"stru
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEED2Ev(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %0) unnamed_addr #5 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
-  %2 = alloca %"struct.std::__allocated_ptr"*, align 8
-  store %"struct.std::__allocated_ptr"* %0, %"struct.std::__allocated_ptr"** %2, align 8
-  %3 = load %"struct.std::__allocated_ptr"*, %"struct.std::__allocated_ptr"** %2, align 8
-  %4 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %3, i32 0, i32 1
-  %5 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %4, align 8
-  %6 = icmp ne %"struct.std::_List_node"* %5, null
-  br i1 %6, label %7, label %13
+define linkonce_odr dso_local void @_ZNSt15__allocated_ptrISaISt10_List_nodeIiEEED2Ev(%"struct.std::__allocated_ptr"* noundef nonnull align 8 dereferenceable(16) %0) unnamed_addr #1 comdat align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
+  %2 = alloca %"class.std::allocator"*, align 8
+  %3 = alloca %"struct.std::_List_node"*, align 8
+  %4 = alloca i64, align 8
+  %5 = alloca %"struct.std::__allocated_ptr"*, align 8
+  store %"struct.std::__allocated_ptr"* %0, %"struct.std::__allocated_ptr"** %5, align 8
+  %6 = load %"struct.std::__allocated_ptr"*, %"struct.std::__allocated_ptr"** %5, align 8
+  %7 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %6, i32 0, i32 1
+  %8 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %7, align 8
+  %9 = icmp ne %"struct.std::_List_node"* %8, null
+  br i1 %9, label %10, label %20
 
-7:                                                ; preds = %1
-  %8 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %3, i32 0, i32 0
-  %9 = load %"class.std::allocator"*, %"class.std::allocator"** %8, align 8
-  %10 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %3, i32 0, i32 1
-  %11 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %10, align 8
-  invoke void @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE10deallocateERS2_PS1_m(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %9, %"struct.std::_List_node"* noundef %11, i64 noundef 1)
-          to label %12 unwind label %14
+10:                                               ; preds = %1
+  %11 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %6, i32 0, i32 0
+  %12 = load %"class.std::allocator"*, %"class.std::allocator"** %11, align 8
+  %13 = getelementptr inbounds %"struct.std::__allocated_ptr", %"struct.std::__allocated_ptr"* %6, i32 0, i32 1
+  %14 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %13, align 8
+  store %"class.std::allocator"* %12, %"class.std::allocator"** %2, align 8
+  store %"struct.std::_List_node"* %14, %"struct.std::_List_node"** %3, align 8
+  store i64 1, i64* %4, align 8
+  %15 = load %"class.std::allocator"*, %"class.std::allocator"** %2, align 8
+  %16 = bitcast %"class.std::allocator"* %15 to %"class.std::__new_allocator"*
+  %17 = load %"struct.std::_List_node"*, %"struct.std::_List_node"** %3, align 8
+  %18 = load i64, i64* %4, align 8
+  call void @_ZNSt15__new_allocatorISt10_List_nodeIiEE10deallocateEPS1_m(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %16, %"struct.std::_List_node"* noundef %17, i64 noundef %18)
+  br label %19
 
-12:                                               ; preds = %7
-  br label %13
+19:                                               ; preds = %10
+  br label %20
 
-13:                                               ; preds = %12, %1
+20:                                               ; preds = %19, %1
   ret void
 
-14:                                               ; preds = %7
-  %15 = landingpad { i8*, i32 }
+21:                                               ; No predecessors!
+  %22 = landingpad { i8*, i32 }
           catch i8* null
-  %16 = extractvalue { i8*, i32 } %15, 0
-  call void @__clang_call_terminate(i8* %16) #15
+  %23 = extractvalue { i8*, i32 } %22, 0
+  call void @__clang_call_terminate(i8* %23) #15
   unreachable
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %"struct.std::_List_node"* @_ZNSt16allocator_traitsISaISt10_List_nodeIiEEE8allocateERS2_m(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0, i64 noundef %1) #4 comdat align 2 {
-  %3 = alloca %"class.std::allocator"*, align 8
-  %4 = alloca i64, align 8
-  store %"class.std::allocator"* %0, %"class.std::allocator"** %3, align 8
-  store i64 %1, i64* %4, align 8
-  %5 = load %"class.std::allocator"*, %"class.std::allocator"** %3, align 8
-  %6 = bitcast %"class.std::allocator"* %5 to %"class.__gnu_cxx::new_allocator"*
-  %7 = load i64, i64* %4, align 8
-  %8 = call noundef %"struct.std::_List_node"* @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE8allocateEmPKv(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %6, i64 noundef %7, i8* noundef null)
-  ret %"struct.std::_List_node"* %8
-}
+define linkonce_odr dso_local noundef %"struct.std::_List_node"* @_ZNSt15__new_allocatorISt10_List_nodeIiEE8allocateEmPKv(%"class.std::__new_allocator"* noundef nonnull align 1 dereferenceable(1) %0, i64 noundef %1, i8* noundef %2) #0 comdat align 2 {
+  %4 = alloca %"class.std::__new_allocator"*, align 8
+  %5 = alloca %"class.std::__new_allocator"*, align 8
+  %6 = alloca i64, align 8
+  %7 = alloca i8*, align 8
+  store %"class.std::__new_allocator"* %0, %"class.std::__new_allocator"** %5, align 8
+  store i64 %1, i64* %6, align 8
+  store i8* %2, i8** %7, align 8
+  %8 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %5, align 8
+  %9 = load i64, i64* %6, align 8
+  store %"class.std::__new_allocator"* %8, %"class.std::__new_allocator"** %4, align 8
+  %10 = load %"class.std::__new_allocator"*, %"class.std::__new_allocator"** %4, align 8
+  %11 = icmp ugt i64 %9, 384307168202282325
+  br i1 %11, label %12, label %17
 
-; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef %"struct.std::_List_node"* @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE8allocateEmPKv(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %0, i64 noundef %1, i8* noundef %2) #4 comdat align 2 {
-  %4 = alloca %"class.__gnu_cxx::new_allocator"*, align 8
-  %5 = alloca i64, align 8
-  %6 = alloca i8*, align 8
-  store %"class.__gnu_cxx::new_allocator"* %0, %"class.__gnu_cxx::new_allocator"** %4, align 8
-  store i64 %1, i64* %5, align 8
-  store i8* %2, i8** %6, align 8
-  %7 = load %"class.__gnu_cxx::new_allocator"*, %"class.__gnu_cxx::new_allocator"** %4, align 8
-  %8 = load i64, i64* %5, align 8
-  %9 = call noundef i64 @_ZNK9__gnu_cxx13new_allocatorISt10_List_nodeIiEE11_M_max_sizeEv(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %7) #3
-  %10 = icmp ugt i64 %8, %9
-  br i1 %10, label %11, label %16
+12:                                               ; preds = %3
+  %13 = load i64, i64* %6, align 8
+  %14 = icmp ugt i64 %13, 768614336404564650
+  br i1 %14, label %15, label %16
 
-11:                                               ; preds = %3
-  %12 = load i64, i64* %5, align 8
-  %13 = icmp ugt i64 %12, 768614336404564650
-  br i1 %13, label %14, label %15
-
-14:                                               ; preds = %11
+15:                                               ; preds = %12
   call void @_ZSt28__throw_bad_array_new_lengthv() #18
   unreachable
 
-15:                                               ; preds = %11
+16:                                               ; preds = %12
   call void @_ZSt17__throw_bad_allocv() #18
   unreachable
 
-16:                                               ; preds = %3
-  %17 = load i64, i64* %5, align 8
-  %18 = mul i64 %17, 24
-  %19 = call noalias noundef nonnull i8* @_Znwm(i64 noundef %18) #19
-  %20 = bitcast i8* %19 to %"struct.std::_List_node"*
-  ret %"struct.std::_List_node"* %20
-}
-
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i64 @_ZNK9__gnu_cxx13new_allocatorISt10_List_nodeIiEE11_M_max_sizeEv(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %0) #6 comdat align 2 {
-  %2 = alloca %"class.__gnu_cxx::new_allocator"*, align 8
-  store %"class.__gnu_cxx::new_allocator"* %0, %"class.__gnu_cxx::new_allocator"** %2, align 8
-  %3 = load %"class.__gnu_cxx::new_allocator"*, %"class.__gnu_cxx::new_allocator"** %2, align 8
-  ret i64 384307168202282325
+17:                                               ; preds = %3
+  %18 = load i64, i64* %6, align 8
+  %19 = mul i64 %18, 24
+  %20 = call noalias noundef nonnull i8* @_Znwm(i64 noundef %19) #16
+  %21 = bitcast i8* %20 to %"struct.std::_List_node"*
+  ret %"struct.std::_List_node"* %21
 }
 
 ; Function Attrs: noreturn
-declare void @_ZSt28__throw_bad_array_new_lengthv() #14
+declare void @_ZSt28__throw_bad_array_new_lengthv() #13
 
 ; Function Attrs: noreturn
-declare void @_ZSt17__throw_bad_allocv() #14
+declare void @_ZSt17__throw_bad_allocv() #13
 
 ; Function Attrs: nobuiltin allocsize(0)
-declare noundef nonnull i8* @_Znwm(i64 noundef) #11
+declare noundef nonnull i8* @_Znwm(i64 noundef) #9
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef %"class.std::allocator"* @_ZSt11__addressofISaISt10_List_nodeIiEEEPT_RS3_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0) #6 comdat {
+define linkonce_odr dso_local noundef %"class.std::allocator"* @_ZSt11__addressofISaISt10_List_nodeIiEEEPT_RS3_(%"class.std::allocator"* noundef nonnull align 1 dereferenceable(1) %0) #2 comdat {
   %2 = alloca %"class.std::allocator"*, align 8
   store %"class.std::allocator"* %0, %"class.std::allocator"** %2, align 8
   %3 = load %"class.std::allocator"*, %"class.std::allocator"** %2, align 8
   ret %"class.std::allocator"* %3
 }
 
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx13new_allocatorISt10_List_nodeIiEE9constructIiJRKiEEEvPT_DpOT0_(%"class.__gnu_cxx::new_allocator"* noundef nonnull align 1 dereferenceable(1) %0, i32* noundef %1, i32* noundef nonnull align 4 dereferenceable(4) %2) #6 comdat align 2 {
-  %4 = alloca %"class.__gnu_cxx::new_allocator"*, align 8
-  %5 = alloca i32*, align 8
-  %6 = alloca i32*, align 8
-  store %"class.__gnu_cxx::new_allocator"* %0, %"class.__gnu_cxx::new_allocator"** %4, align 8
-  store i32* %1, i32** %5, align 8
-  store i32* %2, i32** %6, align 8
-  %7 = load %"class.__gnu_cxx::new_allocator"*, %"class.__gnu_cxx::new_allocator"** %4, align 8
-  %8 = load i32*, i32** %5, align 8
-  %9 = bitcast i32* %8 to i8*
-  %10 = bitcast i8* %9 to i32*
-  %11 = load i32*, i32** %6, align 8
-  %12 = call noundef nonnull align 4 dereferenceable(4) i32* @_ZSt7forwardIRKiEOT_RNSt16remove_referenceIS2_E4typeE(i32* noundef nonnull align 4 dereferenceable(4) %11) #3
-  %13 = load i32, i32* %12, align 4
-  store i32 %13, i32* %10, align 4
-  ret void
-}
-
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_List_node_baseE(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.std::__detail::_List_node_base"* noundef %1) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_List_node_baseE(%"struct.std::_List_iterator"* noundef nonnull align 8 dereferenceable(8) %0, %"struct.std::__detail::_List_node_base"* noundef %1) unnamed_addr #1 comdat align 2 {
   %3 = alloca %"struct.std::_List_iterator"*, align 8
   %4 = alloca %"struct.std::__detail::_List_node_base"*, align 8
   store %"struct.std::_List_iterator"* %0, %"struct.std::_List_iterator"** %3, align 8
@@ -1538,7 +1450,7 @@ define linkonce_odr dso_local void @_ZNSt14_List_iteratorIiEC2EPNSt8__detail15_L
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx114listIiSaIiEE13_M_node_countEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #4 comdat align 2 {
+define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx114listIiSaIiEE13_M_node_countEv(%"class.std::__cxx11::list"* noundef nonnull align 8 dereferenceable(24) %0) #0 comdat align 2 {
   %2 = alloca %"class.std::__cxx11::list"*, align 8
   store %"class.std::__cxx11::list"* %0, %"class.std::__cxx11::list"** %2, align 8
   %3 = load %"class.std::__cxx11::list"*, %"class.std::__cxx11::list"** %2, align 8
@@ -1548,7 +1460,7 @@ define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx114listIiSaIiEE13_M_node_
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx1110_List_baseIiSaIiEE11_M_get_sizeEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #6 comdat align 2 {
+define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx1110_List_baseIiSaIiEE11_M_get_sizeEv(%"class.std::__cxx11::_List_base"* noundef nonnull align 8 dereferenceable(24) %0) #2 comdat align 2 {
   %2 = alloca %"class.std::__cxx11::_List_base"*, align 8
   store %"class.std::__cxx11::_List_base"* %0, %"class.std::__cxx11::_List_base"** %2, align 8
   %3 = load %"class.std::__cxx11::_List_base"*, %"class.std::__cxx11::_List_base"** %2, align 8
@@ -1559,32 +1471,25 @@ define linkonce_odr dso_local noundef i64 @_ZNKSt7__cxx1110_List_baseIiSaIiEE11_
   ret i64 %7
 }
 
-; Function Attrs: noinline uwtable
-define internal void @_GLOBAL__sub_I_eulerian_path_and_circuit.cpp() #0 section ".text.startup" {
-  call void @__cxx_global_var_init()
-  ret void
-}
-
-attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #6 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #7 = { argmemonly nofree nounwind willreturn }
-attributes #8 = { nofree nosync nounwind willreturn }
-attributes #9 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #10 = { nofree nosync nounwind readnone speculatable willreturn }
-attributes #11 = { nobuiltin allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #12 = { nobuiltin nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #13 = { noinline noreturn nounwind }
-attributes #14 = { noreturn "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #0 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #2 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #3 = { argmemonly nofree nounwind willreturn }
+attributes #4 = { nofree nosync nounwind willreturn }
+attributes #5 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #6 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #7 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #8 = { nofree nosync nounwind readnone speculatable willreturn }
+attributes #9 = { nobuiltin allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #10 = { nobuiltin nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #11 = { noinline noreturn nounwind }
+attributes #12 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #13 = { noreturn "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #14 = { nounwind }
 attributes #15 = { noreturn nounwind }
 attributes #16 = { builtin allocsize(0) }
 attributes #17 = { builtin nounwind }
 attributes #18 = { noreturn }
-attributes #19 = { allocsize(0) }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}

@@ -15,7 +15,7 @@ If you have not done `make`, follow the following steps to build `ir2vec` binary
 ## Step 2: Generating Triplets
 #### Steps to collect the triplets
  Run `triplets.sh` script with the required parameters
-`bash triplets.sh <buildDir> <numOpt> <llFileList> <outputFileName>`
+ Usage: `bash triplets.sh <build dir> <No of opt> <llFile list> <output FileName>`
 * `buildDir` points to the path of IR2Vec's build folder
 * `numOpt` is an integer between `1` and `6`
     * Determines number of optimization sequences to apply on each file.
@@ -54,9 +54,10 @@ We preprocess the generated triplets from the [previous step](#step-2-generating
     * The processed files `entity2id.txt`, `train2id.txt` and `relation2id.txt` will be generated in the same directory as that of `tripletsFilePath`.
 
 #### Training TransE to generate embeddings
-Run  `python generate_embedding.py --index_dir=<Path of the directory containing the processed files>`
-* `--index_dir` points to the directory containing the processed files generated on preprocessing the triplets.
-* `--nbatches` Mentions the batch size. Default size is 100.
-* `--margin` Mentions the margin size. Default margin is 1.0
+Run  `python generate_embedding_ray.py`
+* Possible arguments to be given with the file. These args have default values that will be used unless provided
+    * `--index_dir` points to the directory containing the processed files generated on preprocessing the triplets.
+    * `--nbatches` Mentions the batch size. Default size is 100.
+    * `--margin` Mentions the margin size. Default margin is 1.0
 
 The seed embedding vocabulary will be generated inside the same directory.

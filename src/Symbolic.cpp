@@ -153,7 +153,8 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     //     }
     //   } else {
     //     IR2VEC_DEBUG(I.dump());
-    //     IR2VEC_DEBUG(errs() << "==========================Function definition
+    //     IR2VEC_DEBUG(errs() << "==========================Function
+    //     definition
     //     "
     //                          "not found==================\n");
     //   }
