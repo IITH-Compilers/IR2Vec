@@ -5,7 +5,7 @@
 # file in the top-level directory for more details.
 #
 SRC_WD="PE-benchmarks"
-DEST_FOLDER="PE-benchmarks-llfiles-llvm16"
+DEST_FOLDER="PE-benchmarks-llfiles-llvm17"
 
 mkdir -p ${DEST_FOLDER}
 
