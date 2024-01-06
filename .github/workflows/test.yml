@@ -17,10 +17,12 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - name: Install LLVM-14.0.1
+    - name: Install libzstd-dev
+      run: sudo apt-get install libzstd-dev
+    - name: Install LLVM-16.0.1
       run: |
         wget https://apt.llvm.org/llvm.sh
-        sudo bash llvm.sh 14
+        sudo bash llvm.sh 16
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |
