@@ -3,8 +3,7 @@ source_filename = "PE-benchmarks/weighted-job-scheduling.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-module asm ".globl _ZSt21ios_base_library_initv"
-
+%"class.std::ios_base::Init" = type { i8 }
 %struct.Job = type { i32, i32, i32 }
 %"class.std::basic_ostream" = type { ptr, %"class.std::basic_ios" }
 %"class.std::basic_ios" = type { %"class.std::ios_base", ptr, i8, i8, ptr, ptr, ptr, ptr }
@@ -25,7 +24,7 @@ $_ZN9__gnu_cxx5__ops16__iter_comp_iterIPFb3JobS2_EEENS0_15_Iter_comp_iterIT_EES6
 
 $_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_T1_ = comdat any
 
-$_ZSt4__lgIlET_S0_ = comdat any
+$_ZSt4__lgl = comdat any
 
 $_ZSt22__final_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_ = comdat any
 
@@ -59,10 +58,6 @@ $_ZSt9iter_swapIP3JobS1_EvT_T0_ = comdat any
 
 $_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_ = comdat any
 
-$_ZSt11__bit_widthImEiT_ = comdat any
-
-$_ZSt13__countl_zeroImEiT_ = comdat any
-
 $_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_ = comdat any
 
 $_ZSt26__unguarded_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_ = comdat any
@@ -85,9 +80,7 @@ $_ZSt12__niter_baseIP3JobET_S2_ = comdat any
 
 $_ZSt23__copy_move_backward_a2ILb1EP3JobS1_ET1_T0_S3_S2_ = comdat any
 
-$_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobS3_EEPT0_PT_S7_S5_ = comdat any
-
-$_ZNSt11__copy_moveILb1ELb0ESt26random_access_iterator_tagE12__assign_oneI3JobS3_EEvPT_PT0_ = comdat any
+$_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobEEPT_PKS4_S7_S5_ = comdat any
 
 $_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEclIS2_PS2_EEbRT_T0_ = comdat any
 
@@ -95,12 +88,30 @@ $_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE
 
 $_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEC2ES4_ = comdat any
 
+@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
+@__dso_handle = external hidden global i8
 @__const.main.arr = private unnamed_addr constant [4 x %struct.Job] [%struct.Job { i32 3, i32 10, i32 20 }, %struct.Job { i32 1, i32 2, i32 50 }, %struct.Job { i32 6, i32 19, i32 100 }, %struct.Job { i32 2, i32 100, i32 200 }], align 16
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [23 x i8] c"The optimal profit is \00", align 1
+@llvm.global_ctors = appending global [1 x { i32, ptr, ptr }] [{ i32, ptr, ptr } { i32 65535, ptr @_GLOBAL__sub_I_weighted_job_scheduling.cpp, ptr null }]
+
+; Function Attrs: noinline uwtable
+define internal void @__cxx_global_var_init() #0 section ".text.startup" {
+  call void @_ZNSt8ios_base4InitC1Ev(ptr noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
+  %1 = call i32 @__cxa_atexit(ptr @_ZNSt8ios_base4InitD1Ev, ptr @_ZStL8__ioinit, ptr @__dso_handle) #3
+  ret void
+}
+
+declare void @_ZNSt8ios_base4InitC1Ev(ptr noundef nonnull align 1 dereferenceable(1)) unnamed_addr #1
+
+; Function Attrs: nounwind
+declare void @_ZNSt8ios_base4InitD1Ev(ptr noundef nonnull align 1 dereferenceable(1)) unnamed_addr #2
+
+; Function Attrs: nounwind
+declare i32 @__cxa_atexit(ptr, ptr, ptr) #3
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define dso_local noundef zeroext i1 @_Z14jobComparataor3JobS_(i64 %0, i32 %1, i64 %2, i32 %3) #0 {
+define dso_local noundef zeroext i1 @_Z14jobComparataor3JobS_(i64 %0, i32 %1, i64 %2, i32 %3) #4 {
   %5 = alloca %struct.Job, align 4
   %6 = alloca { i64, i32 }, align 4
   %7 = alloca %struct.Job, align 4
@@ -124,10 +135,10 @@ define dso_local noundef zeroext i1 @_Z14jobComparataor3JobS_(i64 %0, i32 %1, i6
 }
 
 ; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
-declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #1
+declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #5
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define dso_local noundef i32 @_Z17latestNonConflictP3Jobi(ptr noundef %0, i32 noundef %1) #0 {
+define dso_local noundef i32 @_Z17latestNonConflictP3Jobi(ptr noundef %0, i32 noundef %1) #4 {
   %3 = alloca i32, align 4
   %4 = alloca ptr, align 8
   %5 = alloca i32, align 4
@@ -184,7 +195,7 @@ define dso_local noundef i32 @_Z17latestNonConflictP3Jobi(ptr noundef %0, i32 no
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(ptr noundef %0, i32 noundef %1) #2 {
+define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(ptr noundef %0, i32 noundef %1) #6 {
   %3 = alloca ptr, align 8
   %4 = alloca i32, align 4
   %5 = alloca ptr, align 8
@@ -206,7 +217,7 @@ define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(ptr noundef %0, i32 nounde
   %18 = extractvalue { i64, i1 } %17, 1
   %19 = extractvalue { i64, i1 } %17, 0
   %20 = select i1 %18, i64 -1, i64 %19
-  %21 = call noalias noundef nonnull ptr @_Znam(i64 noundef %20) #9
+  %21 = call noalias noundef nonnull ptr @_Znam(i64 noundef %20) #12
   store ptr %21, ptr %5, align 8
   %22 = load ptr, ptr %3, align 8
   %23 = getelementptr inbounds %struct.Job, ptr %22, i64 0
@@ -285,7 +296,7 @@ define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(ptr noundef %0, i32 nounde
   br i1 %75, label %77, label %76
 
 76:                                               ; preds = %67
-  call void @_ZdaPv(ptr noundef %74) #10
+  call void @_ZdaPv(ptr noundef %74) #13
   br label %77
 
 77:                                               ; preds = %76, %67
@@ -294,7 +305,7 @@ define dso_local noundef i32 @_Z13findMaxProfitP3Jobi(ptr noundef %0, i32 nounde
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt4sortIP3JobPFbS0_S0_EEvT_S4_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #2 comdat {
+define linkonce_odr dso_local void @_ZSt4sortIP3JobPFbS0_S0_EEvT_S4_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #6 comdat {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -315,13 +326,13 @@ define linkonce_odr dso_local void @_ZSt4sortIP3JobPFbS0_S0_EEvT_S4_T0_(ptr noun
 }
 
 ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare { i64, i1 } @llvm.umul.with.overflow.i64(i64, i64) #3
+declare { i64, i1 } @llvm.umul.with.overflow.i64(i64, i64) #7
 
 ; Function Attrs: nobuiltin allocsize(0)
-declare noundef nonnull ptr @_Znam(i64 noundef) #4
+declare noundef nonnull ptr @_Znam(i64 noundef) #8
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) ptr @_ZSt3maxIiERKT_S2_S2_(ptr noundef nonnull align 4 dereferenceable(4) %0, ptr noundef nonnull align 4 dereferenceable(4) %1) #0 comdat {
+define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) ptr @_ZSt3maxIiERKT_S2_S2_(ptr noundef nonnull align 4 dereferenceable(4) %0, ptr noundef nonnull align 4 dereferenceable(4) %1) #4 comdat {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
@@ -350,10 +361,10 @@ define linkonce_odr dso_local noundef nonnull align 4 dereferenceable(4) ptr @_Z
 }
 
 ; Function Attrs: nobuiltin nounwind
-declare void @_ZdaPv(ptr noundef) #5
+declare void @_ZdaPv(ptr noundef) #9
 
 ; Function Attrs: mustprogress noinline norecurse uwtable
-define dso_local noundef i32 @main() #6 {
+define dso_local noundef i32 @main() #10 {
   %1 = alloca i32, align 4
   %2 = alloca [4 x %struct.Job], align 16
   %3 = alloca i32, align 4
@@ -368,12 +379,12 @@ define dso_local noundef i32 @main() #6 {
   ret i32 0
 }
 
-declare noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8), ptr noundef) #7
+declare noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8), ptr noundef) #1
 
-declare noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEi(ptr noundef nonnull align 8 dereferenceable(8), i32 noundef) #7
+declare noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEi(ptr noundef nonnull align 8 dereferenceable(8), i32 noundef) #1
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #2 comdat {
+define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #6 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -397,7 +408,7 @@ define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_co
   %19 = ptrtoint ptr %17 to i64
   %20 = sub i64 %18, %19
   %21 = sdiv exact i64 %20, 12
-  %22 = call noundef i64 @_ZSt4__lgIlET_S0_(i64 noundef %21)
+  %22 = call noundef i64 @_ZSt4__lgl(i64 noundef %21)
   %23 = mul nsw i64 %22, 2
   call void @llvm.memcpy.p0.p0.i64(ptr align 8 %7, ptr align 8 %4, i64 8, i1 false)
   %24 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", ptr %7, i32 0, i32 0
@@ -416,7 +427,7 @@ define linkonce_odr dso_local void @_ZSt6__sortIP3JobN9__gnu_cxx5__ops15_Iter_co
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local ptr @_ZN9__gnu_cxx5__ops16__iter_comp_iterIPFb3JobS2_EEENS0_15_Iter_comp_iterIT_EES6_(ptr noundef %0) #2 comdat {
+define linkonce_odr dso_local ptr @_ZN9__gnu_cxx5__ops16__iter_comp_iterIPFb3JobS2_EEENS0_15_Iter_comp_iterIT_EES6_(ptr noundef %0) #6 comdat {
   %2 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %3 = alloca ptr, align 8
   store ptr %0, ptr %3, align 8
@@ -428,7 +439,7 @@ define linkonce_odr dso_local ptr @_ZN9__gnu_cxx5__ops16__iter_comp_iterIPFb3Job
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_T1_(ptr noundef %0, ptr noundef %1, i64 noundef %2, ptr %3) #2 comdat {
+define linkonce_odr dso_local void @_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_T1_(ptr noundef %0, ptr noundef %1, i64 noundef %2, ptr %3) #6 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca ptr, align 8
   %7 = alloca ptr, align 8
@@ -496,18 +507,19 @@ define linkonce_odr dso_local void @_ZSt16__introsort_loopIP3JoblN9__gnu_cxx5__o
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i64 @_ZSt4__lgIlET_S0_(i64 noundef %0) #0 comdat {
+define linkonce_odr dso_local noundef i64 @_ZSt4__lgl(i64 noundef %0) #4 comdat {
   %2 = alloca i64, align 8
   store i64 %0, ptr %2, align 8
   %3 = load i64, ptr %2, align 8
-  %4 = call noundef i32 @_ZSt11__bit_widthImEiT_(i64 noundef %3) #11
-  %5 = sub nsw i32 %4, 1
-  %6 = sext i32 %5 to i64
-  ret i64 %6
+  %4 = call i64 @llvm.ctlz.i64(i64 %3, i1 true)
+  %5 = trunc i64 %4 to i32
+  %6 = sub nsw i32 63, %5
+  %7 = sext i32 %6 to i64
+  ret i64 %7
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt22__final_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #2 comdat {
+define linkonce_odr dso_local void @_ZSt22__final_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #6 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -558,7 +570,7 @@ define linkonce_odr dso_local void @_ZSt22__final_insertion_sortIP3JobN9__gnu_cx
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt14__partial_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr %3) #2 comdat {
+define linkonce_odr dso_local void @_ZSt14__partial_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr %3) #6 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca ptr, align 8
   %7 = alloca ptr, align 8
@@ -583,7 +595,7 @@ define linkonce_odr dso_local void @_ZSt14__partial_sortIP3JobN9__gnu_cxx5__ops1
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt27__unguarded_partition_pivotIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #2 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt27__unguarded_partition_pivotIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #6 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -626,7 +638,7 @@ define linkonce_odr dso_local noundef ptr @_ZSt27__unguarded_partition_pivotIP3J
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt13__heap_selectIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr %3) #2 comdat {
+define linkonce_odr dso_local void @_ZSt13__heap_selectIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr %3) #6 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca ptr, align 8
   %7 = alloca ptr, align 8
@@ -677,7 +689,7 @@ define linkonce_odr dso_local void @_ZSt13__heap_selectIP3JobN9__gnu_cxx5__ops15
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt11__sort_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(ptr noundef %0, ptr noundef %1, ptr noundef nonnull align 8 dereferenceable(8) %2) #2 comdat {
+define linkonce_odr dso_local void @_ZSt11__sort_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(ptr noundef %0, ptr noundef %1, ptr noundef nonnull align 8 dereferenceable(8) %2) #6 comdat {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -712,7 +724,7 @@ define linkonce_odr dso_local void @_ZSt11__sort_heapIP3JobN9__gnu_cxx5__ops15_I
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt11__make_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(ptr noundef %0, ptr noundef %1, ptr noundef nonnull align 8 dereferenceable(8) %2) #2 comdat {
+define linkonce_odr dso_local void @_ZSt11__make_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_RT0_(ptr noundef %0, ptr noundef %1, ptr noundef nonnull align 8 dereferenceable(8) %2) #6 comdat {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -788,7 +800,7 @@ define linkonce_odr dso_local void @_ZSt11__make_heapIP3JobN9__gnu_cxx5__ops15_I
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEclIPS2_S7_EEbT_T0_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1, ptr noundef %2) #2 comdat align 2 {
+define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEclIPS2_S7_EEbT_T0_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1, ptr noundef %2) #6 comdat align 2 {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -821,7 +833,7 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops15_Iter_com
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_RT0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr noundef nonnull align 8 dereferenceable(8) %3) #2 comdat {
+define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_RT0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr noundef nonnull align 8 dereferenceable(8) %3) #6 comdat {
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
   %7 = alloca ptr, align 8
@@ -861,7 +873,7 @@ define linkonce_odr dso_local void @_ZSt10__pop_heapIP3JobN9__gnu_cxx5__ops15_It
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_T0_S9_T1_T2_(ptr noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, ptr %5) #2 comdat {
+define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_T0_S9_T1_T2_(ptr noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, ptr %5) #6 comdat {
   %7 = alloca %struct.Job, align 4
   %8 = alloca { i64, i32 }, align 4
   %9 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
@@ -978,7 +990,7 @@ define linkonce_odr dso_local void @_ZSt13__adjust_heapIP3JoblS0_N9__gnu_cxx5__o
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #8 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #11 comdat align 2 {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   store ptr %0, ptr %3, align 8
@@ -993,7 +1005,7 @@ define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops14_Iter_comp_valIPFbS0_S0_EEEEvT_T0_S9_T1_RT2_(ptr noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, ptr noundef nonnull align 8 dereferenceable(8) %5) #2 comdat {
+define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops14_Iter_comp_valIPFbS0_S0_EEEEvT_T0_S9_T1_RT2_(ptr noundef %0, i64 noundef %1, i64 noundef %2, i64 %3, i32 %4, ptr noundef nonnull align 8 dereferenceable(8) %5) #6 comdat {
   %7 = alloca %struct.Job, align 4
   %8 = alloca { i64, i32 }, align 4
   %9 = alloca ptr, align 8
@@ -1059,7 +1071,7 @@ define linkonce_odr dso_local void @_ZSt11__push_heapIP3JoblS0_N9__gnu_cxx5__ops
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEclIPS2_S2_EEbT_RT0_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1, ptr noundef nonnull align 4 dereferenceable(12) %2) #2 comdat align 2 {
+define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Iter_comp_valIPFb3JobS2_EEclIPS2_S2_EEbT_RT0_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1, ptr noundef nonnull align 4 dereferenceable(12) %2) #6 comdat align 2 {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1092,7 +1104,7 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Iter_com
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt22__move_median_to_firstIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr noundef %3, ptr %4) #2 comdat {
+define linkonce_odr dso_local void @_ZSt22__move_median_to_firstIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr noundef %3, ptr %4) #6 comdat {
   %6 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %7 = alloca ptr, align 8
   %8 = alloca ptr, align 8
@@ -1186,7 +1198,7 @@ define linkonce_odr dso_local void @_ZSt22__move_median_to_firstIP3JobN9__gnu_cx
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt21__unguarded_partitionIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr %3) #2 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt21__unguarded_partitionIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEET_S8_S8_S8_T0_(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr %3) #6 comdat {
   %5 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %6 = alloca ptr, align 8
   %7 = alloca ptr, align 8
@@ -1252,19 +1264,19 @@ define linkonce_odr dso_local noundef ptr @_ZSt21__unguarded_partitionIP3JobN9__
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZSt9iter_swapIP3JobS1_EvT_T0_(ptr noundef %0, ptr noundef %1) #0 comdat {
+define linkonce_odr dso_local void @_ZSt9iter_swapIP3JobS1_EvT_T0_(ptr noundef %0, ptr noundef %1) #4 comdat {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   store ptr %0, ptr %3, align 8
   store ptr %1, ptr %4, align 8
   %5 = load ptr, ptr %3, align 8
   %6 = load ptr, ptr %4, align 8
-  call void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(ptr noundef nonnull align 4 dereferenceable(12) %5, ptr noundef nonnull align 4 dereferenceable(12) %6) #11
+  call void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(ptr noundef nonnull align 4 dereferenceable(12) %5, ptr noundef nonnull align 4 dereferenceable(12) %6) #3
   ret void
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(ptr noundef nonnull align 4 dereferenceable(12) %0, ptr noundef nonnull align 4 dereferenceable(12) %1) #0 comdat {
+define linkonce_odr dso_local void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_(ptr noundef nonnull align 4 dereferenceable(12) %0, ptr noundef nonnull align 4 dereferenceable(12) %1) #4 comdat {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   %5 = alloca %struct.Job, align 4
@@ -1280,59 +1292,11 @@ define linkonce_odr dso_local void @_ZSt4swapI3JobENSt9enable_ifIXsr6__and_ISt6_
   ret void
 }
 
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i32 @_ZSt11__bit_widthImEiT_(i64 noundef %0) #0 comdat {
-  %2 = alloca i64, align 8
-  %3 = alloca i32, align 4
-  store i64 %0, ptr %2, align 8
-  store i32 64, ptr %3, align 4
-  %4 = load i64, ptr %2, align 8
-  %5 = call noundef i32 @_ZSt13__countl_zeroImEiT_(i64 noundef %4) #11
-  %6 = sub nsw i32 64, %5
-  ret i32 %6
-}
-
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef i32 @_ZSt13__countl_zeroImEiT_(i64 noundef %0) #0 comdat {
-  %2 = alloca i32, align 4
-  %3 = alloca i64, align 8
-  %4 = alloca i32, align 4
-  %5 = alloca i32, align 4
-  %6 = alloca i32, align 4
-  %7 = alloca i32, align 4
-  %8 = alloca i32, align 4
-  store i64 %0, ptr %3, align 8
-  store i32 64, ptr %4, align 4
-  %9 = load i64, ptr %3, align 8
-  %10 = icmp eq i64 %9, 0
-  br i1 %10, label %11, label %12
-
-11:                                               ; preds = %1
-  store i32 64, ptr %2, align 4
-  br label %17
-
-12:                                               ; preds = %1
-  store i32 64, ptr %5, align 4
-  store i32 64, ptr %6, align 4
-  store i32 32, ptr %7, align 4
-  store i32 0, ptr %8, align 4
-  %13 = load i64, ptr %3, align 8
-  %14 = call i64 @llvm.ctlz.i64(i64 %13, i1 true)
-  %15 = trunc i64 %14 to i32
-  %16 = sub nsw i32 %15, 0
-  store i32 %16, ptr %2, align 4
-  br label %17
-
-17:                                               ; preds = %12, %11
-  %18 = load i32, ptr %2, align 4
-  ret i32 %18
-}
-
 ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare i64 @llvm.ctlz.i64(i64, i1 immarg) #3
+declare i64 @llvm.ctlz.i64(i64, i1 immarg) #7
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #2 comdat {
+define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #6 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1409,7 +1373,7 @@ define linkonce_odr dso_local void @_ZSt16__insertion_sortIP3JobN9__gnu_cxx5__op
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt26__unguarded_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #2 comdat {
+define linkonce_odr dso_local void @_ZSt26__unguarded_insertion_sortIP3JobN9__gnu_cxx5__ops15_Iter_comp_iterIPFbS0_S0_EEEEvT_S8_T0_(ptr noundef %0, ptr noundef %1, ptr %2) #6 comdat {
   %4 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1454,7 +1418,7 @@ define linkonce_odr dso_local void @_ZSt26__unguarded_insertion_sortIP3JobN9__gn
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt13move_backwardIP3JobS1_ET0_T_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #2 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt13move_backwardIP3JobS1_ET0_T_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #6 comdat {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1471,7 +1435,7 @@ define linkonce_odr dso_local noundef ptr @_ZSt13move_backwardIP3JobS1_ET0_T_S3_
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu_cxx5__ops14_Val_comp_iterIPFbS0_S0_EEEEvT_T0_(ptr noundef %0, ptr %1) #2 comdat {
+define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu_cxx5__ops14_Val_comp_iterIPFbS0_S0_EEEEvT_T0_(ptr noundef %0, ptr %1) #6 comdat {
   %3 = alloca %"struct.__gnu_cxx::__ops::_Val_comp_iter", align 8
   %4 = alloca ptr, align 8
   %5 = alloca %struct.Job, align 4
@@ -1511,7 +1475,7 @@ define linkonce_odr dso_local void @_ZSt25__unguarded_linear_insertIP3JobN9__gnu
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local ptr @_ZN9__gnu_cxx5__ops15__val_comp_iterIPFb3JobS2_EEENS0_14_Val_comp_iterIT_EENS0_15_Iter_comp_iterIS6_EE(ptr %0) #2 comdat {
+define linkonce_odr dso_local ptr @_ZN9__gnu_cxx5__ops15__val_comp_iterIPFb3JobS2_EEENS0_14_Val_comp_iterIT_EENS0_15_Iter_comp_iterIS6_EE(ptr %0) #6 comdat {
   %2 = alloca %"struct.__gnu_cxx::__ops::_Val_comp_iter", align 8
   %3 = alloca %"struct.__gnu_cxx::__ops::_Iter_comp_iter", align 8
   %4 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", ptr %3, i32 0, i32 0
@@ -1523,7 +1487,7 @@ define linkonce_odr dso_local ptr @_ZN9__gnu_cxx5__ops15__val_comp_iterIPFb3JobS
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt22__copy_move_backward_aILb1EP3JobS1_ET1_T0_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #2 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt22__copy_move_backward_aILb1EP3JobS1_ET1_T0_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #6 comdat {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1531,18 +1495,18 @@ define linkonce_odr dso_local noundef ptr @_ZSt22__copy_move_backward_aILb1EP3Jo
   store ptr %1, ptr %5, align 8
   store ptr %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
-  %8 = call noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %7) #11
+  %8 = call noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %7) #3
   %9 = load ptr, ptr %5, align 8
-  %10 = call noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %9) #11
+  %10 = call noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %9) #3
   %11 = load ptr, ptr %6, align 8
-  %12 = call noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %11) #11
+  %12 = call noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %11) #3
   %13 = call noundef ptr @_ZSt23__copy_move_backward_a1ILb1EP3JobS1_ET1_T0_S3_S2_(ptr noundef %8, ptr noundef %10, ptr noundef %12)
   %14 = call noundef ptr @_ZSt12__niter_wrapIP3JobET_RKS2_S2_(ptr noundef nonnull align 8 dereferenceable(8) %6, ptr noundef %13)
   ret ptr %14
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt12__miter_baseIP3JobET_S2_(ptr noundef %0) #0 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt12__miter_baseIP3JobET_S2_(ptr noundef %0) #4 comdat {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
@@ -1550,7 +1514,7 @@ define linkonce_odr dso_local noundef ptr @_ZSt12__miter_baseIP3JobET_S2_(ptr no
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt12__niter_wrapIP3JobET_RKS2_S2_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1) #0 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt12__niter_wrapIP3JobET_RKS2_S2_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1) #4 comdat {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   store ptr %0, ptr %3, align 8
@@ -1560,7 +1524,7 @@ define linkonce_odr dso_local noundef ptr @_ZSt12__niter_wrapIP3JobET_RKS2_S2_(p
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt23__copy_move_backward_a1ILb1EP3JobS1_ET1_T0_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #2 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt23__copy_move_backward_a1ILb1EP3JobS1_ET1_T0_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #6 comdat {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1575,7 +1539,7 @@ define linkonce_odr dso_local noundef ptr @_ZSt23__copy_move_backward_a1ILb1EP3J
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %0) #0 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr noundef %0) #4 comdat {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
@@ -1583,7 +1547,7 @@ define linkonce_odr dso_local noundef ptr @_ZSt12__niter_baseIP3JobET_S2_(ptr no
 }
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef ptr @_ZSt23__copy_move_backward_a2ILb1EP3JobS1_ET1_T0_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #2 comdat {
+define linkonce_odr dso_local noundef ptr @_ZSt23__copy_move_backward_a2ILb1EP3JobS1_ET1_T0_S3_S2_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #6 comdat {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1593,12 +1557,12 @@ define linkonce_odr dso_local noundef ptr @_ZSt23__copy_move_backward_a2ILb1EP3J
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
   %9 = load ptr, ptr %6, align 8
-  %10 = call noundef ptr @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobS3_EEPT0_PT_S7_S5_(ptr noundef %7, ptr noundef %8, ptr noundef %9)
+  %10 = call noundef ptr @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobEEPT_PKS4_S7_S5_(ptr noundef %7, ptr noundef %8, ptr noundef %9)
   ret ptr %10
 }
 
-; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef ptr @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobS3_EEPT0_PT_S7_S5_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #2 comdat align 2 {
+; Function Attrs: mustprogress noinline nounwind uwtable
+define linkonce_odr dso_local noundef ptr @_ZNSt20__copy_move_backwardILb1ELb1ESt26random_access_iterator_tagE13__copy_move_bI3JobEEPT_PKS4_S7_S5_(ptr noundef %0, ptr noundef %1, ptr noundef %2) #4 comdat align 2 {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1614,7 +1578,7 @@ define linkonce_odr dso_local noundef ptr @_ZNSt20__copy_move_backwardILb1ELb1ES
   %13 = sdiv exact i64 %12, 12
   store i64 %13, ptr %7, align 8
   %14 = load i64, ptr %7, align 8
-  %15 = icmp sgt i64 %14, 1
+  %15 = icmp ne i64 %14, 0
   br i1 %15, label %16, label %24
 
 16:                                               ; preds = %3
@@ -1626,48 +1590,21 @@ define linkonce_odr dso_local noundef ptr @_ZNSt20__copy_move_backwardILb1ELb1ES
   %22 = load i64, ptr %7, align 8
   %23 = mul i64 12, %22
   call void @llvm.memmove.p0.p0.i64(ptr align 4 %20, ptr align 4 %21, i64 %23, i1 false)
-  br label %32
+  br label %24
 
-24:                                               ; preds = %3
-  %25 = load i64, ptr %7, align 8
-  %26 = icmp eq i64 %25, 1
-  br i1 %26, label %27, label %31
-
-27:                                               ; preds = %24
-  %28 = load ptr, ptr %6, align 8
-  %29 = getelementptr inbounds %struct.Job, ptr %28, i64 -1
-  %30 = load ptr, ptr %4, align 8
-  call void @_ZNSt11__copy_moveILb1ELb0ESt26random_access_iterator_tagE12__assign_oneI3JobS3_EEvPT_PT0_(ptr noundef %29, ptr noundef %30)
-  br label %31
-
-31:                                               ; preds = %27, %24
-  br label %32
-
-32:                                               ; preds = %31, %16
-  %33 = load ptr, ptr %6, align 8
-  %34 = load i64, ptr %7, align 8
-  %35 = sub i64 0, %34
-  %36 = getelementptr inbounds %struct.Job, ptr %33, i64 %35
-  ret ptr %36
+24:                                               ; preds = %16, %3
+  %25 = load ptr, ptr %6, align 8
+  %26 = load i64, ptr %7, align 8
+  %27 = sub i64 0, %26
+  %28 = getelementptr inbounds %struct.Job, ptr %25, i64 %27
+  ret ptr %28
 }
 
 ; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
-declare void @llvm.memmove.p0.p0.i64(ptr nocapture writeonly, ptr nocapture readonly, i64, i1 immarg) #1
-
-; Function Attrs: mustprogress noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZNSt11__copy_moveILb1ELb0ESt26random_access_iterator_tagE12__assign_oneI3JobS3_EEvPT_PT0_(ptr noundef %0, ptr noundef %1) #0 comdat align 2 {
-  %3 = alloca ptr, align 8
-  %4 = alloca ptr, align 8
-  store ptr %0, ptr %3, align 8
-  store ptr %1, ptr %4, align 8
-  %5 = load ptr, ptr %4, align 8
-  %6 = load ptr, ptr %3, align 8
-  call void @llvm.memcpy.p0.p0.i64(ptr align 4 %6, ptr align 4 %5, i64 12, i1 false)
-  ret void
-}
+declare void @llvm.memmove.p0.p0.i64(ptr nocapture writeonly, ptr nocapture readonly, i64, i1 immarg) #5
 
 ; Function Attrs: mustprogress noinline uwtable
-define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEclIS2_PS2_EEbRT_T0_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef nonnull align 4 dereferenceable(12) %1, ptr noundef %2) #2 comdat align 2 {
+define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEclIS2_PS2_EEbRT_T0_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef nonnull align 4 dereferenceable(12) %1, ptr noundef %2) #6 comdat align 2 {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8
@@ -1700,7 +1637,7 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Val_comp
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #8 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS2_EEC2EONS0_15_Iter_comp_iterIS4_EE(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef nonnull align 8 dereferenceable(8) %1) unnamed_addr #11 comdat align 2 {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   store ptr %0, ptr %3, align 8
@@ -1715,7 +1652,7 @@ define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops14_Val_comp_iterIPFb3JobS
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEC2ES4_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1) unnamed_addr #8 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3JobS2_EEC2ES4_(ptr noundef nonnull align 8 dereferenceable(8) %0, ptr noundef %1) unnamed_addr #11 comdat align 2 {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   store ptr %0, ptr %3, align 8
@@ -1727,18 +1664,26 @@ define linkonce_odr dso_local void @_ZN9__gnu_cxx5__ops15_Iter_comp_iterIPFb3Job
   ret void
 }
 
-attributes #0 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #1 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }
-attributes #2 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #3 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
-attributes #4 = { nobuiltin allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { nobuiltin nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #6 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #7 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #8 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #9 = { builtin allocsize(0) }
-attributes #10 = { builtin nounwind }
-attributes #11 = { nounwind }
+; Function Attrs: noinline uwtable
+define internal void @_GLOBAL__sub_I_weighted_job_scheduling.cpp() #0 section ".text.startup" {
+  call void @__cxx_global_var_init()
+  ret void
+}
+
+attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #3 = { nounwind }
+attributes #4 = { mustprogress noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }
+attributes #6 = { mustprogress noinline uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #7 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #8 = { nobuiltin allocsize(0) "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #9 = { nobuiltin nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #10 = { mustprogress noinline norecurse uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #11 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #12 = { builtin allocsize(0) }
+attributes #13 = { builtin nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}
@@ -1748,7 +1693,7 @@ attributes #11 = { nounwind }
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-!5 = !{!"Ubuntu clang version 16.0.6 (++20230710042046+7cbf1a259152-1~exp1~20230710162136.105)"}
+!5 = !{!"Ubuntu clang version 17.0.2 (++20230927043059+b7eba056b93c-1~exp1~20230927163154.45)"}
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}
