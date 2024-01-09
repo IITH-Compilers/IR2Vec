@@ -41,7 +41,11 @@ file(GLOB RESOURCE_FILES ../vocabulary/seedEmbeddingVocab.txt)
 llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
 
 add_executable(${PROJECT_NAME} ${binsrc})
-target_link_libraries (${PROJECT_NAME} ${llvm_libs} objlib)
+
+target_link_libraries(
+  ${PROJECT_NAME} ${llvm_libs} objlib
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE .)
 
 add_library(objlib OBJECT ${libsrc})
@@ -84,3 +88,26 @@ add_custom_target(verify-flowaware
  )
 
 add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
+
+
+# Fetch gTest
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+
+# Make gtest available
+FetchContent_MakeAvailable(googletest)
+
+# create test executable
+add_executable(${PROJECT_NAME}_test ${commonsrc} CollectIR.cpp tests/test_ir2vec.cpp)
+
+# Link test executable against gtest & gtest_main
+target_link_libraries(${PROJECT_NAME}_test GTest::gtest_main ${llvm_libs} Eigen3::Eigen)
+
+# Add gtest based tests
+enable_testing()
+
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME}_test)
