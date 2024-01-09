@@ -202,17 +202,17 @@ for (auto val : pgmVec)
 ```
 
 ## Using Python package (IR2Vec-Wheels)
+- Initialization:
+  - ```initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")```
 - Input:
   - .ll/.bc file for which embeddings are needed
   - `fa` -> Flow-Aware Encoddings; `sym` -> Symbolic Encodings
   - `p` -> program level; `f` -> function level
 - Output:
-    - A dictionary containing:
-        - `Instruction_Dict`: Key: Instruction[String]; Value : Embedding Vector
-        - `Function_Dict`: Key: Function name[String]; Value : Embedding Vector
-        - `Program_List`: Program/Module Name[String]; Embedding Vector
-        - `Message`: [String] Appropriate debug message.
-        - `Status`: [Bool] True if everything went fine else False
+    - Use the following functions:
+        - `Program Vector`: ```progVector1 = ir2vec.getProgramVector(initObj)``` or ```progVector2 = initObj.getProgramVector()```
+        - `Function Vector`: ```functionVectorMap1 = ir2vec.getFunctionVectors(initObj)``` or ```functionVectorMap2 = initObj.getFunctionVectors()```
+        - `Instruction Vectors`: ```instructionVectorsList1 = ir2vec.getInstructionVectors(initObj)``` or ```instructionVectorsList2 = initObj.getInstructionVectors()```
 - The following code snippet contains an example to demonstrate the usage of the package.
 
 ```python
