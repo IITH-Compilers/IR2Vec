@@ -217,36 +217,35 @@ for (auto val : pgmVec)
 
 ```python
 import ir2vec
+import numpy as np
 
 # IR2Vec Python APIs can be used in two ways. As shown below.
 initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+
+#Approach 1
 progVector1 = ir2vec.getProgramVector(initObj)
 functionVectorMap1 = ir2vec.getFunctionVectors(initObj)
 instructionVectorsList1 = ir2vec.getInstructionVectors(initObj)
 
+#Approach 2
 progVector2 = initObj.getProgramVector()
 functionVectorMap2 = initObj.getFunctionVectors()
 instructionVectorsList2 = initObj.getInstructionVectors()
 
 # Both the approaches would result in same outcomes
-tolerance = 1e-6
-for val1, val2 in zip(progVector1, progVector2):
-    assert (abs(progVector1 - progVector2) <= tolerance)
+assert(np.allclose(progVector1,progVector2))
 
 for fun, funcObj in functionVectorMap1.items():
     assert fun == funcObj["demangledName"]
-
     functionOutput1 = ir2vec.getFunctionVectors(
         initObj,
         funcObj["actualName"],
     )
-
     functionOutput2 = initObj.getFunctionVectors(
         funcObj["actualName"]
     )
+    assert(np.allclose(functionOutput1[fun]["vector"],functionOutput2[fun]["vector"]))
 
-    for val1, val2 in zip(functionOutput1[fun]["vector"], functionOutput2[fun]["vector"]):
-        assert (abs(progVector1 - progVector2) <= tolerance)
 
 ```
 ## Binaries, Libraries and Wheels - Artifacts
