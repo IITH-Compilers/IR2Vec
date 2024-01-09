@@ -202,17 +202,80 @@ for (auto val : pgmVec)
 ```
 
 ## Using Python package (IR2Vec-Wheels)
-- Input:
-  - .ll/.bc file for which embeddings are needed
-  - `fa` -> Flow-Aware Encoddings; `sym` -> Symbolic Encodings
-  - `p` -> program level; `f` -> function level
-- Output:
-    - A dictionary containing:
-        - `Instruction_Dict`: Key: Instruction[String]; Value : Embedding Vector
-        - `Function_Dict`: Key: Function name[String]; Value : Embedding Vector
-        - `Program_List`: Program/Module Name[String]; Embedding Vector
-        - `Message`: [String] Appropriate debug message.
-        - `Status`: [Bool] True if everything went fine else False
+### Initialization -ir2vec.initEmbedding
+
+**Description:** Initialize IR2Vec embedding for an LLVM IR file.
+
+**Parameters:**
+
+* `file_path`: str - Path to the `.ll` or `.bc` file.
+* `encoding_type`: str - Choose `fa` (Flow-Aware) or `sym` (Symbolic).
+* `level`: str - Choose `p` for program-level or `f` for function-level.
+
+**Returns:**
+
+* `IR2VecObject`: Initialized object for accessing embeddings.
+
+**Example:**
+
+```python
+import ir2vec
+import numpy as np
+
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+```
+
+### getProgramVector
+
+**Description:** Gets the program-level vector representation.
+
+**Parameters:** optional
+
+**Returns:**
+
+- `progVector`: ndarray - The program-level embedding vector.
+
+**Example:**
+
+```python
+# Getting the program-level vector
+progVector = initObj.getProgramVector()
+```
+### getFunctionVectors
+
+**Description:** Gets function-level vectors for all functions in the LLVM IR file.
+
+**Parameters:** optional
+
+**Returns:**
+
+- `functionVectorMap`: dict - A dictionary where keys are function names and values are ndarrays containing function-level embedding vectors.
+
+**Example:**
+
+```python
+# Getting function-level vectors
+functionVectorMap = initObj.getFunctionVectors()
+```
+
+### getInstructionVectors
+
+**Description:** Gets instruction-level vectors for all instructions in the LLVM IR file.
+
+**Parameters:** optional
+
+**Returns:**
+
+- `instructionVectorsList`: list - A list of list where each list contains instruction corresponding embedding vectors as values.
+
+**Example:**
+
+```python
+
+# Getting instruction-level vectors
+instructionVectorsList = initObj.getInstructionVectors()
+```
+## Example
 - The following code snippet contains an example to demonstrate the usage of the package.
 
 ```python
