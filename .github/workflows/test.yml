@@ -19,6 +19,10 @@ jobs:
     steps:
     - name: Install libzstd-dev
       run: sudo apt-get install libzstd-dev
+    - name: Install LIT and Filecheck
+      run: |
+        sudo python3 -m pip install lit
+        sudo python3 -m pip install filecheck
     - name: Install LLVM-17
       run: |
         wget https://apt.llvm.org/llvm.sh
@@ -41,4 +45,4 @@ jobs:
     - name: make
       run: cd build && make -j8
     - name: Run-tests
-      run: cd build && ulimit -s unlimited && make verify-all
+      run: cd build && ulimit -s unlimited && make check
