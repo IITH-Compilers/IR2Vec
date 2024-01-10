@@ -6,7 +6,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
-[![LLVM](https://img.shields.io/badge/LLVM-v17.0.2-blue)](https://github.com/llvm/llvm-project/releases/tag/llvmorg-17.0.2)
+[![LLVM](https://img.shields.io/badge/LLVM-v17.0.6-blue)](https://github.com/llvm/llvm-project/releases/tag/llvmorg-17.0.6)
 [![PyPI Version](https://img.shields.io/pypi/v/IR2Vec)](https://pypi.org/project/IR2Vec/)
 ![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
@@ -18,7 +18,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 | LLVM Version | Branch |
 | ------------ | ------ |
-| LLVM 17.0.2 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 17.0.6 | [main](https://github.com/IITH-Compilers/IR2Vec) |
 | LLVM 16.0.1 | [main](https://github.com/IITH-Compilers/IR2Vec/tree/llvm16) |
 | LLVM 14.0.1 | [llvm14](https://github.com/IITH-Compilers/IR2Vec/tree/llvm14) |
 | LLVM 12.0.0 | [llvm12](https://github.com/IITH-Compilers/IR2Vec/tree/llvm12) |
@@ -41,6 +41,11 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
             - [Symbolic Embeddings](#symbolic-embeddings)
     - [Using Libraries](#using-libraries)
     - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
+        - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
+        - [getProgramVector](#getprogramvector)
+        - [getFunctionVectors](#getfunctionvectors)
+        - [getInstructionVectors](#getinstructionvectors)
+    - [Example](#example)
     - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
     - [Experiments](#experiments)
         - [Note](#note)
@@ -70,7 +75,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (17.0.2) - [src](https://github.com/llvm/llvm-project/tree/release/17.x), [release](https://releases.llvm.org/download.html#17.0.2)
+* LLVM (17.0.6) - [src](https://github.com/llvm/llvm-project/tree/release/17.x), [release](https://releases.llvm.org/download.html#17.0.6)
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7)
 * Python (3.6.7)
