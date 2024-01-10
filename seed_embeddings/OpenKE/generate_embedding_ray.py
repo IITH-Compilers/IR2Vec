@@ -126,7 +126,7 @@ if __name__ == "__main__":
         metavar="DIRECTORY",
         help="Location of the directory entity2id.txt, train2id.txt and relation2id.txt",
         required=False,
-        default="/home/nishu/nishant/ir2vec/IR2Vec/seed_embeddings/preprocessed/",
+        default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
         "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1500
