@@ -50,6 +50,9 @@ void generateAndVerifyEncodings(std::string iname,
 
   // get the program vector
   IR2Vec::Vector pgmVector = emb->getProgramVector();
+  for (auto &pgm : pgmVector) {
+    EXPECT_EQ(typeid(pgm), typeid(double));
+  }
 
   // assertions for the programVector
   EXPECT_NE(pgmVector.size(), 0);
