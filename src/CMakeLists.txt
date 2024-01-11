@@ -101,11 +101,17 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # create test executable
-add_executable(${PROJECT_NAME}_test tests/test_ir2vec.cpp ${commonsrc})
+add_executable(${PROJECT_NAME}_test tests/test_ir2vec.cpp)
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(${PROJECT_NAME}_test GTest::gtest_main ${llvm_libs} Eigen3::Eigen)
-target_link_libraries(${PROJECT_NAME}_test ${IR2VEC_LIB_STATIC})
+target_link_libraries(
+  ${PROJECT_NAME}_test
+  GTest::gtest_main
+  ${IR2VEC_LIB}
+  ${IR2VEC_LIB_STATIC}
+  ${llvm_libs}
+  Eigen3::Eigen
+)
 
 # Add gtest based tests
 enable_testing()
