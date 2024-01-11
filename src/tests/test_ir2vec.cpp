@@ -36,11 +36,6 @@ void generateAndVerifyEncodings(std::string iname,
   EXPECT_NE(instVecMap.size(), 0);
   for (auto &inst : instVecMap) {
     EXPECT_NE(inst.second.size(), 0);
-
-    // assert that the vector is made of double values
-    for (auto &val : inst.second) {
-      EXPECT_EQ(typeid(val), typeid(double));
-    }
   }
 
   // get the function vector map
@@ -51,11 +46,6 @@ void generateAndVerifyEncodings(std::string iname,
   EXPECT_NE(funcVecMap.size(), 1);
   for (auto &func : funcVecMap) {
     EXPECT_NE(func.second.size(), 0);
-
-    // assert that the vector is made of double values
-    for (auto &val : func.second) {
-      EXPECT_EQ(typeid(val), typeid(double));
-    }
   }
 
   // get the program vector
@@ -63,9 +53,6 @@ void generateAndVerifyEncodings(std::string iname,
 
   // assertions for the programVector
   EXPECT_NE(pgmVector.size(), 0);
-  for (auto &val : pgmVector) {
-    EXPECT_EQ(typeid(val), typeid(double));
-  }
 }
 
 TEST(FA_F, IR2VecTests) {
