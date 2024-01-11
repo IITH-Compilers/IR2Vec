@@ -90,24 +90,24 @@ add_custom_target(verify-flowaware
 add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
 
 
-# # Fetch gTest
-# include(FetchContent)
-# FetchContent_Declare(
-#   googletest
-#   URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-# )
+# Fetch gTest
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
 
-# # Make gtest available
-# FetchContent_MakeAvailable(googletest)
+# Make gtest available
+FetchContent_MakeAvailable(googletest)
 
-# # create test executable
-# add_executable(${PROJECT_NAME}_test ${commonsrc} libIR2Vec.cpp CollectIR.cpp tests/test_ir2vec.cpp)
+# create test executable
+add_executable(${PROJECT_NAME}_test ${commonsrc} libIR2Vec.cpp CollectIR.cpp tests/test_ir2vec.cpp)
 
-# # Link test executable against gtest & gtest_main
-# target_link_libraries(${PROJECT_NAME}_test GTest::gtest_main ${llvm_libs} Eigen3::Eigen)
+# Link test executable against gtest & gtest_main
+target_link_libraries(${PROJECT_NAME}_test GTest::gtest_main ${llvm_libs} Eigen3::Eigen)
 
-# # Add gtest based tests
-# enable_testing()
+# Add gtest based tests
+enable_testing()
 
-# include(GoogleTest)
-# gtest_discover_tests(${PROJECT_NAME}_test)
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME}_test)
