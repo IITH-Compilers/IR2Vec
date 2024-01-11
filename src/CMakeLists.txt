@@ -28,7 +28,7 @@ set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 
 # LLVM is normally built without RTTI. Be consistent with that.
 if(NOT LLVM_ENABLE_RTTI)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -frtti")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
 
 set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
@@ -38,7 +38,7 @@ set(binsrc CollectIR.cpp IR2Vec.cpp)
 file(GLOB RESOURCE_FILES ../vocabulary/seedEmbeddingVocab.txt)
 
 # llvm_map_components_to_libnames(llvm_libs all)
-llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils option)
+llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
 
 add_executable(${PROJECT_NAME} ${binsrc})
 

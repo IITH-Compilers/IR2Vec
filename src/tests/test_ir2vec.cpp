@@ -49,11 +49,6 @@ void generateAndVerifyEncodings(std::string iname,
   EXPECT_NE(funcVecMap.size(), 1);
   for (auto &func : funcVecMap) {
     EXPECT_NE(func.second.size(), 0);
-
-    // assert elements are all double
-    for (auto &elem : func.second) {
-      EXPECT_EQ(typeid(elem), typeid(double));
-    }
   }
 
   // get the program vector
