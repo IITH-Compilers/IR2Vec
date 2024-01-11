@@ -19,10 +19,10 @@ jobs:
     steps:
     - name: Install libzstd-dev
       run: sudo apt-get install libzstd-dev
-    - name: Install LLVM-16.0.1
+    - name: Install LLVM-17
       run: |
         wget https://apt.llvm.org/llvm.sh
-        sudo bash llvm.sh 16
+        sudo bash llvm.sh 17
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |

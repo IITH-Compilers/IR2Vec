@@ -126,7 +126,7 @@ if __name__ == "__main__":
         metavar="DIRECTORY",
         help="Location of the directory entity2id.txt, train2id.txt and relation2id.txt",
         required=False,
-        default="/home/intern23002/iitH/ir2vec/IR2Vec/seed_embeddings/preprocessed/",
+        default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
         "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1500
@@ -159,12 +159,11 @@ if __name__ == "__main__":
     arg_conf = parser.parse_args()
 
     search_space = {
-        "epoch": tune.grid_search([1500, 2000, 2500, 3000]),
-        "epoch": arg_conf.epoch,
+        "epoch": tune.grid_search([1500]),
         "dim": arg_conf.dim,
         "index_dir": arg_conf.index_dir,
-        "nbatches": tune.grid_search([2**x for x in range(5, 9)]),
-        "margin": tune.grid_search([x for x in np.arange(3.0, 4.0, 0.5)]),
+        "nbatches": tune.grid_search([300, 350]),
+        "margin": tune.grid_search([3.5, 4, 4.5]),
     }
 
     try:
@@ -177,7 +176,7 @@ if __name__ == "__main__":
     tuner = tune.Tuner(
         train,
         param_space=search_space,
-        tune_config=TuneConfig(max_concurrent_trials=20),
+        tune_config=TuneConfig(max_concurrent_trials=4),
     )
 
     results = tuner.fit()
