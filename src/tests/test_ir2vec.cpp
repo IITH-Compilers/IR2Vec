@@ -3,10 +3,13 @@
 #include "IR2Vec.h"
 #include "Symbolic.h"
 #include "version.h"
+
 #include "llvm/Support/CommandLine.h"
+
 #include <gtest/gtest.h>
 #include <stdio.h>
 #include <time.h>
+#include <type_traits>
 
 using namespace llvm;
 using namespace IR2Vec;
@@ -46,14 +49,15 @@ void generateAndVerifyEncodings(std::string iname,
   EXPECT_NE(funcVecMap.size(), 1);
   for (auto &func : funcVecMap) {
     EXPECT_NE(func.second.size(), 0);
+
+    // assert elements are all double
+    for (auto &elem : func.second) {
+      EXPECT_EQ(typeid(elem), typeid(double));
+    }
   }
 
   // get the program vector
   IR2Vec::Vector pgmVector = emb->getProgramVector();
-  for (auto &pgm : pgmVector) {
-    EXPECT_EQ(typeid(pgm), typeid(double));
-  }
-
   // assertions for the programVector
   EXPECT_NE(pgmVector.size(), 0);
 }
