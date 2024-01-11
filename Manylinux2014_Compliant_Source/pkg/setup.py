@@ -50,7 +50,7 @@ IR2Vec_core = Extension(
     sources=["ir2vec/core.cpp"],
     include_dirs=["./ir2vec/"],
     libraries=["z"],
-    extra_objects=["/usr/local/lib/libIR2Vec.so"] + get_llvm_files(),
+    extra_objects=["/usr/local/lib/libIR2Vec.a"] + get_llvm_files(),
     extra_compile_args=["-v", "--std=c++17"],
 )
 
