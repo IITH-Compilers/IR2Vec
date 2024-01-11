@@ -106,9 +106,12 @@ add_executable(${PROJECT_NAME}_test tests/test_ir2vec.cpp)
 # Link test executable against gtest & gtest_main
 target_link_libraries(
   ${PROJECT_NAME}_test
-  GTest::gtest_main
   ${IR2VEC_LIB}
   ${IR2VEC_LIB_STATIC}
+)
+target_link_libraries(
+  ${PROJECT_NAME}_test
+  GTest::gtest_main
   ${llvm_libs}
   Eigen3::Eigen
 )
