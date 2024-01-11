@@ -16,6 +16,7 @@ jobs:
     steps:
     - name: Install LLVM-17
       run: |
+        sudo apt-get install -y libzstd-dev
         wget https://apt.llvm.org/llvm.sh
         sudo bash llvm.sh 17
     - uses: actions/checkout@v2
