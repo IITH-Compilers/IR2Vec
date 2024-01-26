@@ -25,7 +25,7 @@ set(binsrc CollectIR.cpp IR2Vec.cpp)
 file(GLOB RESOURCE_FILES ../vocabulary/seedEmbeddingVocab.txt)
 
 option(LLVM_IR2VEC "where to enable IR2Vec as subproject for LLVM" OFF)
-if(LLVM_IR2VEC)
+if(NOT LLVM_IR2VEC)
 set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
 list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
