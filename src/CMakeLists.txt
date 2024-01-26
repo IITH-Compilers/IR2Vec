@@ -1,25 +1,12 @@
-cmake_minimum_required(VERSION 3.13)
-project(ir2vec VERSION 2.1.2)
-
 set(IR2VEC_LIB "IR2Vec")
 set(IR2VEC_LIB_STATIC "IR2Vec_Static")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
-
-set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
-list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
-
-find_package(LLVM 17.0.0 REQUIRED CONFIG)
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 find_package (Eigen3 3.3.7 REQUIRED NO_MODULE)
 message(STATUS "Found Eigen3 in: ${Eigen3_DIR}")
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 
 configure_file (./include/version.h.cmake version.h @ONLY)
 include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
@@ -28,7 +15,7 @@ set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 
 # LLVM is normally built without RTTI. Be consistent with that.
 if(NOT LLVM_ENABLE_RTTI)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
 
 set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
@@ -37,6 +24,16 @@ set(binsrc CollectIR.cpp IR2Vec.cpp)
 
 file(GLOB RESOURCE_FILES ../vocabulary/seedEmbeddingVocab.txt)
 
+option(LLVM_IR2VEC "where to enable IR2Vec as subproject for LLVM" OFF)
+if(LLVM_IR2VEC)
+set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
+list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
+
+find_package(LLVM 17.0.0 REQUIRED CONFIG)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 # llvm_map_components_to_libnames(llvm_libs all)
 llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
 
@@ -84,3 +81,21 @@ add_custom_target(verify-flowaware
  )
 
 add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
+else()
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/IR2Vec.h DESTINATION ${LLVM_MAIN_INCLUDE_DIR}/llvm )
+
+set(LLVM_OPTIONAL_SOURCES ${binsrc})
+
+add_llvm_library(LLVMIR2Vec
+  ${libsrc}
+
+  DEPENDS
+  intrinsics_gen
+)
+
+target_link_libraries(LLVMIR2Vec PRIVATE Eigen3::Eigen)
+target_include_directories(LLVMIR2Vec PRIVATE ${LLVM_MAIN_INCLUDE_DIR})
+target_include_directories(LLVMIR2Vec PRIVATE .)
+
+endif()
