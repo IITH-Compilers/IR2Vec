@@ -33,7 +33,7 @@ jobs:
         cmake ../eigen-3.3.7
         make -j4 && cd ..
     - name: cmake
-      run: cd build && cmake -DEigen3_DIR=./eigen-build ../src
+      run: cd build && cmake -DEigen3_DIR=./eigen-build ..
     - name: make
       run: cd build && make -j8
     - uses: actions/upload-artifact@v2
