@@ -1,5 +1,6 @@
-include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
 
+configure_file (./include/version.h.cmake version.h @ONLY)
+include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
 
 set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})

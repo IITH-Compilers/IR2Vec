@@ -11,10 +11,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 find_package (Eigen3 3.3.7 REQUIRED NO_MODULE)
 message(STATUS "Found Eigen3 in: ${Eigen3_DIR}")
 
-message("project version: ${PROJECT_VERSION}")
-
-configure_file (src/include/version.h.cmake version.h @ONLY)
-
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 
 # LLVM is normally built without RTTI. Be consistent with that.
