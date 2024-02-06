@@ -87,8 +87,15 @@ add_custom_target(verify-flowaware
  VERBATIM
  )
 
-add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
+add_custom_target(check
+ COMMAND python3 my-lit.py -v .
+ COMMENT "Running LIT based test-suite"
+ WORKING_DIRECTORY ./test-suite
+ DEPENDS ${PROJECT_NAME}
+ VERBATIM
+)
 
+add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
 
 # Fetch gTest
 include(FetchContent)
