@@ -1,0 +1,3 @@
+// RUN: bash sanity_check.sh FA llvm17
+
+// RUN: bash ./sanity_check.sh SYM llvm17
