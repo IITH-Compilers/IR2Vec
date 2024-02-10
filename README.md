@@ -27,31 +27,31 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ## Table Of Contents
 - [IR2Vec](#ir2vec)
-    - [LLVM Version Archive](#llvm-version-archive)
-    - [Table Of Contents](#table-of-contents)
-    - [Installation](#installation)
-    - [Python](#python)
-    - [Cpp](#cpp)
-    - [Requirements](#requirements)
-    - [Building from source](#building-from-source)
-    - [Generating program representations](#generating-program-representations)
-        - [Using Binary](#using-binary)
-            - [Command-Line options](#command-line-options)
-            - [Flow-Aware Embeddings](#flow-aware-embeddings)
-            - [Symbolic Embeddings](#symbolic-embeddings)
-    - [Using Libraries](#using-libraries)
-    - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
-        - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
-        - [getProgramVector](#getprogramvector)
-        - [getFunctionVectors](#getfunctionvectors)
-        - [getInstructionVectors](#getinstructionvectors)
-    - [Example](#example)
-    - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
-    - [Experiments](#experiments)
-        - [Note](#note)
-    - [Citation](#citation)
-    - [Contributions](#contributions)
-    - [License](#license)
+  - [LLVM Version Archive](#llvm-version-archive)
+  - [Table Of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Python](#python)
+  - [Cpp](#cpp)
+  - [Requirements](#requirements)
+  - [Building from source](#building-from-source)
+  - [Generating program representations](#generating-program-representations)
+    - [Using Binary](#using-binary)
+      - [Command-Line options](#command-line-options)
+      - [Flow-Aware Embeddings](#flow-aware-embeddings)
+      - [Symbolic Embeddings](#symbolic-embeddings)
+  - [Using Libraries](#using-libraries)
+  - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
+    - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
+    - [getProgramVector](#getprogramvector)
+    - [getFunctionVectors](#getfunctionvectors)
+    - [getInstructionVectors](#getinstructionvectors)
+  - [Example](#example)
+  - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
+  - [Experiments](#experiments)
+    - [Note](#note)
+  - [Citation](#citation)
+  - [Contributions](#contributions)
+  - [License](#license)
 
 ## Installation
 
@@ -96,7 +96,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
     2. `mkdir eigen-build && cd eigen-build`
     3. `cmake ../eigen-3.3.7 && make`
     4. `cd ../`
-3. `cmake -DLT_LLVM_INSTALL_DIR=<path_to_LLVM_build_dir> -DEigen3_DIR=<path_to_eigen_build_dir> [-DCMAKE_INSTALL_PREFIX=<install_dir>] ../src`
+3. `cmake -DLT_LLVM_INSTALL_DIR=<path_to_LLVM_build_dir> -DEigen3_DIR=<path_to_eigen_build_dir> [-DCMAKE_INSTALL_PREFIX=<install_dir>] ..`
 4. `make [&& make install]`
 
 This process would generate `ir2vec` binary under `build/bin` directory, `libIR2Vec.a` and `libIR2Vec.so` under `build/lib` directory.
