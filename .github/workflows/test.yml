@@ -41,4 +41,4 @@ jobs:
     - name: make
       run: cd build && make -j8
     - name: Run-tests
-      run: cd build && ulimit -s unlimited && make verify-all
+      run: cd build && ulimit -s unlimited && make check
