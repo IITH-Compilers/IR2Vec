@@ -18,7 +18,7 @@ LLVM_LIBS = []
 VERSION = ""
 DESCRIPTION = ""
 
-with (pl.Path(__file__).resolve().parents[2] / "src" / "CMakeLists.txt").open() as f:
+with (pl.Path(__file__).resolve().parents[2] / "CMakeLists.txt").open() as f:
     for line in f:
         if not VERSION:
             vmatch = version_regex.match(line)  # Not using walrus because Python3.6

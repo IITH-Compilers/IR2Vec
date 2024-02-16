@@ -1,6 +1,5 @@
 
 BUILD=@LIB_LOC@
-
 EncodingType=$1
 
 SO_FILE=
@@ -26,7 +25,7 @@ fi
 
 SEED_VERSION=$2
 VOCAB_PATH="./vocabulary/seedEmbeddingVocab.txt"
-IR2VEC_PATH="../bin/ir2vec"
+IR2VEC_PATH="../../bin/ir2vec"
 
 functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" "insertionSort" "binomialCoeff" "find" "countParenth" "boruvkaMST" "maxStackHeight" "badCharHeuristic" "bpm"
     "count" "getMaxUtil" "buildSuffixArray" "countOnes" "countStrings" "countRec" "countWays" "AP" "cutRod" "isCyclic" "isDivisible" "DFS" "editDist" "eggDrop" "isSC" "isConnected" "printClosest"

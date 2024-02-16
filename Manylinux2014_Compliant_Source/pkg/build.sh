@@ -15,7 +15,7 @@ cd eigen-build
 cmake ../eigen-3.3.7 && make && make install
 
 cd ..
-cmake -DCMAKE_BUILD_TYPE=Release ../src && make -j"$(nproc)" && make install
+cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
 
 cd ..
 cp src/include/utils.h Manylinux2014_Compliant_Source/pkg/ir2vec/
