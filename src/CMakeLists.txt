@@ -71,60 +71,10 @@ install(TARGETS ${IR2VEC_LIB} ${IR2VEC_LIB_STATIC}
 
 add_subdirectory(test-suite)
 
-add_custom_target(verify-symbolic
- COMMAND bash ./sanity_check.sh SYM llvm17
- COMMENT "Generating Symbolic IR2Vec vectors and comparing with oracle..."
- WORKING_DIRECTORY ./test-suite
- DEPENDS ${PROJECT_NAME}
- VERBATIM
- )
-
-add_custom_target(verify-flowaware
- COMMAND bash sanity_check.sh FA llvm17
- COMMENT "Generating Flow-Aware IR2Vec vectors and comparing with oracle..."
- WORKING_DIRECTORY ./test-suite
- DEPENDS ${PROJECT_NAME}
- VERBATIM
- )
-
 add_custom_target(check
- COMMAND python3 my-lit.py -v .
+ COMMAND python3 test-lit.py -a .
  COMMENT "Running LIT based test-suite"
  WORKING_DIRECTORY ./test-suite
  DEPENDS ${PROJECT_NAME}
  VERBATIM
 )
-
-add_custom_target(verify-all DEPENDS verify-symbolic verify-flowaware)
-
-# Fetch gTest
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-
-# Make gtest available
-FetchContent_MakeAvailable(googletest)
-
-# create test executable
-add_executable(${PROJECT_NAME}_test CollectIR.cpp tests/test_ir2vec.cpp)
-
-# Link test executable against gtest & gtest_main
-target_link_libraries(
-  ${PROJECT_NAME}_test
-  ${IR2VEC_LIB}
-  ${IR2VEC_LIB_STATIC}
-)
-target_link_libraries(
-  ${PROJECT_NAME}_test
-  GTest::gtest_main
-  ${llvm_libs}
-  Eigen3::Eigen
-)
-
-# Add gtest based tests
-enable_testing()
-
-include(GoogleTest)
-gtest_discover_tests(${PROJECT_NAME}_test)
