@@ -60,4 +60,34 @@ matrix solve(matrix A, matrix B) {
   return raw_data;
 }
 
+
+matrix jacobiIterative(const matrix& A, const matrix& B) {
+    int n = A.size();
+    matrix X(n, std::vector<double>(1, 0.0));
+    for (int iter = 0; iter < 100; ++iter) {
+        matrix newX(X);
+        for (int i = 0; i < n; ++i) {
+            double sum = 0.0;
+            for (int j = 0; j < n; ++j) {
+                if (j != i) {
+                    sum += A[i][j] * X[j][0];
+                }
+            }
+            newX[i][0] = (B[i][0] - sum) / A[i][i];
+        }
+
+        double error = 0.0;
+        for (int i = 0; i < n; ++i) {
+            error += std::abs(newX[i][0] - X[i][0]);
+        }
+
+        if (error < 1e-6) {
+            return newX;
+        }
+
+        X = newX;
+    }
+
+    return X;
+}
 #endif
