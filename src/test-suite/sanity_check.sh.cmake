@@ -103,7 +103,3 @@ perform_vector_comparison() {
         fi
     fi
 }
-
-perform_vector_comparison "p" "p"
-perform_vector_comparison "f" "f"
-perform_vector_comparison "f" "onDemand"

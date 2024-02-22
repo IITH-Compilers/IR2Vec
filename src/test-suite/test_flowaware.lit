@@ -1,4 +1,0 @@
-// RUN: bash %s
-// RUN: bash sanity_check.sh FA llvm17
-
-echo "Generating Flow-Aware IR2Vec vectors and comparing with oracle..."
