@@ -3,7 +3,7 @@ name: GitHub Wiki upload
 on:
   push:
     branches:
-      - master
+      - llvm17lit
     paths: [docs/**, .github/workflows/publish-docs.yml]
 
 concurrency:
