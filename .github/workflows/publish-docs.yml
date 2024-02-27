@@ -13,6 +13,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Set up Git
+      run: |
+        git config --global user.email "nishant.sachdeva@research.iiit.ac.in"
+        git config --global user.name "nishant-sachdeva"
+
     - name: Copy Docs to Wiki
       run: |
         mkdir -p wiki_temp
