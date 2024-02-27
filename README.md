@@ -83,6 +83,9 @@ If you're a C++ developer and require low-level control, optimization, or integr
     * For training the vocabulary are available in [seed_embeddings/OpenKE/requirements.txt](./seed_embeddings/OpenKE/requirements.txt), and
     * For running experiments are available in [experiments/exp_requirements.yaml](./experiments/exp_requirements.yaml)
     * Conda/Anaconda based virtual environment is assumed
+* LIT and FileCheck
+    * To install LIT, run `pip3 install --user lit`
+    * To install FileCheck, run `pip3 install --user filecheck`
 
 (Experiments are done on an Ubuntu 20.04 machine)
 
