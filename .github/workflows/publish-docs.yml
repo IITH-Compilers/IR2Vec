@@ -1,31 +1,18 @@
-name: Publish Docs to Wiki
-
+name: Publish wiki
 on:
   push:
-    branches:
-      - llvm17lit  # Adjust to your main branch
-
+    branches: [llvm17lit]
+    paths:
+      - docs/**
+      - .github/workflows/publish-docs.yml
+concurrency:
+  group: publish-wiki
+  cancel-in-progress: true
+permissions:
+  contents: write
 jobs:
-  publish_docs:
+  publish-wiki:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-
-    - name: Set up Git
-      run: |
-        git config --global user.email "nishant.sachdeva@research.iiit.ac.in"
-        git config --global user.name "nishant-sachdeva"
-
-    - name: Copy Docs to Wiki
-      run: |
-        mkdir -p wiki_temp
-        cp -r docs/* wiki_temp/
-        mv wiki_temp/* .
-
-    - name: Commit and Push Changes
-      run: |
-        git add .
-        git commit -m "Update Wiki with Docs"
-        git push
+      - uses: actions/checkout@v3
+      - uses: Andrew-Chen-Wang/github-wiki-action@v4
