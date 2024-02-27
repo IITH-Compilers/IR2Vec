@@ -1,26 +1,41 @@
-name: Publish docs to Wiki
+name: GitHub Wiki upload
 
 on:
   push:
-    paths:
-      - docs/**
     branches:
-      - llvm17lit
+      - master
+    paths: [docs/**, .github/workflows/publish-docs.yml]
+
+concurrency:
+  group: wiki
+  cancel-in-progress: true
+
+permissions:
+  contents: write
 
 jobs:
-  publish_docs_to_wiki:
-    name: Publish docs to Wiki
+  wiki:
+    name: Publish to GitHub Wiki
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - name: Checkout source code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          repository: ${{github.repository}}
+          path: ${{github.repository}}
 
-      - name: Publish Github Wiki
-        uses: nimblehq/publish-github-wiki-action@v1.0
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
         with:
-          user_name: nishant-sachdeva
-          user_email: nishant.sachdeva@research.iiit.ac.in
-          user_access_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          repository: ${{github.repository}}.wiki
+          path: ${{github.repository}}.wiki
+
+      - name: Push to wiki
+        run: |
+          set -e
+          cd $GITHUB_WORKSPACE/${{github.repository}}.wiki
+          cp -r $GITHUB_WORKSPACE/${{github.repository}}/docs/* .
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git diff-index --quiet HEAD || git commit -m "action: wiki sync" && git push
