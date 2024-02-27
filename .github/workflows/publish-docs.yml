@@ -1,0 +1,26 @@
+name: Publish Docs to Wiki
+
+on:
+  push:
+    branches:
+      - llvm17lit  # Adjust to your main branch
+
+jobs:
+  publish_docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Copy Docs to Wiki
+      run: |
+        mkdir -p wiki_temp
+        cp -r docs/* wiki_temp/
+        mv wiki_temp/* .
+
+    - name: Commit and Push Changes
+      run: |
+        git add .
+        git commit -m "Update Wiki with Docs"
+        git push
