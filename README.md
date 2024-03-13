@@ -90,7 +90,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
     2. `mkdir eigen-build && cd eigen-build`
     3. `cmake ../eigen-3.3.7 && make`
     4. `cd ../`
-3. `cmake -DLT_LLVM_INSTALL_DIR=<path_to_LLVM_build_dir> -DEigen3_DIR=<path_to_eigen_build_dir> [-DCMAKE_INSTALL_PREFIX=<install_dir>] ../src`
+3. `cmake -DLT_LLVM_INSTALL_DIR=<path_to_LLVM_build_dir> -DEigen3_DIR=<path_to_eigen_build_dir> [-DCMAKE_INSTALL_PREFIX=<install_dir>] ..`
 4. `make [&& make install]`
 
 This process would generate `ir2vec` binary under `build/bin` directory, `libIR2Vec.a` and `libIR2Vec.so` under `build/lib` directory.
