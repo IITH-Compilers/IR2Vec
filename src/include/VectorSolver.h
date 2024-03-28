@@ -7,44 +7,39 @@
 #ifndef __VECTOR_SOLVER_H__
 #define __VECTOR_SOLVER_H__
 
-#include "llvm/ADT/SmallVector.h"
+#include <cmath>
 #include <vector>
-
-using namespace llvm;
 
 typedef std::vector<std::vector<double>> matrix;
 
-matrix solve(const matrix &A, const matrix &B, int maxIterations = 10000,
-             double tolerance = 1e-8) {
+// Gauss-Seidel Iterative Solver
+matrix solve(const matrix &A, const matrix &B, double tolerance = 1e-6,
+             int maxIterations = 1000) {
   int n = A.size();
   int m = B[0].size();
+  matrix X(n, std::vector<double>(m, 0.0)); // Initial guess for solution
 
-  matrix X(n, std::vector<double>(m, 0.0));
-
-  for (int k = 0; k < maxIterations; ++k) {
+  // Iterate until convergence or maximum iterations reached
+  for (int iter = 0; iter < maxIterations; ++iter) {
     double maxDiff = 0.0;
 
+    // Iterate over each equation
     for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < m; ++j) {
-        double sum = B[i][j];
-        for (int p = 0; p < n; ++p) {
-          if (p != i) {
-            sum -= A[i][p] * X[p][j];
-          }
-        }
-        double oldX = X[i][j];
-        X[i][j] = sum / A[i][i];
-        if (maxDiff < abs(X[i][j] - oldX)) {
-          maxDiff = abs(X[i][j] - oldX);
-        }
+      double sum = 0.0;
+      for (int j = 0; j < n; ++j) {
+        if (j != i)
+          sum += A[i][j] * X[j][0];
       }
+      double newX = (B[i][0] - sum) / A[i][i]; // Gauss-Seidel update
+      maxDiff = std::max(maxDiff, std::abs(newX - X[i][0]));
+      X[i][0] = newX;
     }
 
-    if (maxDiff < tolerance) {
-      return X;
-    }
+    // Check for convergence
+    if (maxDiff < tolerance)
+      break;
   }
 
-  return matrix();
+  return X;
 }
 #endif
