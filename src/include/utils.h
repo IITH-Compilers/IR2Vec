@@ -34,7 +34,6 @@ extern bool fa;
 extern bool sym;
 extern bool printTime;
 extern bool collectIR;
-extern std::string vocab;
 extern std::string iname;
 extern std::string oname;
 extern std::string funcName;
