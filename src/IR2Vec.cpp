@@ -32,11 +32,6 @@ cl::opt<bool> cl_collectIR(
     "collectIR", cl::Optional,
     cl::desc("Generate triplets for training seed embedding vocabulary"),
     cl::init(false), cl::cat(category));
-
-cl::opt<std::string> cl_vocab("vocab", cl::Optional, cl::init(""),
-                              cl::desc("Use embeddings from file path"),
-                              cl::cat(category));
-
 cl::opt<std::string> cl_iname(cl::Positional, cl::desc("Input file path"),
                               cl::Required, cl::cat(category));
 
@@ -81,7 +76,6 @@ int main(int argc, char **argv) {
   fa = cl_fa;
   sym = cl_sym;
   collectIR = cl_collectIR;
-  vocab = cl_vocab;
   iname = cl_iname;
   oname = cl_oname;
   // newly added
@@ -105,18 +99,12 @@ int main(int argc, char **argv) {
       errs() << "Invalid level specified: Use either p or f\n";
       failed = true;
     }
-    if (vocab.empty()) {
-      errs() << "Should specify vocab pointing to the path of vocabulary\n";
-      failed = true;
-    }
   } else {
     if (!collectIR) {
       errs() << "Either of sym, fa or collectIR should be specified\n";
       failed = true;
     } else if (level)
       errs() << "[WARNING] level would not be used in collectIR mode\n";
-    else if (!vocab.empty())
-      errs() << "[WARNING] vocab would not be used in collectIR mode\n";
   }
 
   if (failed)

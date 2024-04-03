@@ -14,12 +14,11 @@
 #include "llvm/Support/CommandLine.h"
 
 int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
-                                          IR2Vec::IR2VecMode mode,
-                                          std::string vocab, char level,
+                                          IR2Vec::IR2VecMode mode, char level,
                                           std::string funcName, std::ostream *o,
                                           int cls, float WO, float WA,
                                           float WT) {
-  IR2Vec::vocab = vocab;
+
   IR2Vec::level = level;
   IR2Vec::cls = cls;
   IR2Vec::WO = WO;

@@ -17,7 +17,6 @@ bool IR2Vec::fa;
 bool IR2Vec::sym;
 bool IR2Vec::printTime;
 bool IR2Vec::collectIR;
-std::string IR2Vec::vocab;
 std::string IR2Vec::iname;
 std::string IR2Vec::oname;
 std::string IR2Vec::funcName;
