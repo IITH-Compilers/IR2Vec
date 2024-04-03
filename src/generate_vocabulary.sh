@@ -1,8 +1,30 @@
 #!/bin/bash
 
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+	key="$1"
+
+	case $key in
+	-o | --output)
+		output_file="$2"
+		shift # past argument
+		shift # past value
+		;;
+	*) # unknown option
+		echo "Unknown option: $1"
+		exit 1
+		;;
+	esac
+done
+
+# Check if the output file path is provided
+if [ -z "$output_file" ]; then
+	echo "Error: Output file path not provided."
+	exit 1
+fi
+
 # Define paths
-vocab_file="vocabulary/seedEmbeddingVocab.txt"
-output_file="src/include/vocabulary.h" # Output file path adjusted
+vocab_file="../vocabulary/seedEmbeddingVocab.txt"
 
 # Check if the vocabulary file exists
 if [ ! -f "$vocab_file" ]; then

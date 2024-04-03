@@ -1,14 +1,17 @@
 
 configure_file (./include/version.h.cmake version.h @ONLY)
 include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
-
+include_directories(${CMAKE_BINARY_DIR})
 set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
 
-file(GLOB RESOURCE_FILES ../vocabulary/seedEmbeddingVocab.txt)
-
 option(LLVM_IR2VEC "where to enable IR2Vec as subproject for LLVM" OFF)
+execute_process(
+    COMMAND bash generate_vocabulary.sh -o ${CMAKE_BINARY_DIR}/vocabulary.h
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND echo "Vocabulary file generated."
+)
 
 if(NOT LLVM_IR2VEC)
 
@@ -37,7 +40,6 @@ if(NOT LLVM_IR2VEC)
       VERSION ${PROJECT_VERSION}
       SOVERSION 1
       PUBLIC_HEADER "./include/IR2Vec.h"
-      RESOURCE ${RESOURCE_FILES}
       OUTPUT_NAME ${IR2VEC_LIB}
       LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
       ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib

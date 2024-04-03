@@ -6,6 +6,7 @@
 //
 #include "utils.h"
 #include "IR2Vec.h"
+#include "vocabulary.h"
 #include <fstream>
 #include <string>
 
@@ -40,26 +41,8 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
 }
 
 void IR2Vec::collectDataFromVocab(std::map<std::string, Vector> &opcMap) {
-  IR2VEC_DEBUG(errs() << "Reading from " + vocab + "\n");
-  std::ifstream i(vocab);
-  std::string delimiter = ":";
-  for (std::string line; getline(i, line);) {
-    std::string token = line.substr(0, line.find(delimiter));
-    Vector rep;
-    std::string vec = line.substr(line.find(delimiter) + 1, line.length());
-    std::string val = vec.substr(vec.find("[") + 1, vec.find(", ") - 1);
-    rep.push_back(stod(val));
-    int pos = vec.find(", ");
-    vec = vec.substr(pos + 1);
-    for (int i = 1; i < DIM - 1; i++) {
-      val = vec.substr(1, vec.find(", ") - 1);
-      rep.push_back(stod(val));
-      pos = vec.find(", ");
-      vec = vec.substr(pos + 1);
-    }
-    val = vec.substr(1, vec.find("]") - 1);
-    rep.push_back(stod(val));
-    opcMap[token] = rep;
+  for (const auto &entry : vocabulary) {
+    opcMap[entry.first] = entry.second;
   }
 }
 
