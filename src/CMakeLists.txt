@@ -1,18 +1,17 @@
 
 configure_file (./include/version.h.cmake version.h @ONLY)
 include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_BINARY_DIR}/include)
+include_directories(${CMAKE_BINARY_DIR})
 set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
 option(LLVM_IR2VEC "where to enable IR2Vec as subproject for LLVM" OFF)
 execute_process(
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/include
-    COMMAND bash generate_vocabulary.sh ${CMAKE_BINARY_DIR}/include/vocabulary.h
+
+    COMMAND bash generate_vocabulary.sh ${CMAKE_BINARY_DIR}/vocabulary.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND echo "Vocabulary file generated."
 )
-
 if(NOT LLVM_IR2VEC)
 
   set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
