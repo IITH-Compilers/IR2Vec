@@ -9,7 +9,6 @@
 #include "IR2Vec.h"
 #include "utils.h"
 #include "version.h"
-#include "vocabulary.h"
 #include <Python.h>
 #include <cstring>
 #include <fstream>
@@ -370,8 +369,6 @@ PyMethodDef IR2Vec_core_Methods[] = {
      "Get Program Vector"},
     {"getFunctionVectors", (PyCFunction)getFunctionVectors, METH_VARARGS,
      "Get Function Vectors"},
-    {"setSeedEmbdPath", (PyCFunction)setSeedEmbeddingPath, METH_VARARGS,
-     "Set Seed Embedding Path"},
     {"getVersion", getIR2VecVersion, METH_VARARGS, "Get IR2Vec Version"},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
