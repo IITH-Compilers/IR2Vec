@@ -40,9 +40,7 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
 }
 
 void IR2Vec::collectDataFromVocab(std::map<std::string, Vector> &opcMap) {
-  for (const auto &entry : vocabulary) {
-    opcMap[entry.first] = entry.second;
-  }
+  opcMap = IR2Vec::Vocabulary::getVocabulary();
 }
 
 void IR2Vec::scaleVector(Vector &vec, float factor) {

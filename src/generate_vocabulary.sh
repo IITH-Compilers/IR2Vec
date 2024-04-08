@@ -1,21 +1,7 @@
 #!/bin/bash
 
-# Parse arguments
-while [[ $# -gt 0 ]]; do
-	key="$1"
-
-	case $key in
-	-o | --output)
-		output_file="$2"
-		shift # past argument
-		shift # past value
-		;;
-	*) # unknown option
-		echo "Unknown option: $1"
-		exit 1
-		;;
-	esac
-done
+# Define output file
+output_file="${1}"
 
 # Check if the output file path is provided
 if [ -z "$output_file" ]; then
@@ -33,51 +19,47 @@ if [ ! -f "$vocab_file" ]; then
 fi
 
 # Generate the header file
-echo "#pragma once" >"$output_file"
-echo "" >>"$output_file"
-echo "#include <map>" >>"$output_file"
-echo "#include <string>" >>"$output_file"
-echo "#include <vector>" >>"$output_file"
-echo "#include \"IR2Vec.h\"" >>"$output_file" # Include IR2Vec.h here
-echo "" >>"$output_file"
-echo "using namespace llvm;" >>"$output_file"
-echo "" >>"$output_file"
+{
+	echo "#include <map>"
+	echo "#include <string>"
+	echo "#include <vector>"
+	echo "#include \"IR2Vec.h\"" # Include IR2Vec.h here
+	echo ""
+	echo "namespace IR2Vec {"
+	echo ""
+	echo "class Vocabulary {"
+	echo "public:"
+	echo "    static const std::map<std::string, IR2Vec::Vector>& getVocabulary() {"
+	echo "        return vocabulary;"
+	echo "    }"
+	echo "private:"
+	echo "    static const std::map<std::string, IR2Vec::Vector> vocabulary;"
+	echo "};"
+	echo ""
+	echo "const std::map<std::string, IR2Vec::Vector> Vocabulary::vocabulary = {"
 
-echo "extern const std::map<std::string, IR2Vec::Vector> vocabulary;" >>"$output_file"
-echo "" >>"$output_file"
+	# Process each line in the vocabulary file
+	while IFS=: read -r token vector_str; do
+		# Trim leading and trailing spaces
+		token=$(echo "$token" | awk '{$1=$1};1')
+		vector_str=$(echo "$vector_str" | awk '{$1=$1};1')
 
-# Process each line in the vocabulary file
-while IFS=: read -r token vector_str; do
-	# Trim leading and trailing spaces
-	token=$(echo "$token" | awk '{$1=$1};1')
-	vector_str=$(echo "$vector_str" | awk '{$1=$1};1')
+		# Extract vector elements
+		vector=($(echo "$vector_str" | tr -d '[]' | tr ',' ' ')) # Separate by space
 
-	# Extract vector elements
-	vector=($(echo "$vector_str" | tr -d '[]' | tr ',' ' ')) # Separate by space
+		# Construct vector string with commas
+		vector_string=""
+		for elem in "${vector[@]}"; do
+			vector_string="$vector_string $elem,"
+		done
+		vector_string="${vector_string%,}" # Remove trailing comma
 
-	# Construct vector string with commas
-	vector_string=""
-	for elem in "${vector[@]}"; do
-		vector_string="$vector_string $elem,"
-	done
-	vector_string="${vector_string%,}" # Remove trailing comma
+		# Write map entry to the output file
+		echo "    { \"$token\", { $vector_string } },"
+	done <"$vocab_file"
 
-	# Write vector declaration to the output file
-	echo "const IR2Vec::Vector ${token}_vector = { $vector_string };" >>"$output_file"
-done <"$vocab_file"
-
-echo "" >>"$output_file"
-echo "const std::map<std::string, IR2Vec::Vector> vocabulary = {" >>"$output_file"
-
-# Process each line in the vocabulary file
-while IFS=: read -r token _; do
-	# Trim leading and trailing spaces
-	token=$(echo "$token" | awk '{$1=$1};1')
-
-	# Write map entry to the output file
-	echo "    { \"$token\", ${token}_vector }," >>"$output_file"
-done <"$vocab_file"
-
-echo "};" >>"$output_file"
+	echo "};"
+	echo "} // namespace ir2vec"
+} >"$output_file"
 
 echo "Generated $output_file"
