@@ -14,5 +14,3 @@ import os, io
 __version__ = getVersion()
 __copyright__ = "Copyright The Contributors of IR2Vec"
 __license__ = "BSD 4-Clause License"
-
-setSeedEmbdPath(preparation.install_loc_pkg)

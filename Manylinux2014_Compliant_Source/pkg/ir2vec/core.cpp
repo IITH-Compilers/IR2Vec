@@ -9,7 +9,7 @@
 #include "IR2Vec.h"
 #include "utils.h"
 #include "version.h"
-
+#include "vocabulary.h"
 #include <Python.h>
 #include <cstring>
 #include <fstream>
