@@ -7,7 +7,6 @@ set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
 option(LLVM_IR2VEC "where to enable IR2Vec as subproject for LLVM" OFF)
 execute_process(
-
     COMMAND bash generate_vocabulary.sh ${CMAKE_BINARY_DIR}/vocabulary.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND echo "Vocabulary file generated."

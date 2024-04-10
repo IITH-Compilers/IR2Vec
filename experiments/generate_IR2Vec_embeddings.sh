@@ -19,8 +19,6 @@ fi
 
 BUILD=$(realpath ${BUILD})
 
-Absolute_path_of_RepresentationFile=$(realpath ../vocabulary/seedEmbeddingVocab.txt)
-
 TASK_DIR=$1
 if [ -z "${TASK_DIR}" ]; then
 	echo "Task is not mentioned. Please enter value of DM for Device Mapping or TC for Thread_Coarsening."
@@ -88,7 +86,7 @@ ulimit -s unlimited
 for d in ./*.ll; do
 	let "a++"
 	echo "$a      $d" >>${ALL_FILE}
-	${BUILD}/bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -class $a -o res_$Trans_type.txt -level p $WEIGHTS $d &>/dev/null
+	${BUILD}/bin/ir2vec -${PASS} -class $a -o res_$Trans_type.txt -level p $WEIGHTS $d &>/dev/null
 done
 cd ../..
 
