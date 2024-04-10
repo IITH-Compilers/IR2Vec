@@ -20,12 +20,15 @@ fi
 
 # Generate the header file
 {
+	echo "#ifndef __VOCABULARY__"
+	echo "#define __VOCABULARY__"
+	echo ""
 	echo "#include <map>"
 	echo "#include <string>"
 	echo "#include <vector>"
 	echo "#include \"IR2Vec.h\"" # Include IR2Vec.h here
 	echo ""
-	echo "namespace IR2Vec {"
+	echo "namespace Vocabulary {"
 	echo ""
 	echo "class Vocabulary {"
 	echo "public:"
@@ -59,7 +62,9 @@ fi
 	done <"$vocab_file"
 
 	echo "};"
-	echo "} // namespace ir2vec"
+	echo "} // namespace Vocabulary"
+	echo ""
+	echo "#endif // __VOCABULARY__"
 } >"$output_file"
 
 echo "Generated $output_file"
