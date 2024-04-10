@@ -28,7 +28,7 @@ fi
 	echo "#include <vector>"
 	echo "#include \"IR2Vec.h\"" # Include IR2Vec.h here
 	echo ""
-	echo "namespace Vocabulary {"
+	echo "namespace IR2Vec {"
 	echo ""
 	echo "class Vocabulary {"
 	echo "public:"
@@ -62,7 +62,7 @@ fi
 	done <"$vocab_file"
 
 	echo "};"
-	echo "} // namespace Vocabulary"
+	echo "} // namespace IR2Vec"
 	echo ""
 	echo "#endif // __VOCABULARY__"
 } >"$output_file"
