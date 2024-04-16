@@ -132,7 +132,6 @@ public:
 
     pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
-    IR2Vec::collectDataFromVocab(opcMap);
 
     memWriteOps.try_emplace("store", 1);
     memWriteOps.try_emplace("cmpxchg", 0);
@@ -175,8 +174,6 @@ public:
   void generateFlowAwareEncodingsForFunction(
       std::ostream *o = nullptr, std::string name = "",
       std::ostream *missCount = nullptr, std::ostream *cyclicCount = nullptr);
-
-  std::map<std::string, IR2Vec::Vector> opcMap;
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {

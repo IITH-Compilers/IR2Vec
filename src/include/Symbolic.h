@@ -33,13 +33,11 @@ private:
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
-  std::map<std::string, IR2Vec::Vector> opcMap;
 
 public:
   IR2Vec_Symbolic(llvm::Module &M) : M{M} {
     pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
-    IR2Vec::collectDataFromVocab(opcMap);
   }
 
   void generateSymbolicEncodings(std::ostream *o = nullptr);

@@ -9,7 +9,6 @@
 #include "vocabulary.h"
 #include <fstream>
 #include <string>
-
 using namespace llvm;
 using namespace IR2Vec;
 
@@ -26,7 +25,8 @@ float IR2Vec::WO;
 float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
-
+std::map<std::string, Vector> IR2Vec::opcMap =
+    IR2Vec::Vocabulary::getVocabulary();
 std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   SMDiagnostic err;
   static LLVMContext context;
@@ -37,10 +37,6 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
     exit(1);
   }
   return M;
-}
-
-void IR2Vec::collectDataFromVocab(std::map<std::string, Vector> &opcMap) {
-  opcMap = IR2Vec::Vocabulary::getVocabulary();
 }
 
 void IR2Vec::scaleVector(Vector &vec, float factor) {
