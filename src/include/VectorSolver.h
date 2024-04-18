@@ -1,3 +1,9 @@
+// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
+// Department of Computer Science and Engineering, IIT Hyderabad
+//
+// This software is available under the BSD 4-Clause License. Please see LICENSE
+// file in the top-level directory for more details.
+//
 #ifndef __VECTOR_SOLVER_H__
 #define __VECTOR_SOLVER_H__
 
@@ -6,14 +12,14 @@
 #include <limits>
 #include <vector>
 
+typedef std::vector<std::vector<double>> matrix;
 // Function to perform Gaussian elimination with partial pivoting
-std::vector<std::vector<double>> solve(std::vector<std::vector<double>> &A,
-                                       std::vector<std::vector<double>> &B) {
+matrix solve(matrix A, matrix B) {
   int n = A.size();
   int m = B[0].size(); // Number of columns in B
 
   // Initialize the solution matrix X with zeros
-  std::vector<std::vector<double>> X(n, std::vector<double>(m, 0.0));
+  matrix X(n, std::vector<double>(m, 0.0));
 
   // Forward elimination with partial pivoting
   for (int pivot = 0; pivot < n - 1; pivot++) {

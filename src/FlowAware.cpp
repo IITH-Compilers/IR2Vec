@@ -1068,7 +1068,6 @@ void IR2Vec_FA::solveInsts(
   }
 
   auto C = solve(A, B);
-
   SmallMapVector<const BasicBlock *, SmallVector<const Instruction *, 10>, 16>
       bbInstMap;
 
