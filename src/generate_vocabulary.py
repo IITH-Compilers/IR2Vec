@@ -13,21 +13,34 @@ vocab_file='../vocabulary/seedEmbeddingVocab.txt'
 
 # Define headers and opening/closing of map
 header = """\
-#pragma once
+#ifndef __VOCABULARY__
+#define __VOCABULARY__
 
 #include <map>
 #include <string>
 #include <vector>
 #include "IR2Vec.h"
 
-using namespace llvm;
+namespace IR2Vec {
 
-extern const std::map<std::string, IR2Vec::Vector> vocabulary;
+class Vocabulary {
+public:
+    static const std::map<std::string, IR2Vec::Vector>& getVocabulary() {
+        return vocabulary;
+    }
+private:
+    static const std::map<std::string, IR2Vec::Vector> vocabulary;
+};
 
 """
 
-opening = '\nconst std::map<std::string, IR2Vec::Vector> vocabulary = {\n'
-closing = '};\n'
+opening = '\nconst std::map<std::string, IR2Vec::Vector> Vocabulary::vocabulary = {\n'
+closing = """\
+};
+} // namespace IR2Vec
+
+#endif // __VOCABULARY__
+"""
 
 try:
     with open(output_file, 'w') as fw:
