@@ -6,9 +6,9 @@
 //
 #include "utils.h"
 #include "IR2Vec.h"
+#include "vocabulary.h"
 #include <fstream>
 #include <string>
-
 using namespace llvm;
 using namespace IR2Vec;
 
@@ -16,7 +16,6 @@ bool IR2Vec::fa;
 bool IR2Vec::sym;
 bool IR2Vec::printTime;
 bool IR2Vec::collectIR;
-std::string IR2Vec::vocab;
 std::string IR2Vec::iname;
 std::string IR2Vec::oname;
 std::string IR2Vec::funcName;
@@ -26,7 +25,8 @@ float IR2Vec::WO;
 float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
-
+std::map<std::string, Vector> IR2Vec::opcMap =
+    IR2Vec::Vocabulary::getVocabulary();
 std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   SMDiagnostic err;
   static LLVMContext context;
@@ -37,30 +37,6 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
     exit(1);
   }
   return M;
-}
-
-void IR2Vec::collectDataFromVocab(std::map<std::string, Vector> &opcMap) {
-  IR2VEC_DEBUG(errs() << "Reading from " + vocab + "\n");
-  std::ifstream i(vocab);
-  std::string delimiter = ":";
-  for (std::string line; getline(i, line);) {
-    std::string token = line.substr(0, line.find(delimiter));
-    Vector rep;
-    std::string vec = line.substr(line.find(delimiter) + 1, line.length());
-    std::string val = vec.substr(vec.find("[") + 1, vec.find(", ") - 1);
-    rep.push_back(stod(val));
-    int pos = vec.find(", ");
-    vec = vec.substr(pos + 1);
-    for (int i = 1; i < DIM - 1; i++) {
-      val = vec.substr(1, vec.find(", ") - 1);
-      rep.push_back(stod(val));
-      pos = vec.find(", ");
-      vec = vec.substr(pos + 1);
-    }
-    val = vec.substr(1, vec.find("]") - 1);
-    rep.push_back(stod(val));
-    opcMap[token] = rep;
-  }
 }
 
 void IR2Vec::scaleVector(Vector &vec, float factor) {

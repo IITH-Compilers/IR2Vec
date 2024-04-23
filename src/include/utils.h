@@ -13,6 +13,7 @@
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
+
 #include <cxxabi.h>
 
 #include <map>
@@ -34,7 +35,6 @@ extern bool fa;
 extern bool sym;
 extern bool printTime;
 extern bool collectIR;
-extern std::string vocab;
 extern std::string iname;
 extern std::string oname;
 extern std::string funcName;
@@ -44,9 +44,8 @@ extern float WO;
 extern float WA;
 extern float WT;
 extern bool debug;
-
+extern std::map<std::string, Vector> opcMap;
 std::unique_ptr<llvm::Module> getLLVMIR();
-void collectDataFromVocab(std::map<std::string, Vector> &opcMap);
 void scaleVector(Vector &vec, float factor);
 // newly added
 std::string getDemagledName(const llvm::Function *function);

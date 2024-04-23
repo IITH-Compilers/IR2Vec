@@ -110,14 +110,13 @@ To ensure the correctness, run `make verify-all`
 instructions.
 
 ### Using Binary
-> ir2vec -\<mode\> -vocab \<seedEmbedding-file-path\> -o \<output-file\> -level \<p|f\> -class \<class-number\> -funcName=\<function-name\> \<input-ll-file\>
+> ir2vec -\<mode\> -o \<output-file\> -level \<p|f\> -class \<class-number\> -funcName=\<function-name\> \<input-ll-file\>
 
 #### Command-Line options
 
 - `mode` - can be one of `sym`/`fa`
     - `sym` denotes Symbolic representation
     - `fa` denotes Flow-Aware representation
-- `vocab`  - the path to the seed embeddings file
 -  `o` - file in which the embeddings are to be appended;     (Note : If  file doesn’t exist, new file would be created, else embeddings would be appended)
 - `level` - can be one of chars `p`/`f`.
     - `p` denotes `program level` encoding
@@ -139,16 +138,16 @@ Please use `--help` for further details.
 
 #### Flow-Aware Embeddings
 For all functions
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+* `` ir2vec -fa -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
 
 For a specific function
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
+* `` ir2vec -fa -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### Symbolic Embeddings
 For all functions
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
+ * `` ir2vec -sym -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
 For a specific function
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab.txt -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
+ * `` ir2vec -sym -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
@@ -176,8 +175,7 @@ The following example snippet shows how to query the exposed vector representati
 
 // Creating object to generate FlowAware representation
 auto ir2vec =
-      IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware,
-                         "./vocabulary/seedEmbeddingVocab.txt");
+      IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware);
 
 // Getting Instruction vectors corresponding to the instructions in <LLVM Module>
 auto instVecMap = ir2vec.getInstVecMap();

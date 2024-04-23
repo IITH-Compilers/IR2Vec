@@ -24,7 +24,6 @@ else
 fi
 
 SEED_VERSION=$2
-VOCAB_PATH="./vocabulary/seedEmbeddingVocab.txt"
 IR2VEC_PATH="../../bin/ir2vec"
 
 functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" "insertionSort" "binomialCoeff" "find" "countParenth" "boruvkaMST" "maxStackHeight" "badCharHeuristic" "bpm"
@@ -47,7 +46,7 @@ perform_vector_comparison() {
 
     if [[ "$FILE_PREFIX" == "p" || "$FILE_PREFIX" == "f" ]]; then
         while IFS= read -r d; do
-            ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level ${LEVEL} -o ${VIR_FILE} ${d} &> /dev/null
+            ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${VIR_FILE} ${d} &> /dev/null
         done < index-${SEED_VERSION}.files
         wait
     else
@@ -55,7 +54,7 @@ perform_vector_comparison() {
         do
             for func in "${functions[@]}"
             do
-                ${IR2VEC_PATH} -${PASS} -vocab=${VOCAB_PATH} -level ${LEVEL} -funcName=$func -o ${VIR_FILE} ${d_on} &> /dev/null
+                ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -funcName=$func -o ${VIR_FILE} ${d_on} &> /dev/null
             done
         done < index-${SEED_VERSION}.files
         wait

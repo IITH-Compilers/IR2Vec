@@ -9,7 +9,6 @@
 #include "IR2Vec.h"
 #include "utils.h"
 #include "version.h"
-
 #include <Python.h>
 #include <cstring>
 #include <fstream>
@@ -56,14 +55,6 @@ static PyObject *getIR2VecVersion(PyObject *self, PyObject *args) {
   return PyUnicode_DecodeUTF8(
       IR2VEC_VERSION, sizeof(IR2VEC_VERSION) / sizeof(IR2VEC_VERSION[0]) - 1,
       NULL);
-}
-
-PyObject *setSeedEmbeddingPath(PyObject *self, PyObject *args) {
-  const char *vocab_path2 = "";
-  if (PyArg_ParseTuple(args, "s", &vocab_path2)) {
-    seed_emb_path = string(vocab_path2);
-  }
-  return PyUnicode_FromString("Seed Embedding Path is Set");
 }
 
 bool fileNotValid(const char *filename) {
@@ -169,7 +160,6 @@ public:
     // The scope of this Module object is extremely crucial
     std::unique_ptr<llvm::Module> Module;
     Module = IR2Vec::getLLVMIR();
-    std::string vocab_path = seed_emb_path + "/seedEmbeddingVocab.txt";
 
     IR2Vec::Embeddings *emb = new IR2Vec::Embeddings();
     // if output file is provided
@@ -177,13 +167,11 @@ public:
       string outFile = this->outputFile;
       ofstream output;
       output.open(outFile, ios_base::app);
-      emb = std::move(new IR2Vec::Embeddings(*Module, ir2vecMode, vocab_path,
-                                             (this->level)[0], &output,
-                                             funcName));
+      emb = std::move(new IR2Vec::Embeddings(
+          *Module, ir2vecMode, (this->level)[0], &output, funcName));
     } else {
-      emb = std::move(new IR2Vec::Embeddings(*Module, ir2vecMode, vocab_path,
-                                             (this->level)[0], nullptr,
-                                             funcName));
+      emb = std::move(new IR2Vec::Embeddings(
+          *Module, ir2vecMode, (this->level)[0], nullptr, funcName));
     }
 
     if (!emb) {
@@ -381,8 +369,6 @@ PyMethodDef IR2Vec_core_Methods[] = {
      "Get Program Vector"},
     {"getFunctionVectors", (PyCFunction)getFunctionVectors, METH_VARARGS,
      "Get Function Vectors"},
-    {"setSeedEmbdPath", (PyCFunction)setSeedEmbeddingPath, METH_VARARGS,
-     "Set Seed Embedding Path"},
     {"getVersion", getIR2VecVersion, METH_VARARGS, "Get IR2Vec Version"},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };

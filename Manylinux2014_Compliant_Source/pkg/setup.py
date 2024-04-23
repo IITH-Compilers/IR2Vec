@@ -81,6 +81,5 @@ setup(
     ],
     ext_modules=[IR2Vec_core],
     packages=["ir2vec"],
-    package_data={"": ["seedEmbeddingVocab.txt"]},
     include_package_data=True,
 )
