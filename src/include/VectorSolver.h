@@ -139,6 +139,25 @@ using namespace std;
 static int totalGauss = 0;
 static int total = 0;
 typedef std::vector<std::vector<double>> matrix;
+std::vector<std::vector<double>>
+makeDiagonallyDominant(std::vector<std::vector<double>> matrix) {
+  // Iterate over rows
+  for (int i = 0; i < matrix.size(); ++i) {
+    double rowSum = 0.0;
+    // Calculate the sum of absolute values excluding diagonal
+    for (int j = 0; j < matrix[i].size(); ++j) {
+      if (j != i) {
+        rowSum += std::abs(matrix[i][j]);
+      }
+    }
+    // Adjust diagonal element if necessary
+    if (std::abs(matrix[i][i]) <= rowSum) {
+      matrix[i][i] = rowSum + 1; // Adjust diagonal element
+    }
+  }
+  return matrix;
+}
+
 matrix gaussSolve(matrix A, matrix B) {
   totalGauss++;
   int n = A.size();
@@ -223,9 +242,27 @@ void printMatrix(const matrix &M) {
   }
 }
 static bool isFirst = true;
+bool isDiagonallyDominant(const matrix &A) {
+  int n = A.size();
+  for (int i = 0; i < n; ++i) {
+    double diag = std::abs(A[i][i]);
+    double sum = 0.0;
+    for (int j = 0; j < n; ++j) {
+      if (j != i) {
+        sum += std::abs(A[i][j]);
+      }
+    }
+    if (diag <= sum) {
+      return false; // Not diagonally dominant
+    }
+  }
+  return true; // Diagonally dominant
+}
+
 // Gauss-Seidel Iterative Solver
-matrix solve(const matrix &A, const matrix &B, double tolerance = 1e-3,
-             int maxIterations = 100000) {
+matrix solve(matrix &A, matrix &B, double tolerance = 1e-12,
+             int maxIterations = 10000000000) {
+  // std::cout << total << " " << totalGauss << "\n";
   total++;
   int n = A.size();
   int m = B[0].size();
@@ -234,6 +271,13 @@ matrix solve(const matrix &A, const matrix &B, double tolerance = 1e-3,
   matrix X(n, std::vector<double>(m, 0.0)); // Initial guess for solution
 
   // Iterate until convergence or maximum iterations reached
+  if (!isDiagonallyDominant(A)) {
+    //  matrix gaussResult(n, std::vector<double>(m, 0.0));
+    //       gaussResult = gaussSolve(A, B);
+    //       return gaussResult;
+    matrix newA = makeDiagonallyDominant(A);
+    A = newA;
+  }
   for (int iter = 0; iter < maxIterations; ++iter) {
     double maxDiff = 0.0;
 
@@ -276,11 +320,11 @@ matrix solve(const matrix &A, const matrix &B, double tolerance = 1e-3,
         //     isFirst = false;
         //     return X;
         // }
-        if (newX > 100000) {
-          matrix gaussResult(n, std::vector<double>(m, 0.0));
-          gaussResult = gaussSolve(A, B);
-          return gaussResult;
-        }
+        // if (newX > 100000) {
+        // matrix gaussResult(n, std::vector<double>(m, 0.0));
+        // gaussResult = gaussSolve(A, B);
+        // return gaussResult;
+        // }
         X[i][k] = newX;
         // if(X[i][k])
       }
@@ -291,7 +335,7 @@ matrix solve(const matrix &A, const matrix &B, double tolerance = 1e-3,
       break;
   }
   // std::cout << "hihi\n";
-  // std::cout << total << " " << totalGauss << "\n";
+
   return X;
 }
 // #define EIGEN_MPL2_ONLY
