@@ -79,6 +79,7 @@ matrix solve(matrix &A, matrix &B, double tolerance = 1e-12,
         }
         double newX = (B[i][k] - sum) / A[i][i]; // Gauss-Seidel update
         maxDiff = std::max(maxDiff, std::fabs(newX - X[i][k]));
+        X[i][k] = newX;
       }
     }
 
