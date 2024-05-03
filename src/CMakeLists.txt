@@ -24,8 +24,11 @@ if(NOT LLVM_IR2VEC)
   # llvm_map_components_to_libnames(llvm_libs all)
   llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
 
+  # Check if OpenMP is supported by the compiler
+  find_package(OpenMP REQUIRED)
+
   add_executable(${PROJECT_NAME} ${binsrc})
-  target_link_libraries (${PROJECT_NAME} ${llvm_libs} objlib)
+  target_link_libraries (${PROJECT_NAME} ${llvm_libs} objlib OpenMP::OpenMP_CXX)
   target_include_directories(${PROJECT_NAME} PRIVATE .)
 
   add_library(objlib OBJECT ${libsrc})
@@ -49,6 +52,9 @@ if(NOT LLVM_IR2VEC)
       LIBRARY DESTINATION lib
       PUBLIC_HEADER DESTINATION include
       RESOURCE DESTINATION ./)
+
+  # Add compiler flags for OpenMP
+  target_compile_options(${PROJECT_NAME} PRIVATE ${OpenMP_CXX_FLAGS})
 
   add_subdirectory(test-suite)
 
