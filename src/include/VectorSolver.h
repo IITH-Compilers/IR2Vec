@@ -210,7 +210,6 @@ void lu_decomposition(const vector<vector<double>> &A,
     L[i][i] = 1.0;
   }
 }
-
 // Function to solve X = A_inverse * B using LU decomposition
 vector<vector<double>> solve(const vector<vector<double>> &A,
                              const vector<vector<double>> &B) {
