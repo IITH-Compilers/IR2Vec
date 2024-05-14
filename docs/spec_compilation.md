@@ -5,10 +5,10 @@
 ## CPU 2006
 
 - Run installation using the command `bash install.sh`.
-- Create config file, using `config_clang14_cpu2006.cfg`. 
+- Create config file, using `config_clang14_cpu2006.cfg`.
 - Change the following compilation parameters to reflect the appropriate llvm version.
   - `CC`, `CXX`
-- To `COPTIMIZE`, and `CXXOPTIMIZE`, also add `-S -emit-llvm -Xclang` to make sure compilation stops appropriately without errors.
+- To `COPTIMIZE`, and `CXXOPTIMIZE`, also add `-S -emit-llvm -Xclang` to ensure that compilation stops appropriately without errors.
 - Copy the config file to the `config` folder in the `cpu2006install` folder.
 - Source the install. `source shrc`
 - Run the command
@@ -21,7 +21,7 @@
 - Create config file, using `config_clang14_cpu2017.cfg`.
 - Change the following compilation parameters to reflect the appropriate llvm version.
   - `CC`, `CXX`, `CLD`, `FLD`
-- To `COPTIMIZE`, and `CXXOPTIMIZE`, also add `-S -emit-llvm -Xclang` to make sure compilation stops appropriately without errors.
+- To `COPTIMIZE`, and `CXXOPTIMIZE`, also add `-S -emit-llvm -Xclang` to ensure that compilation stops appropriately without errors.
 - Copy the config file to the `config` folder in the `cpu2017install` folder.
 - Source the install. `source shrc`
 - Run the command
