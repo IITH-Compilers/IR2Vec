@@ -13,7 +13,7 @@
 - Source the install. `source shrc`
 - Run the command
   - `runspec --config config_clang16_cpu2006.cfg  --tune=base  --action=build --rebuild --define build_ncpus=1 int fp`
-- Once the `.o` files are generated, run the script (`get_ll_spec.sh`) with appropriate changes to get these files together in the repo.
+- Once the `.o` files are generated, run the script (`collect_ir/spec/get_ll_spec.sh`) with appropriate changes to get these files together in the repo.
 
 ## CPU 2017
 
@@ -27,5 +27,5 @@
 - Run the command
   - `runcpu --config config_clang16_cpu2017.cfg --tune=base --action=build --rebuild --define build_ncpus=1 intrate fprate intspeed fpspeed`
 
-- Once the `.o` files are generated, run the script ([`get_ll_spec.sh`](https://github.com/IITH-Compilers/IR2Vec-Version-Upgrade-Checks/blob/main/collect_ir/spec/get_ll_SPEC.sh)) with appropriate changes to get these files together in the repo.
+- Once the `.o` files are generated, run the script (`collect_ir/spec/get_ll_spec.sh`) with appropriate changes to get these files together in the repo.
 - Once the ll, .o files are generated, collect them in an `ll_files.txt` file and proceed with generating the triplets.

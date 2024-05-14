@@ -7,6 +7,9 @@ The following guide details the steps followed in upgrading the LLVM version sup
    - The git repo `IR2Vec-Version-Upgrade-Checks` has the required scripts to be run for this process.
    - The repo is available [here](https://github.com/IITH-Compilers/IR2Vec-Version-Upgrade-Checks/)
    - Our relevant scripts and files will be present in the folder `collect_ir`.
+      - `collect_ir/spec/get_ll_files_list.py`
+      - `collect_ir/boost/get_ll_files_list.py`
+      - `collect_ir/spec/get_ll_spec.sh`
    - We use the C++ Library Boost, and the CPU-SPEC source codes to generate training data.
       - Download these source codes.
    - Compile the relevant Boost `.c*` files with the relevant LLVM version.
