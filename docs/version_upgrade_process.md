@@ -1,4 +1,4 @@
-The following guide details the steps followed in the upgrade process for IR2Vec.
+The following guide details the steps followed in upgrading the LLVM version supported by IR2Vec
 
 # Compile the IR2Vec binary
    - Instructions for the same are present [here](https://github.com/IITH-Compilers/IR2Vec/blob/main/README.md)
@@ -12,7 +12,7 @@ The following guide details the steps followed in the upgrade process for IR2Vec
    - Compile the relevant Boost `.c*` files with the relevant LLVM version.
       - The folder has the script `get_boost_ll.py` for this purpose.
    - CPU/SPEC .c++ files compilation with the relevant LLVM version.
-      - For detailed instructions on this step, refer to [here](https://github.com/nishant-sachdeva/IR2Vec/wiki/spec_compilation).
+      - For detailed instructions on this step, refer to [here](https://github.com/IITH-Compilers/IR2Vec/wiki/spec_compilation).
 - Collect the paths to all these compiled .ll / .o files in a single place using the scripts `collect_ir/spec/get_ll_files_list.py` and `collect_ir/boost/get_ll_files_list.py`.
 
 
@@ -59,7 +59,7 @@ The following guide details the steps followed in the upgrade process for IR2Vec
       - `git grep llvm16`
    - For the complete evaluation, we need to update the docker image as well.
    - The docker images for running the Github tests are available [here](https://github.com/IITH-Compilers/manylinux2014-llvm/tree/main).
-   - The instructions to generate a new Docker image for the updated version are available [here](https://github.com/nishant-sachdeva/IR2Vec/wiki/docker_update)
+   - The instructions to generate a new Docker image for the updated version are available [here](https://github.com/IITH-Compilers/IR2Vec/wiki/docker_update)
 
 
 # Pushing commits
