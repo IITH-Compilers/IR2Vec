@@ -22,6 +22,5 @@ cp build/vocabulary.h Manylinux2014_Compliant_Source/pkg/ir2vec/
 cp src/include/utils.h Manylinux2014_Compliant_Source/pkg/ir2vec/
 cp src/include/IR2Vec.h Manylinux2014_Compliant_Source/pkg/ir2vec/
 cp build/src/version.h Manylinux2014_Compliant_Source/pkg/ir2vec/
-cp vocabulary/seedEmbeddingVocab.txt Manylinux2014_Compliant_Source/pkg/ir2vec/
 
 bash Manylinux2014_Compliant_Source/pkg/regen-oracle.sh
