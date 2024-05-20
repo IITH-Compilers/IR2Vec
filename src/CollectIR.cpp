@@ -19,15 +19,24 @@
 using namespace llvm;
 
 void CollectIR::generateTriplets(std::ostream &out) {
+#pragma omp parallel {
+  std::string local_res = "";
   for (Function &F : M)
-    for (BasicBlock &B : F)
-      traverseBasicBlock(B);
-  out << res;
+    for (BasicBlock &B : F) {
+      local_res += traverseBasicBlock(B);
+    }
+
+#pragma omp critical {
+  res += local_res;
+}
+}
+out << res;
 }
 
-void CollectIR::traverseBasicBlock(BasicBlock &B) {
+std::string CollectIR::traverseBasicBlock(BasicBlock &B) {
+  std::string local_res = "";
   for (Instruction &I : B) {
-    res += "\n" + std::string(I.getOpcodeName()) + " ";
+    local_res += "\n" + std::string(I.getOpcodeName()) + " ";
     auto type = I.getType();
     IR2VEC_DEBUG(I.print(outs()); outs() << "\n";);
     IR2VEC_DEBUG(I.getType()->print(outs()); outs() << " Type\n";);
@@ -36,44 +45,32 @@ void CollectIR::traverseBasicBlock(BasicBlock &B) {
 
     if (type->isVoidTy()) {
       stype = " voidTy ";
-      res += stype;
     } else if (type->isFloatingPointTy()) {
       stype = " floatTy ";
-      res += stype;
     } else if (type->isIntegerTy()) {
       stype = " integerTy ";
-      res += stype;
     } else if (type->isFunctionTy()) {
       stype = " functionTy ";
-      res += stype;
     } else if (type->isStructTy()) {
       stype = " structTy ";
-      res += stype;
     } else if (type->isArrayTy()) {
       stype = " arrayTy ";
-      res += stype;
     } else if (type->isPointerTy()) {
       stype = " pointerTy ";
-      res += stype;
     } else if (type->isVectorTy()) {
       stype = " vectorTy ";
-      res += stype;
     } else if (type->isEmptyTy()) {
       stype = " emptyTy ";
-      res += stype;
     } else if (type->isLabelTy()) {
       stype = " labelTy ";
-      res += stype;
     } else if (type->isTokenTy()) {
       stype = " tokenTy ";
-      res += stype;
     } else if (type->isMetadataTy()) {
       stype = " metadataTy ";
-      res += stype;
     } else {
       stype = " unknownTy ";
-      res += stype;
     }
+    local_res += stype;
 
     IR2VEC_DEBUG(errs() << "Type taken : " << stype << "\n";);
 
@@ -83,21 +80,22 @@ void CollectIR::traverseBasicBlock(BasicBlock &B) {
       IR2VEC_DEBUG(I.getOperand(i)->print(outs()); outs() << "\n";);
 
       if (isa<Function>(I.getOperand(i))) {
-        res += " function ";
+        local_res += " function ";
         IR2VEC_DEBUG(outs() << "Function\n");
       } else if (isa<PointerType>(I.getOperand(i)->getType())) {
-        res += " pointer ";
+        local_res += " pointer ";
         IR2VEC_DEBUG(outs() << "pointer\n");
       } else if (isa<Constant>(I.getOperand(i))) {
-        res += " constant ";
+        local_res += " constant ";
         IR2VEC_DEBUG(outs() << "constant\n");
       } else if (isa<BasicBlock>(I.getOperand(i))) {
-        res += " label ";
+        local_res += " label ";
         IR2VEC_DEBUG(outs() << "label\n");
       } else {
-        res += " variable ";
+        local_res += " variable ";
         IR2VEC_DEBUG(outs() << "variable2\n");
       }
     }
   }
+  return local_res;
 }
