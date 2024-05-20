@@ -23,7 +23,7 @@ private:
   std::string res;
   llvm::Module &M;
 
-  void traverseBasicBlock(llvm::BasicBlock &B);
+  std::string traverseBasicBlock(llvm::BasicBlock &B);
 
 public:
   CollectIR(std::unique_ptr<llvm::Module> &M) : M{*M} { res = ""; }

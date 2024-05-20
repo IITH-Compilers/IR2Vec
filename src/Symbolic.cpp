@@ -63,13 +63,20 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
     if (cls != -1)
       res += std::to_string(cls) + "\t";
 
-    for (auto i : pgmVector) {
-      if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-        i = 0;
+#pragma omp parallel
+    {
+      std::string local_res;
+      for (auto i : pgmVector) {
+        if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+          i = 0;
+        }
+        local_res += std::to_string(i) + "\t";
       }
-      res += std::to_string(i) + "\t";
+
+#pragma omp critical
+      { res += local_res; }
+      res += "\n";
     }
-    res += "\n";
   }
 
   if (o)
@@ -114,11 +121,7 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
   MapVector<const BasicBlock *, double> cumulativeScore;
 
   for (auto *b : RPOT) {
-    auto bbVector = bb2Vec(*b, funcStack);
-
-    Vector weightedBBVector;
-    weightedBBVector = bbVector;
-
+    Vector weightedBBVector = bb2Vec(*b, funcStack);
     std::transform(funcVector.begin(), funcVector.end(),
                    weightedBBVector.begin(), funcVector.begin(),
                    std::plus<double>());
@@ -193,40 +196,6 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     } else {
       vec = getValue("unknownTy");
     }
-
-    /*switch (I.getType()->getTypeID()) {
-    case 0:
-      vec = getValue("voidTy");
-      break;
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-      vec = getValue("floatTy");
-      break;
-    case 11:
-      vec = getValue("integerTy");
-      break;
-    case 12:
-      vec = getValue("functionTy");
-      break;
-    case 13:
-      vec = getValue("structTy");
-      break;
-    case 14:
-      vec = getValue("arrayTy");
-      break;
-    case 15:
-      vec = getValue("pointerTy");
-      break;
-    case 16:
-      vec = getValue("vectorTy");
-      break;
-    default:
-      vec = getValue("unknownTy");
-    }*/
 
     scaleVector(vec, WT);
     std::transform(instVector.begin(), instVector.end(), vec.begin(),

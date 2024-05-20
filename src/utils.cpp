@@ -42,6 +42,7 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
 }
 
 void IR2Vec::scaleVector(Vector &vec, float factor) {
+#pragma omp parallel for
   for (unsigned i = 0; i < vec.size(); i++) {
     vec[i] = vec[i] * factor;
   }
@@ -86,12 +87,19 @@ std::string IR2Vec::updatedRes(IR2Vec::Vector tmp, llvm::Function *f,
   res += M->getSourceFileName() + "__" + demangledName + "\t";
 
   res += "=\t";
-  for (auto i : tmp) {
-    if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-      i = 0;
+#pragma omp parallel
+  {
+    std::string local_res;
+    for (auto i : tmp) {
+      if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+        i = 0;
+      }
+      local_res += std::to_string(i) + "\t";
     }
-    res += std::to_string(i) + "\t";
-  }
 
+#pragma omp critical
+    { res += local_res; }
+    res += "\n";
+  }
   return res;
 }
