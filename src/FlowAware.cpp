@@ -5,8 +5,11 @@
 // file in the top-level directory for more details.
 //
 #include "FlowAware.h"
-#include "VectorSolver.h"
-
+#ifdef EIGEN_FOUND
+  #include "VectorSolverEigen.h"
+#else
+  #include "VectorSolver.h"
+#endif
 #include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PostOrderIterator.h"

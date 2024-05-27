@@ -6,58 +6,90 @@
 //
 #ifndef __VECTOR_SOLVER_H__
 #define __VECTOR_SOLVER_H__
-#define EIGEN_MPL2_ONLY
 
-#include "Eigen/LU"
-#include "Eigen/QR"
-#include "llvm/ADT/SmallVector.h"
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <limits>
 #include <vector>
-
-using namespace Eigen;
-using namespace llvm;
-
+using namespace std;
 typedef std::vector<std::vector<double>> matrix;
-
-MatrixXd calculate(MatrixXd A, MatrixXd B) {
-  if (A.determinant() != 0) {
-    return A.fullPivHouseholderQr().solve(B);
-  } else {
-    // To-Do: perturb probabilities
-    llvm_unreachable("inconsistent/infinitely many solutions");
-  }
+// Function to swap rows in a matrix
+void swapRows(std::vector<double> &row1, std::vector<double> &row2) {
+  std::swap(row1, row2);
 }
 
-MatrixXd formMatrix(std::vector<std::vector<double>> a, int r, int l) {
-  MatrixXd M(r, l);
-  for (int i = 0; i < r; i++)
-    M.row(i) = VectorXd::Map(&a[i][0], a[i].size());
+const double EPS = 1e-9;
 
-  return M;
-}
+void gaussJordan(matrix a, int k, matrix &ans) {
+  int n = (int)a.size();
+  int m = (int)a[0].size() - k;
 
-matrix solve(matrix A, matrix B) {
-  int r = A.size();
-  int c = A[0].size();
-  MatrixXd mA(r, c);
-  mA = formMatrix(A, r, c);
+  vector<int> where(m, -1);
+  for (int col = 0, row = 0; col < m && row < n; ++col) {
+    int sel = row;
+    for (int i = row; i < n; ++i)
+      if (abs(a[i][col]) > abs(a[sel][col]))
+        sel = i;
+    if (abs(a[sel][col]) < EPS)
+      continue;
+    for (int i = 0; i < m + k; ++i)
+      swap(a[sel][i], a[row][i]);
+    where[col] = row;
 
-  r = B.size();
-  c = B[0].size();
-  MatrixXd mB(r, c);
-  mB = formMatrix(B, r, c);
-
-  r = A.size();
-  MatrixXd x(r, c);
-  x = calculate(mA, mB);
-  std::vector<std::vector<double>> raw_data;
-  // raw_data.resize(x.rows());
-  for (unsigned i = 0; i < x.rows(); i++) {
-    std::vector<double> tmp;
-    tmp.resize(x.cols());
-    VectorXd::Map(&tmp[0], x.cols()) = x.row(i);
-    raw_data.push_back(tmp);
+    for (int i = 0; i < n; ++i)
+      if (i != row) {
+        double c = a[i][col] / a[row][col];
+        for (int j = col; j < m + k; ++j)
+          a[i][j] -= a[row][j] * c;
+      }
+    ++row;
   }
-  return raw_data;
+
+  ans.assign(m, vector<double>(k, 0));
+  for (int i = 0; i < m; ++i)
+    if (where[i] != -1)
+      for (int j = 0; j < k; ++j)
+        ans[i][j] = a[where[i]][m + j] / a[where[i]][i];
+
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < k; ++j) {
+      double sum = 0;
+      for (int l = 0; l < m; ++l)
+        sum += ans[l][j] * a[i][l];
+      if (abs(sum - a[i][m + j]) > EPS)
+        return;
+    }
+  }
+}
+matrix solve(matrix &A, matrix &B) {
+  int m = A.size();
+  int n = B[0].size();
+
+  // Check if dimensions are compatible (m rows in A, same m rows in B)
+  if (m != B.size()) {
+    throw std::invalid_argument(
+        "Matrix dimensions are not compatible for solving AX=B");
+  }
+
+  matrix augmented(m, std::vector<double>(m + n));
+  for (int i = 0; i < m; ++i) {
+    for (int j = 0; j < m; ++j) {
+      augmented[i][j] = A[i][j];
+    }
+    for (int j = 0; j < n; ++j) {
+      augmented[i][m + j] = B[i][j];
+    }
+  }
+  gaussJordan(augmented, B[0].size(), B);
+  matrix X(m, std::vector<double>(n));
+  for (int i = 0; i < m; ++i) {
+    for (int j = 0; j < n; ++j) {
+      X[i][j] = B[i][j];
+    }
+  }
+
+  return X;
 }
 
 #endif

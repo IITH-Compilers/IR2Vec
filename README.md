@@ -77,7 +77,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
 * GNU Make (4.2.1)
 * LLVM (17.0.6) - [src](https://github.com/llvm/llvm-project/tree/release/17.x), [release](https://releases.llvm.org/download.html#17.0.6)
     * Support for latest LLVM versions would be added soon
-* Eigen library (3.3.7)
+* Eigen library (3.3.7) (Optional)
 * Python (3.6.7)
 * Other python requirements
     * For training the vocabulary are available in [seed_embeddings/OpenKE/requirements.txt](./seed_embeddings/OpenKE/requirements.txt), and
