@@ -6,9 +6,9 @@
 //
 #include "FlowAware.h"
 #ifdef EIGEN_FOUND
-  #include "VectorSolverEigen.h"
+#include "VectorSolverEigen.h"
 #else
-  #include "VectorSolver.h"
+#include "VectorSolver.h"
 #endif
 
 #include "llvm/ADT/DepthFirstIterator.h"
