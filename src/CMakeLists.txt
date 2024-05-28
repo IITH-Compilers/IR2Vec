@@ -30,7 +30,6 @@ if(NOT LLVM_IR2VEC)
 
   add_library(objlib OBJECT ${libsrc})
   set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
-  find_package(Eigen3 QUIET)
   if(Eigen3_FOUND)
     target_link_libraries (objlib Eigen3::Eigen)
   endif()
@@ -74,7 +73,6 @@ else()
     intrinsics_gen
   )
 
-  find_package(Eigen3 QUIET)
   if(Eigen3_FOUND)
     target_link_libraries(LLVMIR2Vec PRIVATE Eigen3::Eigen)
   endif()
