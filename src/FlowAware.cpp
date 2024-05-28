@@ -10,6 +10,7 @@
 #else
   #include "VectorSolver.h"
 #endif
+
 #include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PostOrderIterator.h"

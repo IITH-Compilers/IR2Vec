@@ -11,8 +11,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 find_package (Eigen3 3.3.7 QUIET NO_MODULE)
 
 if (Eigen3_FOUND)
-    # Eigen3 found, include the directory
-    include_directories(${Eigen3_DIR})
     message(STATUS "Found Eigen3: ${Eigen3_DIR}")
     add_definitions(-DEIGEN_FOUND)
 endif()
