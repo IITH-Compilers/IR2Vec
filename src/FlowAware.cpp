@@ -94,7 +94,7 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
 }
 
 Vector IR2Vec_FA::getValue(std::string key) {
-  Vector vec;
+  Vector vec(DIM, 0);
   if (opcMap.find(key) == opcMap.end()) {
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
     dataMissCounter++;
