@@ -50,28 +50,12 @@ if(NOT LLVM_IR2VEC)
 
   add_subdirectory(test-suite)
 
-  add_custom_target(verify-symbolic
-  COMMAND bash ./sanity_check.sh SYM llvm17
-  COMMENT "Generating Symbolic IR2Vec vectors and comparing with oracle..."
-  WORKING_DIRECTORY ./test-suite
-  DEPENDS ${PROJECT_NAME}
-  VERBATIM
-  )
-
-  add_custom_target(verify-flowaware
-  COMMAND bash sanity_check.sh FA llvm17
-  COMMENT "Generating Flow-Aware IR2Vec vectors and comparing with oracle..."
-  WORKING_DIRECTORY ./test-suite
-  DEPENDS ${PROJECT_NAME}
-  VERBATIM
-  )
-
-  add_custom_target(verify-all
-  COMMAND bash sanity_check.sh FA llvm17 && bash sanity_check.sh SYM llvm17
-  COMMENT "Generating both Symbolic and Flow-Aware IR2Vec vectors and comparing with oracle..."
-  WORKING_DIRECTORY ./test-suite
-  DEPENDS ${PROJECT_NAME}
-  VERBATIM
+  add_custom_target(check
+    COMMAND python3 test-lit.py -a .
+    COMMENT "Running LIT based test-suite"
+    WORKING_DIRECTORY ./test-suite
+    DEPENDS ${PROJECT_NAME}
+    VERBATIM
   )
 
 else()

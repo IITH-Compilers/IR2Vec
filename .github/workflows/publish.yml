@@ -14,9 +14,14 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+    - name: Install libzstd-dev
+      run: sudo apt-get install -y libzstd-dev
+    - name: Install LIT and Filecheck
+      run: |
+        sudo python3 -m pip install lit
+        sudo python3 -m pip install filecheck
     - name: Install LLVM-17
       run: |
-        sudo apt-get install -y libzstd-dev
         wget https://apt.llvm.org/llvm.sh
         sudo bash llvm.sh 17
     - uses: actions/checkout@v2
