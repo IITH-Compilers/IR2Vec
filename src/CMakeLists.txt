@@ -30,7 +30,9 @@ if(NOT LLVM_IR2VEC)
 
   add_library(objlib OBJECT ${libsrc})
   set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
-  target_link_libraries (objlib Eigen3::Eigen)
+  if(Eigen3_FOUND)
+    target_link_libraries (objlib Eigen3::Eigen)
+  endif()
 
   add_library(${IR2VEC_LIB} SHARED $<TARGET_OBJECTS:objlib>)
   add_library(${IR2VEC_LIB_STATIC} STATIC $<TARGET_OBJECTS:objlib>)
@@ -71,7 +73,9 @@ else()
     intrinsics_gen
   )
 
-  target_link_libraries(LLVMIR2Vec PRIVATE Eigen3::Eigen)
+  if(Eigen3_FOUND)
+    target_link_libraries(LLVMIR2Vec PRIVATE Eigen3::Eigen)
+  endif()
   target_include_directories(LLVMIR2Vec PRIVATE ${LLVM_MAIN_INCLUDE_DIR})
   target_include_directories(LLVMIR2Vec PRIVATE .)
 
