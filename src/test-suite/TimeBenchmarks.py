@@ -16,7 +16,7 @@ IR2VEC_PATH = (Path(__file__).parents[2] / "build/bin/ir2vec").resolve()
 
 
 def evaluate_benchmark(benchmark_path: Path, mode: str, repeat: int):
-    command = [IR2VEC_PATH.resolve(),
+    command = [IR2VEC_PATH,
                f"-{mode}",
                "-level", "p",
                "-o", "/dev/null",
