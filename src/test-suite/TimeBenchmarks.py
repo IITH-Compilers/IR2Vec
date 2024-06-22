@@ -16,11 +16,15 @@ IR2VEC_PATH = (Path(__file__).parents[2] / "build/bin/ir2vec").resolve()
 
 
 def evaluate_benchmark(benchmark_path: Path, mode: str, repeat: int):
-    command = [IR2VEC_PATH,
-               f"-{mode}",
-               "-level", "p",
-               "-o", "/dev/null",
-               benchmark_path.resolve()]
+    command = [
+        IR2VEC_PATH,
+        f"-{mode}",
+        "-level",
+        "p",
+        "-o",
+        "/dev/null",
+        benchmark_path.resolve(),
+    ]
     trials_time = []
     for _ in range(repeat):
         start = time.perf_counter_ns()
@@ -36,28 +40,38 @@ def evaluate_benchmark(benchmark_path: Path, mode: str, repeat: int):
 
 if __name__ == "__main__":
     default_repeat = 5
-    default_ir_path = Path(__file__).parent / \
-        f"PE-benchmarks-llfiles-{SEED_VERSION}"
+    default_ir_path = Path(__file__).parent / f"PE-benchmarks-llfiles-{SEED_VERSION}"
 
     parser = argparse.ArgumentParser(
         prog="TimeBenchmarks",
-        description="Performance evaluation script of `PE-benchmarks`")
+        description="Performance evaluation script of `PE-benchmarks`",
+    )
 
-    parser.add_argument("--benchmarks_path", type=str,
-                        default=(default_ir_path).resolve(),
-                        help="Path to benchmarks \".ll\" files. "
-                        f"(default={default_ir_path})")
+    parser.add_argument(
+        "--benchmarks_path",
+        type=str,
+        default=(default_ir_path).resolve(),
+        help='Path to benchmarks ".ll" files. ' f"(default={default_ir_path})",
+    )
 
-    parser.add_argument("--repeat", type=int, default=default_repeat,
-                        help="Number of repeats of a single benchmark "
-                        "evaluation, result reported is the average runtime. "
-                        f"(default={default_repeat})")
+    parser.add_argument(
+        "--repeat",
+        type=int,
+        default=default_repeat,
+        help="Number of repeats of a single benchmark "
+        "evaluation, result reported is the average runtime. "
+        f"(default={default_repeat})",
+    )
 
-    parser.add_argument("-o", "--output_file", type=str,
-                        default=f"TimeTaken-{int(time.time())}.csv",
-                        help="Output file name, generated relative to where "
-                        "this script was executed. "
-                        "(default=\"TimeTaken-<CURRENT_TIME>.csv\")")
+    parser.add_argument(
+        "-o",
+        "--output_file",
+        type=str,
+        default=f"TimeTaken-{int(time.time())}.csv",
+        help="Output file name, generated relative to where "
+        "this script was executed. "
+        '(default="TimeTaken-<CURRENT_TIME>.csv")',
+    )
     args = parser.parse_args()
 
     benchmarks_ll_path = Path(args.benchmarks_path)
