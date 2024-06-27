@@ -9,6 +9,8 @@
 #include "vocabulary.h"
 #include <fstream>
 #include <string>
+#include <unordered_map>
+
 using namespace llvm;
 using namespace IR2Vec;
 
@@ -25,7 +27,7 @@ float IR2Vec::WO;
 float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
-std::map<std::string, Vector> IR2Vec::opcMap =
+std::unordered_map<std::string, Vector> IR2Vec::opcMap =
     IR2Vec::Vocabulary::getVocabulary();
 std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   SMDiagnostic err;
@@ -39,8 +41,7 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   return M;
 }
 
-void IR2Vec::scaleVector(Vector &vec, float factor) {
-#pragma omp parallel for
+inline void IR2Vec::scaleVector(Vector &vec, float factor) {
   for (unsigned i = 0; i < vec.size(); i++) {
     vec[i] = vec[i] * factor;
   }
@@ -85,19 +86,12 @@ std::string IR2Vec::updatedRes(IR2Vec::Vector tmp, llvm::Function *f,
   res += M->getSourceFileName() + "__" + demangledName + "\t";
 
   res += "=\t";
-#pragma omp parallel
-  {
-    std::string local_res;
-    for (auto i : tmp) {
-      if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-        i = 0;
-      }
-      local_res += std::to_string(i) + "\t";
+  for (auto i : tmp) {
+    if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+      i = 0;
     }
-
-#pragma omp critical
-    { res += local_res; }
-    res += "\n";
+    res += std::to_string(i) + "\t";
   }
+  res += "\n";
   return res;
 }
