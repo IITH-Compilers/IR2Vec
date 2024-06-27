@@ -51,14 +51,31 @@ perform_vector_comparison() {
         done < index-${SEED_VERSION}.files
         wait
     else
+        echo "Generating ${VIR_FILE} , level ${LEVEL} for ${EncodingType} encoding type"
         while IFS= read -r d_on
         do
             for func in "${functions[@]}"
             do
                 ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -funcName=$func -o ${VIR_FILE} ${d_on} &> /dev/null
             done
+
+            # check if VIR_FILE exists
+            if [ -f ${VIR_FILE} ]; then
+                echo -e "${VIR_FILE} exists."
+            else
+                echo -e "${RED}${BOLD}Error: ${VIR_FILE} does not exist.During Compilation ${NC}"
+                exit 1
+            fi
         done < index-${SEED_VERSION}.files
         wait
+    fi
+
+    # check if VIR_FILE exists
+    if [ -f ${VIR_FILE} ]; then
+    echo -e "${VIR_FILE} exists."
+    else
+        echo -e "${RED}${BOLD}Error: ${VIR_FILE} does not exist.${NC}"
+        exit 1
     fi
 
     TEMP=temp_${EncodingType}_${SEED_VERSION}_${FILE_PREFIX}
@@ -98,6 +115,7 @@ perform_vector_comparison() {
             fi
         else
             echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
+            echo "${TEMP}/${VIR_FILE} does not exist"
             exit 1
         fi
     fi
