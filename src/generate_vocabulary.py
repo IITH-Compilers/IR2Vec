@@ -32,22 +32,23 @@ header = """\
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "IR2Vec.h"
 
 namespace IR2Vec {
 
 class Vocabulary {
 public:
-    static const std::map<std::string, IR2Vec::Vector>& getVocabulary() {
+    static const std::unordered_map<std::string, IR2Vec::Vector>& getVocabulary() {
         return vocabulary;
     }
 private:
-    static const std::map<std::string, IR2Vec::Vector> vocabulary;
+    static const std::unordered_map<std::string, IR2Vec::Vector> vocabulary;
 };
 
 """
 
-opening = "\nconst std::map<std::string, IR2Vec::Vector> Vocabulary::vocabulary = {\n"
+opening = "\nconst std::unordered_map<std::string, IR2Vec::Vector> Vocabulary::vocabulary = {\n"
 closing = """\
 };
 } // namespace IR2Vec

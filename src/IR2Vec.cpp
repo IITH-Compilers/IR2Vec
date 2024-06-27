@@ -72,20 +72,6 @@ void printVersion(raw_ostream &ostream) {
 }
 
 int main(int argc, char **argv) {
-  int N = 100;
-  float a[N], b[N], result[N];
-
-// Initialize arrays a and b with some values
-#pragma omp parallel for
-  for (int i = 0; i < N; ++i) {
-    a[i] = i;
-    b[i] = i + 2;
-  }
-#pragma omp parallel for
-  for (int i = 0; i < N; ++i) {
-    result[i] = a[i] + b[i];
-  }
-
   cl::SetVersionPrinter(printVersion);
   cl::HideUnrelatedOptions(category);
   cl::ParseCommandLineOptions(argc, argv);

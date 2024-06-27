@@ -26,7 +26,7 @@ private:
   llvm::Module &M;
   IR2Vec::Vector pgmVector;
 
-  IR2Vec::Vector getValue(std::string key);
+  inline void getValue(IR2Vec::Vector *vec, std::string key);
   IR2Vec::Vector bb2Vec(llvm::BasicBlock &B,
                         llvm::SmallVector<llvm::Function *, 15> &funcStack);
   IR2Vec::Vector func2Vec(llvm::Function &F,
