@@ -71,13 +71,12 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
     }
     res += "\n";
   }
-}
 
-if (o)
-  *o << res;
+  if (o)
+    *o << res;
 
-IR2VEC_DEBUG(errs() << "class = " << cls << "\n");
-IR2VEC_DEBUG(errs() << "res = " << res);
+  IR2VEC_DEBUG(errs() << "class = " << cls << "\n");
+  IR2VEC_DEBUG(errs() << "res = " << res);
 }
 
 // for generating symbolic encodings for specific function
@@ -114,11 +113,20 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
   ReversePostOrderTraversal<Function *> RPOT(&F);
   MapVector<const BasicBlock *, double> cumulativeScore;
 
-  for (auto *b : RPOT) {
-    Vector weightedBBVector = bb2Vec(*b, funcStack);
-    std::transform(funcVector.begin(), funcVector.end(),
-                   weightedBBVector.begin(), funcVector.begin(),
-                   std::plus<double>());
+#pragma omp parallel
+  {
+    std::vector<Vector> localVector;
+    for (auto *b : RPOT) {
+      Vector weightedBBVector = bb2Vec(*b, funcStack);
+      localVector.push_back(weightedBBVector);
+    }
+
+#pragma omp critical
+    for (auto weightedBBVector : localVector) {
+      std::transform(funcVector.begin(), funcVector.end(),
+                     weightedBBVector.begin(), funcVector.begin(),
+                     std::plus<double>());
+    }
   }
 
   funcStack.pop_back();

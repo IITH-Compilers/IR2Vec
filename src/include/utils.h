@@ -48,7 +48,7 @@ extern float WT;
 extern bool debug;
 extern std::unordered_map<std::string, Vector> opcMap;
 std::unique_ptr<llvm::Module> getLLVMIR();
-inline void scaleVector(Vector &vec, float factor);
+void scaleVector(Vector &vec, float factor);
 // newly added
 std::string getDemagledName(const llvm::Function *function);
 char *getActualName(llvm::Function *function);
