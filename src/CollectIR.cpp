@@ -20,16 +20,14 @@ using namespace llvm;
 
 void CollectIR::generateTriplets(std::ostream &out) {
   for (Function &F : M)
-    for (BasicBlock &B : F) {
-      res += traverseBasicBlock(B);
-    }
+    for (BasicBlock &B : F)
+      traverseBasicBlock(B);
   out << res;
 }
 
-std::string CollectIR::traverseBasicBlock(BasicBlock &B) {
-  std::string local_res = "";
+void CollectIR::traverseBasicBlock(BasicBlock &B) {
   for (Instruction &I : B) {
-    local_res += "\n" + std::string(I.getOpcodeName()) + " ";
+    res += "\n" + std::string(I.getOpcodeName()) + " ";
     auto type = I.getType();
     IR2VEC_DEBUG(I.print(outs()); outs() << "\n";);
     IR2VEC_DEBUG(I.getType()->print(outs()); outs() << " Type\n";);
@@ -63,7 +61,7 @@ std::string CollectIR::traverseBasicBlock(BasicBlock &B) {
     } else {
       stype = " unknownTy ";
     }
-    local_res += stype;
+    res += stype;
 
     IR2VEC_DEBUG(errs() << "Type taken : " << stype << "\n";);
 
@@ -73,22 +71,21 @@ std::string CollectIR::traverseBasicBlock(BasicBlock &B) {
       IR2VEC_DEBUG(I.getOperand(i)->print(outs()); outs() << "\n";);
 
       if (isa<Function>(I.getOperand(i))) {
-        local_res += " function ";
+        res += " function ";
         IR2VEC_DEBUG(outs() << "Function\n");
       } else if (isa<PointerType>(I.getOperand(i)->getType())) {
-        local_res += " pointer ";
+        res += " pointer ";
         IR2VEC_DEBUG(outs() << "pointer\n");
       } else if (isa<Constant>(I.getOperand(i))) {
-        local_res += " constant ";
+        res += " constant ";
         IR2VEC_DEBUG(outs() << "constant\n");
       } else if (isa<BasicBlock>(I.getOperand(i))) {
-        local_res += " label ";
+        res += " label ";
         IR2VEC_DEBUG(outs() << "label\n");
       } else {
-        local_res += " variable ";
+        res += " variable ";
         IR2VEC_DEBUG(outs() << "variable2\n");
       }
     }
   }
-  return local_res;
 }
