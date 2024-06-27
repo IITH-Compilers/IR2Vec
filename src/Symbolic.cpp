@@ -27,13 +27,13 @@ using namespace llvm;
 using namespace IR2Vec;
 using abi::__cxa_demangle;
 
-Vector IR2Vec_Symbolic::getValue(std::string key) {
-  Vector vec;
-  if (opcMap.find(key) == opcMap.end())
+inline void IR2Vec_Symbolic::getValue(IR2Vec::Vector *vec, std::string key) {
+  auto it = opcMap.find(key);
+  if (it == opcMap.end())
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
   else
-    vec = opcMap[key];
-  return vec;
+    vec = &it->second;
+  return;
 }
 
 void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
@@ -63,27 +63,21 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
     if (cls != -1)
       res += std::to_string(cls) + "\t";
 
-#pragma omp parallel
-    {
-      std::string local_res;
-      for (auto i : pgmVector) {
-        if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-          i = 0;
-        }
-        local_res += std::to_string(i) + "\t";
+    for (auto i : pgmVector) {
+      if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+        i = 0;
       }
-
-#pragma omp critical
-      { res += local_res; }
-      res += "\n";
+      res += std::to_string(i) + "\t";
     }
+    res += "\n";
   }
+}
 
-  if (o)
-    *o << res;
+if (o)
+  *o << res;
 
-  IR2VEC_DEBUG(errs() << "class = " << cls << "\n");
-  IR2VEC_DEBUG(errs() << "res = " << res);
+IR2VEC_DEBUG(errs() << "class = " << cls << "\n");
+IR2VEC_DEBUG(errs() << "res = " << res);
 }
 
 // for generating symbolic encodings for specific function
@@ -137,85 +131,78 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
 
   for (auto &I : B) {
     Vector instVector(DIM, 0);
-    auto vec = getValue(I.getOpcodeName());
-    // if (isa<CallInst>(I)) {
-    //   auto ci = dyn_cast<CallInst>(&I);
-    //   // ci->dump();
-    //   Function *func = ci->getCalledFunction();
-    //   if (func) {
-    //     // if(!func->isDeclaration())
-    //     //     if(func != I.getParent()->getParent())
-    //     //         errs() << func->getName() << "\t" <<
-    //     //         I.getParent()->getParent()->getName() << "\n";
-    //     if (!func->isDeclaration() &&
-    //         std::find(funcStack.begin(), funcStack.end(), func) ==
-    //             funcStack.end()) {
-    //       auto funcVec = func2Vec(*func, funcStack);
+    Vector getValueVec;
+    getValue(&getValueVec, I.getOpcodeName());
 
-    //       std::transform(vec.begin(), vec.end(), funcVec.begin(),
-    //       vec.begin(),
-    //                      std::plus<double>());
-    //     }
-    //   } else {
-    //     IR2VEC_DEBUG(I.dump());
-    //     IR2VEC_DEBUG(errs() << "==========================Function
-    //     definition
-    //     "
-    //                          "not found==================\n");
-    //   }
-    // }
-    scaleVector(vec, WO);
-    std::transform(instVector.begin(), instVector.end(), vec.begin(),
+    scaleVector(getValueVec, WO);
+
+    std::transform(instVector.begin(), instVector.end(), getValueVec.begin(),
                    instVector.begin(), std::plus<double>());
+
     auto type = I.getType();
 
     if (type->isVoidTy()) {
-      vec = getValue("voidTy");
+      getValue(&getValueVec, "voidTy");
     } else if (type->isFloatingPointTy()) {
-      vec = getValue("floatTy");
+      getValue(&getValueVec, "floatTy");
     } else if (type->isIntegerTy()) {
-      vec = getValue("integerTy");
+      getValue(&getValueVec, "integerTy");
     } else if (type->isFunctionTy()) {
-      vec = getValue("functionTy");
+      getValue(&getValueVec, "functionTy");
     } else if (type->isStructTy()) {
-      vec = getValue("structTy");
+      getValue(&getValueVec, "structTy");
     } else if (type->isArrayTy()) {
-      vec = getValue("arrayTy");
+      getValue(&getValueVec, "arrayTy");
     } else if (type->isPointerTy()) {
-      vec = getValue("pointerTy");
+      getValue(&getValueVec, "pointerTy");
     } else if (type->isVectorTy()) {
-      vec = getValue("vectorTy");
+      getValue(&getValueVec, "vectorTy");
     } else if (type->isEmptyTy()) {
-      vec = getValue("emptyTy");
+      getValue(&getValueVec, "emptyTy");
     } else if (type->isLabelTy()) {
-      vec = getValue("labelTy");
+      getValue(&getValueVec, "labelTy");
     } else if (type->isTokenTy()) {
-      vec = getValue("tokenTy");
+      getValue(&getValueVec, "tokenTy");
     } else if (type->isMetadataTy()) {
-      vec = getValue("metadataTy");
+      getValue(&getValueVec, "metadataTy");
     } else {
-      vec = getValue("unknownTy");
+      getValue(&getValueVec, "unknownTy");
     }
 
-    scaleVector(vec, WT);
-    std::transform(instVector.begin(), instVector.end(), vec.begin(),
-                   instVector.begin(), std::plus<double>());
-    for (unsigned i = 0; i < I.getNumOperands(); i++) {
-      Vector vec;
-      if (isa<Function>(I.getOperand(i))) {
-        vec = getValue("function");
-      } else if (isa<PointerType>(I.getOperand(i)->getType())) {
-        vec = getValue("pointer");
-      } else if (isa<Constant>(I.getOperand(i))) {
-        vec = getValue("constant");
-      } else {
-        vec = getValue("variable");
-      }
-      scaleVector(vec, WA);
+    scaleVector(getValueVec, WT);
 
-      std::transform(instVector.begin(), instVector.end(), vec.begin(),
-                     instVector.begin(), std::plus<double>());
-      instVecMap[&I] = instVector;
+    std::transform(instVector.begin(), instVector.end(), getValueVec.begin(),
+                   instVector.begin(), std::plus<double>());
+
+// Check if this section can be made faster using openMP
+// order of vectors is not important since it's all added up using
+// std::transform
+// So we can parallelize this section
+#pragma omp parallel
+    {
+      std::vector<Vector> localVec;
+      for (unsigned i = 0; i < I.getNumOperands(); i++) {
+        Vector localValueVector;
+        if (isa<Function>(I.getOperand(i))) {
+          getValue(&localValueVector, "function");
+        } else if (isa<PointerType>(I.getOperand(i)->getType())) {
+          getValue(&localValueVector, "pointer");
+        } else if (isa<Constant>(I.getOperand(i))) {
+          getValue(&localValueVector, "constant");
+        } else {
+          getValue(&localValueVector, "variable");
+        }
+        scaleVector(localValueVector, WA);
+        localVec.push_back(localValueVector);
+      }
+
+#pragma omp critical
+      for (auto localValueVector : localVec) {
+        std::transform(instVector.begin(), instVector.end(),
+                       localValueVector.begin(), instVector.begin(),
+                       std::plus<double>());
+        instVecMap[&I] = instVector;
+      }
     }
     std::transform(bbVector.begin(), bbVector.end(), instVector.begin(),
                    bbVector.begin(), std::plus<double>());

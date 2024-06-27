@@ -19,18 +19,11 @@
 using namespace llvm;
 
 void CollectIR::generateTriplets(std::ostream &out) {
-#pragma omp parallel {
-  std::string local_res = "";
   for (Function &F : M)
     for (BasicBlock &B : F) {
-      local_res += traverseBasicBlock(B);
+      res += traverseBasicBlock(B);
     }
-
-#pragma omp critical {
-  res += local_res;
-}
-}
-out << res;
+  out << res;
 }
 
 std::string CollectIR::traverseBasicBlock(BasicBlock &B) {
