@@ -94,6 +94,6 @@ std::string IR2Vec::updatedRes(IR2Vec::Vector tmp, llvm::Function *f,
     }
     res += std::to_string(i) + "\t";
   }
-  res += "\n";
+
   return res;
 }
