@@ -53,12 +53,16 @@ while IFS= read -r d; do
 done <index-${SEED_VERSION}.files
 wait
 
+echo "Finished generating P level files"
+
 echo "generating F level files"
 while IFS= read -r d; do
 	${IR2VEC_PATH} -sym -level f -o ${DEST_FOLDER_SYM}/ir2vec.txt ${d} &>/dev/null
 	${IR2VEC_PATH} -fa -level f -o ${DEST_FOLDER_FA}/ir2vec.txt ${d} &>/dev/null
 done <index-${SEED_VERSION}.files
 wait
+
+echo "Finished generating F level files"
 
 echo "generating onDemand level files"
 while IFS= read -r d; do
@@ -69,3 +73,5 @@ while IFS= read -r d; do
 	done
 done <index-${SEED_VERSION}.files
 wait
+
+echo "Finished generating onDemand level files"
