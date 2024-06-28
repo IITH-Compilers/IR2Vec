@@ -10,25 +10,25 @@ file(COPY test-lit.py DESTINATION ./)
 file(COPY test-ir2vec.lit DESTINATION ./)
 
 # SQLite IR file is added along side other PE-benchmarks for this version
-set(SQLITE_LLVM_IR 
+set(SQLITE_LLVM_IR
     ${CMAKE_CURRENT_SOURCE_DIR}/PE-benchmarks-llfiles-llvm17/sqlite3.ll
 )
 
 if(NOT EXISTS ${SQLITE_LLVM_IR})
-    # The downloaded Zip file and source files directory are located at the 
+    # The downloaded Zip file and source files directory are located at the
     # build directory since its already gitignore anyways.
     set(SQLITE_ZIP ${CMAKE_CURRENT_BINARY_DIR}/sqlite-amalgamation-3460000.zip)
     set(SQLITE_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/sqlite-amalgamation-3460000)
 
     # Some of the recommended compile flags. https://sqlite.org/amalgamation.html
     # with the following flags the resulting LLVM IR file is about 500k lines
-    set(SQLITE_COMPILE_FLAGS 
+    set(SQLITE_COMPILE_FLAGS
         -DSQLITE_ENABLE_FTS3
         -DSQLITE_ENABLE_FTS5
         -DSQLITE_ENABLE_RTREE
         -DSQLITE_ENABLE_DBSTAT_VTAB
         -DSQLITE_ENABLE_RBU
-        -DSQLITE_ENABLE_SESSION 
+        -DSQLITE_ENABLE_SESSION
     )
 
     if(NOT EXISTS ${SQLITE_ZIP})
@@ -36,14 +36,14 @@ if(NOT EXISTS ${SQLITE_LLVM_IR})
         message(STATUS "Downloading SQLite Amalgamation source zip file..")
         file(
         DOWNLOAD https://sqlite.org/2024/sqlite-amalgamation-3460000.zip
-        ${SQLITE_ZIP} 
-        EXPECTED_HASH SHA3_256=1221eed70de626871912bfca144c00411f0c30d3c2b7935cff3963b63370ef7c 
+        ${SQLITE_ZIP}
+        EXPECTED_HASH SHA3_256=1221eed70de626871912bfca144c00411f0c30d3c2b7935cff3963b63370ef7c
         SHOW_PROGRESS
         )
     endif()
 
     if(NOT EXISTS ${SQLITE_SOURCE})
-        message(STATUS 
+        message(STATUS
             "Unzipping SQLite source files at: ${SQLITE_SOURCE}"
         )
         execute_process(
@@ -63,9 +63,9 @@ if(NOT EXISTS ${SQLITE_LLVM_IR})
     endif()
 
     execute_process(
-        COMMAND ${CLANG_BIN} -S -emit-llvm ${SQLITE_COMPILE_FLAGS} 
-            -Xclang -disable-O0-optnone 
-            -o ${SQLITE_LLVM_IR} 
+        COMMAND ${CLANG_BIN} -S -emit-llvm ${SQLITE_COMPILE_FLAGS}
+            -Xclang -disable-O0-optnone
+            -o ${SQLITE_LLVM_IR}
             ${SQLITE_SOURCE}/sqlite3.c
             RESULT_VARIABLE sqlite_ir_result
     )
