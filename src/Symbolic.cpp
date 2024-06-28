@@ -27,12 +27,12 @@ using namespace llvm;
 using namespace IR2Vec;
 using abi::__cxa_demangle;
 
-inline void IR2Vec_Symbolic::getValue(IR2Vec::Vector *vec, std::string key) {
+inline void IR2Vec_Symbolic::getValue(IR2Vec::Vector &vec, std::string key) {
   auto it = opcMap.find(key);
   if (it == opcMap.end())
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
   else
-    vec = &it->second;
+    vec = it->second;
   return;
 }
 
@@ -140,7 +140,7 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
   for (auto &I : B) {
     Vector instVector(DIM, 0);
     Vector getValueVec;
-    getValue(&getValueVec, I.getOpcodeName());
+    getValue(getValueVec, I.getOpcodeName());
 
     scaleVector(getValueVec, WO);
 
@@ -150,31 +150,31 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     auto type = I.getType();
 
     if (type->isVoidTy()) {
-      getValue(&getValueVec, "voidTy");
+      getValue(getValueVec, "voidTy");
     } else if (type->isFloatingPointTy()) {
-      getValue(&getValueVec, "floatTy");
+      getValue(getValueVec, "floatTy");
     } else if (type->isIntegerTy()) {
-      getValue(&getValueVec, "integerTy");
+      getValue(getValueVec, "integerTy");
     } else if (type->isFunctionTy()) {
-      getValue(&getValueVec, "functionTy");
+      getValue(getValueVec, "functionTy");
     } else if (type->isStructTy()) {
-      getValue(&getValueVec, "structTy");
+      getValue(getValueVec, "structTy");
     } else if (type->isArrayTy()) {
-      getValue(&getValueVec, "arrayTy");
+      getValue(getValueVec, "arrayTy");
     } else if (type->isPointerTy()) {
-      getValue(&getValueVec, "pointerTy");
+      getValue(getValueVec, "pointerTy");
     } else if (type->isVectorTy()) {
-      getValue(&getValueVec, "vectorTy");
+      getValue(getValueVec, "vectorTy");
     } else if (type->isEmptyTy()) {
-      getValue(&getValueVec, "emptyTy");
+      getValue(getValueVec, "emptyTy");
     } else if (type->isLabelTy()) {
-      getValue(&getValueVec, "labelTy");
+      getValue(getValueVec, "labelTy");
     } else if (type->isTokenTy()) {
-      getValue(&getValueVec, "tokenTy");
+      getValue(getValueVec, "tokenTy");
     } else if (type->isMetadataTy()) {
-      getValue(&getValueVec, "metadataTy");
+      getValue(getValueVec, "metadataTy");
     } else {
-      getValue(&getValueVec, "unknownTy");
+      getValue(getValueVec, "unknownTy");
     }
 
     scaleVector(getValueVec, WT);
@@ -192,13 +192,13 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
       for (unsigned i = 0; i < I.getNumOperands(); i++) {
         Vector localValueVector;
         if (isa<Function>(I.getOperand(i))) {
-          getValue(&localValueVector, "function");
+          getValue(localValueVector, "function");
         } else if (isa<PointerType>(I.getOperand(i)->getType())) {
-          getValue(&localValueVector, "pointer");
+          getValue(localValueVector, "pointer");
         } else if (isa<Constant>(I.getOperand(i))) {
-          getValue(&localValueVector, "constant");
+          getValue(localValueVector, "constant");
         } else {
-          getValue(&localValueVector, "variable");
+          getValue(localValueVector, "variable");
         }
         scaleVector(localValueVector, WA);
         localVec.push_back(localValueVector);
