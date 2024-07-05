@@ -44,7 +44,7 @@ perform_vector_comparison() {
     VIR_FILE=ir2vec_${FILE_PREFIX}.txt
 
 
-    # SQLite specific variables.. Only declared
+    # SQLite specific variables.
     if [[ "@ENABLE_SQLITE@" == "ON" ]]; then
         SQLITE_VIR=sqlite3_${FILE_PREFIX}.txt
         SQLITE_INPUT=./PE-benchmarks-llfiles-${SEED_VERSION}/sqlite3.ll
