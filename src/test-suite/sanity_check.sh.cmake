@@ -43,6 +43,14 @@ perform_vector_comparison() {
     ORIG_FILE=oracle/${EncodingType}_${SEED_VERSION}_${FILE_PREFIX}/ir2vec.txt
     VIR_FILE=ir2vec_${FILE_PREFIX}.txt
 
+
+    # SQLite specific variables.. Only declared
+    if [[ "@ENABLE_SQLITE@" == "ON" ]]; then
+        SQLITE_VIR=sqlite3_${FILE_PREFIX}.txt
+        SQLITE_INPUT=./PE-benchmarks-llfiles-${SEED_VERSION}/sqlite3.ll
+        SQLITE_ORIG=oracle/${EncodingType}_${SEED_VERSION}_${FILE_PREFIX}/sqlite3.txt
+    fi
+
     # if file prefix is p or f, run the first while loop, else, run the second while loop
 
     if [[ "$FILE_PREFIX" == "p" || "$FILE_PREFIX" == "f" ]]; then
@@ -50,6 +58,11 @@ perform_vector_comparison() {
             ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${VIR_FILE} ${d} &> /dev/null
         done < index-${SEED_VERSION}.files
         wait
+
+        # SQLITE is currently only tested against the program (p) level
+        if [[ "@ENABLE_SQLITE@" == "ON" && "$FILE_PREFIX" == "p" ]]; then
+            ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${SQLITE_VIR} ${SQLITE_INPUT} &> /dev/null
+        fi
     else
         while IFS= read -r d_on
         do
@@ -78,6 +91,25 @@ perform_vector_comparison() {
             echo -e "$(tput bold)${RED}[Error] No embeddings are generated.${NC}"
             exit 1
         fi
+
+        # SQLite tests only if its enabled 
+        if [[ "@ENABLE_SQLITE@" == "ON" ]]; then
+            if [[ ! -e "$SQLITE_VIR" ]]; then
+                echo -e "$(tput bold)${RED}[Error] No embeddings are generated for SQLite benchmark.${NC}"
+                exit 1
+            fi
+            mv ${SQLITE_VIR} ${TEMP}/
+
+            d=$(diff <(sed -e 's/^ *#[0-9]* *//g' ${SQLITE_ORIG}) <(sed -e 's/^ *#[0-9]* *//g' ${TEMP}/${SQLITE_VIR}))
+
+            if [ "$d" == "" ]; then
+                echo -e "${GREEN}${BOLD}[Test Passed] SQLite Benchmark Vectors of Oracle and Current version of ${FILE_PREFIX}-level are Identical.${NC}"
+            else
+                echo -e "$(tput bold)${RED}[Test Failed] SQLite Benchmark Vectors of Oracle and Current version of ${FILE_PREFIX}-level are Different.${NC}"
+                exit 1
+            fi
+        fi
+
     else
         if ls *${VIR_FILE} 1> /dev/null 2>&1
         then
