@@ -16,7 +16,7 @@ set(SQLITE_LLVM_IR
     ${CMAKE_CURRENT_SOURCE_DIR}/PE-benchmarks-llfiles-llvm17/sqlite3.ll
 )
 
-if(NOT EXISTS ${SQLITE_LLVM_IR} AND SQLITE_ENABLED)
+if(NOT EXISTS ${SQLITE_LLVM_IR} AND ENABLE_SQLITE)
     # The downloaded Zip file and source files directory are located at the
     # build directory since its already gitignore anyways.
     set(SQLITE_ZIP ${CMAKE_CURRENT_BINARY_DIR}/sqlite-amalgamation-3460000.zip)
