@@ -92,7 +92,7 @@ perform_vector_comparison() {
             exit 1
         fi
 
-        # SQLite tests only if its enabled 
+        # SQLite tests only if its enabled
         if [[ "@ENABLE_SQLITE@" == "ON" ]]; then
             if [[ ! -e "$SQLITE_VIR" ]]; then
                 echo -e "$(tput bold)${RED}[Error] No embeddings are generated for SQLite benchmark.${NC}"
