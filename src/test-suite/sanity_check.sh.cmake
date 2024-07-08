@@ -1,5 +1,6 @@
 
 BUILD=@LIB_LOC@
+ENABLE_SQLITE=@ENABLE_SQLITE@
 EncodingType=$1
 
 SO_FILE=
@@ -45,12 +46,12 @@ perform_vector_comparison() {
 
 
     # SQLite specific variables.
-    if [[ "@ENABLE_SQLITE@" == "ON" ]]; then
+    if [[ "$ENABLE_SQLITE" == "ON" ]]; then
         SQLITE_VIR=sqlite3_${FILE_PREFIX}.txt
         SQLITE_INPUT=./PE-benchmarks-llfiles-${SEED_VERSION}/sqlite3.ll
         SQLITE_ORIG=oracle/${EncodingType}_${SEED_VERSION}_${FILE_PREFIX}/sqlite3.txt
     else
-        echo "${BOLD}{RED}SQLITE is off or not set: (@ENABLE_SQLITE@) ${NC}"
+        echo "$(tput bold)${RED}SQLITE is off or not set: ($ENABLE_SQLITE) ${NC}"
     fi
 
     # if file prefix is p or f, run the first while loop, else, run the second while loop
@@ -62,7 +63,7 @@ perform_vector_comparison() {
         wait
 
         # SQLITE is currently only tested against the program (p) level
-        if [[ "@ENABLE_SQLITE@" == "ON" && "$FILE_PREFIX" == "p" ]]; then
+        if [[ "$ENABLE_SQLITE" == "ON" && "$FILE_PREFIX" == "p" ]]; then
             ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${SQLITE_VIR} ${SQLITE_INPUT} &> /dev/null
         fi
     else
@@ -95,7 +96,7 @@ perform_vector_comparison() {
         fi
 
         # SQLite tests only if its enabled
-        if [[ "@ENABLE_SQLITE@" == "ON" ]]; then
+        if [[ "$ENABLE_SQLITE" == "ON" ]]; then
             if [[ ! -e "$SQLITE_VIR" ]]; then
                 echo -e "$(tput bold)${RED}[Error] No embeddings are generated for SQLite benchmark.${NC}"
                 exit 1
