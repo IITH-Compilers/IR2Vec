@@ -66,7 +66,9 @@ perform_vector_comparison() {
 
         # SQLITE is currently only tested against the program (p) level
         if [[ "$ENABLE_SQLITE" == "ON" && "$FILE_PREFIX" == "p" ]]; then
-            ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${SQLITE_VIR} ${SQLITE_INPUT} &> /dev/null
+            echo -e "started generating embedding for SQLite benchmark."
+            ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${SQLITE_VIR} ${SQLITE_INPUT}
+            echo -e "...embedding generated at: ${SQLITE_VIR}"
         fi
     else
         while IFS= read -r d_on
