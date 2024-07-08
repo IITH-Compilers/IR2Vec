@@ -101,6 +101,7 @@ perform_vector_comparison() {
         if [[ "$ENABLE_SQLITE" == "ON" ]]; then
             if [[ ! -e "$SQLITE_VIR" ]]; then
                 echo -e "$(tput bold)${RED}[Error] No embeddings are generated for SQLite benchmark.${NC}"
+                echo -e "Generated embedding file name: ${SQLITE_VIR}. \n $(ls -l)"
                 exit 1
             fi
             mv ${SQLITE_VIR} ${TEMP}/
