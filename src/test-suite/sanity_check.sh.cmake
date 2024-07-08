@@ -49,6 +49,8 @@ perform_vector_comparison() {
         SQLITE_VIR=sqlite3_${FILE_PREFIX}.txt
         SQLITE_INPUT=./PE-benchmarks-llfiles-${SEED_VERSION}/sqlite3.ll
         SQLITE_ORIG=oracle/${EncodingType}_${SEED_VERSION}_${FILE_PREFIX}/sqlite3.txt
+    else
+        echo "${BOLD}{RED}SQLITE is off or not set: (@ENABLE_SQLITE@) ${NC}"
     fi
 
     # if file prefix is p or f, run the first while loop, else, run the second while loop
