@@ -1,3 +1,5 @@
+option(ENABLE_SQLITE "Enables SQLite Amalgamation Benchmark." ON)
+
 configure_file(sanity_check.sh.cmake sanity_check.sh @ONLY)
 file(COPY PE-benchmarks-llfiles-llvm17 DESTINATION ./)
 file(COPY oracle DESTINATION ./)
@@ -9,13 +11,11 @@ configure_file(lit.site.cfg.py.in lit.site.cfg.py @ONLY)
 file(COPY test-lit.py DESTINATION ./)
 file(COPY test-ir2vec.lit DESTINATION ./)
 
-option(ENABLE_SQLITE "Enables SQLite Amalgamation Benchmark." ON)
-
-# SQLite IR file is added along side other PE-benchmarks for this version
 set(SQLITE_LLVM_IR
     ${CMAKE_CURRENT_SOURCE_DIR}/PE-benchmarks-llfiles-llvm17/sqlite3.ll
 )
 
+# SQLite IR file is added along side other PE-benchmarks for this version
 if(NOT EXISTS ${SQLITE_LLVM_IR} AND ENABLE_SQLITE)
     # The downloaded Zip file and source files directory are located at the
     # build directory since its already gitignore anyways.
