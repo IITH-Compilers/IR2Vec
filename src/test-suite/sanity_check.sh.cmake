@@ -50,10 +50,6 @@ perform_vector_comparison() {
         SQLITE_VIR=sqlite3_${FILE_PREFIX}.txt
         SQLITE_INPUT=./PE-benchmarks-llfiles-${SEED_VERSION}/sqlite3.ll
         SQLITE_ORIG=oracle/${EncodingType}_${SEED_VERSION}_${FILE_PREFIX}/sqlite3.txt
-
-        echo -e "${BLUE}${BOLD} SQLITE is on status=($ENABLE_SQLITE). ${NC}"
-    else
-        echo -e "${RED}${BOLD} SQLITE is off or not set: ($ENABLE_SQLITE) ${NC}"
     fi
 
     # if file prefix is p or f, run the first while loop, else, run the second while loop
@@ -66,9 +62,7 @@ perform_vector_comparison() {
 
         # SQLITE is currently only tested against the program (p) level
         if [[ "$ENABLE_SQLITE" == "ON" && "$FILE_PREFIX" == "p" ]]; then
-            echo -e "started generating embedding for SQLite benchmark."
-            ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${SQLITE_VIR} ${SQLITE_INPUT}
-            echo -e "...embedding generated at: ${SQLITE_VIR}"
+            ${IR2VEC_PATH} -${PASS} -level ${LEVEL} -o ${SQLITE_VIR} ${SQLITE_INPUT} &> /dev/null
         fi
     else
         while IFS= read -r d_on
@@ -103,7 +97,6 @@ perform_vector_comparison() {
         if [[ "$ENABLE_SQLITE" == "ON" ]]; then
             if [[ ! -e "$SQLITE_VIR" ]]; then
                 echo -e "$(tput bold)${RED}[Error] No embeddings are generated for SQLite benchmark.${NC}"
-                echo -e "Generated embedding file name: ${SQLITE_VIR}. \n $(ls ./temp_FA_llvm17_p -l)"
                 exit 1
             fi
             mv ${SQLITE_VIR} ${TEMP}/
