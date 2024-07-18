@@ -49,11 +49,8 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
         noOfFunc++;
       }
 
-      // else if (level == 'p') {
       std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
                      pgmVector.begin(), std::plus<double>());
-
-      // }
     }
   }
 
@@ -113,16 +110,11 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
   ReversePostOrderTraversal<Function *> RPOT(&F);
   MapVector<const BasicBlock *, double> cumulativeScore;
 
-#pragma omp parallel
-  {
-    std::vector<Vector> localVector;
-    for (auto *b : RPOT) {
-      Vector weightedBBVector = bb2Vec(*b, funcStack);
-      localVector.push_back(weightedBBVector);
-    }
-
+#pragma omp parallel for
+  for (auto *b : RPOT) {
+    Vector weightedBBVector = bb2Vec(*b, funcStack);
 #pragma omp critical
-    for (auto weightedBBVector : localVector) {
+    {
       std::transform(funcVector.begin(), funcVector.end(),
                      weightedBBVector.begin(), funcVector.begin(),
                      std::plus<double>());
@@ -137,6 +129,7 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
                                SmallVector<Function *, 15> &funcStack) {
   Vector bbVector(DIM, 0);
 
+#pragma omp parallel for
   for (auto &I : B) {
     Vector instVector(DIM, 0);
     Vector getValueVec;
@@ -182,38 +175,27 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     std::transform(instVector.begin(), instVector.end(), getValueVec.begin(),
                    instVector.begin(), std::plus<double>());
 
-// Check if this section can be made faster using openMP
-// order of vectors is not important since it's all added up using
-// std::transform
-// So we can parallelize this section
-#pragma omp parallel
-    {
-      std::vector<Vector> localVec;
-      for (unsigned i = 0; i < I.getNumOperands(); i++) {
-        Vector localValueVector;
-        if (isa<Function>(I.getOperand(i))) {
-          getValue(localValueVector, "function");
-        } else if (isa<PointerType>(I.getOperand(i)->getType())) {
-          getValue(localValueVector, "pointer");
-        } else if (isa<Constant>(I.getOperand(i))) {
-          getValue(localValueVector, "constant");
-        } else {
-          getValue(localValueVector, "variable");
-        }
-        scaleVector(localValueVector, WA);
-        localVec.push_back(localValueVector);
+    for (unsigned i = 0; i < I.getNumOperands(); i++) {
+      Vector localValueVector;
+      if (isa<Function>(I.getOperand(i))) {
+        getValue(localValueVector, "function");
+      } else if (isa<PointerType>(I.getOperand(i)->getType())) {
+        getValue(localValueVector, "pointer");
+      } else if (isa<Constant>(I.getOperand(i))) {
+        getValue(localValueVector, "constant");
+      } else {
+        getValue(localValueVector, "variable");
       }
-
-#pragma omp critical
-      for (auto localValueVector : localVec) {
-        std::transform(instVector.begin(), instVector.end(),
-                       localValueVector.begin(), instVector.begin(),
-                       std::plus<double>());
-        instVecMap[&I] = instVector;
-      }
+      scaleVector(localValueVector, WA);
+      std::transform(instVector.begin(), instVector.end(),
+                     localValueVector.begin(), instVector.begin(),
+                     std::plus<double>());
     }
-    std::transform(bbVector.begin(), bbVector.end(), instVector.begin(),
-                   bbVector.begin(), std::plus<double>());
+#pragma omp critical
+    {
+      std::transform(bbVector.begin(), bbVector.end(), instVector.begin(),
+                     bbVector.begin(), std::plus<double>());
+    }
   }
   return bbVector;
 }

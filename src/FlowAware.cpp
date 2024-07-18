@@ -131,12 +131,17 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *cyclicCount) {
 
   int noOfFunc = 0;
+#pragma omp parallel
+  {
+#pragma omp for
+    for (auto &f : M) {
+      if (!f.isDeclaration()) {
+        SmallVector<Function *, 15> funcStack;
+        auto tmp = func2Vec(f, funcStack);
 
-  for (auto &f : M) {
-    if (!f.isDeclaration()) {
-      SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
-      funcVecMap[&f] = tmp;
+#pragma omp critical
+        { funcVecMap[&f] = tmp; }
+      }
     }
   }
 
@@ -147,7 +152,6 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   for (auto &f : M) {
     if (!f.isDeclaration()) {
       Vector tmp;
-      SmallVector<Function *, 15> funcStack;
       tmp = funcVecMap[&f];
 
       if (level == 'f') {
@@ -156,10 +160,8 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
         noOfFunc++;
       }
 
-      // else if (level == 'p') {
       std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
                      pgmVector.begin(), std::plus<double>());
-      // }
     }
   }
 
@@ -358,19 +360,24 @@ Vector IR2Vec_FA::func2Vec(Function &F,
 
   ReversePostOrderTraversal<Function *> RPOT(&F);
 
-  for (auto *b : RPOT) {
-    unsigned opnum;
-    SmallVector<Instruction *, 16> lists;
-    for (auto &I : *b) {
-      lists.clear();
-      if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
-          dyn_cast<Instruction>(I.getOperand(opnum))) {
-        Instruction *argI = cast<Instruction>(I.getOperand(opnum));
-        lists = createKilllist(argI, &I);
-        TransitiveReads(lists, argI, I.getParent());
-        if (argI->getParent() == I.getParent())
-          lists.push_back(argI);
-        killMap[&I] = lists;
+#pragma omp parallel
+  {
+#pragma omp for
+    for (auto *b : RPOT) {
+      for (auto &I : *b) {
+        unsigned opnum;
+        SmallVector<Instruction *, 16> lists;
+        if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
+            dyn_cast<Instruction>(I.getOperand(opnum))) {
+          Instruction *argI = cast<Instruction>(I.getOperand(opnum));
+          lists = createKilllist(argI, &I);
+          TransitiveReads(lists, argI, I.getParent());
+          if (argI->getParent() == I.getParent())
+            lists.push_back(argI);
+
+#pragma openmp critical
+          { killMap[&I] = lists; }
+        }
       }
     }
   }
