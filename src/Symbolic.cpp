@@ -40,8 +40,7 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
   int noOfFunc = 0;
   for (auto &f : M) {
     if (!f.isDeclaration()) {
-      SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
+      auto tmp = func2Vec(f);
       funcVecMap[&f] = tmp;
       if (level == 'f') {
         res += updatedRes(tmp, &f, &M);
@@ -84,8 +83,7 @@ void IR2Vec_Symbolic::generateSymbolicEncodingsForFunction(std::ostream *o,
     auto Result = getActualName(&f);
     if (!f.isDeclaration() && Result == name) {
       Vector tmp;
-      SmallVector<Function *, 15> funcStack;
-      tmp = func2Vec(f, funcStack);
+      tmp = func2Vec(f);
       funcVecMap[&f] = tmp;
       if (level == 'f') {
         res += updatedRes(tmp, &f, &M);
@@ -99,20 +97,18 @@ void IR2Vec_Symbolic::generateSymbolicEncodingsForFunction(std::ostream *o,
     *o << res;
 }
 
-Vector IR2Vec_Symbolic::func2Vec(Function &F,
-                                 SmallVector<Function *, 15> &funcStack) {
+Vector IR2Vec_Symbolic::func2Vec(Function &F) {
   auto It = funcVecMap.find(&F);
   if (It != funcVecMap.end()) {
     return It->second;
   }
-  funcStack.push_back(&F);
   Vector funcVector(DIM, 0);
   ReversePostOrderTraversal<Function *> RPOT(&F);
   MapVector<const BasicBlock *, double> cumulativeScore;
 
 #pragma omp parallel for
   for (auto *b : RPOT) {
-    Vector weightedBBVector = bb2Vec(*b, funcStack);
+    Vector weightedBBVector = bb2Vec(*b);
 #pragma omp critical
     {
       std::transform(funcVector.begin(), funcVector.end(),
@@ -121,12 +117,10 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
     }
   }
 
-  funcStack.pop_back();
   return funcVector;
 }
 
-Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
-                               SmallVector<Function *, 15> &funcStack) {
+Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B) {
   Vector bbVector(DIM, 0);
 
 #pragma omp parallel for
