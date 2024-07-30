@@ -18,6 +18,7 @@
 
 #include <cxxabi.h>
 
+#include <algorithm>
 #include <map>
 
 namespace IR2Vec {
@@ -48,7 +49,10 @@ extern float WT;
 extern bool debug;
 extern std::unordered_map<std::string, Vector> opcMap;
 std::unique_ptr<llvm::Module> getLLVMIR();
-void scaleVector(Vector &vec, float factor);
+inline void scaleVector(Vector &vec, float factor) {
+  std::transform(vec.begin(), vec.end(), vec.begin(),
+                 [factor](const auto &val) { return val * factor; });
+}
 // newly added
 std::string getDemagledName(const llvm::Function *function);
 char *getActualName(llvm::Function *function);

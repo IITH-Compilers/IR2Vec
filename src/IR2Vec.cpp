@@ -157,7 +157,7 @@ void generateSYMEncodings() {
   o.close();
 }
 
-void collectIR() {
+void collectIRfunc() {
   auto M = getLLVMIR();
   CollectIR cir(M);
   std::ofstream o;
@@ -232,7 +232,7 @@ int main(int argc, char **argv) {
   } else if (sym) {
     generateSYMEncodings();
   } else if (collectIR) {
-    collectIR();
+    collectIRfunc();
   }
   return 0;
 }
