@@ -43,12 +43,6 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   return M;
 }
 
-void IR2Vec::scaleVector(Vector &vec, float factor) {
-  for (unsigned i = 0; i < vec.size(); i++) {
-    vec[i] = vec[i] * factor;
-  }
-}
-
 // Function to get demangled function name
 std::string IR2Vec::getDemagledName(const llvm::Function *function) {
   auto functionName = function->getName().str();
