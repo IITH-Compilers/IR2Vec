@@ -61,7 +61,7 @@ setup(
     long_description=DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/IITH-Compilers/IR2Vec",
-    license='Apache License v2.0 with LLVM Exceptions',
+    license="Apache License v2.0 with LLVM Exceptions",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
