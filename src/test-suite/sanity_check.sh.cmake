@@ -75,7 +75,7 @@ perform_vector_comparison() {
 
             # check if VIR_FILE exists
             if [ -f ${VIR_FILE} ]; then
-                echo -e "${VIR_FILE} exists."
+            :
             else
                 echo -e "${RED}${BOLD}Error: ${VIR_FILE} does not exist.During Compilation ${NC}"
                 exit 1
@@ -86,7 +86,7 @@ perform_vector_comparison() {
 
     # check if VIR_FILE exists
     if [ -f ${VIR_FILE} ]; then
-    echo -e "${VIR_FILE} exists."
+    :
     else
         echo -e "${RED}${BOLD}Error: ${VIR_FILE} does not exist.${NC}"
         exit 1
