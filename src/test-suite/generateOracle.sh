@@ -1,9 +1,8 @@
-# Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-# Department of Computer Science and Engineering, IIT Hyderabad
-
-# This software is available under the BSD 4-Clause License. Please see LICENSE
-# file in the top-level directory for more details.
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
+
 SEED_VERSION="llvm17"
 # SRC_WD="PE-benchmarks-llfiles-llvm17
 DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}_p"

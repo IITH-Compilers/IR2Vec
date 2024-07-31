@@ -355,4 +355,4 @@ keywords = {heterogeneous systems, representation learning, compiler optimizatio
 Please feel free to raise issues to file a bug, pose a question, or initiate any related discussions. Pull requests are welcome :)
 
 ## License
-IR2Vec is released under a BSD 4-Clause License. See the LICENSE file for more details.
+IR2Vec is released under a Apache License v2.0 with LLVM Exceptions License. See the LICENSE file for more details.
