@@ -48,7 +48,7 @@ perform_vector_comparison() {
     # SQLite specific variables.
     if [[ "$ENABLE_SQLITE" == "ON" ]]; then
         SQLITE_VIR=sqlite3_${FILE_PREFIX}.txt
-        SQLITE_INPUT=./PE-benchmarks-llfiles-${SEED_VERSION}/sqlite3.ll
+        SQLITE_INPUT=./sqlite3.ll
         SQLITE_ORIG=oracle/${EncodingType}_${SEED_VERSION}_${FILE_PREFIX}/sqlite3.txt
     fi
 
