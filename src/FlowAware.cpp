@@ -108,7 +108,6 @@ Vector IR2Vec_FA::getValue(std::string key) {
 // Function to update funcVecMap of function with vectors of it's callee list
 void IR2Vec_FA::updateFuncVecMapWithCallee(const llvm::Function *function) {
   if (funcCallMap.find(function) != funcCallMap.end()) {
-
     auto calleelist = funcCallMap[function];
     Vector calleeVector(DIM, 0);
     for (auto funcs : calleelist) {
@@ -131,17 +130,14 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *cyclicCount) {
 
   int noOfFunc = 0;
-#pragma omp parallel
-  {
 #pragma omp for
-    for (auto &f : M) {
-      if (!f.isDeclaration()) {
-        SmallVector<Function *, 15> funcStack;
-        auto tmp = func2Vec(f, funcStack);
+  for (auto &f : M) {
+    if (!f.isDeclaration()) {
+      SmallVector<Function *, 15> funcStack;
+      auto tmp = func2Vec(f, funcStack);
 
 #pragma omp critical
-        { funcVecMap[&f] = tmp; }
-      }
+      { funcVecMap[&f] = tmp; }
     }
   }
 
@@ -360,24 +356,21 @@ Vector IR2Vec_FA::func2Vec(Function &F,
 
   ReversePostOrderTraversal<Function *> RPOT(&F);
 
-#pragma omp parallel
-  {
 #pragma omp for
-    for (auto *b : RPOT) {
-      for (auto &I : *b) {
-        unsigned opnum;
-        SmallVector<Instruction *, 16> lists;
-        if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
-            dyn_cast<Instruction>(I.getOperand(opnum))) {
-          Instruction *argI = cast<Instruction>(I.getOperand(opnum));
-          lists = createKilllist(argI, &I);
-          TransitiveReads(lists, argI, I.getParent());
-          if (argI->getParent() == I.getParent())
-            lists.push_back(argI);
+  for (auto *b : RPOT) {
+    for (auto &I : *b) {
+      unsigned opnum;
+      SmallVector<Instruction *, 16> lists;
+      if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
+          dyn_cast<Instruction>(I.getOperand(opnum))) {
+        Instruction *argI = cast<Instruction>(I.getOperand(opnum));
+        lists = createKilllist(argI, &I);
+        TransitiveReads(lists, argI, I.getParent());
+        if (argI->getParent() == I.getParent())
+          lists.push_back(argI);
 
 #pragma openmp critical
-          { killMap[&I] = lists; }
-        }
+        { killMap[&I] = lists; }
       }
     }
   }
@@ -718,9 +711,11 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
   IR2VEC_DEBUG(
       outs()
       << "Call to getReachingDefs Started****************************\n");
+
   auto parent = dyn_cast<Instruction>(I->getOperand(loc));
   if (!parent)
     return {};
+
   SmallVector<const Instruction *, 10> RD;
   SmallVector<const Instruction *, 10> probableRD;
   IR2VEC_DEBUG(outs() << "Inside RD for : ");
@@ -729,21 +724,17 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
   if (writeDefsMap[parent].empty()) {
     RD.push_back(parent);
     return RD;
-  }
-
-  if (writeDefsMap[parent].size() >= 1) {
+  } else if (writeDefsMap[parent].size() >= 1) {
     SmallMapVector<const BasicBlock *, SmallVector<const Instruction *, 10>, 16>
         bbInstMap;
     // Remove definitions which don't reach I
     for (auto it : writeDefsMap[parent]) {
       if (it != I && isPotentiallyReachable(it, I)) {
-
         probableRD.push_back(it);
       }
     }
     probableRD.push_back(parent);
-    IR2VEC_DEBUG(outs() << "----PROBABLE RD---"
-                        << "\n");
+    IR2VEC_DEBUG(outs() << "----PROBABLE RD---\n");
     for (auto i : probableRD) {
       IR2VEC_DEBUG(i->print(outs()); outs() << "\n");
       bbInstMap[i->getParent()].push_back(i);
@@ -1074,7 +1065,6 @@ void IR2Vec_FA::solveInsts(
   }
 
   for (unsigned i = 0; i < B.size(); i++) {
-    auto Bvec = B[i];
     for (unsigned j = 0; j < B[i].size(); j++) {
       B[i][j] = (int)(B[i][j] * 10) / 10.0;
     }
@@ -1190,12 +1180,12 @@ void IR2Vec_FA::solveSingleComponent(
         the instVecMap but should be in the partialInstValMap*/
 
         if (partialInstValMap.find(i) == partialInstValMap.end()) {
-          assert(partialInstValMap.find(i) != partialInstValMap.end() &&
-                 "Should have been in instvecmap or partialmap");
+          throw std::runtime_error(
+              "Should have been in instvecmap or partialmap");
+        } else {
+          std::transform(instVecMap[i].begin(), instVecMap[i].end(),
+                         vecInst.begin(), vecInst.begin(), std::plus<double>());
         }
-      } else {
-        std::transform(instVecMap[i].begin(), instVecMap[i].end(),
-                       vecInst.begin(), vecInst.begin(), std::plus<double>());
       }
     }
   }
