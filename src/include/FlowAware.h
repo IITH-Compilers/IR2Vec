@@ -70,12 +70,11 @@ private:
 
   void getAllSCC();
 
-  IR2Vec::Vector getValue(std::string key);
+  inline void getValue(IR2Vec::Vector &vec, std::string key);
   void collectWriteDefsMap(llvm::Module &M);
   void getTransitiveUse(
       const llvm::Instruction *root, const llvm::Instruction *def,
-      llvm::SmallVector<const llvm::Instruction *, 100> &visitedList,
-      llvm::SmallVector<const llvm::Instruction *, 10> toAppend = {});
+      llvm::SmallVector<const llvm::Instruction *, 100> &visitedList);
   llvm::SmallVector<const llvm::Instruction *, 10>
   getReachingDefs(const llvm::Instruction *, unsigned i);
 
