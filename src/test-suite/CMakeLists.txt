@@ -1,7 +1,7 @@
 option(ENABLE_SQLITE "Enables SQLite Amalgamation Benchmark." ON)
 
 set(SQLITE_LLVM_IR
-    ${CMAKE_CURRENT_SOURCE_DIR}/PE-benchmarks-llfiles-llvm17/sqlite3.ll
+    ${CMAKE_CURRENT_SOURCE_DIR}/sqlite3.ll
 )
 
 # SQLite IR file is added along side other PE-benchmarks for this version
@@ -69,6 +69,7 @@ endif()
 # sanity checks and lit configs
 configure_file(sanity_check.sh.cmake sanity_check.sh @ONLY)
 file(COPY PE-benchmarks-llfiles-llvm17 DESTINATION ./)
+file(COPY sqlite3.ll DESTINATION ./)
 file(COPY oracle DESTINATION ./)
 file(COPY ../../vocabulary DESTINATION ./)
 file(COPY index-llvm17.files DESTINATION ./)

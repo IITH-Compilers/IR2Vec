@@ -70,14 +70,14 @@ private:
 
   void getAllSCC();
 
-  IR2Vec::Vector getValue(std::string key);
+  inline void getValue(IR2Vec::Vector &vec, std::string key);
   void collectWriteDefsMap(llvm::Module &M);
   void getTransitiveUse(
       const llvm::Instruction *root, const llvm::Instruction *def,
-      llvm::SmallVector<const llvm::Instruction *, 100> &visitedList,
-      llvm::SmallVector<const llvm::Instruction *, 10> toAppend = {});
-  llvm::SmallVector<const llvm::Instruction *, 10>
-  getReachingDefs(const llvm::Instruction *, unsigned i);
+      llvm::SmallVector<const llvm::Instruction *, 100> &visitedList);
+
+  void getReachingDefs(llvm::SmallVector<const llvm::Instruction *, 10> &RD,
+                       const llvm::Instruction *, unsigned i);
 
   void solveSingleComponent(
       const llvm::Instruction &I,
@@ -89,7 +89,7 @@ private:
 
   void solveInsts(llvm::SmallMapVector<const llvm::Instruction *,
                                        IR2Vec::Vector, 16> &instValMap);
-  std::vector<int> topoOrder(int size);
+  void topoOrder(std::vector<int> &visitStack, int size);
 
   void topoDFS(int vertex, std::vector<bool> &Visited,
                std::vector<int> &visitStack);
@@ -117,8 +117,9 @@ private:
 
   void TransitiveReads(llvm::SmallVector<llvm::Instruction *, 16> &Killlist,
                        llvm::Instruction *Inst, llvm::BasicBlock *ParentBB);
-  llvm::SmallVector<llvm::Instruction *, 16>
-  createKilllist(llvm::Instruction *Arg, llvm::Instruction *writeInst);
+
+  void createKilllist(llvm::SmallVector<llvm::Instruction *, 16> &KillList,
+                      llvm::Instruction *Arg, llvm::Instruction *writeInst);
 
   // For Debugging
   void print(IR2Vec::Vector t, unsigned pos) { llvm::outs() << t[pos]; }
