@@ -33,8 +33,12 @@ private:
   unsigned cyclicCounter;
 
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
-  llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memAccessOps;
+  enum memOpType {
+    memAccessOp, // Enum field for memory access operations
+    memWriteOp   // Enum field for memory write operations
+  };
+  llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
@@ -111,9 +115,7 @@ private:
   IR2Vec::Vector func2Vec(llvm::Function &F,
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
 
-  bool isMemOp(llvm::StringRef opcode, unsigned &operand,
-               llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
-  std::string splitAndPipeFunctionName(std::string s);
+  bool isMemOp(llvm::StringRef opcode, unsigned &operand, memOpType op);
 
   void TransitiveReads(llvm::SmallVector<llvm::Instruction *, 16> &Killlist,
                        llvm::Instruction *Inst, llvm::BasicBlock *ParentBB);
@@ -136,21 +138,27 @@ public:
     pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
 
-    memWriteOps.try_emplace("store", 1);
-    memWriteOps.try_emplace("cmpxchg", 0);
-    memWriteOps.try_emplace("atomicrmw", 0);
+    auto memWritePairs = {std::make_pair("store", 1),
+                          std::make_pair("cmpxchg", 0),
+                          std::make_pair("atomicrmw", 0)};
 
-    memAccessOps.try_emplace("getelementptr", 0);
-    memAccessOps.try_emplace("load", 0);
+    // Insert the pairs using insert with a range
+    memWriteOps.insert(memWritePairs.begin(), memWritePairs.end());
+
+    auto memAccessPairs = {std::make_pair("getelementptr", 0),
+                           std::make_pair("load", 0)};
+
+    memAccessOps.insert(memAccessPairs.begin(), memAccessPairs.end());
 
     dataMissCounter = 0;
     cyclicCounter = 0;
 
     collectWriteDefsMap(M);
 
-    llvm::CallGraph cg = llvm::CallGraph(M);
+    llvm::CallGraph callGraph = llvm::CallGraph(M);
 
-    for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
+    for (auto callItr = callGraph.begin(); callItr != callGraph.end();
+         callItr++) {
       if (callItr->first && !callItr->first->isDeclaration()) {
         auto ParentFunc = callItr->first;
         llvm::CallGraphNode *cgn = callItr->second.get();

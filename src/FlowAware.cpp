@@ -30,10 +30,45 @@
 #include <algorithm> // for transform
 
 #include <functional>
+#include <iostream>
 #include <regex>
+#include <stack>
 
 using namespace llvm;
 using namespace IR2Vec;
+
+// void IR2Vec_FA::getTransitiveUse(
+//     const Instruction *root, const Instruction *def,
+//     SmallVector<const Instruction *, 100> &visitedList)
+// {
+//   std::stack<const Instruction *> stack; // Explicit stack for DFS
+//   stack.push(def);
+
+//   while (!stack.empty()) {
+//       const Instruction *currentDef = stack.top();
+//       stack.pop();
+
+//       visitedList.push_back(currentDef);
+//       unsigned operandNum = 0;
+//       for (auto U : currentDef->users()) {
+//           if (auto use = dyn_cast<Instruction>(U))
+//           {
+//             if (std::find(visitedList.begin(), visitedList.end(), use) ==
+//             visitedList.end())
+//             {
+//               if (isMemOp(use->getOpcodeName(), operandNum, memWriteOp) &&
+//                 use->getOperand(operandNum) == currentDef)
+//               {
+//                   writeDefsMap[root].push_back(use);
+//               } else if (isMemOp(use->getOpcodeName(), operandNum,
+//               memAccessOp) && use->getOperand(operandNum) == currentDef) {
+//                   stack.push(use); // Push the next node to the stack
+//               }
+//             }
+//           }
+//       }
+//   }
+// }
 
 void IR2Vec_FA::getTransitiveUse(
     const Instruction *root, const Instruction *def,
@@ -49,10 +84,10 @@ void IR2Vec_FA::getTransitiveUse(
                      def->print(outs(), true); outs() << "\n";);
         IR2VEC_DEBUG(outs() << "Use " << /* use << */ " ";
                      use->print(outs(), true); outs() << "\n";);
-        if (isMemOp(use->getOpcodeName(), operandNum, memWriteOps) &&
+        if (isMemOp(use->getOpcodeName(), operandNum, memWriteOp) &&
             use->getOperand(operandNum) == def) {
           writeDefsMap[root].push_back(use);
-        } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOps) &&
+        } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOp) &&
                    use->getOperand(operandNum) == def) {
           getTransitiveUse(root, use, visitedList);
         }
@@ -70,8 +105,8 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
       for (auto &BB : F) {
         for (auto &I : BB) {
           unsigned operandNum = 0;
-          if ((isMemOp(I.getOpcodeName(), operandNum, memAccessOps) ||
-               isMemOp(I.getOpcodeName(), operandNum, memWriteOps) ||
+          if ((isMemOp(I.getOpcodeName(), operandNum, memAccessOp) ||
+               isMemOp(I.getOpcodeName(), operandNum, memWriteOp) ||
                strcmp(I.getOpcodeName(), "alloca") == 0) &&
               std::find(visitedList.begin(), visitedList.end(), &I) ==
                   visitedList.end()) {
@@ -294,7 +329,7 @@ void IR2Vec_FA::TransitiveReads(SmallVector<Instruction *, 16> &Killlist,
                                 Instruction *Inst, BasicBlock *ParentBB) {
   assert(Inst != nullptr);
   unsigned operandNum;
-  bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOps);
+  bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOp);
 
   if (!isMemAccess)
     return;
@@ -316,7 +351,7 @@ void IR2Vec_FA::createKilllist(SmallVector<Instruction *, 16> &KillList,
 
   for (User *U : Arg->users()) {
     if (Instruction *UseInst = dyn_cast<Instruction>(U)) {
-      if (isMemOp(UseInst->getOpcodeName(), opnum, memWriteOps)) {
+      if (isMemOp(UseInst->getOpcodeName(), opnum, memWriteOp)) {
         Instruction *OpInst = dyn_cast<Instruction>(UseInst->getOperand(opnum));
         if (OpInst && OpInst == Arg)
           tempList.push_back(UseInst);
@@ -357,7 +392,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     for (auto &I : *b) {
       unsigned opnum;
       SmallVector<Instruction *, 16> lists;
-      if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
+      if (isMemOp(I.getOpcodeName(), opnum, memWriteOp) &&
           dyn_cast<Instruction>(I.getOperand(opnum))) {
         Instruction *argI = cast<Instruction>(I.getOperand(opnum));
         createKilllist(lists, argI, &I);
@@ -809,14 +844,6 @@ void IR2Vec_FA::getReachingDefs(llvm::SmallVector<const Instruction *, 10> &RD,
                      refBBInstMap[i]->print(outs()); outs() << "\n");
       }
     }
-    IR2VEC_DEBUG(
-        outs() << "****************************\n";
-        outs() << "Reaching defn for "; I->print(outs()); outs() << "\n";
-        for (auto i
-             : RD) i->print(outs());
-        outs() << "\n";
-        outs()
-        << "Call to getReachingDefs Ended****************************\n");
     return;
   }
 
@@ -824,8 +851,15 @@ void IR2Vec_FA::getReachingDefs(llvm::SmallVector<const Instruction *, 10> &RD,
   return;
 }
 
-bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand,
-                        SmallDenseMap<StringRef, unsigned> map) {
+bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand, memOpType op) {
+
+  auto map =
+      (op == memAccessOp)
+          ? memAccessOps
+          : (op == memWriteOp)
+                ? memWriteOps
+                : throw std::invalid_argument("Invalid MemoryOperation type");
+
   bool isMemOperand = false;
   auto It = map.find(opcode);
   if (It != map.end()) {
@@ -1119,7 +1153,7 @@ void IR2Vec_FA::solveSingleComponent(
   instVector = partialInstValMap[&I];
 
   unsigned operandNum;
-  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOps);
+  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOp);
   bool isCyclic = false;
   Vector VecArgs(DIM, 0);
 
@@ -1279,7 +1313,7 @@ void IR2Vec_FA::inst2Vec(
   partialInstValMap[&I] = instVector;
 
   unsigned operandNum;
-  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOps);
+  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOp);
   bool isCyclic = false;
   Vector VecArgs(DIM, 0);
 
@@ -1329,13 +1363,10 @@ void IR2Vec_FA::inst2Vec(
   if (!RDList.empty()) {
     for (auto i : RDList) {
       // Check if value of RD is precomputed
-      if (instVecMap.find(i) == instVecMap.end()) {
-        assert(instVecMap.find(i) != instVecMap.end() &&
-               "All RDs should have been solved by Topo Order!");
-      } else {
-        std::transform(instVecMap[i].begin(), instVecMap[i].end(),
-                       vecInst.begin(), vecInst.begin(), std::plus<double>());
-      }
+      assert(instVecMap.find(i) != instVecMap.end() &&
+             "All RDs should have been solved by Topo Order!");
+      std::transform(instVecMap[i].begin(), instVecMap[i].end(),
+                     vecInst.begin(), vecInst.begin(), std::plus<double>());
     }
   }
 
