@@ -134,8 +134,7 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
 #pragma omp parallel for
   for (auto &f : M) {
     if (!f.isDeclaration()) {
-      SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
+      auto tmp = func2Vec(f);
 
 #pragma omp critical
       { funcVecMap[&f] = tmp; }
@@ -190,24 +189,50 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
 
 // This function will update funcVecMap by doing DFS starting from parent
 // function
+// void IR2Vec_FA::updateFuncVecMap(
+//     llvm::Function *function,
+//     llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
+//   visitedFunctions.insert(function);
+//   auto tmpParent = func2Vec(*function);
+//   // funcVecMap is updated with vectors returned by func2Vec
+//   funcVecMap[function] = tmpParent;
+//   auto calledFunctions = funcCallMap[function];
+//   for (auto &calledFunction : calledFunctions) {
+//     if (calledFunction && !calledFunction->isDeclaration() &&
+//         visitedFunctions.count(calledFunction) == 0) {
+//       // doing casting since calledFunctions is of type of const
+//       // llvm::Function* and we need llvm::Function* as argument
+//       auto *callee = const_cast<Function *>(calledFunction);
+//       // This function is called recursively to update funcVecMap
+//       updateFuncVecMap(callee, visitedFunctions);
+//     }
+//   }
+// }
+
 void IR2Vec_FA::updateFuncVecMap(
     llvm::Function *function,
     llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
-  visitedFunctions.insert(function);
-  SmallVector<Function *, 15> funcStack;
-  funcStack.clear();
-  auto tmpParent = func2Vec(*function, funcStack);
-  // funcVecMap is updated with vectors returned by func2Vec
-  funcVecMap[function] = tmpParent;
-  auto calledFunctions = funcCallMap[function];
-  for (auto &calledFunction : calledFunctions) {
-    if (calledFunction && !calledFunction->isDeclaration() &&
-        visitedFunctions.count(calledFunction) == 0) {
-      // doing casting since calledFunctions is of type of const
-      // llvm::Function* and we need llvm::Function* as argument
-      auto *callee = const_cast<Function *>(calledFunction);
-      // This function is called recursively to update funcVecMap
-      updateFuncVecMap(callee, visitedFunctions);
+
+  // Stack to simulate the recursive calls
+  std::stack<llvm::Function *> stack;
+  stack.push(function);
+
+  while (!stack.empty()) {
+    auto *currentFunction = stack.top();
+    stack.pop();
+
+    visitedFunctions.insert(currentFunction);
+    auto tmpParent = func2Vec(*currentFunction);
+    funcVecMap[currentFunction] = tmpParent;
+
+    auto calledFunctions = funcCallMap[currentFunction];
+    for (auto &calledFunction : calledFunctions) {
+      if (calledFunction && !calledFunction->isDeclaration() &&
+          visitedFunctions.count(calledFunction) == 0) {
+        // Cast and push the callee to the stack
+        auto *callee = const_cast<llvm::Function *>(calledFunction);
+        stack.push(callee);
+      }
     }
   }
 }
@@ -336,14 +361,11 @@ void IR2Vec_FA::createKilllist(SmallVector<Instruction *, 16> &KillList,
   return;
 }
 
-Vector IR2Vec_FA::func2Vec(Function &F,
-                           SmallVector<Function *, 15> &funcStack) {
+Vector IR2Vec_FA::func2Vec(Function &F) {
   auto It = funcVecMap.find(&F);
   if (It != funcVecMap.end()) {
     return It->second;
   }
-
-  funcStack.push_back(&F);
 
   instReachingDefsMap.clear();
   allSCCs.clear();
@@ -520,7 +542,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
   }
 
   for (auto *b : RPOT) {
-    bb2Vec(*b, funcStack);
+    bb2Vec(*b);
     Vector bbVector(DIM, 0);
     IR2VEC_DEBUG(outs() << "-------------------------------------------\n");
     for (auto &I : *b) {
@@ -545,7 +567,6 @@ Vector IR2Vec_FA::func2Vec(Function &F,
                    funcVector.begin(), std::plus<double>());
   }
 
-  funcStack.pop_back();
   funcVecMap[&F] = funcVector;
   return funcVector;
 }
@@ -1220,9 +1241,7 @@ void IR2Vec_FA::solveSingleComponent(
   ----------------------------------------------------------------------------------
 */
 
-void IR2Vec_FA::inst2Vec(
-    const Instruction &I, SmallVector<Function *, 15> &funcStack,
-    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
+void IR2Vec_FA::inst2Vec(const Instruction &I) {
 
   if (instVecMap.find(&I) != instVecMap.end()) {
     IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
@@ -1236,14 +1255,6 @@ void IR2Vec_FA::inst2Vec(
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
-  partialInstValMap[&I] = instVector;
-
-  IR2VEC_DEBUG(outs() << "contents of partialInstValMap:\n";
-               for (auto i
-                    : partialInstValMap) {
-                 i.first->print(outs());
-                 outs() << "\n";
-               });
 
   auto type = I.getType();
 
@@ -1277,7 +1288,6 @@ void IR2Vec_FA::inst2Vec(
   scaleVector(vec, WT);
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
-  partialInstValMap[&I] = instVector;
 
   unsigned operandNum;
   bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOp);
@@ -1443,17 +1453,8 @@ void IR2Vec_FA::getAllSCC() {
   }
 }
 
-void IR2Vec_FA::bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack) {
-  SmallMapVector<const Instruction *, Vector, 16> partialInstValMap;
-
+void IR2Vec_FA::bb2Vec(BasicBlock &B) {
   for (auto &I : B) {
-
-    partialInstValMap[&I] = {};
-    IR2VEC_DEBUG(outs() << "XX------------ Call from bb2vec function "
-                           "Started---------------------XX\n");
-    inst2Vec(I, funcStack, partialInstValMap);
-    IR2VEC_DEBUG(outs() << "YY------------Call from bb2vec function "
-                           "Ended---------------------YY\n");
-    partialInstValMap.erase(&I);
+    inst2Vec(I);
   }
 }

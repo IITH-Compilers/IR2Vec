@@ -98,10 +98,7 @@ private:
   void topoDFS(int vertex, std::vector<bool> &Visited,
                std::vector<int> &visitStack);
 
-  void inst2Vec(const llvm::Instruction &I,
-                llvm::SmallVector<llvm::Function *, 15> &funcStack,
-                llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
-                                     16> &instValMap);
+  void inst2Vec(const llvm::Instruction &I);
   void traverseRD(const llvm::Instruction *inst,
                   std::unordered_map<const llvm::Instruction *, bool> &Visited,
                   llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
@@ -110,10 +107,8 @@ private:
                std::unordered_map<const llvm::Instruction *, bool> &Visited,
                llvm::SmallVector<const llvm::Instruction *, 10> &set);
 
-  void bb2Vec(llvm::BasicBlock &B,
-              llvm::SmallVector<llvm::Function *, 15> &funcStack);
-  IR2Vec::Vector func2Vec(llvm::Function &F,
-                          llvm::SmallVector<llvm::Function *, 15> &funcStack);
+  void bb2Vec(llvm::BasicBlock &B);
+  IR2Vec::Vector func2Vec(llvm::Function &F);
 
   bool isMemOp(llvm::StringRef opcode, unsigned &operand, memOpType op);
 
