@@ -187,28 +187,6 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                      std::to_string(cyclicCounter) + "\n");
 }
 
-// This function will update funcVecMap by doing DFS starting from parent
-// function
-// void IR2Vec_FA::updateFuncVecMap(
-//     llvm::Function *function,
-//     llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
-//   visitedFunctions.insert(function);
-//   auto tmpParent = func2Vec(*function);
-//   // funcVecMap is updated with vectors returned by func2Vec
-//   funcVecMap[function] = tmpParent;
-//   auto calledFunctions = funcCallMap[function];
-//   for (auto &calledFunction : calledFunctions) {
-//     if (calledFunction && !calledFunction->isDeclaration() &&
-//         visitedFunctions.count(calledFunction) == 0) {
-//       // doing casting since calledFunctions is of type of const
-//       // llvm::Function* and we need llvm::Function* as argument
-//       auto *callee = const_cast<Function *>(calledFunction);
-//       // This function is called recursively to update funcVecMap
-//       updateFuncVecMap(callee, visitedFunctions);
-//     }
-//   }
-// }
-
 void IR2Vec_FA::updateFuncVecMap(
     llvm::Function *function,
     llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
