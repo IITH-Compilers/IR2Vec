@@ -1380,18 +1380,46 @@ void IR2Vec_FA::traverseRD(
   timeStack.push_back(inst);
 }
 
+// void IR2Vec_FA::DFSUtil(
+//     const llvm::Instruction *inst,
+//     std::unordered_map<const llvm::Instruction *, bool> &Visited,
+//     llvm::SmallVector<const llvm::Instruction *, 10> &nodeList) {
+
+//   nodeList.push_back(inst);
+//   Visited[inst] = true;
+//   auto RD = reverseReachingDefsMap[inst];
+
+//   for (auto defs : RD) {
+//     if (Visited.find(defs) == Visited.end()) {
+//       DFSUtil(defs, Visited, nodeList);
+//     }
+//   }
+// }
+
 void IR2Vec_FA::DFSUtil(
     const llvm::Instruction *inst,
     std::unordered_map<const llvm::Instruction *, bool> &Visited,
-    llvm::SmallVector<const llvm::Instruction *, 10> &set) {
+    llvm::SmallVector<const llvm::Instruction *, 10> &nodeList) {
 
-  Visited[inst] = true;
-  auto RD = reverseReachingDefsMap[inst];
+  std::stack<const llvm::Instruction *> stack;
+  stack.push(inst);
 
-  for (auto defs : RD) {
-    if (Visited.find(defs) == Visited.end()) {
-      set.push_back(defs);
-      DFSUtil(defs, Visited, set);
+  while (!stack.empty()) {
+    auto current = stack.top();
+    stack.pop();
+
+    // Only process the node if it hasn't been visited
+    nodeList.push_back(current);
+    Visited[current] = true;
+
+    auto RD = reverseReachingDefsMap[current];
+    // Push elements onto the stack in reverse order to preserve the order
+    // of visitation that would be achieved with recursion.
+    // However, only push nodes that have not been visited
+    for (auto it = RD.rbegin(); it != RD.rend(); ++it) {
+      if (Visited.find(*it) == Visited.end()) {
+        stack.push(*it);
+      }
     }
   }
 }
@@ -1423,7 +1451,6 @@ void IR2Vec_FA::getAllSCC() {
     timeStack.pop_back();
     if (Visited.find(inst) == Visited.end()) {
       llvm::SmallVector<const llvm::Instruction *, 10> set;
-      set.push_back(inst);
       DFSUtil(inst, Visited, set);
       if (set.size() != 0)
         allSCCs.push_back(set);
