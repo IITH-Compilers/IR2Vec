@@ -37,39 +37,6 @@
 using namespace llvm;
 using namespace IR2Vec;
 
-// void IR2Vec_FA::getTransitiveUse(
-//     const Instruction *root, const Instruction *def,
-//     SmallVector<const Instruction *, 100> &visitedList)
-// {
-//   std::stack<const Instruction *> stack; // Explicit stack for DFS
-//   stack.push(def);
-
-//   while (!stack.empty()) {
-//       const Instruction *currentDef = stack.top();
-//       stack.pop();
-
-//       visitedList.push_back(currentDef);
-//       unsigned operandNum = 0;
-//       for (auto U : currentDef->users()) {
-//           if (auto use = dyn_cast<Instruction>(U))
-//           {
-//             if (std::find(visitedList.begin(), visitedList.end(), use) ==
-//             visitedList.end())
-//             {
-//               if (isMemOp(use->getOpcodeName(), operandNum, memWriteOp) &&
-//                 use->getOperand(operandNum) == currentDef)
-//               {
-//                   writeDefsMap[root].push_back(use);
-//               } else if (isMemOp(use->getOpcodeName(), operandNum,
-//               memAccessOp) && use->getOperand(operandNum) == currentDef) {
-//                   stack.push(use); // Push the next node to the stack
-//               }
-//             }
-//           }
-//       }
-//   }
-// }
-
 void IR2Vec_FA::getTransitiveUse(
     const Instruction *root, const Instruction *def,
     SmallVector<const Instruction *, 100> &visitedList) {
