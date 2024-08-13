@@ -825,7 +825,6 @@ bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand, memOpType op) {
           : (op == memWriteOp)
                 ? memWriteOps
                 : throw std::invalid_argument("Invalid MemoryOperation type");
-
   bool isMemOperand = false;
   auto It = map.find(opcode);
   if (It != map.end()) {
