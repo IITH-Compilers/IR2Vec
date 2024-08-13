@@ -298,17 +298,22 @@ void IR2Vec_FA::topoOrder(std::vector<int> &visitStack, int size) {
 void IR2Vec_FA::TransitiveReads(SmallVector<Instruction *, 16> &Killlist,
                                 Instruction *Inst, BasicBlock *ParentBB) {
   assert(Inst != nullptr);
-  unsigned operandNum;
-  bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOp);
+  Instruction *parentI;
+  while (true) {
+    unsigned operandNum;
+    bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOp);
+    if (!isMemAccess)
+      break;
 
-  if (!isMemAccess)
-    return;
-  auto parentI = dyn_cast<Instruction>(Inst->getOperand(operandNum));
-  if (parentI == nullptr)
-    return;
-  if (ParentBB == parentI->getParent())
-    Killlist.push_back(parentI);
-  TransitiveReads(Killlist, parentI, ParentBB);
+    parentI = dyn_cast<Instruction>(Inst->getOperand(operandNum));
+    if (parentI == nullptr)
+      break;
+
+    if (ParentBB == parentI->getParent())
+      Killlist.push_back(parentI);
+
+    Inst = parentI; // Move to the next instruction (parent)
+  }
 }
 
 void IR2Vec_FA::createKilllist(SmallVector<Instruction *, 16> &KillList,
@@ -1363,13 +1368,10 @@ void IR2Vec_FA::traverseRD(
     llvm::SmallVector<const llvm::Instruction *, 10> &timeStack) {
 
   auto RDit = instReachingDefsMap.find(inst);
-
   Visited[inst] = true;
 
   if (RDit != instReachingDefsMap.end()) {
-
     auto RD = RDit->second;
-
     for (auto defs : RD) {
       if (Visited.find(defs) == Visited.end())
         traverseRD(defs, Visited, timeStack);
@@ -1378,22 +1380,6 @@ void IR2Vec_FA::traverseRD(
   // All the children (RDs) of current node is done push to timeStack
   timeStack.push_back(inst);
 }
-
-// void IR2Vec_FA::DFSUtil(
-//     const llvm::Instruction *inst,
-//     std::unordered_map<const llvm::Instruction *, bool> &Visited,
-//     llvm::SmallVector<const llvm::Instruction *, 10> &nodeList) {
-
-//   nodeList.push_back(inst);
-//   Visited[inst] = true;
-//   auto RD = reverseReachingDefsMap[inst];
-
-//   for (auto defs : RD) {
-//     if (Visited.find(defs) == Visited.end()) {
-//       DFSUtil(defs, Visited, nodeList);
-//     }
-//   }
-// }
 
 void IR2Vec_FA::DFSUtil(
     const llvm::Instruction *inst,
