@@ -14,13 +14,19 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
-    - name: Install LLVM-10.0.1
+    - name: Install libzstd-dev
+      run: sudo apt-get install libzstd-dev
+    - name: Install LIT and Filecheck
       run: |
-          wget https://apt.llvm.org/llvm.sh
-          sudo bash llvm.sh 10
+        sudo python3 -m pip install lit
+        sudo python3 -m pip install filecheck
+    - name: Install LLVM-17
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        sudo bash llvm.sh 17
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |
@@ -35,8 +41,8 @@ jobs:
         cmake ../eigen-3.3.7
         make -j4 && cd ..
     - name: cmake
-      run: cd build && cmake -DEigen3_DIR=./eigen-build ../src
+      run: cd build && cmake -DEigen3_DIR=./eigen-build ..
     - name: make
       run: cd build && make -j8
     - name: Run-tests
-      run: cd build && ulimit -s unlimited && make verify-all
+      run: cd build && ulimit -s unlimited && make check

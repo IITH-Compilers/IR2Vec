@@ -1,11 +1,17 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- FlowAware.cpp - Flow-aware embeddings of IR2Vec ----------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #include "FlowAware.h"
+#ifdef EIGEN_FOUND
+#include "VectorSolverEigen.h"
+#else
 #include "VectorSolver.h"
+#endif
 
 #include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/ADT/MapVector.h"
@@ -13,6 +19,7 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Analysis/CFG.h"
 #include "llvm/Analysis/CallGraph.h"
+
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/DebugInfoMetadata.h"
@@ -21,14 +28,13 @@
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 
 #include <algorithm> // for transform
-#include <cxxabi.h>
+
 #include <functional>
 #include <regex>
 #include <string>
 
 using namespace llvm;
 using namespace IR2Vec;
-using abi::__cxa_demangle;
 
 void IR2Vec_FA::getTransitiveUse(
     const Instruction *root, const Instruction *def,
@@ -93,34 +99,37 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
 Vector IR2Vec_FA::getValue(std::string key) {
   Vector vec(DIM, 0);
   if (opcMap.find(key) == opcMap.end()) {
-    errs() << "cannot find key in map : " << key << "\n";
+    IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
     dataMissCounter++;
   } else
     vec = opcMap[key];
   return vec;
 }
 
+// Function to update funcVecMap of function with vectors of it's callee list
+void IR2Vec_FA::updateFuncVecMapWithCallee(const llvm::Function *function) {
+  if (funcCallMap.find(function) != funcCallMap.end()) {
+
+    auto calleelist = funcCallMap[function];
+    Vector calleeVector(DIM, 0);
+    for (auto funcs : calleelist) {
+
+      auto tmp = funcVecMap[funcs];
+      std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
+                     calleeVector.begin(), std::plus<double>());
+    }
+
+    scaleVector(calleeVector, WA);
+    auto tmpParent = funcVecMap[function];
+    std::transform(calleeVector.begin(), calleeVector.end(), tmpParent.begin(),
+                   tmpParent.begin(), std::plus<double>());
+    funcVecMap[function] = tmpParent;
+  }
+}
+
 void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *missCount,
                                            std::ostream *cyclicCount) {
-
-  collectWriteDefsMap(M);
-
-  CallGraph cg = CallGraph(M);
-
-  for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
-    if (callItr->first && !callItr->first->isDeclaration()) {
-      auto ParentFunc = callItr->first;
-      CallGraphNode *cgn = callItr->second.get();
-      if (cgn) {
-        for (auto It = cgn->begin(); It != cgn->end(); It++) {
-          auto func = It->second->getFunction();
-          if (func && !func->isDeclaration())
-            funcCallMap[ParentFunc].push_back(func);
-        }
-      }
-    }
-  }
 
   int noOfFunc = 0;
 
@@ -133,20 +142,7 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   }
 
   for (auto funcit : funcVecMap) {
-    if (funcCallMap.find(funcit.first) != funcCallMap.end()) {
-      auto calleelist = funcCallMap[funcit.first];
-      Vector calleeVector(DIM, 0);
-      for (auto funcs : calleelist) {
-        auto tmp = funcVecMap[funcs];
-        std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
-                       calleeVector.begin(), std::plus<double>());
-      }
-      scaleVector(calleeVector, WA);
-      auto tmpParent = funcVecMap[funcit.first];
-      std::transform(calleeVector.begin(), calleeVector.end(),
-                     tmpParent.begin(), tmpParent.begin(), std::plus<double>());
-      funcVecMap[funcit.first] = tmpParent;
-    }
+    updateFuncVecMapWithCallee(funcit.first);
   }
 
   for (auto &f : M) {
@@ -156,27 +152,8 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
       tmp = funcVecMap[&f];
 
       if (level == 'f') {
-        //  if(f.getName() == "main"){
-        auto funcName = f.getName().str();
-        std::size_t sz = 17;
-        int status;
-        char *const readable_name =
-            __cxa_demangle(funcName.c_str(), 0, &sz, &status);
-        auto demangledName =
-            status == 0 ? std::string(readable_name) : funcName;
-        res += M.getSourceFileName() + "__" + demangledName + "\t";
-
-        res += "=\t";
-        for (auto i : tmp) {
-          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-            i = 0;
-          }
-          res += std::to_string(i) + "\t";
-        }
+        res += updatedRes(tmp, &f, &M);
         res += "\n";
-
-        // }
-
         noOfFunc++;
       }
 
@@ -198,6 +175,83 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
       res += std::to_string(i) + "\t";
     }
     res += "\n";
+  }
+
+  if (o)
+    *o << res;
+
+  if (missCount) {
+    std::string missEntry =
+        (M.getSourceFileName() + "\t" + std::to_string(dataMissCounter) + "\n");
+    *missCount << missEntry;
+  }
+
+  if (cyclicCount)
+    *cyclicCount << (M.getSourceFileName() + "\t" +
+                     std::to_string(cyclicCounter) + "\n");
+}
+
+// This function will update funcVecMap by doing DFS starting from parent
+// function
+void IR2Vec_FA::updateFuncVecMap(
+    llvm::Function *function,
+    llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
+  visitedFunctions.insert(function);
+  SmallVector<Function *, 15> funcStack;
+  funcStack.clear();
+  auto tmpParent = func2Vec(*function, funcStack);
+  // funcVecMap is updated with vectors returned by func2Vec
+  funcVecMap[function] = tmpParent;
+  auto calledFunctions = funcCallMap[function];
+  for (auto &calledFunction : calledFunctions) {
+    if (calledFunction && !calledFunction->isDeclaration() &&
+        visitedFunctions.count(calledFunction) == 0) {
+      // doing casting since calledFunctions is of type of const
+      // llvm::Function* and we need llvm::Function* as argument
+      auto *callee = const_cast<Function *>(calledFunction);
+      // This function is called recursively to update funcVecMap
+      updateFuncVecMap(callee, visitedFunctions);
+    }
+  }
+}
+
+void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
+    std::ostream *o, std::string name, std::ostream *missCount,
+    std::ostream *cyclicCount) {
+
+  int noOfFunc = 0;
+  for (auto &f : M) {
+
+    auto Result = getActualName(&f);
+    if (!f.isDeclaration() && Result == name) {
+      // If funcName is matched with one of the functions in module, we
+      // will update funcVecMap of it and it's child functions recursively
+      llvm::SmallSet<const Function *, 16> visitedFunctions;
+      updateFuncVecMap(&f, visitedFunctions);
+    }
+  }
+  // iterating over all functions in module instead of funcVecMap to preserve
+  // order
+  for (auto &f : M) {
+    if (funcVecMap.find(&f) != funcVecMap.end()) {
+      auto *function = const_cast<const Function *>(&f);
+      updateFuncVecMapWithCallee(function);
+    }
+  }
+
+  for (auto &f : M) {
+    auto Result = getActualName(&f);
+    if (!f.isDeclaration() && Result == name) {
+      Vector tmp;
+      SmallVector<Function *, 15> funcStack;
+      tmp = funcVecMap[&f];
+
+      if (level == 'f') {
+        res += updatedRes(tmp, &f, &M);
+        res += "\n";
+        noOfFunc++;
+      }
+    }
   }
 
   if (o)
@@ -455,8 +509,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
       solveSingleComponent(*defs, partialInstValMap);
       partialInstValMap.erase(defs);
     } else {
-      cyclicCounter++; // for components with length more than 1 will represent
-                       // cycles
+      cyclicCounter++; // for components with length more than 1 will
+                       // represent cycles
       for (auto defs : component) {
         partialInstValMap[defs] = {};
         getPartialVec(*defs, partialInstValMap);
@@ -558,9 +612,10 @@ bool isPotentiallyReachableFromMany(
     if (LI) {
       Outer = getOutermostLoop(LI, BB);
       // If we're in a loop with a hole, not all blocks in the loop are
-      // reachable from all other blocks. That implies we can't simply jump to
-      // the loop's exit blocks, as that exit might need to pass through an
-      // excluded block. Clear Outer so we process BB's successors.
+      // reachable from all other blocks. That implies we can't simply
+      // jump to the loop's exit blocks, as that exit might need to pass
+      // through an excluded block. Clear Outer so we process BB's
+      // successors.
       if (LoopsWithHoles.count(Outer))
         Outer = nullptr;
       if (StopLoop && Outer == StopLoop)
@@ -568,15 +623,15 @@ bool isPotentiallyReachableFromMany(
     }
 
     if (!--Limit) {
-      // We haven't been able to prove it one way or the other. Conservatively
-      // answer true -- that there is potentially a path.
+      // We haven't been able to prove it one way or the other.
+      // Conservatively answer true -- that there is potentially a path.
       return true;
     }
 
     if (Outer) {
-      // All blocks in a single loop are reachable from all other blocks. From
-      // any of these blocks, we can skip directly to the exits of the loop,
-      // ignoring any other blocks inside the loop body.
+      // All blocks in a single loop are reachable from all other blocks.
+      // From any of these blocks, we can skip directly to the exits of
+      // the loop, ignoring any other blocks inside the loop body.
       Outer->getExitBlocks(Worklist);
     } else {
       Worklist.append(succ_begin(BB), succ_end(BB));
@@ -598,11 +653,11 @@ bool isPotentiallyReachable(
   SmallVector<BasicBlock *, 32> Worklist;
 
   if (A->getParent() == B->getParent()) {
-    // The same block case is special because it's the only time we're looking
-    // within a single block to see which instruction comes first. Once we
-    // start looking at multiple blocks, the first instruction of the block is
-    // reachable, so we only need to determine reachability between whole
-    // blocks.
+    // The same block case is special because it's the only time we're
+    // looking within a single block to see which instruction comes first.
+    // Once we start looking at multiple blocks, the first instruction of
+    // the block is reachable, so we only need to determine reachability
+    // between whole blocks.
     BasicBlock *BB = const_cast<BasicBlock *>(A->getParent());
 
     // If the block is in a loop then we can reach any instruction in the
@@ -698,8 +753,8 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
     });
 
     // If there is a reachable write within I's basic block only that defn
-    // would reach always If there are more than one defn, take the immediate
-    // defn before I
+    // would reach always If there are more than one defn, take the
+    // immediate defn before I
     if (!bbInstMap[I->getParent()].empty()) {
       IR2VEC_DEBUG(outs() << "--------Within BB--------\n");
       IR2VEC_DEBUG(I->print(outs()); outs() << "\n");
@@ -810,8 +865,8 @@ void IR2Vec_FA::getPartialVec(
   }
 
   Vector instVector(DIM, 0);
-  std::string opcodeName = I.getOpcodeName();
-  auto vec = getValue(opcodeName);
+  StringRef opcodeName = I.getOpcodeName();
+  auto vec = getValue(opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
@@ -823,40 +878,36 @@ void IR2Vec_FA::getPartialVec(
                  i.first->print(outs());
                  outs() << "\n";
                });
+  auto type = I.getType();
 
-  switch (I.getType()->getTypeID()) {
-  case 0:
+  if (type->isVoidTy()) {
     vec = getValue("voidTy");
-    break;
-  case 1:
-  case 2:
-  case 3:
-  case 4:
-  case 5:
-  case 6:
+  } else if (type->isFloatingPointTy()) {
     vec = getValue("floatTy");
-    break;
-  case 11:
+  } else if (type->isIntegerTy()) {
     vec = getValue("integerTy");
-    break;
-  case 12:
+  } else if (type->isFunctionTy()) {
     vec = getValue("functionTy");
-    break;
-  case 13:
+  } else if (type->isStructTy()) {
     vec = getValue("structTy");
-    break;
-  case 14:
+  } else if (type->isArrayTy()) {
     vec = getValue("arrayTy");
-    break;
-  case 15:
+  } else if (type->isPointerTy()) {
     vec = getValue("pointerTy");
-    break;
-  case 16:
+  } else if (type->isVectorTy()) {
     vec = getValue("vectorTy");
-    break;
-  default:
+  } else if (type->isEmptyTy()) {
+    vec = getValue("emptyTy");
+  } else if (type->isLabelTy()) {
+    vec = getValue("labelTy");
+  } else if (type->isTokenTy()) {
+    vec = getValue("tokenTy");
+  } else if (type->isMetadataTy()) {
+    vec = getValue("metadataTy");
+  } else {
     vec = getValue("unknownTy");
   }
+
   scaleVector(vec, WT);
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
@@ -1129,14 +1180,13 @@ void IR2Vec_FA::solveSingleComponent(
       // Check if value of RD is precomputed
       if (instVecMap.find(i) == instVecMap.end()) {
 
-        /*Some phi instructions reach themselves and hence may not be in the
-        instVecMap but should be in the partialInstValMap*/
+        /*Some phi instructions reach themselves and hence may not be in
+        the instVecMap but should be in the partialInstValMap*/
 
         if (partialInstValMap.find(i) == partialInstValMap.end()) {
           assert(partialInstValMap.find(i) != partialInstValMap.end() &&
                  "Should have been in instvecmap or partialmap");
         }
-
       } else {
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
@@ -1188,8 +1238,8 @@ void IR2Vec_FA::inst2Vec(
   }
 
   Vector instVector(DIM, 0);
-  std::string opcodeName = I.getOpcodeName();
-  auto vec = getValue(opcodeName);
+  StringRef opcodeName = I.getOpcodeName();
+  auto vec = getValue(opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
@@ -1202,37 +1252,33 @@ void IR2Vec_FA::inst2Vec(
                  outs() << "\n";
                });
 
-  switch (I.getType()->getTypeID()) {
-  case 0:
+  auto type = I.getType();
+
+  if (type->isVoidTy()) {
     vec = getValue("voidTy");
-    break;
-  case 1:
-  case 2:
-  case 3:
-  case 4:
-  case 5:
-  case 6:
+  } else if (type->isFloatingPointTy()) {
     vec = getValue("floatTy");
-    break;
-  case 11:
+  } else if (type->isIntegerTy()) {
     vec = getValue("integerTy");
-    break;
-  case 12:
+  } else if (type->isFunctionTy()) {
     vec = getValue("functionTy");
-    break;
-  case 13:
+  } else if (type->isStructTy()) {
     vec = getValue("structTy");
-    break;
-  case 14:
+  } else if (type->isArrayTy()) {
     vec = getValue("arrayTy");
-    break;
-  case 15:
+  } else if (type->isPointerTy()) {
     vec = getValue("pointerTy");
-    break;
-  case 16:
+  } else if (type->isVectorTy()) {
     vec = getValue("vectorTy");
-    break;
-  default:
+  } else if (type->isEmptyTy()) {
+    vec = getValue("emptyTy");
+  } else if (type->isLabelTy()) {
+    vec = getValue("labelTy");
+  } else if (type->isTokenTy()) {
+    vec = getValue("tokenTy");
+  } else if (type->isMetadataTy()) {
+    vec = getValue("metadataTy");
+  } else {
     vec = getValue("unknownTy");
   }
   scaleVector(vec, WT);

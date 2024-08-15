@@ -6,41 +6,89 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
-![LLVM](https://img.shields.io/badge/LLVM-v10.0.1-blue)
-![Tests](https://github.com/svkeerthy/IR2Vec/workflows/Tests/badge.svg)
-![Publish](https://github.com/svkeerthy/IR2Vec/workflows/Publish/badge.svg)
-![pre-commit checks](https://github.com/svkeerthy/IR2Vec/workflows/pre-commit%20checks/badge.svg)
+[![LLVM](https://img.shields.io/badge/LLVM-v17.0.6-blue)](https://github.com/llvm/llvm-project/releases/tag/llvmorg-17.0.6)
+[![PyPI Version](https://img.shields.io/pypi/v/IR2Vec)](https://pypi.org/project/IR2Vec/)
+![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
+![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
+![pre-commit checks](https://github.com/IITH-Compilers/IR2Vec/workflows/pre-commit%20checks/badge.svg)
 
 ![Image](images/ir2vec.jpg)
 
+## LLVM Version Archive
+
+| LLVM Version | Branch |
+| ------------ | ------ |
+| LLVM 17.0.6 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 16.0.1 | [llvm16](https://github.com/IITH-Compilers/IR2Vec/tree/llvm16) |
+| LLVM 14.0.1 | [llvm14](https://github.com/IITH-Compilers/IR2Vec/tree/llvm14) |
+| LLVM 12.0.0 | [llvm12](https://github.com/IITH-Compilers/IR2Vec/tree/llvm12) |
+| LLVM 10.0.1 | [llvm10](https://github.com/IITH-Compilers/IR2Vec/tree/llvm10) |
+| LLVM 8.0.1 | [llvm8](https://github.com/IITH-Compilers/IR2Vec/tree/llvm8) |
+
 ## Table Of Contents
-* [Requirements](#requirements)
-* [Binaries and Libraries - Artifacts](#binaries-and-libraries---artifacts)
-* [Building from Source](#building-from-source)
-* [Generating program representations](#generating-program-representations)
-   * [Using Binary](#using-binary)
-   * [Using Libraries](#using-libraries)
-* [Experiments](#experiments)
-* [Citation](#citation)
-* [Contributions](#contributions)
-* [License](#license)
+- [IR2Vec](#ir2vec)
+  - [LLVM Version Archive](#llvm-version-archive)
+  - [Table Of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Python](#python)
+  - [Cpp](#cpp)
+  - [Requirements](#requirements)
+  - [Building from source](#building-from-source)
+  - [Generating program representations](#generating-program-representations)
+    - [Using Binary](#using-binary)
+      - [Command-Line options](#command-line-options)
+      - [Flow-Aware Embeddings](#flow-aware-embeddings)
+      - [Symbolic Embeddings](#symbolic-embeddings)
+  - [Using Libraries](#using-libraries)
+  - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
+    - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
+    - [getProgramVector](#getprogramvector)
+    - [getFunctionVectors](#getfunctionvectors)
+    - [getInstructionVectors](#getinstructionvectors)
+  - [Example](#example)
+  - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
+  - [Experiments](#experiments)
+    - [Note](#note)
+  - [Citation](#citation)
+  - [Contributions](#contributions)
+  - [License](#license)
+
+## Installation
+
+`IR2Vec` can be installed in different ways to accommodate individual preferences and requirements effectively. You may select to install via a user-friendly Python wheel setup if you are a Python user, or opt for a C++ based installation if you are looking to integrate with a compiler pass or necessitate advanced control and enhanced integration capabilities. The detailed setup steps are mentioned in the following sections.
+
+## Python
+
+If you prefer working with Python, you can easily install `IR2Vec` using `pip`.
+
+```
+pip install -U ir2vec
+```
+Now, you can import and use IR2Vec in your Python projects. Make sure you have a good understanding of Python and its package management system.
+
+We are actively working on improving the Python interfaces and providing better support. If you find any good-to-have interfaces that you may need for your use case missing, please feel free to raise a request.
+
+## Cpp
+
+If you're a C++ developer and require low-level control, optimization, or integration with C++ projects, you can build `IR2Vec` from source. First, ensure the below requirements are satisfied, then follow the steps mentioned in the [Building from source](#building-from-source) section.
 
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (10.0.1) - [src](https://github.com/llvm/llvm-project/tree/release/10.x), [release](https://releases.llvm.org/download.html#10.0.1)
+* LLVM (17.0.6) - [src](https://github.com/llvm/llvm-project/tree/release/17.x), [release](https://releases.llvm.org/download.html#17.0.6)
     * Support for latest LLVM versions would be added soon
-* Eigen library (3.3.7)
+* Eigen library (3.3.7) (Optional)
 * Python (3.6.7)
 * Other python requirements
     * For training the vocabulary are available in [seed_embeddings/OpenKE/requirements.txt](./seed_embeddings/OpenKE/requirements.txt), and
     * For running experiments are available in [experiments/exp_requirements.yaml](./experiments/exp_requirements.yaml)
     * Conda/Anaconda based virtual environment is assumed
+* LIT and FileCheck
+    * To install LIT, run `pip3 install --user lit`
+    * To install FileCheck, run `pip3 install --user filecheck`
 
-(Experiments are done on an Ubuntu 18.04 machine)
+(Experiments are done on an Ubuntu 20.04 machine)
 
-## Binaries and Libraries - Artifacts
-Binaries and Libraries (.a and .so) are autogenerated for every relevant checkin using GitHub Actions. Such generated artifacts are tagged along with the successful runs of `Publish` workflow and can be found [here](https://github.com/IITH-Compilers/IR2Vec/actions?query=workflow%3APublish).
 
 ## Building from source
 1. `mkdir build && cd build`
@@ -51,31 +99,33 @@ Binaries and Libraries (.a and .so) are autogenerated for every relevant checkin
     2. `mkdir eigen-build && cd eigen-build`
     3. `cmake ../eigen-3.3.7 && make`
     4. `cd ../`
-3. `cmake -DLT_LLVM_INSTALL_DIR=<path_to_LLVM_build_dir> -DEigen3_DIR=<path_to_eigen_build_dir> [-DCMAKE_INSTALL_PREFIX=<install_dir>] ../src`
+3. `cmake -DLT_LLVM_INSTALL_DIR=<path_to_LLVM_build_dir> -DEigen3_DIR=<path_to_eigen_build_dir> [-DCMAKE_INSTALL_PREFIX=<install_dir>] ..`
 4. `make [&& make install]`
 
 This process would generate `ir2vec` binary under `build/bin` directory, `libIR2Vec.a` and `libIR2Vec.so` under `build/lib` directory.
 
-To ensure the correctness, run `make verify-all`
+To ensure the correctness, run `make check`
+
+
 
 ## Generating program representations
-`IR2Vec` can be used either as a stand alone tool using binary, or can be integrated with any third party tools using libraries. Please see below for the usage
+`IR2Vec` can be used either as a stand-alone tool using binary or can be integrated with any third-party tools using libraries. Please see below for the usage
 instructions.
 
 ### Using Binary
-> ir2vec -\<mode\> -vocab \<seedEmbedding-file-path\> -o \<output-file\> -level \<p|f\> -class \<class-number\> \<input-ll-file\>
+> ir2vec -\<mode\> -o \<output-file\> -level \<p|f\> -class \<class-number\> -funcName=\<function-name\> \<input-ll-file\>
 
 #### Command-Line options
 
 - `mode` - can be one of `sym`/`fa`
     - `sym` denotes Symbolic representation
     - `fa` denotes Flow-Aware representation
-- `vocab`  - the path to the seed embeddings file
 -  `o` - file in which the embeddings are to be appended;     (Note : If  file doesn’t exist, new file would be created, else embeddings would be appended)
 - `level` - can be one of chars `p`/`f`.
     - `p` denotes `program level` encoding
     - `f` denotes `function level` encoding
-- `class` - only non-mandatory argument. Used for the purpose of mentioning class labels for *classification tasks* (To be used with the `level p`). Defaults to *-1*.  When, not equal to -1, the pass prints `class-number` followed by the corresponding  embeddings
+- `class` - non-mandatory argument. Used for the purpose of mentioning class labels for *classification tasks* (To be used with the `level p`). Defaults to *-1*.  When, not equal to -1, the pass prints `class-number` followed by the corresponding  embeddings
+- `funcName` - also a non-mandatory argument. Used for generating embeddings only for the functions with given name. `level` should be `f` while using this option
 
 Please use `--help` for further details.
 
@@ -90,10 +140,17 @@ Please use `--help` for further details.
 >     <function-name> = <Embeddings>
 
 #### Flow-Aware Embeddings
-* `` ir2vec -fa -vocab vocabulary/seedEmbeddingVocab-300-llvm10.txt -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+For all functions
+* `` ir2vec -fa -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+
+For a specific function
+* `` ir2vec -fa -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### Symbolic Embeddings
- * `` ir2vec -sym -vocab vocabulary/seedEmbeddingVocab-300-llvm10.txt -o <output_file> -level <p|f> -class <class-number>  <input_ll_file>``
+For all functions
+ * `` ir2vec -sym -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
+For a specific function
+ * `` ir2vec -sym -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
@@ -121,8 +178,7 @@ The following example snippet shows how to query the exposed vector representati
 
 // Creating object to generate FlowAware representation
 auto ir2vec =
-      IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware,
-                         "./vocabulary/seedEmbeddingVocab-300-llvm10.txt");
+      IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware);
 
 // Getting Instruction vectors corresponding to the instructions in <LLVM Module>
 auto instVecMap = ir2vec.getInstVecMap();
@@ -151,6 +207,118 @@ auto pgmVec = ir2vec.getProgramVector();
 for (auto val : pgmVec)
     outs() << val << "\t";
 ```
+
+## Using Python package (IR2Vec-Wheels)
+### Initialization -ir2vec.initEmbedding
+
+**Description:** Initialize IR2Vec embedding for an LLVM IR file.
+
+**Parameters:**
+
+* `file_path`: str - Path to the `.ll` or `.bc` file.
+* `encoding_type`: str - Choose `fa` (Flow-Aware) or `sym` (Symbolic).
+* `level`: str - Choose `p` for program-level or `f` for function-level.
+
+**Returns:**
+
+* `IR2VecObject`: Initialized object for accessing embeddings.
+
+**Example:**
+
+```python
+import ir2vec
+
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+```
+
+### getProgramVector
+
+**Description:** Gets the program-level vector representation.
+
+**Parameters:** optional
+
+**Returns:**
+
+- `progVector`: ndarray - The program-level embedding vector.
+
+**Example:**
+
+```python
+# Getting the program-level vector
+progVector = initObj.getProgramVector()
+```
+### getFunctionVectors
+
+**Description:** Gets function-level vectors for all functions in the LLVM IR file.
+
+**Parameters:** optional
+
+**Returns:**
+
+- `functionVectorMap`: dict - A dictionary where keys are function names and values are ndarrays containing function-level embedding vectors.
+
+**Example:**
+
+```python
+# Getting function-level vectors
+functionVectorMap = initObj.getFunctionVectors()
+```
+
+### getInstructionVectors
+
+**Description:** Gets instruction-level vectors for all instructions in the LLVM IR file.
+
+**Parameters:** optional
+
+**Returns:**
+
+- `instructionVectorsList`: list - A list of list where each list contains instruction corresponding embedding vectors as values.
+
+**Example:**
+
+```python
+
+# Getting instruction-level vectors
+instructionVectorsList = initObj.getInstructionVectors()
+```
+## Example
+- The following code snippet contains an example to demonstrate the usage of the package.
+
+```python
+import ir2vec
+import numpy as np
+
+# IR2Vec Python APIs can be used in two ways. As shown below.
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+
+#Approach 1
+progVector1 = ir2vec.getProgramVector(initObj)
+functionVectorMap1 = ir2vec.getFunctionVectors(initObj)
+instructionVectorsList1 = ir2vec.getInstructionVectors(initObj)
+
+#Approach 2
+progVector2 = initObj.getProgramVector()
+functionVectorMap2 = initObj.getFunctionVectors()
+instructionVectorsList2 = initObj.getInstructionVectors()
+
+# Both the approaches would result in same outcomes
+assert(np.allclose(progVector1,progVector2))
+
+for fun, funcObj in functionVectorMap1.items():
+    assert fun == funcObj["demangledName"]
+    functionOutput1 = ir2vec.getFunctionVectors(
+        initObj,
+        funcObj["actualName"],
+    )
+    functionOutput2 = initObj.getFunctionVectors(
+        funcObj["actualName"]
+    )
+    assert(np.allclose(functionOutput1[fun]["vector"],functionOutput2[fun]["vector"]))
+
+
+```
+## Binaries, Libraries and Wheels - Artifacts
+Binaries, Libraries (.a and .so), and whl files are autogenerated for every relevant check-in using GitHub Actions. Such generated artifacts are tagged along with the successful runs of [`Publish`](https://github.com/IITH-Compilers/IR2Vec/actions?query=workflow%3APublish) and [`Build Wheels`](https://github.com/IITH-Compilers/IR2Vec/actions/workflows/wheel.yml) actions.
 
 ## Experiments
 
@@ -184,7 +352,7 @@ keywords = {heterogeneous systems, representation learning, compiler optimizatio
 }
 ```
 ## Contributions
-Please feel free to raise issues to file a bug, to pose a question, or to initiate any related discussions. Pull requests are welcome :)
+Please feel free to raise issues to file a bug, pose a question, or initiate any related discussions. Pull requests are welcome :)
 
 ## License
-IR2Vec is released under a BSD 4-Clause License. See the LICENSE file for more details.
+IR2Vec is released under a Apache License v2.0 with LLVM Exceptions License. See the LICENSE file for more details.

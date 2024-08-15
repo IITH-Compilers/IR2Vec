@@ -1,9 +1,8 @@
-# Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-# Department of Computer Science and Engineering, IIT Hyderabad
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
-# This software is available under the BSD 4-Clause License. Please see LICENSE
-# file in the top-level directory for more details.
-#
+
 import config
 import models
 import tensorflow as tf
@@ -21,9 +20,9 @@ def train(arg_conf):
     con.set_in_path(arg_conf.index_dir)
     con.set_work_threads(4)
     con.set_train_times(arg_conf.epoch)
-    con.set_nbatches(100)
+    con.set_nbatches(nbatches=arg_conf.nbatches)
     con.set_alpha(0.001)
-    con.set_margin(1.0)
+    con.set_margin(arg_conf.margin)
     con.set_bern(0)
     con.set_dimension(arg_conf.dim)
     con.set_ent_neg_rate(1)
@@ -32,7 +31,12 @@ def train(arg_conf):
 
     outfile = os.path.join(
         arg_conf.index_dir,
-        "embedding_{}E_{}D.json".format(arg_conf.epoch, arg_conf.dim),
+        "seedEmbedding_{}E_{}D_{}batches{}margin.json".format(
+            arg_conf.epoch,
+            arg_conf.dim,
+            arg_conf.nbatches,
+            arg_conf.margin,
+        ),
     )
     con.set_out_files(outfile)
     con.init()
@@ -84,6 +88,22 @@ if __name__ == "__main__":
         type=int,
         default=300,
     )
+    parser.add_argument(
+        "--nbatches",
+        dest="nbatches",
+        help="Number of batches",
+        required=False,
+        type=int,
+        default=100,
+    )
+    parser.add_argument(
+        "--margin",
+        dest="margin",
+        help="Margin",
+        required=False,
+        type=float,
+        default=1.0,
+    )
 
     arg_conf = parser.parse_args()
 
@@ -91,7 +111,9 @@ if __name__ == "__main__":
 
     seedfile = os.path.join(
         arg_conf.index_dir,
-        "seedEmbedding_{}E_{}D.txt".format(arg_conf.epoch, arg_conf.dim),
+        "embeddings/seedEmbedding_{}E_{}D_{}batches{}margin.txt".format(
+            arg_conf.epoch, arg_conf.dim, arg_conf.nbatches, arg_conf.margin
+        ),
     )
 
     findRep(outfilejson, seedfile, arg_conf.index_dir)

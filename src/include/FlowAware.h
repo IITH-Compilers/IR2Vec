@@ -1,24 +1,27 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- FlowAware.h - Flow-aware embeddings of IR2Vec ------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #ifndef __IR2Vec_FA_H__
 #define __IR2Vec_FA_H__
 
 #include "utils.h"
 
 #include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallSet.h"
+#include "llvm/Analysis/CallGraph.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
-#include <unordered_map>
-
 #include <fstream>
+#include <unordered_map>
 
 class IR2Vec_FA {
 
@@ -121,11 +124,17 @@ private:
   // For Debugging
   void print(IR2Vec::Vector t, unsigned pos) { llvm::outs() << t[pos]; }
 
+  void updateFuncVecMap(
+      llvm::Function *function,
+      llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions);
+
+  void updateFuncVecMapWithCallee(const llvm::Function *function);
+
 public:
   IR2Vec_FA(llvm::Module &M) : M{M} {
+
     pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
-    IR2Vec::collectDataFromVocab(opcMap);
 
     memWriteOps.try_emplace("store", 1);
     memWriteOps.try_emplace("cmpxchg", 0);
@@ -136,12 +145,38 @@ public:
 
     dataMissCounter = 0;
     cyclicCounter = 0;
+
+    collectWriteDefsMap(M);
+
+    llvm::CallGraph cg = llvm::CallGraph(M);
+
+    for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
+      if (callItr->first && !callItr->first->isDeclaration()) {
+        auto ParentFunc = callItr->first;
+        llvm::CallGraphNode *cgn = callItr->second.get();
+        if (cgn) {
+
+          for (auto It = cgn->begin(); It != cgn->end(); It++) {
+
+            auto func = It->second->getFunction();
+            if (func && !func->isDeclaration()) {
+              funcCallMap[ParentFunc].push_back(func);
+            }
+          }
+        }
+      }
+    }
   }
 
   void generateFlowAwareEncodings(std::ostream *o = nullptr,
                                   std::ostream *missCount = nullptr,
                                   std::ostream *cyclicCount = nullptr);
-  std::map<std::string, IR2Vec::Vector> opcMap;
+
+  // newly added
+
+  void generateFlowAwareEncodingsForFunction(
+      std::ostream *o = nullptr, std::string name = "",
+      std::ostream *missCount = nullptr, std::ostream *cyclicCount = nullptr);
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {

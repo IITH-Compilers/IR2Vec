@@ -3,3 +3,10 @@ build/
 __pycache__/
 .vscode
 experiments/*/output
+seed_embeddings/triplets.txt
+seed_embeddings/preprocessed/*
+.cache/
+
+html
+latex
+sqlite3.ll

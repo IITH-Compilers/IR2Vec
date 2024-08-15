@@ -26,7 +26,8 @@ void transitiveClosure(int graph[][V]) {
           consider only the vertices in set {0, 1, 2, .. k-1} as
           intermediate vertices.
   ----> After the end of a iteration, vertex no. k is added to the
-                  set of intermediate vertices and the set becomes {0, 1, .. k}
+                  set of intermediate vertices and the set becomes {0, 1, ..
+  k}
 */
   for (k = 0; k < V; k++) {
     // Pick all vertices as source one by one

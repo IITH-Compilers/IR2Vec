@@ -1,8 +1,6 @@
-# Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-# Department of Computer Science and Engineering, IIT Hyderabad
-#
-# This software is available under the BSD 4-Clause License. Please see LICENSE
-# file in the top-level directory for more details.
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 
 # Usage: bash generate_IR2Vec_embeddings.sh <Task> <EncodingType>
@@ -18,8 +16,6 @@ if [ -z "${BUILD}" ]; then
 fi
 
 BUILD=$(realpath ${BUILD})
-
-Absolute_path_of_RepresentationFile=$(realpath ../vocabulary/seedEmbeddingVocab-300-llvm10.txt)
 
 TASK_DIR=$1
 if [ -z "${TASK_DIR}" ]; then
@@ -45,10 +41,10 @@ fi
 
 if [ $EncodingType = "SYM" ]; then
 	PASS="sym"
-	Trans_type="${TASK_DIR}_Symbolic_llvm10"
+	Trans_type="${TASK_DIR}_Symbolic_llvm17"
 elif [ $EncodingType = "FA" ]; then
 	PASS="fa"
-	Trans_type="${TASK_DIR}_FlowAware_llvm10"
+	Trans_type="${TASK_DIR}_FlowAware_llvm17"
 else
 	echo "Please enter SYM or FA for EncodingType"
 	exit
@@ -88,7 +84,7 @@ ulimit -s unlimited
 for d in ./*.ll; do
 	let "a++"
 	echo "$a      $d" >>${ALL_FILE}
-	${BUILD}/bin/ir2vec -${PASS} -vocab $Absolute_path_of_RepresentationFile -class $a -o res_$Trans_type.txt -level p $WEIGHTS $d &>/dev/null
+	${BUILD}/bin/ir2vec -${PASS} -class $a -o res_$Trans_type.txt -level p $WEIGHTS $d &>/dev/null
 done
 cd ../..
 

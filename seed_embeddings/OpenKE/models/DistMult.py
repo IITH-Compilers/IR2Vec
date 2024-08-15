@@ -6,9 +6,9 @@ from .Model import model
 
 class DistMult(model):
     r"""
-	DistMult is based on the bilinear model where each relation is represented by a diagonal rather than a full matrix.
-	DistMult enjoys the same scalable property as TransE and it achieves superior performance over TransE.
-	"""
+    DistMult is based on the bilinear model where each relation is represented by a diagonal rather than a full matrix.
+    DistMult enjoys the same scalable property as TransE and it achieves superior performance over TransE.
+    """
 
     def _calc(self, h, t, r):
         return tf.reduce_sum(input_tensor=h * r * t, axis=-1, keepdims=False)
@@ -59,7 +59,7 @@ class DistMult(model):
             + tf.nn.softplus(-neg_y * _n_score)
         )
         regul_func = tf.reduce_mean(
-            input_tensor=p_h ** 2 + p_t ** 2 + p_r ** 2 + n_h ** 2 + n_t ** 2 + n_r ** 2
+            input_tensor=p_h**2 + p_t**2 + p_r**2 + n_h**2 + n_t**2 + n_r**2
         )
         self.loss = loss_func + config.lmbda * regul_func
 

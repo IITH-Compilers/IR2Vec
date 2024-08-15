@@ -1,15 +1,19 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- Symbolic.cpp - Symbolic Encodings of IR2Vec  -------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #include "Symbolic.h"
 
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PostOrderIterator.h"
 #include "llvm/Analysis/LoopInfo.h"
+#include "llvm/Demangle/Demangle.h" //for getting function base name
 #include "llvm/IR/Type.h"
+#include "llvm/Support/CommandLine.h"
 #include "llvm/Transforms/Scalar.h"
 
 #include <algorithm> // for transform
@@ -26,7 +30,7 @@ using abi::__cxa_demangle;
 Vector IR2Vec_Symbolic::getValue(std::string key) {
   Vector vec;
   if (opcMap.find(key) == opcMap.end())
-    errs() << "cannot find key in map : " << key << "\n";
+    IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
   else
     vec = opcMap[key];
   return vec;
@@ -34,42 +38,14 @@ Vector IR2Vec_Symbolic::getValue(std::string key) {
 
 void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
   int noOfFunc = 0;
-
   for (auto &f : M) {
     if (!f.isDeclaration()) {
       SmallVector<Function *, 15> funcStack;
       auto tmp = func2Vec(f, funcStack);
       funcVecMap[&f] = tmp;
-    }
-  }
-
-  for (auto &f : M) {
-    if (!f.isDeclaration()) {
-      SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
       if (level == 'f') {
-        //  if(f.getName() == "main"){
-        auto funcName = f.getName().str();
-        std::size_t sz = 17;
-        int status;
-        char *const readable_name =
-            __cxa_demangle(funcName.c_str(), 0, &sz, &status);
-        auto demangledName =
-            status == 0 ? std::string(readable_name) : funcName;
-
-        res += M.getSourceFileName() + "__" + demangledName + "\t";
-
-        res += "=\t";
-        for (auto i : tmp) {
-          if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
-            i = 0;
-          }
-          res += std::to_string(i) + "\t";
-        }
+        res += updatedRes(tmp, &f, &M);
         res += "\n";
-
-        // }
-
         noOfFunc++;
       }
 
@@ -101,6 +77,29 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
 
   IR2VEC_DEBUG(errs() << "class = " << cls << "\n");
   IR2VEC_DEBUG(errs() << "res = " << res);
+}
+
+// for generating symbolic encodings for specific function
+void IR2Vec_Symbolic::generateSymbolicEncodingsForFunction(std::ostream *o,
+                                                           std::string name) {
+  int noOfFunc = 0;
+  for (auto &f : M) {
+    auto Result = getActualName(&f);
+    if (!f.isDeclaration() && Result == name) {
+      Vector tmp;
+      SmallVector<Function *, 15> funcStack;
+      tmp = func2Vec(f, funcStack);
+      funcVecMap[&f] = tmp;
+      if (level == 'f') {
+        res += updatedRes(tmp, &f, &M);
+        res += "\n";
+        noOfFunc++;
+      }
+    }
+  }
+
+  if (o)
+    *o << res;
 }
 
 Vector IR2Vec_Symbolic::func2Vec(Function &F,
@@ -161,7 +160,8 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     //     }
     //   } else {
     //     IR2VEC_DEBUG(I.dump());
-    //     IR2VEC_DEBUG(errs() << "==========================Function definition
+    //     IR2VEC_DEBUG(errs() << "==========================Function
+    //     definition
     //     "
     //                          "not found==================\n");
     //   }
@@ -169,8 +169,37 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     scaleVector(vec, WO);
     std::transform(instVector.begin(), instVector.end(), vec.begin(),
                    instVector.begin(), std::plus<double>());
+    auto type = I.getType();
 
-    switch (I.getType()->getTypeID()) {
+    if (type->isVoidTy()) {
+      vec = getValue("voidTy");
+    } else if (type->isFloatingPointTy()) {
+      vec = getValue("floatTy");
+    } else if (type->isIntegerTy()) {
+      vec = getValue("integerTy");
+    } else if (type->isFunctionTy()) {
+      vec = getValue("functionTy");
+    } else if (type->isStructTy()) {
+      vec = getValue("structTy");
+    } else if (type->isArrayTy()) {
+      vec = getValue("arrayTy");
+    } else if (type->isPointerTy()) {
+      vec = getValue("pointerTy");
+    } else if (type->isVectorTy()) {
+      vec = getValue("vectorTy");
+    } else if (type->isEmptyTy()) {
+      vec = getValue("emptyTy");
+    } else if (type->isLabelTy()) {
+      vec = getValue("labelTy");
+    } else if (type->isTokenTy()) {
+      vec = getValue("tokenTy");
+    } else if (type->isMetadataTy()) {
+      vec = getValue("metadataTy");
+    } else {
+      vec = getValue("unknownTy");
+    }
+
+    /*switch (I.getType()->getTypeID()) {
     case 0:
       vec = getValue("voidTy");
       break;
@@ -202,7 +231,8 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
       break;
     default:
       vec = getValue("unknownTy");
-    }
+    }*/
+
     scaleVector(vec, WT);
     std::transform(instVector.begin(), instVector.end(), vec.begin(),
                    instVector.begin(), std::plus<double>());

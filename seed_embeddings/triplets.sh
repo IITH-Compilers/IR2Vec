@@ -1,10 +1,14 @@
-# Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-# Department of Computer Science and Engineering, IIT Hyderabad
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
-# This software is available under the BSD 4-Clause License. Please see LICENSE
-# file in the top-level directory for more details.
 #
-#Usage: bash triplets.sh <build dir> <No of opt> <llFile list> <output FileName>
+#Usage: bash triplets.sh <build dir> <No of opt> <llFile alist> <output FileNme> <llvm_build>
+
+_DEBUG="off"
+function DEBUG() {
+	[ "$_DEBUG" == "on" ] && $@
+}
 
 COLLECT_BUILD=$1
 
@@ -30,19 +34,28 @@ if [ -z $4 ]; then
 	exit
 fi
 
-i=0
+LLVM_BUILD=$5
+
+if [ -z $LLVM_BUILD ]; then
+	echo "5st arg should have a valid Build path"
+	exit
+fi
+
+counter=0
 while read p; do
-	let "i++"
-	echo "collecting data from $p"
+	let "counter++"
+	DEBUG echo "collecting data from $p"
+	# print out the line count of the file
+	echo "Line count of $p is $(wc -l $p)"
 	NO_OF_OPT_FILES=$2
-	echo "NO_OF_OPT_FILES from $NO_OF_OPT_FILES"
+	DEBUG echo "NO_OF_OPT_FILES from $NO_OF_OPT_FILES"
 	OPT_LEVELS=("O0" "O1" "O2" "O3" "Os" "Oz")
 	a=0
 	USED_OPT=()
-	tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXX)
 	while [ "$a" -lt "$NO_OF_OPT_FILES" ]; do # this is loop1
+		tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXXXXXX)
 		opt_index=$((RANDOM % 6))
-		echo "opt_index from $opt_index"
+		DEBUG echo "opt_index from $opt_index"
 		opt=${OPT_LEVELS[$opt_index]}
 		optRP=0
 		for i in ${USED_OPT[@]}; do
@@ -52,16 +65,21 @@ while read p; do
 			fi
 		done
 		if [ $optRP -eq 1 ]; then
-			echo "repeat"
+			DEBUG echo "repeat"
 			continue
 		fi
 		USED_OPT[$a]=$opt
-		echo "opt from $opt"
-		opt-8 -S -$opt $p -o $tmpfile
+		DEBUG echo "opt from $opt"
+		${LLVM_BUILD}/bin/opt-14 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
+		rm "$tmpfile"
 	done &
-	rm "$tmpfile"
+	if [ $counter == 100 ]; then
+		sleep 20
+		counter=0
+	fi
+
 done <$3
 
 wait

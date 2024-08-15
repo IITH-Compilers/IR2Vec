@@ -19,9 +19,9 @@ def tf_resize(tensor, axis, size):
 
 class TransD(model):
     r"""
-	TransD constructs a dynamic mapping matrix for each entity-relation pair by considering the diversity of entities and relations simultaneously.
-	Compared with TransR/CTransR, TransD has fewer parameters and has no matrix vector multiplication.
-	"""
+    TransD constructs a dynamic mapping matrix for each entity-relation pair by considering the diversity of entities and relations simultaneously.
+    Compared with TransR/CTransR, TransD has fewer parameters and has no matrix vector multiplication.
+    """
 
     def _transfer(self, e, t, r):
         # return e + tf.reduce_sum(e * t, -1, keep_dims = True) * r

@@ -1,31 +1,25 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v4.0.1
     hooks:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
         exclude: test-suite/oracle
 -   repo: https://github.com/psf/black
-    rev: 19.3b0
+    rev: 22.3.0
     hooks:
     -   id: black
 -   repo: https://github.com/pocc/pre-commit-hooks
-    rev: python
+    rev: v1.1.1
     hooks:
         - id: clang-format
           args: [-i]
--   repo: https://github.com/dfm/black_nbconvert
-    rev: stable
-    hooks:
-        - id: black_nbconvert
--   repo: local
-    hooks:
-      - id: shfmt
-        name: shfmt
-        minimum_pre_commit_version: 2.4.0
-        language: golang
-        additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.2.0]
-        entry: shfmt
-        args: [-w]
-        types: [shell]
+# -   repo: https://github.com/dfm/black_nbconvert
+#     rev: v0.4.0
+#     hooks:
+#         - id: black_nbconvert
+- repo: https://github.com/maxwinterstein/shfmt-py
+  rev: v3.4.3.1
+  hooks:
+    - id: shfmt

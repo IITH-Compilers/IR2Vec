@@ -1,9 +1,11 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- IR2Vec.h - Top-level driver utility ----------------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #ifndef __IR2Vec__
 #define __IR2Vec__
 
@@ -19,8 +21,8 @@ using Vector = llvm::SmallVector<double, DIM>;
 enum IR2VecMode { FlowAware, Symbolic };
 
 class Embeddings {
-  int generateEncodings(llvm::Module &M, IR2VecMode mode, std::string vocab,
-                        char level = '\0', std::ostream *o = nullptr,
+  int generateEncodings(llvm::Module &M, IR2VecMode mode, char level = '\0',
+                        std::string funcName = "", std::ostream *o = nullptr,
                         int cls = -1, float WO = 1, float WA = 0.2,
                         float WT = 0.5);
 
@@ -30,16 +32,19 @@ class Embeddings {
   Vector pgmVector;
 
 public:
-  Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab, float WO = 1,
-             float WA = 0.2, float WT = 0.5) {
-    generateEncodings(M, mode, vocab, '\0', nullptr, -1, WO, WA, WT);
+  Embeddings() = default;
+  Embeddings(llvm::Module &M, IR2VecMode mode, std::string funcName = "",
+             float WO = 1, float WA = 0.2, float WT = 0.5) {
+    generateEncodings(M, mode, '\0', funcName, nullptr, -1, WO, WA, WT);
   }
 
-  // Use this constructor if the representations ought to be written to a file.
-  // Analogous to the command line options that are being used in IR2Vec binary.
-  Embeddings(llvm::Module &M, IR2VecMode mode, std::string vocab, char level,
-             std::ostream *o, float WO = 1, float WA = 0.2, float WT = 0.5) {
-    generateEncodings(M, mode, vocab, level, o, -1, WO, WA, WT);
+  // Use this constructor if the representations ought to be written to a
+  // file. Analogous to the command line options that are being used in IR2Vec
+  // binary.
+  Embeddings(llvm::Module &M, IR2VecMode mode, char level, std::ostream *o,
+             std::string funcName = "", float WO = 1, float WA = 0.2,
+             float WT = 0.5) {
+    generateEncodings(M, mode, level, funcName, o, -1, WO, WA, WT);
   }
 
   // Returns a map containing instructions and the corresponding vector
