@@ -33,13 +33,13 @@ int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
     FA.generateFlowAwareEncodingsForFunction(o, funcName);
     instVecMap = FA.getInstVecMap();
     funcVecMap = FA.getFuncVecMap();
-    bbVecMap = SYM.getBBVecMap();
+    bbVecMap = FA.getBBVecMap();
   } else if (mode == IR2Vec::IR2VecMode::FlowAware) {
     IR2Vec_FA FA(M);
     FA.generateFlowAwareEncodings(o);
     instVecMap = FA.getInstVecMap();
     funcVecMap = FA.getFuncVecMap();
-    bbVecMap = SYM.getBBVecMap();
+    bbVecMap = FA.getBBVecMap();
     pgmVector = FA.getProgramVector();
   } else if (mode == IR2Vec::IR2VecMode::Symbolic && !funcName.empty()) {
     IR2Vec_Symbolic SYM(M);
