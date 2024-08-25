@@ -37,12 +37,12 @@ Boost | https://www.boost.org/
 SPEC17 CPU | https://www.spec.org/cpu2017/
 
 ## Step 3: Training TransE to generate seed embedding vocabulary
-The [`OpenKE`](./OpenKE) directory is a modified version of OpenKE repository (https://github.com/thunlp/OpenKE/tree/OpenKE-Tensorflow1.0) with the necessary changes for training seed embedding vocabulary.
+The [`OpenKE`](./OpenKE) directory is a modified version of OpenKE repository (https://github.com/thunlp/OpenKE/tree/OpenKE-PyTorch) with the necessary changes for training seed embedding vocabulary.
 
 Please see [OpenKE/README.md](./OpenKE/README.md) for further information on OpenKE.
 
 #### Requirements
-Create `conda` environment and install the packages given in [openKE.yaml](./OpenKE/requirements.txt)
+Create `conda` environment and install the packages given in [openKE.yaml](./OpenKE/openKE.yaml)
 * `conda create -f ./OpenKE/openKE.yaml`
 * `conda activate openKE`
 
