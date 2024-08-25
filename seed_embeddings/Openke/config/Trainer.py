@@ -27,7 +27,7 @@ class Trainer(object):
                  alpha = 0.5,
                  use_gpu = False,
                  opt_method = "sgd",
-                 save_steps = 100,
+                 save_steps = None,
                  checkpoint_dir = None,):
 
         self.work_threads = 8
@@ -58,7 +58,7 @@ class Trainer(object):
         self.optimizer.step()		 
         return loss.item()
 
-    def run(self,link_prediction = False,test_dataloader = None,model = None):
+    def run(self,link_prediction = False,test_dataloader = None,model = None,ray = True):
         if self.use_gpu:
             self.model.cuda()
 
@@ -98,9 +98,31 @@ class Trainer(object):
                 loss = self.train_one_step(data)
                 res += loss
             training_range.set_description("Epoch %d | loss: %f" % (epoch, res))
-           
+            checkpoint = None
+            if ray :
+                metrics = {"loss" : res}
+                # Link Prediction
+                if link_prediction :
+                    # model here is the orginal pytorch model
+                    tester = Tester(model = model, data_loader = test_dataloader, use_gpu = False)
 
-            if self.save_steps and self.checkpoint_dir and (epoch + 1) % self.save_steps == 0:
+                    mrr,mr,hit10,hit3,hit1= tester.run_link_prediction(type_constrain = False)
+
+                    metrics.update({"mrr" : mrr,
+                            "mr" : mr,
+                            "hit10" : hit10,
+                            "hit3" : hit3,
+                            "hit1" : hit1,})
+                
+
+                with tempfile.TemporaryDirectory() as temp_checkpoint_dir:
+                    # Save the checkpoint...
+                    self.model.save_checkpoint(os.path.join(temp_checkpoint_dir,"checkpoint " + "-" + str(epoch) + ".ckpt"))
+                    checkpoint = Checkpoint.from_directory(temp_checkpoint_dir)
+
+                    train.report(metrics, checkpoint=checkpoint)
+
+            elif self.save_steps and self.checkpoint_dir and (epoch + 1) % self.save_steps == 0:
             	print("Epoch %d has finished, saving..." % (epoch))
             	self.model.save_checkpoint(os.path.join(self.checkpoint_dir + "-" + str(epoch) + ".ckpt"))
 

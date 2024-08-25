@@ -90,7 +90,7 @@ def train(arg_conf):
         # train the model
     trainer = Trainer(model = model, data_loader = train_dataloader, train_times = arg_conf.epoch, alpha = 0.001,checkpoint_dir = checkpoint_dir
     )
-    trainer.run(link_prediction = True,test_dataloader = test_dataloader,model = transe)
+    trainer.run(link_prediction = True,test_dataloader = test_dataloader,model = transe,ray = False)
     
 
     return checkpoint_dir

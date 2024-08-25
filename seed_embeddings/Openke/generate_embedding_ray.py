@@ -141,7 +141,7 @@ if __name__ == "__main__":
         default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default= 100
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default= 9000
     )
    
     parser.add_argument(
@@ -215,7 +215,7 @@ if __name__ == "__main__":
         tune_config=TuneConfig(
             max_concurrent_trials=4,
             scheduler = scheduler,
-            num_samples = 8
+            num_samples = 8,
             ),
         run_config = RunConfig( 
                 checkpoint_config=CheckpointConfig(
