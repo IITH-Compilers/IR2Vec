@@ -141,7 +141,7 @@ if __name__ == "__main__":
         default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default= 2
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default= 100
     )
    
     parser.add_argument(
