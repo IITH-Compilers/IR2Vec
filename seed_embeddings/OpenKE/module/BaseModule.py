@@ -30,9 +30,13 @@ class BaseModule(nn.Module):
         self.eval()
 
     def save_parameters(self, path):
-        f = open(path, "w")
-        f.write(json.dumps(self.get_parameters("list")))
-        f.close()
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w") as f:
+                f.write(json.dumps(self.get_parameters("list")))
+            print(f"Parameters saved successfully to {path}")
+        except Exception as e:
+            print(f"Error saving parameters: {e}")
 
     def get_parameters(self, mode="numpy", param_dict=None):
         all_param_dict = self.state_dict()

@@ -83,12 +83,23 @@ def train(arg_conf):
         batch_size=train_dataloader.get_batch_size(),
     )
 
+    outfile = os.path.join(
+        arg_conf["index_dir"],
+        "seedEmbedding_{}E_{}D_{}batches{}margin.json".format(
+            arg_conf["epoch"],
+            arg_conf["dim"],
+            arg_conf["nbatches"],
+            arg_conf["margin"],
+        ),
+    )
+    print(outfile)
     # train the model
     trainer = Trainer(
         model=model,
         data_loader=train_dataloader,
         train_times=arg_conf["epoch"],
         alpha=arg_conf["alpha"],
+        out_path=outfile,
     )
     trainer.run(link_prediction=True, test_dataloader=test_dataloader, model=transe)
 
@@ -104,6 +115,7 @@ def train(arg_conf):
     }
 
     if arg_conf["is_analogy"]:
+        findRep(outfile, seedfile, arg_conf["index_dir"])
         analogy_score = analogy.getAnalogyScore(seedfile)
         final_dict.update({"AnalogiesScore": analogy_score})
 
@@ -146,7 +158,7 @@ if __name__ == "__main__":
         default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=9000
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1
     )
 
     parser.add_argument(
@@ -219,9 +231,9 @@ if __name__ == "__main__":
         train,
         param_space=search_space,
         tune_config=TuneConfig(
-            max_concurrent_trials=4,
-            scheduler=scheduler,
-            num_samples=8,
+            # max_concurrent_trials=4,
+            # scheduler=scheduler,
+            num_samples=1,
         ),
         run_config=RunConfig(
             checkpoint_config=CheckpointConfig(

@@ -30,6 +30,7 @@ class Trainer(object):
         opt_method="sgd",
         save_steps=None,
         checkpoint_dir=None,
+        out_path=None,
     ):
 
         self.work_threads = 8
@@ -46,6 +47,7 @@ class Trainer(object):
         self.use_gpu = use_gpu
         self.save_steps = save_steps
         self.checkpoint_dir = checkpoint_dir
+        self.out_path = out_path
 
     def train_one_step(self, data):
         self.optimizer.zero_grad()
@@ -147,6 +149,11 @@ class Trainer(object):
                 self.model.save_checkpoint(
                     os.path.join(self.checkpoint_dir + "-" + str(epoch) + ".ckpt")
                 )
+
+        if self.out_path:
+            print("Inside out_path")
+            print(self.out_path)
+            self.model.save_parameters(self.out_path)
 
     def set_model(self, model):
         self.model = model
