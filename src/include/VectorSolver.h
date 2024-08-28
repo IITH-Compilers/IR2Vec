@@ -56,7 +56,6 @@ void gaussJordan(matrix a, int k, matrix &ans) {
       for (int j = 0; j < k; ++j)
         ans[i][j] = a[where[i]][m + j] / a[where[i]][i];
 
-#pragma omp parallel for
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < k; ++j) {
       double sum = 0;
