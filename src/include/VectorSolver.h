@@ -13,6 +13,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <omp.h>
 #include <vector>
 using namespace std;
 typedef std::vector<std::vector<double>> matrix;
@@ -49,11 +50,13 @@ void gaussJordan(matrix a, int k, matrix &ans) {
   }
 
   ans.assign(m, vector<double>(k, 0));
+#pragma omp parallel for
   for (int i = 0; i < m; ++i)
     if (where[i] != -1)
       for (int j = 0; j < k; ++j)
         ans[i][j] = a[where[i]][m + j] / a[where[i]][i];
 
+#pragma omp parallel for
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < k; ++j) {
       double sum = 0;
@@ -75,6 +78,7 @@ matrix solve(matrix &A, matrix &B) {
   }
 
   matrix augmented(m, std::vector<double>(m + n));
+#pragma omp parallel for
   for (int i = 0; i < m; ++i) {
     for (int j = 0; j < m; ++j) {
       augmented[i][j] = A[i][j];
@@ -85,6 +89,7 @@ matrix solve(matrix &A, matrix &B) {
   }
   gaussJordan(augmented, B[0].size(), B);
   matrix X(m, std::vector<double>(n));
+#pragma omp parallel for
   for (int i = 0; i < m; ++i) {
     for (int j = 0; j < n; ++j) {
       X[i][j] = B[i][j];
