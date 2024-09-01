@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from collections import OrderedDict
 from scipy import spatial
+import os
 
 
 def findVec(str1, src):
@@ -25,6 +26,32 @@ def findVec(str1, src):
             vec = [float(element) for element in vecstr]
             # print(vec)
             return vec
+
+
+def findVecFromDict(str1, entity_dict):
+    """
+    Finds the vector for a given entity dictionary
+    """
+    if str1.upper() in entity_dict:
+        return np.array(entity_dict[str1.upper()])
+    else:
+        print(f"{str1} not found in entity_dict")
+    return None
+
+
+def genSimilarityTableFromDict(vec, entity_dict):
+    """
+    Generates cosine and Euclidean similarity tables based on the entity embeddings dictionary.
+    """
+    cosineDict = {}
+    euclDict = {}
+
+    for opcode, value in entity_dict.items():
+        value = np.array(value)
+        cosineDict[opcode] = spatial.distance.cosine(vec, value)
+        euclDict[opcode] = spatial.distance.euclidean(vec, value)
+
+    return cosineDict, euclDict
 
 
 def genSimilarityTable(vec, src):
@@ -55,8 +82,53 @@ def findTopk(dict1, k, values):
     return {k: sortedByVal[k] for k in list(sortedByVal)[:k]}
 
 
+def getAnalogyScoreFromDict(entity_dict, index_dir):
+    """
+    Computes the analogy score directly from entity embeddings dict and analogies.txt.
+    """
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    refFile = os.path.join(script_dir, "analogies.txt")
+
+    # Read analogies
+    with open(refFile) as f:
+        analogies = [line.strip("\n") for line in f]
+
+    totalCnt = 0
+    correctCnt = 0
+    avg = []
+
+    # Iterate through the analogies
+    for analogy in analogies:
+        totalCnt += 1
+        values = analogy.split(" ")
+
+        vecA = findVecFromDict(values[0], entity_dict)
+        vecB = findVecFromDict(values[1], entity_dict)
+        vecC = findVecFromDict(values[2], entity_dict)
+
+        if vecA is None or vecB is None or vecC is None:
+            continue
+
+        vecD = vecB - vecA + vecC
+
+        cosineDict, euclDict = genSimilarityTableFromDict(vecD, entity_dict)
+        topKCosineDict = findTopk(cosineDict, 5, values)
+
+        if values[3].upper() in topKCosineDict:
+            correctCnt += 1
+            avg.append(topKCosineDict[values[3].upper()])
+
+    return correctCnt
+
+
 def getAnalogyScore(fileName):
-    refFile = "analogies.txt"
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the full path to 'analogies.txt'
+    refFile = os.path.join(script_dir, "analogies.txt")
+    # refFile = "analogies.txt"
     with open(refFile) as f:
         analogies = [line.strip("\n") for line in f]
         totalCnt = 0

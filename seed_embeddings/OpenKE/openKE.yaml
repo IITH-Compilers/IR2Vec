@@ -1,4 +1,4 @@
-name: openke
+name: openKE
 channels:
   - defaults
 dependencies:

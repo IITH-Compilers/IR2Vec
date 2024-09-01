@@ -66,8 +66,12 @@ def train(arg_conf):
     )
 
     # dataloader for test (link prediction)
-    test_dataloader = TestDataLoader(arg_conf["index_dir"], "link")
+    if arg_conf["link_pred"]:
+        test_dataloader = TestDataLoader(arg_conf["index_dir"], "link")
+    else:
+        test_dataloader = None
 
+    print("After test_dataloader")
     transe = TransE(
         ent_tot=train_dataloader.get_ent_tot(),
         rel_tot=train_dataloader.get_rel_tot(),
@@ -75,14 +79,14 @@ def train(arg_conf):
         p_norm=1,
         norm_flag=True,
     )
-
+    print("After Transe")
     # define the loss function
     model = NegativeSampling(
         model=transe,
         loss=MarginLoss(margin=arg_conf["margin"]),
         batch_size=train_dataloader.get_batch_size(),
     )
-
+    print("model")
     outfile = os.path.join(
         arg_conf["index_dir"],
         "seedEmbedding_{}E_{}D_{}batches{}margin.json".format(
@@ -92,7 +96,7 @@ def train(arg_conf):
             arg_conf["margin"],
         ),
     )
-    print(outfile)
+
     # train the model
     trainer = Trainer(
         model=model,
@@ -100,32 +104,23 @@ def train(arg_conf):
         train_times=arg_conf["epoch"],
         alpha=arg_conf["alpha"],
         out_path=outfile,
+        index_dir=arg_conf["index_dir"],
     )
-    trainer.run(link_prediction=True, test_dataloader=test_dataloader, model=transe)
-
-    seedfile = os.path.join(
-        arg_conf["index_dir"],
-        "embeddings/seedEmbedding_{}E_{}D_{}batches{}margin.txt".format(
-            arg_conf["epoch"], arg_conf["dim"], arg_conf["nbatches"], arg_conf["margin"]
-        ),
+    print("Before Trainer Run")
+    trainer.run(
+        link_prediction=arg_conf["link_pred"],
+        test_dataloader=test_dataloader,
+        model=transe,
+        is_analogy=arg_conf["is_analogy"],
     )
-
-    final_dict = {
-        "seedFile": seedfile,
-    }
-
-    if arg_conf["is_analogy"]:
-        findRep(outfile, seedfile, arg_conf["index_dir"])
-        analogy_score = analogy.getAnalogyScore(seedfile)
-        final_dict.update({"AnalogiesScore": analogy_score})
-
-    return final_dict
+    print("After Trainer Run")
 
 
 def findRep(src, dest, index_dir):
     with open(src) as fSource:
         data = json.load(fSource)
-        rep = data["ent_embeddings"]
+        print(data.keys())
+        rep = data["model.ent_embeddings.weight"]
 
     with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
         content = fEntity.read()
@@ -158,13 +153,21 @@ if __name__ == "__main__":
         default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=100
     )
 
     parser.add_argument(
         "--is_analogy",
         dest="is_analogy",
         help="Uses Analogies while training",
+        required=False,
+        type=bool,
+        default=False,
+    )
+    parser.add_argument(
+        "--link_pred",
+        dest="link_pred",
+        help="Does Link Prediction on Test Files",
         required=False,
         type=bool,
         default=False,
@@ -209,6 +212,7 @@ if __name__ == "__main__":
         "bern": tune.randint(0, 2),
         "opt_method": tune.choice(["SGD", "Adagrad", "Adam", "Adadelta"]),
         "is_analogy": arg_conf.is_analogy,
+        "link_pred": arg_conf.link_pred,
     }
 
     try:
@@ -218,46 +222,113 @@ if __name__ == "__main__":
         print("Error in files")
         raise Exception("Error in files")
 
-    scheduler = ASHAScheduler(
-        time_attr="training_iteration",
-        max_t=arg_conf.epoch,
-        grace_period=min(arg_conf.epoch, 4000),
-        reduction_factor=2,
-        metric="hit1",
-        mode="max",
-    )
-
-    tuner = tune.Tuner(
-        train,
-        param_space=search_space,
-        tune_config=TuneConfig(
-            # max_concurrent_trials=4,
-            # scheduler=scheduler,
-            num_samples=1,
-        ),
-        run_config=RunConfig(
-            checkpoint_config=CheckpointConfig(
-                num_to_keep=2,
-                # *Best* checkpoints are determined by these params:
-                # checkpoint_score_attribute="loss",
-                # checkpoint_score_order="min",)
+    if arg_conf.is_analogy:
+        scheduler = ASHAScheduler(
+            time_attr="training_iteration",
+            max_t=arg_conf.epoch,
+            grace_period=min(arg_conf.epoch, 4000),
+            reduction_factor=2,
+            metric="AnalogiesScore",
+            mode="max",
+        )
+        tuner = tune.Tuner(
+            train,
+            param_space=search_space,
+            tune_config=TuneConfig(
+                max_concurrent_trials=4,
+                scheduler=scheduler,
+                num_samples=8,
             ),
-        ),
-    )
+            run_config=RunConfig(
+                checkpoint_config=CheckpointConfig(
+                    num_to_keep=2,
+                    # *Best* checkpoints are determined by these params:
+                    # checkpoint_score_attribute="AnalogiesScore",
+                    # checkpoint_score_order="max",
+                )
+            ),
+        )
+    elif arg_conf.link_pred:
+        scheduler = ASHAScheduler(
+            time_attr="training_iteration",
+            max_t=arg_conf.epoch,
+            grace_period=min(arg_conf.epoch, 4000),
+            reduction_factor=2,
+            metric="hit1",
+            mode="max",
+        )
+        tuner = tune.Tuner(
+            train,
+            param_space=search_space,
+            tune_config=TuneConfig(
+                max_concurrent_trials=4,
+                scheduler=scheduler,
+                num_samples=1,
+            ),
+            run_config=RunConfig(
+                checkpoint_config=CheckpointConfig(
+                    num_to_keep=2,
+                    # *Best* checkpoints are determined by these params:
+                    # checkpoint_score_attribute="hit1",
+                    # checkpoint_score_order="max",
+                )
+            ),
+        )
+    else:
+        scheduler = ASHAScheduler(
+            time_attr="training_iteration",
+            max_t=arg_conf.epoch,
+            grace_period=min(arg_conf.epoch, 4000),
+            reduction_factor=2,
+            metric="loss",
+            mode="min",
+        )
+        tuner = tune.Tuner(
+            train,
+            param_space=search_space,
+            tune_config=TuneConfig(
+                max_concurrent_trials=4,
+                scheduler=scheduler,
+                num_samples=1,
+            ),
+            run_config=RunConfig(
+                checkpoint_config=CheckpointConfig(
+                    num_to_keep=2,
+                    # *Best* checkpoints are determined by these params:
+                    # checkpoint_score_attribute="loss",
+                    # checkpoint_score_order="min",
+                )
+            ),
+        )
 
-    # print(tuner.run_config)
     results = tuner.fit()
-    # print("Best config: ", results.get_best_result(metric="lose", mode="min"))
+
     # Write the best result to a file, best_result.txt
-    # with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
-    #     f.write(
-    #         "\n" + str(results.get_best_result(metric="AnalogiesScore", mode="max"))
-    #     )
 
-    # print("Best config: ", results.get_best_result(metric="AnalogiesScore", mode="max"))
+    if arg_conf.is_analogy:
+        print("inside analogy")
+        with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
+            f.write(
+                "\n" + str(results.get_best_result(metric="AnalogiesScore", mode="max"))
+            )
 
-    # for result in results:
-    #     print(result)
+        print(
+            "Best Config : ",
+            results.get_best_result(metric="AnalogiesScore", mode="max"),
+        )
+    elif arg_conf.link_pred:
+        print(
+            "Best Config Based on Hit1 : ",
+            results.get_best_result(metric="hit1", mode="max"),
+        )
+    else:
+        print(
+            "Best Config Based on Loss : ",
+            results.get_best_result(metric="loss", mode="min"),
+        )
+
+    for result in results:
+        print(result)
     del results
 
     print("Training finished...")

@@ -17,6 +17,9 @@ import tempfile
 from ray.train import Checkpoint
 import ray
 from config.Tester import Tester
+from scipy import spatial
+from collections import OrderedDict
+import analogy
 
 
 class Trainer(object):
@@ -30,12 +33,13 @@ class Trainer(object):
         opt_method="sgd",
         save_steps=None,
         checkpoint_dir=None,
+        index_dir=None,
         out_path=None,
     ):
 
         self.work_threads = 8
         self.train_times = train_times
-
+        self.index_dir = index_dir
         self.opt_method = opt_method
         self.optimizer = None
         self.lr_decay = 0
@@ -64,7 +68,37 @@ class Trainer(object):
         self.optimizer.step()
         return loss.item()
 
-    def run(self, link_prediction=False, test_dataloader=None, model=None, ray=True):
+    def getEntityDict(self, ent_embeddings, index_dir):
+        """
+        Reads the entity embeddings and returns an dictionary
+        mapping entity names to their corresponding embeddings.
+        """
+        rep = ent_embeddings
+
+        with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
+            content = fEntity.read()
+
+        entities = content.split("\n")
+        entity_dict = {}
+
+        for i in range(1, int(entities[0])):
+            entity_name = entities[i].split("\t")[0]
+            entity_dict[entity_name.upper()] = rep[i - 1].tolist()
+
+        last_entity_name = entities[int(entities[0])].split("\t")[0]
+        entity_dict[last_entity_name.upper()] = rep[int(entities[0]) - 1].tolist()
+
+        return entity_dict
+
+    def run(
+        self,
+        link_prediction=False,
+        test_dataloader=None,
+        model=None,
+        is_analogy=False,
+        ray=True,
+        freq=10,
+    ):
         if self.use_gpu:
             self.model.cuda()
 
@@ -105,7 +139,7 @@ class Trainer(object):
                 res += loss
             training_range.set_description("Epoch %d | loss: %f" % (epoch, res))
             checkpoint = None
-            if ray:
+            if ray and epoch % freq == 0:
                 metrics = {"loss": res}
                 # Link Prediction
                 if link_prediction:
@@ -115,7 +149,7 @@ class Trainer(object):
                     )
 
                     mrr, mr, hit10, hit3, hit1 = tester.run_link_prediction(
-                        type_constrain=False
+                        type_constrain=False, sample_size=200, sample_per=30
                     )
 
                     metrics.update(
@@ -127,6 +161,19 @@ class Trainer(object):
                             "hit1": hit1,
                         }
                     )
+                    print("Link Prediction Scores Completed")
+
+                if is_analogy:
+                    # self.model => Negative Sampling object
+                    # self.mode.model => Transe model
+
+                    ent_embeddings = self.model.model.ent_embeddings.weight.data.numpy()
+                    entity_dict = self.getEntityDict(ent_embeddings, self.index_dir)
+                    analogy_score = analogy.getAnalogyScoreFromDict(
+                        entity_dict, self.index_dir
+                    )
+                    metrics.update({"AnalogiesScore": analogy_score})
+                    print("Analogy Score Completed")
 
                 with tempfile.TemporaryDirectory() as temp_checkpoint_dir:
                     # Save the checkpoint...
@@ -150,6 +197,7 @@ class Trainer(object):
                     os.path.join(self.checkpoint_dir + "-" + str(epoch) + ".ckpt")
                 )
 
+        print("out_path : ", self.out_path)
         if self.out_path:
             print("Inside out_path")
             print(self.out_path)

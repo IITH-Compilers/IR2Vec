@@ -24,7 +24,7 @@ class TestDataSampler(object):
 
 
 class TestDataLoader(object):
-    def __init__(self, in_path="./", sampling_mode="link", type_constrain=True):
+    def __init__(self, in_path="./", sampling_mode="link", type_constrain=False):
         base_file = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "../release/Base.so")
         )

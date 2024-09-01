@@ -13,6 +13,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 import copy
 from tqdm import tqdm
+import random
 
 
 class Tester(object):
@@ -71,14 +72,38 @@ class Tester(object):
             }
         )
 
-    def run_link_prediction(self, type_constrain=False):
+    def random_sample(self, data_loader, sample_size):
+
+        if sample_size:
+            reservoir = []
+            for i, batch in enumerate(data_loader):
+                if i < sample_size:
+                    reservoir.append(batch)
+                else:
+                    s = int(random.random() * (i + 1))
+                    if s < sample_size:
+                        reservoir[s] = batch
+            return iter(reservoir)
+
+    def run_link_prediction(
+        self, type_constrain=False, sample_size=None, sample_per=None
+    ):
         self.lib.initTest()
         self.data_loader.set_sampling_mode("link")
         if type_constrain:
             type_constrain = 1
         else:
             type_constrain = 0
-        training_range = tqdm(self.data_loader)
+        print("Len of Test DataLoader : ", len(self.data_loader))
+
+        # Random sampling the data loader
+        if sample_size and sample_per:
+            sample_size = min(sample_size, (sample_per * len(self.data_loader)) // 100)
+
+        data_iterator = self.random_sample(self.data_loader, sample_size)
+
+        training_range = tqdm(data_iterator)
+
         for index, [data_head, data_tail] in enumerate(training_range):
             score = self.test_one_step(data_head)
             self.lib.testHead(
@@ -95,7 +120,7 @@ class Tester(object):
         hit10 = self.lib.getTestLinkHit10(type_constrain)
         hit3 = self.lib.getTestLinkHit3(type_constrain)
         hit1 = self.lib.getTestLinkHit1(type_constrain)
-        # print (hit10)
+
         return mrr, mr, hit10, hit3, hit1
 
     def get_best_threshlod(self, score, ans):

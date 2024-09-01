@@ -109,7 +109,7 @@ class TrainDataLoader(object):
         self.relTotal = self.lib.getRelationTotal()
         self.entTotal = self.lib.getEntityTotal()
         self.tripleTotal = self.lib.getTrainTotal()
-
+        print("Triple Total : ", self.tripleTotal)
         if self.batch_size == None:
             self.batch_size = self.tripleTotal // self.nbatches
         if self.nbatches == None:
@@ -117,7 +117,8 @@ class TrainDataLoader(object):
         self.batch_seq_size = self.batch_size * (
             1 + self.negative_ent + self.negative_rel
         )
-
+        print("self.batch_size : ", self.batch_size)
+        print("self.batch_seq_size : ", self.batch_seq_size)
         self.batch_h = np.zeros(self.batch_seq_size, dtype=np.int64)
         self.batch_t = np.zeros(self.batch_seq_size, dtype=np.int64)
         self.batch_r = np.zeros(self.batch_seq_size, dtype=np.int64)
@@ -126,6 +127,7 @@ class TrainDataLoader(object):
         self.batch_t_addr = self.batch_t.__array_interface__["data"][0]
         self.batch_r_addr = self.batch_r.__array_interface__["data"][0]
         self.batch_y_addr = self.batch_y.__array_interface__["data"][0]
+        print("END OF READ")
 
     def sampling(self):
         self.lib.sampling(
