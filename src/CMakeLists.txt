@@ -52,7 +52,7 @@ if(NOT LLVM_IR2VEC)
 
   add_subdirectory(test-suite)
 
-  add_custom_target(check_ir2vec_lit_tests
+  add_custom_target(check_ir2vec
     COMMAND python3 test-lit.py -a .
     COMMENT "Running LIT based test-suite"
     WORKING_DIRECTORY ./test-suite
