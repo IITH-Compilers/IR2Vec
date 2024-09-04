@@ -359,7 +359,6 @@ Vector IR2Vec_FA::func2Vec(Function &F) {
 
   ReversePostOrderTraversal<Function *> RPOT(&F);
 
-#pragma omp parallel for
   for (auto *b : RPOT) {
     for (auto &I : *b) {
       unsigned opnum;
@@ -372,8 +371,7 @@ Vector IR2Vec_FA::func2Vec(Function &F) {
         if (argI->getParent() == I.getParent())
           lists.push_back(argI);
 
-#pragma omp critical
-        { killMap[&I] = lists; }
+        killMap[&I] = lists;
       }
     }
   }
