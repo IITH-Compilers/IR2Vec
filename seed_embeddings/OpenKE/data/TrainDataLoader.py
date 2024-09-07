@@ -127,7 +127,6 @@ class TrainDataLoader(object):
         self.batch_t_addr = self.batch_t.__array_interface__["data"][0]
         self.batch_r_addr = self.batch_r.__array_interface__["data"][0]
         self.batch_y_addr = self.batch_y.__array_interface__["data"][0]
-        print("END OF READ")
 
     def sampling(self):
         self.lib.sampling(

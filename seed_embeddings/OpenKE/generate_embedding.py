@@ -55,12 +55,13 @@ def train(arg_conf):
         sampling_mode="normal",
         bern_flag=0,
         filter_flag=1,
-        neg_ent=1,
+        neg_ent=22,
         neg_rel=1,
     )
 
     # dataloader for test (link prediction)
-    test_dataloader = TestDataLoader(arg_conf.index_dir, "link")
+    test_dataloader = None
+    # test_dataloader = TestDataLoader(arg_conf.index_dir, "link")
 
     transe = TransE(
         ent_tot=train_dataloader.get_ent_tot(),
@@ -91,11 +92,16 @@ def train(arg_conf):
         model=model,
         data_loader=train_dataloader,
         train_times=arg_conf.epoch,
-        alpha=0.001,
+        alpha=0.00729,
+        opt_method="Adam",
         checkpoint_dir=checkpoint_dir,
     )
     trainer.run(
-        link_prediction=True, test_dataloader=test_dataloader, model=transe, ray=False
+        link_prediction=False,
+        test_dataloader=test_dataloader,
+        model=transe,
+        ray=False,
+        is_analogy=True,
     )
 
     return checkpoint_dir
@@ -134,7 +140,7 @@ if __name__ == "__main__":
         default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=2
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1000
     )
 
     parser.add_argument(
@@ -151,7 +157,7 @@ if __name__ == "__main__":
         help="Dimension of the embedding",
         required=False,
         type=int,
-        default=300,
+        default=500,
     )
 
     parser.add_argument(
@@ -160,7 +166,7 @@ if __name__ == "__main__":
         help="Number of batches",
         required=False,
         type=int,
-        default=100,
+        default=256,
     )
     parser.add_argument(
         "--margin",
@@ -168,7 +174,7 @@ if __name__ == "__main__":
         help="Margin",
         required=False,
         type=float,
-        default=1.0,
+        default=4.0,
     )
 
     arg_conf = parser.parse_args()
@@ -182,7 +188,7 @@ if __name__ == "__main__":
         ),
     )
 
-    # findRep(outfilejson, seedfile, arg_conf.index_dir)
+    findRep(outfilejson, seedfile, arg_conf.index_dir)
 
     print("Training finished...")
     print("seed file : ", seedfile)

@@ -2,7 +2,6 @@
 # Exceptions. See the LICENSE file for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
-
 import heapq
 import sys, re
 import numpy as np
@@ -10,6 +9,7 @@ import pandas as pd
 from collections import OrderedDict
 from scipy import spatial
 import os
+from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 
 
 def findVec(str1, src):
@@ -39,17 +39,35 @@ def findVecFromDict(str1, entity_dict):
     return None
 
 
-def genSimilarityTableFromDict(vec, entity_dict):
-    """
-    Generates cosine and Euclidean similarity tables based on the entity embeddings dictionary.
-    """
-    cosineDict = {}
-    euclDict = {}
+# def genSimilarityTableFromDict(vec, entity_dict):
+#     """
+#     Generates cosine and Euclidean similarity tables based on the entity embeddings dictionary.
+#     """
+#     cosineDict = {}
+#     euclDict = {}
 
-    for opcode, value in entity_dict.items():
-        value = np.array(value)
-        cosineDict[opcode] = spatial.distance.cosine(vec, value)
-        euclDict[opcode] = spatial.distance.euclidean(vec, value)
+#     for opcode, value in entity_dict.items():
+#         value = np.array(value)
+#         cosineDict[opcode] = spatial.distance.cosine(vec, value)
+#         # euclDict[opcode] = spatial.distance.euclidean(vec, value) # Ignored for now
+#     return cosineDict, euclDict
+def genSimilarityTableFromDict(vec, entities, entity_matrix):
+    """
+    Generates cosine table based on the entities and entity matrix.
+    """
+
+    vec = vec.reshape(1, -1)
+
+    # Compute cosine similarity between vec and all entity vectors at once
+    cosine_similarities = cosine_similarity(vec, entity_matrix)[
+        0
+    ]  # [0] to get the first row
+    # euclidean_dist = euclidean_distances(vec, entity_matrix)[0]
+
+    # Create the cosine similarity dictionary using the entity keys
+    cosineDict = dict(zip(entities, 1 - cosine_similarities))
+    # euclDict = {entities[i]: euclidean_dist[i] for i in range(len(entities))} # Keeping this empty since Euclidean part is ignored
+    euclDict = {}
 
     return cosineDict, euclDict
 
@@ -86,7 +104,6 @@ def getAnalogyScoreFromDict(entity_dict, index_dir):
     """
     Computes the analogy score directly from entity embeddings dict and analogies.txt.
     """
-
     script_dir = os.path.dirname(os.path.abspath(__file__))
     refFile = os.path.join(script_dir, "analogies.txt")
 
@@ -97,6 +114,10 @@ def getAnalogyScoreFromDict(entity_dict, index_dir):
     totalCnt = 0
     correctCnt = 0
     avg = []
+
+    # Convert the entity_dict values to a matrix for vectorized operations
+    keys = list(entity_dict.keys())
+    entity_matrix = np.array(list(entity_dict.values()))
 
     # Iterate through the analogies
     for analogy in analogies:
@@ -112,7 +133,7 @@ def getAnalogyScoreFromDict(entity_dict, index_dir):
 
         vecD = vecB - vecA + vecC
 
-        cosineDict, euclDict = genSimilarityTableFromDict(vecD, entity_dict)
+        cosineDict, euclDict = genSimilarityTableFromDict(vecD, keys, entity_matrix)
         topKCosineDict = findTopk(cosineDict, 5, values)
 
         if values[3].upper() in topKCosineDict:

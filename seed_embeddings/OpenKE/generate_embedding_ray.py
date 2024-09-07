@@ -8,6 +8,7 @@ import os
 import sys
 import json
 import argparse
+import shutil
 
 from config import Trainer, Tester
 from module.model import TransE
@@ -71,7 +72,6 @@ def train(arg_conf):
     else:
         test_dataloader = None
 
-    print("After test_dataloader")
     transe = TransE(
         ent_tot=train_dataloader.get_ent_tot(),
         rel_tot=train_dataloader.get_rel_tot(),
@@ -79,22 +79,12 @@ def train(arg_conf):
         p_norm=1,
         norm_flag=True,
     )
-    print("After Transe")
+
     # define the loss function
     model = NegativeSampling(
         model=transe,
         loss=MarginLoss(margin=arg_conf["margin"]),
         batch_size=train_dataloader.get_batch_size(),
-    )
-    print("model")
-    outfile = os.path.join(
-        arg_conf["index_dir"],
-        "seedEmbedding_{}E_{}D_{}batches{}margin.json".format(
-            arg_conf["epoch"],
-            arg_conf["dim"],
-            arg_conf["nbatches"],
-            arg_conf["margin"],
-        ),
     )
 
     # train the model
@@ -103,23 +93,22 @@ def train(arg_conf):
         data_loader=train_dataloader,
         train_times=arg_conf["epoch"],
         alpha=arg_conf["alpha"],
-        out_path=outfile,
         index_dir=arg_conf["index_dir"],
+        use_gpu=False,
     )
-    print("Before Trainer Run")
+
     trainer.run(
         link_prediction=arg_conf["link_pred"],
         test_dataloader=test_dataloader,
         model=transe,
         is_analogy=arg_conf["is_analogy"],
     )
-    print("After Trainer Run")
 
 
 def findRep(src, dest, index_dir):
     with open(src) as fSource:
         data = json.load(fSource)
-        print(data.keys())
+
         rep = data["model.ent_embeddings.weight"]
 
     with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
@@ -153,7 +142,7 @@ if __name__ == "__main__":
         default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=100
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1000
     )
 
     parser.add_argument(
@@ -237,7 +226,7 @@ if __name__ == "__main__":
             tune_config=TuneConfig(
                 max_concurrent_trials=4,
                 scheduler=scheduler,
-                num_samples=8,
+                num_samples=1,
             ),
             run_config=RunConfig(
                 checkpoint_config=CheckpointConfig(
@@ -304,28 +293,67 @@ if __name__ == "__main__":
     results = tuner.fit()
 
     # Write the best result to a file, best_result.txt
-
+    best_result = None
     if arg_conf.is_analogy:
-        print("inside analogy")
+
         with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
             f.write(
                 "\n" + str(results.get_best_result(metric="AnalogiesScore", mode="max"))
             )
 
         print(
-            "Best Config : ",
+            "Best Config Based on Analogy Score : ",
             results.get_best_result(metric="AnalogiesScore", mode="max"),
         )
+
+        best_result = results.get_best_result(metric="AnalogiesScore", mode="max")
+
     elif arg_conf.link_pred:
         print(
             "Best Config Based on Hit1 : ",
             results.get_best_result(metric="hit1", mode="max"),
         )
+        best_result = results.get_best_result(metric="hit1", mode="max")
     else:
         print(
             "Best Config Based on Loss : ",
             results.get_best_result(metric="loss", mode="min"),
         )
+        best_result = results.get_best_result(metric="loss", mode="min")
+
+    # Get the best configuration
+    best_config = best_result.config
+
+    # Extract the values for constructing the file name
+    epoch = best_config["epoch"]
+    dim = best_config["dim"]
+    nbatches = best_config["nbatches"]
+    margin = best_config["margin"]
+    index_dir = best_config["index_dir"]
+
+    # Construct the output file name using the best hyperparameters
+    outfile = os.path.join(
+        index_dir,
+        "seedEmbedding_{}E_{}D_{}batches_{}margin.ckpt".format(
+            epoch,
+            dim,
+            nbatches,
+            margin,
+        ),
+    )
+
+    best_checkpoint_path = best_result.checkpoint.path
+
+    file_name = os.listdir(best_checkpoint_path)[0]
+
+    if file_name.endswith(".ckpt"):
+        # Construct full file path
+        source_file = os.path.join(best_checkpoint_path, file_name)
+        # Copy the .ckpt file to the outfile path
+        shutil.copy(source_file, outfile)
+        print(f"Copied: {file_name} to the path {outfile}")
+    else:
+        print("No .ckpt file found in the source directory.")
 
     for result in results:
         print(result)
