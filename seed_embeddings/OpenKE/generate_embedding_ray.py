@@ -15,7 +15,7 @@ from module.model import TransE
 from module.loss import MarginLoss
 from module.strategy import NegativeSampling
 from data import TrainDataLoader, TestDataLoader
-
+import torch
 import analogy
 
 import ray
@@ -105,11 +105,17 @@ def train(arg_conf):
     )
 
 
-def findRep(src, dest, index_dir):
-    with open(src) as fSource:
-        data = json.load(fSource)
+def findRep(src, dest, index_dir, src_type="json"):
+    rep = None
+    if src_type == "json":
+        with open(src) as fSource:
+            data = json.load(fSource)
 
-        rep = data["model.ent_embeddings.weight"]
+            rep = data["model.ent_embeddings.weight"]
+    elif src_type == "ckpt":
+        checkpoint = torch.load(src)
+        # Access the entity embeddings from the model state_dict
+        rep = checkpoint["model.ent_embeddings.weight"].cpu().detach().numpy()
 
     with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
         content = fEntity.read()
@@ -148,7 +154,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--is_analogy",
         dest="is_analogy",
-        help="Uses Analogies while training",
+        help="Tests Analogies for every 10 epochs",
         required=False,
         type=bool,
         default=False,
@@ -352,6 +358,17 @@ if __name__ == "__main__":
         # Copy the .ckpt file to the outfile path
         shutil.copy(source_file, outfile)
         print(f"Copied: {file_name} to the path {outfile}")
+
+        embeddings_path = os.path.join(
+            index_dir,
+            "embeddings/seedEmbedding_{}E_{}D_{}batches{}margin.txt".format(
+                epoch,
+                dim,
+                nbatches,
+                margin,
+            ),
+        )
+        findRep(outfile, embeddings_path, index_dir, src_type="ckpt")
     else:
         print("No .ckpt file found in the source directory.")
 
