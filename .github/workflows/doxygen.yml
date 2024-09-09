@@ -33,7 +33,7 @@ jobs:
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         # Default Doxyfile build documentation to html directory.
         # Change the directory if changes in Doxyfile
         publish_dir: ./html
