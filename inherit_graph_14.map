@@ -1,0 +1,41 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,520,86,545"/>
+<area shape="rect" id="Node000001" href="$classOpenKE_1_1module_1_1BaseModule_1_1BaseModule.html" title=" " alt="" coords="134,512,326,553"/>
+<area shape="poly" id="edge3_Node000000_Node000001" title=" " alt="" coords="101,530,133,530,133,535,101,535"/>
+<area shape="rect" id="Node000002" href="$classOpenKE_1_1module_1_1loss_1_1Loss_1_1Loss.html" title=" " alt="" coords="380,112,585,137"/>
+<area shape="poly" id="edge4_Node000001_Node000002" title=" " alt="" coords="250,497,471,136,475,139,254,500"/>
+<area shape="rect" id="Node000006" href="$classOpenKE_1_1module_1_1model_1_1Model_1_1Model.html" title=" " alt="" coords="386,512,579,553"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="342,530,385,530,385,535,342,535"/>
+<area shape="rect" id="Node000018" href="$classOpenKE_1_1module_1_1strategy_1_1Strategy_1_1Strategy.html" title=" " alt="" coords="374,740,591,781"/>
+<area shape="poly" id="edge20_Node000001_Node000018" title=" " alt="" coords="267,561,460,738,457,742,263,565"/>
+<area shape="rect" id="Node000003" href="$classOpenKE_1_1module_1_1loss_1_1MarginLoss_1_1MarginLoss.html" title=" " alt="" coords="657,5,840,46"/>
+<area shape="poly" id="edge5_Node000002_Node000003" title=" " alt="" coords="526,102,638,57,675,44,677,49,640,61,528,107"/>
+<area shape="rect" id="Node000004" href="$classOpenKE_1_1module_1_1loss_1_1SigmoidLoss_1_1SigmoidLoss.html" title=" " alt="" coords="653,71,844,111"/>
+<area shape="poly" id="edge6_Node000002_Node000004" title=" " alt="" coords="601,107,652,100,653,106,601,112"/>
+<area shape="rect" id="Node000005" href="$classOpenKE_1_1module_1_1loss_1_1SoftplusLoss_1_1SoftplusLoss.html" title=" " alt="" coords="652,136,845,177"/>
+<area shape="poly" id="edge7_Node000002_Node000005" title=" " alt="" coords="601,136,652,142,651,147,600,141"/>
+<area shape="rect" id="Node000007" href="$classOpenKE_1_1module_1_1model_1_1Analogy_1_1Analogy.html" title=" " alt="" coords="646,201,851,242"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="492,496,511,442,542,377,583,310,609,280,638,253,657,240,660,245,641,257,613,283,588,313,546,379,516,444,497,498"/>
+<area shape="rect" id="Node000008" href="$classOpenKE_1_1module_1_1model_1_1ComplEx_1_1ComplEx.html" title=" " alt="" coords="652,267,845,307"/>
+<area shape="poly" id="edge10_Node000006_Node000008" title=" " alt="" coords="498,497,520,456,552,408,591,360,638,318,660,306,662,310,641,323,595,363,556,411,525,459,503,499"/>
+<area shape="rect" id="Node000009" href="$classOpenKE_1_1module_1_1model_1_1DistMult_1_1DistMult.html" title=" " alt="" coords="659,332,838,373"/>
+<area shape="poly" id="edge11_Node000006_Node000009" title=" " alt="" coords="508,498,564,439,599,408,638,382,661,371,664,376,641,387,603,413,567,443,512,502"/>
+<area shape="rect" id="Node000010" href="$classOpenKE_1_1module_1_1model_1_1HolE_1_1HolE.html" title=" " alt="" coords="641,397,856,422"/>
+<area shape="poly" id="edge12_Node000006_Node000010" title=" " alt="" coords="522,500,575,465,638,433,675,421,676,426,640,437,578,470,525,505"/>
+<area shape="rect" id="Node000011" href="$classOpenKE_1_1module_1_1model_1_1RESCAL_1_1RESCAL.html" title=" " alt="" coords="643,447,854,487"/>
+<area shape="poly" id="edge13_Node000006_Node000011" title=" " alt="" coords="582,505,662,485,663,491,584,510"/>
+<area shape="rect" id="Node000012" href="$classOpenKE_1_1module_1_1model_1_1RotatE_1_1RotatE.html" title=" " alt="" coords="655,512,842,553"/>
+<area shape="poly" id="edge14_Node000006_Node000012" title=" " alt="" coords="595,530,655,530,655,535,595,535"/>
+<area shape="rect" id="Node000013" href="$classOpenKE_1_1module_1_1model_1_1SimplE_1_1SimplE.html" title=" " alt="" coords="654,577,843,618"/>
+<area shape="poly" id="edge15_Node000006_Node000013" title=" " alt="" coords="584,554,663,574,662,579,582,560"/>
+<area shape="rect" id="Node000014" href="$classOpenKE_1_1module_1_1model_1_1TransD_1_1TransD.html" title=" " alt="" coords="654,643,843,683"/>
+<area shape="poly" id="edge16_Node000006_Node000014" title=" " alt="" coords="526,559,579,594,640,627,672,640,670,645,638,632,576,599,523,564"/>
+<area shape="rect" id="Node000015" href="$classOpenKE_1_1module_1_1model_1_1TransE_1_1TransE.html" title=" " alt="" coords="654,708,843,749"/>
+<area shape="poly" id="edge17_Node000006_Node000015" title=" " alt="" coords="509,563,565,629,601,663,641,693,665,705,663,710,638,697,597,667,561,633,505,567"/>
+<area shape="rect" id="Node000016" href="$classOpenKE_1_1module_1_1model_1_1TransH_1_1TransH.html" title=" " alt="" coords="654,773,843,814"/>
+<area shape="poly" id="edge18_Node000006_Node000016" title=" " alt="" coords="501,565,522,609,553,661,593,714,641,758,662,770,659,775,638,762,589,717,549,664,518,612,496,568"/>
+<area shape="rect" id="Node000017" href="$classOpenKE_1_1module_1_1model_1_1TransR_1_1TransR.html" title=" " alt="" coords="654,839,843,879"/>
+<area shape="poly" id="edge19_Node000006_Node000017" title=" " alt="" coords="505,565,594,727,606,756,612,780,622,802,641,824,660,836,657,840,638,828,617,805,607,782,601,758,589,729,501,567"/>
+<area shape="rect" id="Node000019" href="$classOpenKE_1_1module_1_1strategy_1_1NegativeSampling_1_1NegativeSampling.html" title=" " alt="" coords="639,904,858,945"/>
+<area shape="poly" id="edge21_Node000018_Node000019" title=" " alt="" coords="516,790,571,840,605,866,641,889,668,901,666,906,638,893,602,871,568,845,512,794"/>
+</map>

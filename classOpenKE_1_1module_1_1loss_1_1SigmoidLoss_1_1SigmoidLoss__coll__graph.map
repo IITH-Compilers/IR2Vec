@@ -1,0 +1,9 @@
+<map id="OpenKE.module.loss.SigmoidLoss.SigmoidLoss" name="OpenKE.module.loss.SigmoidLoss.SigmoidLoss">
+<area shape="rect" id="Node000001" title=" " alt="" coords="12,241,204,282"/>
+<area shape="rect" id="Node000002" href="$classOpenKE_1_1module_1_1loss_1_1Loss_1_1Loss.html" title=" " alt="" coords="5,168,211,193"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,209,111,241,105,241,105,209"/>
+<area shape="rect" id="Node000003" href="$classOpenKE_1_1module_1_1BaseModule_1_1BaseModule.html" title=" " alt="" coords="12,79,204,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,135,111,167,105,167,105,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="66,5,150,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="111,46,111,79,105,79,105,46"/>
+</map>

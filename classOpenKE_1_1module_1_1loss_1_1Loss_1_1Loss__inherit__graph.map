@@ -1,0 +1,13 @@
+<map id="OpenKE.module.loss.Loss.Loss" name="OpenKE.module.loss.Loss.Loss">
+<area shape="rect" id="Node000001" title=" " alt="" coords="377,78,582,104"/>
+<area shape="rect" id="Node000004" href="$classOpenKE_1_1module_1_1loss_1_1MarginLoss_1_1MarginLoss.html" title=" " alt="" coords="635,5,818,46"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="545,71,646,44,648,49,546,76"/>
+<area shape="rect" id="Node000005" href="$classOpenKE_1_1module_1_1loss_1_1SigmoidLoss_1_1SigmoidLoss.html" title=" " alt="" coords="631,71,822,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="598,88,630,88,630,94,598,94"/>
+<area shape="rect" id="Node000006" href="$classOpenKE_1_1module_1_1loss_1_1SoftplusLoss_1_1SoftplusLoss.html" title=" " alt="" coords="630,136,823,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="546,106,648,133,646,138,545,111"/>
+<area shape="rect" id="Node000002" href="$classOpenKE_1_1module_1_1BaseModule_1_1BaseModule.html" title=" " alt="" coords="137,71,329,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="345,88,376,88,376,94,345,94"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,78,89,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,88,136,88,136,94,104,94"/>
+</map>

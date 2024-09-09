@@ -1,0 +1,9 @@
+<map id="OpenKE.module.model.RESCAL.RESCAL" name="OpenKE.module.model.RESCAL.RESCAL">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,256,216,297"/>
+<area shape="rect" id="Node000002" href="$classOpenKE_1_1module_1_1model_1_1Model_1_1Model.html" title=" " alt="" coords="14,168,207,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,224,113,256,108,256,108,224"/>
+<area shape="rect" id="Node000003" href="$classOpenKE_1_1module_1_1BaseModule_1_1BaseModule.html" title=" " alt="" coords="14,79,207,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,135,113,167,108,167,108,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="69,5,152,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="113,46,113,79,108,79,108,46"/>
+</map>
