@@ -37,12 +37,12 @@ Boost | https://www.boost.org/
 SPEC17 CPU | https://www.spec.org/cpu2017/
 
 ## Step 3: Training TransE to generate seed embedding vocabulary
-The [`OpenKE`](./OpenKE) directory is a modified version of OpenKE repository (https://github.com/thunlp/OpenKE/tree/OpenKE-Tensorflow1.0) with the necessary changes for training seed embedding vocabulary.
+The [`OpenKE`](./OpenKE) directory is a modified version of OpenKE repository (https://github.com/thunlp/OpenKE/tree/OpenKE-PyTorch) with the necessary changes for training seed embedding vocabulary.
 
 Please see [OpenKE/README.md](./OpenKE/README.md) for further information on OpenKE.
 
 #### Requirements
-Create `conda` environment and install the packages given in [openKE.yaml](./OpenKE/requirements.txt)
+Create `conda` environment and install the packages given in [openKE.yaml](./OpenKE/openKE.yaml)
 * `conda create -f ./OpenKE/openKE.yaml`
 * `conda activate openKE`
 
@@ -52,12 +52,41 @@ We preprocess the generated triplets from the [previous step](#step-2-generating
 * `python preprocess.py --tripletFile=<tripletsFilePath>`
     * `--tripletFile` points to the location of the `outputFileName` generated in the [previous step](#step-2-generating-triplets)
     * The processed files `entity2id.txt`, `train2id.txt` and `relation2id.txt` will be generated in the same directory as that of `tripletsFilePath`.
-
 #### Training TransE to generate embeddings
 Run  `python generate_embedding_ray.py`
-* Possible arguments to be given with the file. These args have default values that will be used unless provided
-    * `--index_dir` points to the directory containing the processed files generated on preprocessing the triplets.
-    * `--nbatches` Mentions the batch size. Default size is 100.
-    * `--margin` Mentions the margin size. Default margin is 1.0
+**Possible Arguments:**
+All the arguments have default values unless provided:
+-  `--index_dir`: Specifies the directory containing the processed files generated from preprocessing the triplets.
+-  `--epoch`: Sets the number of epochs. Default is `1000`.
+-  `--is_analogy`: Boolean flag to report analogy scores, calculated every 10 epochs using analogies.txt. Default is `False`.
+-  `--link_pred`: Boolean flag to report link prediction scores. Requires testing files (`test2id.txt`,` valid2id.txt`) in the ``--index_dir`. Link prediction scores include hit@1, hit@3, hit@10, mean rank (MR), and mean reciprocal rank (MRR). Default is `False`.
+-  `--nbatches`: Specifies the batch size. Default is `100`.
+-  `--margin`: Specifies the margin size for training. Default is `1.0`.
+##### Example Command
+To train a model with analogy scoring enabled and a batch size of 200, you can run:
+```
+python generate_embedding_ray.py --index_dir "../seed_embeddings/preprocessed/" --epoch 1500 --is_analogy True --nbatches 200 --margin 1.5
+```
+##### TensorBoard Tracking
+Once training begins, you can monitor the progress using TensorBoard by running the following command:
+```
+tensorboard --logdir=~/ray_results
 
-The seed embedding vocabulary will be generated inside the same directory.
+```
+##### ASHA Scheduler for Hyperparameter Optimization
+We employ the [ASHA Scheduler](https://docs.ray.io/en/latest/tune/api/doc/ray.tune.schedulers.AsyncHyperBandScheduler.html#ray.tune.schedulers.AsyncHyperBandScheduler) to efficiently optimize hyperparameters and terminate suboptimal trials. This scheduler tracks key metrics, which are determined by the following conditions:
+
+- If `--is_analogy` is set to `True`, the AnalogyScore will be the key metric.
+- If `--link_pred` is set to `True`, the hit@1 will be the key metric.
+- If neither flag is set, the default loss will be used as the key metric.
+#### Results
+Once the training completes, the best model will be saved in the specified `index_dir` with the filename format:
+```
+seedEmbedding_{}E_{}D_{}batches_{}margin.ckpt
+
+```
+In addition, the entity embeddings will be stored in the `index_dir/embeddings` subdirectory in the following format:
+```
+embeddings/seedEmbedding_{}E_{}D_{}batches_{}margin.txt
+
+```
