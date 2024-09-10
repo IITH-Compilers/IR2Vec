@@ -131,13 +131,10 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *cyclicCount) {
 
   int noOfFunc = 0;
-#pragma omp parallel for
   for (auto &f : M) {
     if (!f.isDeclaration()) {
       auto tmp = func2Vec(f);
-
-#pragma omp critical
-      { funcVecMap[&f] = tmp; }
+      funcVecMap[&f] = tmp;
     }
   }
 

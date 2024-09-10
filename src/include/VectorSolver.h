@@ -77,7 +77,6 @@ matrix solve(matrix &A, matrix &B) {
   }
 
   matrix augmented(m, std::vector<double>(m + n));
-#pragma omp parallel for
   for (int i = 0; i < m; ++i) {
     for (int j = 0; j < m; ++j) {
       augmented[i][j] = A[i][j];
@@ -88,7 +87,6 @@ matrix solve(matrix &A, matrix &B) {
   }
   gaussJordan(augmented, B[0].size(), B);
   matrix X(m, std::vector<double>(n));
-#pragma omp parallel for
   for (int i = 0; i < m; ++i) {
     for (int j = 0; j < n; ++j) {
       X[i][j] = B[i][j];
