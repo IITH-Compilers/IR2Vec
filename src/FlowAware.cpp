@@ -818,7 +818,7 @@ void IR2Vec_FA::getReachingDefs(llvm::SmallVector<const Instruction *, 10> &RD,
 }
 
 bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand, memOpType op) {
-  auto map = nullptr;
+  llvm::SmallDenseMap<llvm::StringRef, unsigned> map;
 
   if (op == memAccessOp) {
     map = memAccessOps;
