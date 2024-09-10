@@ -819,12 +819,11 @@ void IR2Vec_FA::getReachingDefs(llvm::SmallVector<const Instruction *, 10> &RD,
 
 bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand, memOpType op) {
 
-  auto map =
-      (op == memAccessOp)
-          ? memAccessOps
-          : (op == memWriteOp)
-                ? memWriteOps
-                : throw std::invalid_argument("Invalid MemoryOperation type");
+  auto map = (op == memAccessOp)
+                 ? memAccessOps
+                 : (op == memWriteOp)
+                       ? memWriteOps
+                       : throw std::invalid_argument("Invalid Memory-Op type");
   bool isMemOperand = false;
   auto It = map.find(opcode);
   if (It != map.end()) {
