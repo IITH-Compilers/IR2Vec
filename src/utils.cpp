@@ -11,6 +11,8 @@
 #include "vocabulary.h"
 #include <fstream>
 #include <string>
+#include <unordered_map>
+
 using namespace llvm;
 using namespace IR2Vec;
 
@@ -27,7 +29,7 @@ float IR2Vec::WO;
 float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
-std::map<std::string, Vector> IR2Vec::opcMap =
+std::unordered_map<std::string, Vector> IR2Vec::opcMap =
     IR2Vec::Vocabulary::getVocabulary();
 std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   SMDiagnostic err;
@@ -39,12 +41,6 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
     exit(1);
   }
   return M;
-}
-
-void IR2Vec::scaleVector(Vector &vec, float factor) {
-  for (unsigned i = 0; i < vec.size(); i++) {
-    vec[i] = vec[i] * factor;
-  }
 }
 
 // Function to get demangled function name

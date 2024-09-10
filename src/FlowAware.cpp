@@ -30,15 +30,16 @@
 #include <algorithm> // for transform
 
 #include <functional>
+#include <iostream>
 #include <regex>
+#include <stack>
 
 using namespace llvm;
 using namespace IR2Vec;
 
 void IR2Vec_FA::getTransitiveUse(
     const Instruction *root, const Instruction *def,
-    SmallVector<const Instruction *, 100> &visitedList,
-    SmallVector<const Instruction *, 10> toAppend) {
+    SmallVector<const Instruction *, 100> &visitedList) {
   unsigned operandNum = 0;
   visitedList.push_back(def);
 
@@ -50,12 +51,12 @@ void IR2Vec_FA::getTransitiveUse(
                      def->print(outs(), true); outs() << "\n";);
         IR2VEC_DEBUG(outs() << "Use " << /* use << */ " ";
                      use->print(outs(), true); outs() << "\n";);
-        if (isMemOp(use->getOpcodeName(), operandNum, memWriteOps) &&
+        if (isMemOp(use->getOpcodeName(), operandNum, memWriteOp) &&
             use->getOperand(operandNum) == def) {
           writeDefsMap[root].push_back(use);
-        } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOps) &&
+        } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOp) &&
                    use->getOperand(operandNum) == def) {
-          getTransitiveUse(root, use, visitedList, toAppend);
+          getTransitiveUse(root, use, visitedList);
         }
       }
     }
@@ -71,8 +72,8 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
       for (auto &BB : F) {
         for (auto &I : BB) {
           unsigned operandNum = 0;
-          if ((isMemOp(I.getOpcodeName(), operandNum, memAccessOps) ||
-               isMemOp(I.getOpcodeName(), operandNum, memWriteOps) ||
+          if ((isMemOp(I.getOpcodeName(), operandNum, memAccessOp) ||
+               isMemOp(I.getOpcodeName(), operandNum, memWriteOp) ||
                strcmp(I.getOpcodeName(), "alloca") == 0) &&
               std::find(visitedList.begin(), visitedList.end(), &I) ==
                   visitedList.end()) {
@@ -95,24 +96,22 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
   }
 }
 
-Vector IR2Vec_FA::getValue(std::string key) {
-  Vector vec(DIM, 0);
-  if (opcMap.find(key) == opcMap.end()) {
+inline void IR2Vec_FA::getValue(IR2Vec::Vector &vec, std::string key) {
+  auto it = opcMap.find(key);
+  if (it == opcMap.end()) {
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
     dataMissCounter++;
   } else
-    vec = opcMap[key];
-  return vec;
+    vec = it->second;
+  return;
 }
 
 // Function to update funcVecMap of function with vectors of it's callee list
 void IR2Vec_FA::updateFuncVecMapWithCallee(const llvm::Function *function) {
   if (funcCallMap.find(function) != funcCallMap.end()) {
-
     auto calleelist = funcCallMap[function];
     Vector calleeVector(DIM, 0);
     for (auto funcs : calleelist) {
-
       auto tmp = funcVecMap[funcs];
       std::transform(tmp.begin(), tmp.end(), calleeVector.begin(),
                      calleeVector.begin(), std::plus<double>());
@@ -122,7 +121,8 @@ void IR2Vec_FA::updateFuncVecMapWithCallee(const llvm::Function *function) {
     auto tmpParent = funcVecMap[function];
     std::transform(calleeVector.begin(), calleeVector.end(), tmpParent.begin(),
                    tmpParent.begin(), std::plus<double>());
-    funcVecMap[function] = tmpParent;
+#pragma omp critical
+    { funcVecMap[function] = tmpParent; }
   }
 }
 
@@ -131,15 +131,14 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *cyclicCount) {
 
   int noOfFunc = 0;
-
   for (auto &f : M) {
     if (!f.isDeclaration()) {
-      SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
+      auto tmp = func2Vec(f);
       funcVecMap[&f] = tmp;
     }
   }
 
+#pragma omp parallel for
   for (auto funcit : funcVecMap) {
     updateFuncVecMapWithCallee(funcit.first);
   }
@@ -147,7 +146,6 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   for (auto &f : M) {
     if (!f.isDeclaration()) {
       Vector tmp;
-      SmallVector<Function *, 15> funcStack;
       tmp = funcVecMap[&f];
 
       if (level == 'f') {
@@ -156,10 +154,8 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
         noOfFunc++;
       }
 
-      // else if (level == 'p') {
       std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
                      pgmVector.begin(), std::plus<double>());
-      // }
     }
   }
 
@@ -179,37 +175,39 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
   if (o)
     *o << res;
 
-  if (missCount) {
-    std::string missEntry =
-        (M.getSourceFileName() + "\t" + std::to_string(dataMissCounter) + "\n");
-    *missCount << missEntry;
-  }
+  if (missCount)
+    *missCount << (M.getSourceFileName() + "\t" +
+                   std::to_string(dataMissCounter) + "\n");
 
   if (cyclicCount)
     *cyclicCount << (M.getSourceFileName() + "\t" +
                      std::to_string(cyclicCounter) + "\n");
 }
 
-// This function will update funcVecMap by doing DFS starting from parent
-// function
 void IR2Vec_FA::updateFuncVecMap(
     llvm::Function *function,
     llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
-  visitedFunctions.insert(function);
-  SmallVector<Function *, 15> funcStack;
-  funcStack.clear();
-  auto tmpParent = func2Vec(*function, funcStack);
-  // funcVecMap is updated with vectors returned by func2Vec
-  funcVecMap[function] = tmpParent;
-  auto calledFunctions = funcCallMap[function];
-  for (auto &calledFunction : calledFunctions) {
-    if (calledFunction && !calledFunction->isDeclaration() &&
-        visitedFunctions.count(calledFunction) == 0) {
-      // doing casting since calledFunctions is of type of const
-      // llvm::Function* and we need llvm::Function* as argument
-      auto *callee = const_cast<Function *>(calledFunction);
-      // This function is called recursively to update funcVecMap
-      updateFuncVecMap(callee, visitedFunctions);
+
+  // Stack to simulate the recursive calls
+  std::stack<llvm::Function *> stack;
+  stack.push(function);
+
+  while (!stack.empty()) {
+    auto *currentFunction = stack.top();
+    stack.pop();
+
+    visitedFunctions.insert(currentFunction);
+    auto tmpParent = func2Vec(*currentFunction);
+    funcVecMap[currentFunction] = tmpParent;
+
+    auto calledFunctions = funcCallMap[currentFunction];
+    for (auto &calledFunction : calledFunctions) {
+      if (calledFunction && !calledFunction->isDeclaration() &&
+          visitedFunctions.count(calledFunction) == 0) {
+        // Cast and push the callee to the stack
+        auto *callee = const_cast<llvm::Function *>(calledFunction);
+        stack.push(callee);
+      }
     }
   }
 }
@@ -231,6 +229,7 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
   }
   // iterating over all functions in module instead of funcVecMap to preserve
   // order
+#pragma omp parallel for
   for (auto &f : M) {
     if (funcVecMap.find(&f) != funcVecMap.end()) {
       auto *function = const_cast<const Function *>(&f);
@@ -242,7 +241,6 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
     auto Result = getActualName(&f);
     if (!f.isDeclaration() && Result == name) {
       Vector tmp;
-      SmallVector<Function *, 15> funcStack;
       tmp = funcVecMap[&f];
 
       if (level == 'f') {
@@ -282,9 +280,8 @@ void IR2Vec_FA::topoDFS(int vertex, std::vector<bool> &Visited,
   visitStack.push_back(vertex);
 }
 
-std::vector<int> IR2Vec_FA::topoOrder(int size) {
+void IR2Vec_FA::topoOrder(std::vector<int> &visitStack, int size) {
   std::vector<bool> Visited(size, false);
-  std::vector<int> visitStack;
 
   for (auto &nodes : SCCAdjList) {
     if (Visited[nodes.first] == false) {
@@ -292,29 +289,33 @@ std::vector<int> IR2Vec_FA::topoOrder(int size) {
     }
   }
 
-  return visitStack;
+  return;
 }
 
 void IR2Vec_FA::TransitiveReads(SmallVector<Instruction *, 16> &Killlist,
                                 Instruction *Inst, BasicBlock *ParentBB) {
   assert(Inst != nullptr);
-  unsigned operandNum;
-  bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOps);
+  Instruction *parentI;
+  while (true) {
+    unsigned operandNum;
+    bool isMemAccess = isMemOp(Inst->getOpcodeName(), operandNum, memAccessOp);
+    if (!isMemAccess)
+      break;
 
-  if (!isMemAccess)
-    return;
-  auto parentI = dyn_cast<Instruction>(Inst->getOperand(operandNum));
-  if (parentI == nullptr)
-    return;
-  if (ParentBB == parentI->getParent())
-    Killlist.push_back(parentI);
-  TransitiveReads(Killlist, parentI, ParentBB);
+    parentI = dyn_cast<Instruction>(Inst->getOperand(operandNum));
+    if (parentI == nullptr)
+      break;
+
+    if (ParentBB == parentI->getParent())
+      Killlist.push_back(parentI);
+
+    Inst = parentI; // Move to the next instruction (parent)
+  }
 }
 
-SmallVector<Instruction *, 16>
-IR2Vec_FA::createKilllist(Instruction *Arg, Instruction *writeInst) {
+void IR2Vec_FA::createKilllist(SmallVector<Instruction *, 16> &KillList,
+                               Instruction *Arg, Instruction *writeInst) {
 
-  SmallVector<Instruction *, 16> KillList;
   SmallVector<Instruction *, 16> tempList;
   BasicBlock *ParentBB = writeInst->getParent();
 
@@ -322,7 +323,7 @@ IR2Vec_FA::createKilllist(Instruction *Arg, Instruction *writeInst) {
 
   for (User *U : Arg->users()) {
     if (Instruction *UseInst = dyn_cast<Instruction>(U)) {
-      if (isMemOp(UseInst->getOpcodeName(), opnum, memWriteOps)) {
+      if (isMemOp(UseInst->getOpcodeName(), opnum, memWriteOp)) {
         Instruction *OpInst = dyn_cast<Instruction>(UseInst->getOperand(opnum));
         if (OpInst && OpInst == Arg)
           tempList.push_back(UseInst);
@@ -337,17 +338,14 @@ IR2Vec_FA::createKilllist(Instruction *Arg, Instruction *writeInst) {
       KillList.push_back(*I);
   }
 
-  return KillList;
+  return;
 }
 
-Vector IR2Vec_FA::func2Vec(Function &F,
-                           SmallVector<Function *, 15> &funcStack) {
+Vector IR2Vec_FA::func2Vec(Function &F) {
   auto It = funcVecMap.find(&F);
   if (It != funcVecMap.end()) {
     return It->second;
   }
-
-  funcStack.push_back(&F);
 
   instReachingDefsMap.clear();
   allSCCs.clear();
@@ -359,17 +357,17 @@ Vector IR2Vec_FA::func2Vec(Function &F,
   ReversePostOrderTraversal<Function *> RPOT(&F);
 
   for (auto *b : RPOT) {
-    unsigned opnum;
-    SmallVector<Instruction *, 16> lists;
     for (auto &I : *b) {
-      lists.clear();
-      if (isMemOp(I.getOpcodeName(), opnum, memWriteOps) &&
+      unsigned opnum;
+      SmallVector<Instruction *, 16> lists;
+      if (isMemOp(I.getOpcodeName(), opnum, memWriteOp) &&
           dyn_cast<Instruction>(I.getOperand(opnum))) {
         Instruction *argI = cast<Instruction>(I.getOperand(opnum));
-        lists = createKilllist(argI, &I);
+        createKilllist(lists, argI, &I);
         TransitiveReads(lists, argI, I.getParent());
         if (argI->getParent() == I.getParent())
           lists.push_back(argI);
+
         killMap[&I] = lists;
       }
     }
@@ -379,7 +377,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     for (auto &I : *b) {
       for (int i = 0; i < I.getNumOperands(); i++) {
         if (isa<Instruction>(I.getOperand(i))) {
-          auto RD = getReachingDefs(&I, i);
+          SmallVector<const Instruction *, 10> RD;
+          getReachingDefs(RD, &I, i);
           if (instReachingDefsMap.find(&I) == instReachingDefsMap.end()) {
             instReachingDefsMap[&I] = RD;
           } else {
@@ -480,7 +479,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
 
   std::vector<int> stack;
 
-  stack = topoOrder(allSCCs.size());
+  topoOrder(stack, allSCCs.size());
 
   for (int i = 0; i < allSCCs.size(); i++) {
     if (std::find(stack.begin(), stack.end(), i) == stack.end()) {
@@ -521,7 +520,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
   }
 
   for (auto *b : RPOT) {
-    bb2Vec(*b, funcStack);
+    bb2Vec(*b);
     Vector bbVector(DIM, 0);
     IR2VEC_DEBUG(outs() << "-------------------------------------------\n");
     for (auto &I : *b) {
@@ -546,7 +545,6 @@ Vector IR2Vec_FA::func2Vec(Function &F,
                    funcVector.begin(), std::plus<double>());
   }
 
-  funcStack.pop_back();
   funcVecMap[&F] = funcVector;
   return funcVector;
 }
@@ -706,37 +704,34 @@ bool isPotentiallyReachable(
       Worklist, const_cast<BasicBlock *>(B->getParent()), ExclusionSet, DT, LI);
 }
 
-SmallVector<const Instruction *, 10>
-IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
+void IR2Vec_FA::getReachingDefs(llvm::SmallVector<const Instruction *, 10> &RD,
+                                const Instruction *I, unsigned loc) {
   IR2VEC_DEBUG(
       outs()
       << "Call to getReachingDefs Started****************************\n");
+
   auto parent = dyn_cast<Instruction>(I->getOperand(loc));
   if (!parent)
-    return {};
-  SmallVector<const Instruction *, 10> RD;
+    return;
+
   SmallVector<const Instruction *, 10> probableRD;
   IR2VEC_DEBUG(outs() << "Inside RD for : ");
   IR2VEC_DEBUG(I->print(outs()); outs() << "\n");
 
   if (writeDefsMap[parent].empty()) {
     RD.push_back(parent);
-    return RD;
-  }
-
-  if (writeDefsMap[parent].size() >= 1) {
+    return;
+  } else if (writeDefsMap[parent].size() >= 1) {
     SmallMapVector<const BasicBlock *, SmallVector<const Instruction *, 10>, 16>
         bbInstMap;
     // Remove definitions which don't reach I
     for (auto it : writeDefsMap[parent]) {
       if (it != I && isPotentiallyReachable(it, I)) {
-
         probableRD.push_back(it);
       }
     }
     probableRD.push_back(parent);
-    IR2VEC_DEBUG(outs() << "----PROBABLE RD---"
-                        << "\n");
+    IR2VEC_DEBUG(outs() << "----PROBABLE RD---\n");
     for (auto i : probableRD) {
       IR2VEC_DEBUG(i->print(outs()); outs() << "\n");
       bbInstMap[i->getParent()].push_back(i);
@@ -773,25 +768,16 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
         IR2VEC_DEBUG(outs() << "Returning: ");
         IR2VEC_DEBUG(probableRD->print(outs()); outs() << "\n");
         RD.push_back(probableRD);
-        return RD;
+        return;
       }
     }
 
-    IR2VEC_DEBUG(outs() << "--------Across BB--------\n");
     SmallVector<const Instruction *, 10> toDelete;
-    for (auto it : bbInstMap) {
-      IR2VEC_DEBUG(outs() << "--------INSTMAP BEGIN--------\n";
-                   it.first->print(outs()); outs() << "\n");
-      bool first = true;
-      for (auto it1 : bbInstMap[it.first]) {
-        if (first) {
-          first = false;
-          continue;
-        }
-        toDelete.push_back(it1);
-        IR2VEC_DEBUG(it1->print(outs()); outs() << "\n");
+    for (auto &it : bbInstMap) {
+      auto &vec = it.second;
+      if (vec.size() > 1) { // Skip empty or single-element vectors
+        toDelete.insert(toDelete.end(), vec.begin() + 1, vec.end());
       }
-      IR2VEC_DEBUG(outs() << "--------INSTMAP END--------\n");
     }
     auto tmp = probableRD;
     probableRD = {};
@@ -824,23 +810,24 @@ IR2Vec_FA::getReachingDefs(const Instruction *I, unsigned loc) {
                      refBBInstMap[i]->print(outs()); outs() << "\n");
       }
     }
-    IR2VEC_DEBUG(
-        outs() << "****************************\n";
-        outs() << "Reaching defn for "; I->print(outs()); outs() << "\n";
-        for (auto i
-             : RD) i->print(outs());
-        outs() << "\n";
-        outs()
-        << "Call to getReachingDefs Ended****************************\n");
-    return RD;
+    return;
   }
 
   llvm_unreachable("unreachable");
-  return {};
+  return;
 }
 
-bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand,
-                        SmallDenseMap<StringRef, unsigned> map) {
+bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand, memOpType op) {
+  llvm::SmallDenseMap<llvm::StringRef, unsigned> map;
+
+  if (op == memAccessOp) {
+    map = memAccessOps;
+  } else if (op == memWriteOp) {
+    map = memWriteOps;
+  } else {
+    throw std::invalid_argument("Invalid Memory-Op type");
+  }
+
   bool isMemOperand = false;
   auto It = map.find(opcode);
   if (It != map.end()) {
@@ -864,8 +851,9 @@ void IR2Vec_FA::getPartialVec(
   }
 
   Vector instVector(DIM, 0);
+  Vector vec(DIM, 0);
   StringRef opcodeName = I.getOpcodeName();
-  auto vec = getValue(opcodeName.str());
+  getValue(vec, opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
@@ -880,31 +868,31 @@ void IR2Vec_FA::getPartialVec(
   auto type = I.getType();
 
   if (type->isVoidTy()) {
-    vec = getValue("voidTy");
+    getValue(vec, "voidTy");
   } else if (type->isFloatingPointTy()) {
-    vec = getValue("floatTy");
+    getValue(vec, "floatTy");
   } else if (type->isIntegerTy()) {
-    vec = getValue("integerTy");
+    getValue(vec, "integerTy");
   } else if (type->isFunctionTy()) {
-    vec = getValue("functionTy");
+    getValue(vec, "functionTy");
   } else if (type->isStructTy()) {
-    vec = getValue("structTy");
+    getValue(vec, "structTy");
   } else if (type->isArrayTy()) {
-    vec = getValue("arrayTy");
+    getValue(vec, "arrayTy");
   } else if (type->isPointerTy()) {
-    vec = getValue("pointerTy");
+    getValue(vec, "pointerTy");
   } else if (type->isVectorTy()) {
-    vec = getValue("vectorTy");
+    getValue(vec, "vectorTy");
   } else if (type->isEmptyTy()) {
-    vec = getValue("emptyTy");
+    getValue(vec, "emptyTy");
   } else if (type->isLabelTy()) {
-    vec = getValue("labelTy");
+    getValue(vec, "labelTy");
   } else if (type->isTokenTy()) {
-    vec = getValue("tokenTy");
+    getValue(vec, "tokenTy");
   } else if (type->isMetadataTy()) {
-    vec = getValue("metadataTy");
+    getValue(vec, "metadataTy");
   } else {
-    vec = getValue("unknownTy");
+    getValue(vec, "unknownTy");
   }
 
   scaleVector(vec, WT);
@@ -920,9 +908,9 @@ void IR2Vec_FA::getPartialVec(
 void IR2Vec_FA::solveInsts(
     llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 16>
         &partialInstValMap) {
-  std::map<unsigned, const Instruction *> xI;
-  std::map<const Instruction *, unsigned> Ix;
-  std::vector<std::vector<double>> A, B;
+  std::unordered_map<unsigned, const Instruction *> xI;
+  std::unordered_map<const Instruction *, unsigned> Ix;
+  std::vector<std::vector<double>> B;
   SmallMapVector<const Instruction *,
                  SmallMapVector<const Instruction *, double, 16>, 16>
       RDValMap;
@@ -939,7 +927,8 @@ void IR2Vec_FA::solveInsts(
       B.push_back(tmp);
       for (unsigned i = 0; i < inst->getNumOperands(); i++) {
         if (isa<Function>(inst->getOperand(i))) {
-          auto f = getValue("function");
+          Vector f(DIM, 0);
+          getValue(f, "function");
           if (isa<CallInst>(inst)) {
             auto ci = dyn_cast<CallInst>(inst);
             Function *func = ci->getCalledFunction();
@@ -964,7 +953,8 @@ void IR2Vec_FA::solveInsts(
           B.push_back(vec);
         } else if (isa<Constant>(inst->getOperand(i)) &&
                    !isa<PointerType>(inst->getOperand(i)->getType())) {
-          auto c = getValue("constant");
+          Vector c(DIM, 0);
+          getValue(c, "constant");
           auto svtmp = c;
           scaleVector(svtmp, WA);
           std::vector<double> vtmp(svtmp.begin(), svtmp.end());
@@ -977,7 +967,8 @@ void IR2Vec_FA::solveInsts(
           IR2VEC_DEBUG(outs() << vec.back() << "\n");
           B.push_back(vec);
         } else if (isa<BasicBlock>(inst->getOperand(i))) {
-          auto l = getValue("label");
+          Vector l(DIM, 0);
+          getValue(l, "label");
           auto svtmp = l;
           scaleVector(svtmp, WA);
           std::vector<double> vtmp(svtmp.begin(), svtmp.end());
@@ -991,7 +982,8 @@ void IR2Vec_FA::solveInsts(
           B.push_back(vec);
         } else {
           if (isa<Instruction>(inst->getOperand(i))) {
-            auto RD = getReachingDefs(inst, i);
+            SmallVector<const Instruction *, 10> RD;
+            getReachingDefs(RD, inst, i);
             for (auto i : RD) {
               // Check if value of RD is precomputed
               if (instVecMap.find(i) == instVecMap.end()) {
@@ -1021,7 +1013,8 @@ void IR2Vec_FA::solveInsts(
               }
             }
           } else if (isa<PointerType>(inst->getOperand(i)->getType())) {
-            auto l = getValue("pointer");
+            Vector l(DIM, 0);
+            getValue(l, "pointer");
             auto svtmp = l;
             scaleVector(svtmp, WA);
             std::vector<double> vtmp(svtmp.begin(), svtmp.end());
@@ -1034,7 +1027,8 @@ void IR2Vec_FA::solveInsts(
             IR2VEC_DEBUG(outs() << vec.back() << "\n");
             B.push_back(vec);
           } else {
-            auto l = getValue("variable");
+            Vector l(DIM, 0);
+            getValue(l, "variable");
             auto svtmp = l;
             scaleVector(svtmp, WA);
             std::vector<double> vtmp(svtmp.begin(), svtmp.end());
@@ -1052,11 +1046,10 @@ void IR2Vec_FA::solveInsts(
     }
   }
 
-  for (unsigned i = 0; i < xI.size(); i++) {
-    std::vector<double> tmp(xI.size(), 0);
-    A.push_back(tmp);
-  }
+  std::vector<std::vector<double>> A(xI.size(),
+                                     std::vector<double>(xI.size(), 0));
 
+#pragma omp parallel for
   for (unsigned i = 0; i < xI.size(); i++) {
     A[i][i] = 1;
     auto tmp = A[i];
@@ -1066,8 +1059,8 @@ void IR2Vec_FA::solveInsts(
     }
   }
 
+#pragma omp parallel for collapse(2)
   for (unsigned i = 0; i < B.size(); i++) {
-    auto Bvec = B[i];
     for (unsigned j = 0; j < B[i].size(); j++) {
       B[i][j] = (int)(B[i][j] * 10) / 10.0;
     }
@@ -1128,7 +1121,7 @@ void IR2Vec_FA::solveSingleComponent(
   instVector = partialInstValMap[&I];
 
   unsigned operandNum;
-  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOps);
+  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOp);
   bool isCyclic = false;
   Vector VecArgs(DIM, 0);
 
@@ -1138,7 +1131,7 @@ void IR2Vec_FA::solveSingleComponent(
   for (unsigned i = 0; i < I.getNumOperands() /*&& !isCyclic*/; i++) {
     Vector vecOp(DIM, 0);
     if (isa<Function>(I.getOperand(i))) {
-      vecOp = getValue("function");
+      getValue(vecOp, "function");
       if (isa<CallInst>(I)) {
         auto ci = dyn_cast<CallInst>(&I);
         Function *func = ci->getCalledFunction();
@@ -1155,17 +1148,18 @@ void IR2Vec_FA::solveSingleComponent(
     // non-numeric/alphabetic constants are also caught as pointer types
     else if (isa<Constant>(I.getOperand(i)) &&
              !isa<PointerType>(I.getOperand(i)->getType())) {
-      vecOp = getValue("constant");
+      getValue(vecOp, "constant");
     } else if (isa<BasicBlock>(I.getOperand(i))) {
-      vecOp = getValue("label");
+      getValue(vecOp, "label");
     } else {
       if (isa<Instruction>(I.getOperand(i))) {
-        auto RD = getReachingDefs(&I, i);
+        SmallVector<const Instruction *, 10> RD;
+        getReachingDefs(RD, &I, i);
         RDList.insert(RDList.end(), RD.begin(), RD.end());
       } else if (isa<PointerType>(I.getOperand(i)->getType())) {
-        vecOp = getValue("pointer");
+        getValue(vecOp, "pointer");
       } else
-        vecOp = getValue("variable");
+        getValue(vecOp, "variable");
     }
 
     std::transform(VecArgs.begin(), VecArgs.end(), vecOp.begin(),
@@ -1183,12 +1177,12 @@ void IR2Vec_FA::solveSingleComponent(
         the instVecMap but should be in the partialInstValMap*/
 
         if (partialInstValMap.find(i) == partialInstValMap.end()) {
-          assert(partialInstValMap.find(i) != partialInstValMap.end() &&
-                 "Should have been in instvecmap or partialmap");
+          throw std::runtime_error(
+              "Should have been in instvecmap or partialmap");
+        } else {
+          std::transform(instVecMap[i].begin(), instVecMap[i].end(),
+                         vecInst.begin(), vecInst.begin(), std::plus<double>());
         }
-      } else {
-        std::transform(instVecMap[i].begin(), instVecMap[i].end(),
-                       vecInst.begin(), vecInst.begin(), std::plus<double>());
       }
     }
   }
@@ -1227,9 +1221,7 @@ void IR2Vec_FA::solveSingleComponent(
   ----------------------------------------------------------------------------------
 */
 
-void IR2Vec_FA::inst2Vec(
-    const Instruction &I, SmallVector<Function *, 15> &funcStack,
-    SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
+void IR2Vec_FA::inst2Vec(const Instruction &I) {
 
   if (instVecMap.find(&I) != instVecMap.end()) {
     IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
@@ -1237,56 +1229,48 @@ void IR2Vec_FA::inst2Vec(
   }
 
   Vector instVector(DIM, 0);
+  Vector vec(DIM, 0);
   StringRef opcodeName = I.getOpcodeName();
-  auto vec = getValue(opcodeName.str());
+  getValue(vec, opcodeName.str());
   IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
-  partialInstValMap[&I] = instVector;
-
-  IR2VEC_DEBUG(outs() << "contents of partialInstValMap:\n";
-               for (auto i
-                    : partialInstValMap) {
-                 i.first->print(outs());
-                 outs() << "\n";
-               });
 
   auto type = I.getType();
 
   if (type->isVoidTy()) {
-    vec = getValue("voidTy");
+    getValue(vec, "voidTy");
   } else if (type->isFloatingPointTy()) {
-    vec = getValue("floatTy");
+    getValue(vec, "floatTy");
   } else if (type->isIntegerTy()) {
-    vec = getValue("integerTy");
+    getValue(vec, "integerTy");
   } else if (type->isFunctionTy()) {
-    vec = getValue("functionTy");
+    getValue(vec, "functionTy");
   } else if (type->isStructTy()) {
-    vec = getValue("structTy");
+    getValue(vec, "structTy");
   } else if (type->isArrayTy()) {
-    vec = getValue("arrayTy");
+    getValue(vec, "arrayTy");
   } else if (type->isPointerTy()) {
-    vec = getValue("pointerTy");
+    getValue(vec, "pointerTy");
   } else if (type->isVectorTy()) {
-    vec = getValue("vectorTy");
+    getValue(vec, "vectorTy");
   } else if (type->isEmptyTy()) {
-    vec = getValue("emptyTy");
+    getValue(vec, "emptyTy");
   } else if (type->isLabelTy()) {
-    vec = getValue("labelTy");
+    getValue(vec, "labelTy");
   } else if (type->isTokenTy()) {
-    vec = getValue("tokenTy");
+    getValue(vec, "tokenTy");
   } else if (type->isMetadataTy()) {
-    vec = getValue("metadataTy");
+    getValue(vec, "metadataTy");
   } else {
-    vec = getValue("unknownTy");
+    getValue(vec, "unknownTy");
   }
   scaleVector(vec, WT);
   std::transform(instVector.begin(), instVector.end(), vec.begin(),
                  instVector.begin(), std::plus<double>());
-  partialInstValMap[&I] = instVector;
 
   unsigned operandNum;
-  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOps);
+  bool isMemWrite = isMemOp(opcodeName, operandNum, memWriteOp);
   bool isCyclic = false;
   Vector VecArgs(DIM, 0);
 
@@ -1296,7 +1280,7 @@ void IR2Vec_FA::inst2Vec(
   for (unsigned i = 0; i < I.getNumOperands() /*&& !isCyclic*/; i++) {
     Vector vecOp(DIM, 0);
     if (isa<Function>(I.getOperand(i))) {
-      vecOp = getValue("function");
+      getValue(vecOp, "function");
       if (isa<CallInst>(I)) {
         auto ci = dyn_cast<CallInst>(&I);
         Function *func = ci->getCalledFunction();
@@ -1313,17 +1297,18 @@ void IR2Vec_FA::inst2Vec(
     // non-numeric/alphabetic constants are also caught as pointer types
     else if (isa<Constant>(I.getOperand(i)) &&
              !isa<PointerType>(I.getOperand(i)->getType())) {
-      vecOp = getValue("constant");
+      getValue(vecOp, "constant");
     } else if (isa<BasicBlock>(I.getOperand(i))) {
-      vecOp = getValue("label");
+      getValue(vecOp, "label");
     } else {
       if (isa<Instruction>(I.getOperand(i))) {
-        auto RD = getReachingDefs(&I, i);
+        SmallVector<const Instruction *, 10> RD;
+        getReachingDefs(RD, &I, i);
         RDList.insert(RDList.end(), RD.begin(), RD.end());
       } else if (isa<PointerType>(I.getOperand(i)->getType()))
-        vecOp = getValue("pointer");
+        getValue(vecOp, "pointer");
       else
-        vecOp = getValue("variable");
+        getValue(vecOp, "variable");
     }
 
     std::transform(VecArgs.begin(), VecArgs.end(), vecOp.begin(),
@@ -1335,13 +1320,10 @@ void IR2Vec_FA::inst2Vec(
   if (!RDList.empty()) {
     for (auto i : RDList) {
       // Check if value of RD is precomputed
-      if (instVecMap.find(i) == instVecMap.end()) {
-        assert(instVecMap.find(i) != instVecMap.end() &&
-               "All RDs should have been solved by Topo Order!");
-      } else {
-        std::transform(instVecMap[i].begin(), instVecMap[i].end(),
-                       vecInst.begin(), vecInst.begin(), std::plus<double>());
-      }
+      assert(instVecMap.find(i) != instVecMap.end() &&
+             "All RDs should have been solved by Topo Order!");
+      std::transform(instVecMap[i].begin(), instVecMap[i].end(),
+                     vecInst.begin(), vecInst.begin(), std::plus<double>());
     }
   }
 
@@ -1384,13 +1366,10 @@ void IR2Vec_FA::traverseRD(
     llvm::SmallVector<const llvm::Instruction *, 10> &timeStack) {
 
   auto RDit = instReachingDefsMap.find(inst);
-
   Visited[inst] = true;
 
   if (RDit != instReachingDefsMap.end()) {
-
     auto RD = RDit->second;
-
     for (auto defs : RD) {
       if (Visited.find(defs) == Visited.end())
         traverseRD(defs, Visited, timeStack);
@@ -1403,15 +1382,27 @@ void IR2Vec_FA::traverseRD(
 void IR2Vec_FA::DFSUtil(
     const llvm::Instruction *inst,
     std::unordered_map<const llvm::Instruction *, bool> &Visited,
-    llvm::SmallVector<const llvm::Instruction *, 10> &set) {
+    llvm::SmallVector<const llvm::Instruction *, 10> &nodeList) {
 
-  Visited[inst] = true;
-  auto RD = reverseReachingDefsMap[inst];
+  std::stack<const llvm::Instruction *> stack;
+  stack.push(inst);
 
-  for (auto defs : RD) {
-    if (Visited.find(defs) == Visited.end()) {
-      set.push_back(defs);
-      DFSUtil(defs, Visited, set);
+  while (!stack.empty()) {
+    auto current = stack.top();
+    stack.pop();
+
+    // Only process the node if it hasn't been visited
+    nodeList.push_back(current);
+    Visited[current] = true;
+
+    auto RD = reverseReachingDefsMap[current];
+    // Push elements onto the stack in reverse order to preserve the order
+    // of visitation that would be achieved with recursion.
+    // However, only push nodes that have not been visited
+    for (auto it = RD.rbegin(); it != RD.rend(); ++it) {
+      if (Visited.find(*it) == Visited.end()) {
+        stack.push(*it);
+      }
     }
   }
 }
@@ -1443,7 +1434,6 @@ void IR2Vec_FA::getAllSCC() {
     timeStack.pop_back();
     if (Visited.find(inst) == Visited.end()) {
       llvm::SmallVector<const llvm::Instruction *, 10> set;
-      set.push_back(inst);
       DFSUtil(inst, Visited, set);
       if (set.size() != 0)
         allSCCs.push_back(set);
@@ -1451,17 +1441,8 @@ void IR2Vec_FA::getAllSCC() {
   }
 }
 
-void IR2Vec_FA::bb2Vec(BasicBlock &B, SmallVector<Function *, 15> &funcStack) {
-  SmallMapVector<const Instruction *, Vector, 16> partialInstValMap;
-
+void IR2Vec_FA::bb2Vec(BasicBlock &B) {
   for (auto &I : B) {
-
-    partialInstValMap[&I] = {};
-    IR2VEC_DEBUG(outs() << "XX------------ Call from bb2vec function "
-                           "Started---------------------XX\n");
-    inst2Vec(I, funcStack, partialInstValMap);
-    IR2VEC_DEBUG(outs() << "YY------------Call from bb2vec function "
-                           "Ended---------------------YY\n");
-    partialInstValMap.erase(&I);
+    inst2Vec(I);
   }
 }

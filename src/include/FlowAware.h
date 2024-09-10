@@ -33,8 +33,12 @@ private:
   unsigned cyclicCounter;
 
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
-  llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memAccessOps;
+  enum memOpType {
+    memAccessOp, // Enum field for memory access operations
+    memWriteOp   // Enum field for memory write operations
+  };
+  llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
@@ -70,14 +74,14 @@ private:
 
   void getAllSCC();
 
-  IR2Vec::Vector getValue(std::string key);
+  inline void getValue(IR2Vec::Vector &vec, std::string key);
   void collectWriteDefsMap(llvm::Module &M);
   void getTransitiveUse(
       const llvm::Instruction *root, const llvm::Instruction *def,
-      llvm::SmallVector<const llvm::Instruction *, 100> &visitedList,
-      llvm::SmallVector<const llvm::Instruction *, 10> toAppend = {});
-  llvm::SmallVector<const llvm::Instruction *, 10>
-  getReachingDefs(const llvm::Instruction *, unsigned i);
+      llvm::SmallVector<const llvm::Instruction *, 100> &visitedList);
+
+  void getReachingDefs(llvm::SmallVector<const llvm::Instruction *, 10> &RD,
+                       const llvm::Instruction *, unsigned i);
 
   void solveSingleComponent(
       const llvm::Instruction &I,
@@ -89,15 +93,12 @@ private:
 
   void solveInsts(llvm::SmallMapVector<const llvm::Instruction *,
                                        IR2Vec::Vector, 16> &instValMap);
-  std::vector<int> topoOrder(int size);
+  void topoOrder(std::vector<int> &visitStack, int size);
 
   void topoDFS(int vertex, std::vector<bool> &Visited,
                std::vector<int> &visitStack);
 
-  void inst2Vec(const llvm::Instruction &I,
-                llvm::SmallVector<llvm::Function *, 15> &funcStack,
-                llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector,
-                                     16> &instValMap);
+  void inst2Vec(const llvm::Instruction &I);
   void traverseRD(const llvm::Instruction *inst,
                   std::unordered_map<const llvm::Instruction *, bool> &Visited,
                   llvm::SmallVector<const llvm::Instruction *, 10> &timeStack);
@@ -106,19 +107,16 @@ private:
                std::unordered_map<const llvm::Instruction *, bool> &Visited,
                llvm::SmallVector<const llvm::Instruction *, 10> &set);
 
-  void bb2Vec(llvm::BasicBlock &B,
-              llvm::SmallVector<llvm::Function *, 15> &funcStack);
-  IR2Vec::Vector func2Vec(llvm::Function &F,
-                          llvm::SmallVector<llvm::Function *, 15> &funcStack);
+  void bb2Vec(llvm::BasicBlock &B);
+  IR2Vec::Vector func2Vec(llvm::Function &F);
 
-  bool isMemOp(llvm::StringRef opcode, unsigned &operand,
-               llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
-  std::string splitAndPipeFunctionName(std::string s);
+  bool isMemOp(llvm::StringRef opcode, unsigned &operand, memOpType op);
 
   void TransitiveReads(llvm::SmallVector<llvm::Instruction *, 16> &Killlist,
                        llvm::Instruction *Inst, llvm::BasicBlock *ParentBB);
-  llvm::SmallVector<llvm::Instruction *, 16>
-  createKilllist(llvm::Instruction *Arg, llvm::Instruction *writeInst);
+
+  void createKilllist(llvm::SmallVector<llvm::Instruction *, 16> &KillList,
+                      llvm::Instruction *Arg, llvm::Instruction *writeInst);
 
   // For Debugging
   void print(IR2Vec::Vector t, unsigned pos) { llvm::outs() << t[pos]; }
@@ -135,21 +133,27 @@ public:
     pgmVector = IR2Vec::Vector(DIM, 0);
     res = "";
 
-    memWriteOps.try_emplace("store", 1);
-    memWriteOps.try_emplace("cmpxchg", 0);
-    memWriteOps.try_emplace("atomicrmw", 0);
+    auto memWritePairs = {std::make_pair("store", 1),
+                          std::make_pair("cmpxchg", 0),
+                          std::make_pair("atomicrmw", 0)};
 
-    memAccessOps.try_emplace("getelementptr", 0);
-    memAccessOps.try_emplace("load", 0);
+    // Insert the pairs using insert with a range
+    memWriteOps.insert(memWritePairs.begin(), memWritePairs.end());
+
+    auto memAccessPairs = {std::make_pair("getelementptr", 0),
+                           std::make_pair("load", 0)};
+
+    memAccessOps.insert(memAccessPairs.begin(), memAccessPairs.end());
 
     dataMissCounter = 0;
     cyclicCounter = 0;
 
     collectWriteDefsMap(M);
 
-    llvm::CallGraph cg = llvm::CallGraph(M);
+    llvm::CallGraph callGraph = llvm::CallGraph(M);
 
-    for (auto callItr = cg.begin(); callItr != cg.end(); callItr++) {
+    for (auto callItr = callGraph.begin(); callItr != callGraph.end();
+         callItr++) {
       if (callItr->first && !callItr->first->isDeclaration()) {
         auto ParentFunc = callItr->first;
         llvm::CallGraphNode *cgn = callItr->second.get();
