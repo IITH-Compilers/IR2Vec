@@ -65,7 +65,6 @@ def train(arg_conf):
         neg_ent=arg_conf["neg_ent"],
         neg_rel=arg_conf["neg_rel"],
     )
-
     # dataloader for test (link prediction)
     if arg_conf["link_pred"]:
         test_dataloader = TestDataLoader(arg_conf["index_dir"], "link")
@@ -79,14 +78,12 @@ def train(arg_conf):
         p_norm=1,
         norm_flag=True,
     )
-
     # define the loss function
     model = NegativeSampling(
         model=transe,
         loss=MarginLoss(margin=arg_conf["margin"]),
         batch_size=train_dataloader.get_batch_size(),
     )
-
     # train the model
     trainer = Trainer(
         model=model,
@@ -94,9 +91,8 @@ def train(arg_conf):
         train_times=arg_conf["epoch"],
         alpha=arg_conf["alpha"],
         index_dir=arg_conf["index_dir"],
-        use_gpu=False,
+        use_gpu=arg_conf["use_gpu"],
     )
-
     trainer.run(
         link_prediction=arg_conf["link_pred"],
         test_dataloader=test_dataloader,
@@ -137,7 +133,6 @@ def findRep(src, dest, index_dir, src_type="json"):
 if __name__ == "__main__":
 
     ray.init()
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--index_dir",
@@ -148,7 +143,7 @@ if __name__ == "__main__":
         default="../seed_embeddings/preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1000
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=10
     )
 
     parser.add_argument(
@@ -192,7 +187,14 @@ if __name__ == "__main__":
         type=float,
         default=1.0,
     )
-
+    parser.add_argument(
+        "--use_gpu",
+        dest="use_gpu",
+        help="To use GPU for computation",
+        required=False,
+        type=bool,
+        default=False,
+    )
     arg_conf = parser.parse_args()
 
     search_space = {
@@ -208,6 +210,7 @@ if __name__ == "__main__":
         "opt_method": tune.choice(["SGD", "Adagrad", "Adam", "Adadelta"]),
         "is_analogy": arg_conf.is_analogy,
         "link_pred": arg_conf.link_pred,
+        "use_gpu": arg_conf.use_gpu,
     }
 
     try:
@@ -226,23 +229,6 @@ if __name__ == "__main__":
             metric="AnalogiesScore",
             mode="max",
         )
-        tuner = tune.Tuner(
-            train,
-            param_space=search_space,
-            tune_config=TuneConfig(
-                max_concurrent_trials=4,
-                scheduler=scheduler,
-                num_samples=1,
-            ),
-            run_config=RunConfig(
-                checkpoint_config=CheckpointConfig(
-                    num_to_keep=2,
-                    # *Best* checkpoints are determined by these params:
-                    # checkpoint_score_attribute="AnalogiesScore",
-                    # checkpoint_score_order="max",
-                )
-            ),
-        )
     elif arg_conf.link_pred:
         scheduler = ASHAScheduler(
             time_attr="training_iteration",
@@ -252,23 +238,7 @@ if __name__ == "__main__":
             metric="hit1",
             mode="max",
         )
-        tuner = tune.Tuner(
-            train,
-            param_space=search_space,
-            tune_config=TuneConfig(
-                max_concurrent_trials=4,
-                scheduler=scheduler,
-                num_samples=1,
-            ),
-            run_config=RunConfig(
-                checkpoint_config=CheckpointConfig(
-                    num_to_keep=2,
-                    # *Best* checkpoints are determined by these params:
-                    # checkpoint_score_attribute="hit1",
-                    # checkpoint_score_order="max",
-                )
-            ),
-        )
+
     else:
         scheduler = ASHAScheduler(
             time_attr="training_iteration",
@@ -278,24 +248,32 @@ if __name__ == "__main__":
             metric="loss",
             mode="min",
         )
-        tuner = tune.Tuner(
-            train,
-            param_space=search_space,
-            tune_config=TuneConfig(
-                max_concurrent_trials=4,
-                scheduler=scheduler,
-                num_samples=1,
-            ),
-            run_config=RunConfig(
-                checkpoint_config=CheckpointConfig(
-                    num_to_keep=2,
-                    # *Best* checkpoints are determined by these params:
-                    # checkpoint_score_attribute="loss",
-                    # checkpoint_score_order="min",
-                )
-            ),
+    if arg_conf.use_gpu:
+        train_with_resources = tune.with_resources(
+            train, resources={"cpu": 0, "gpu": 1}
+        )
+    else:
+        train_with_resources = tune.with_resources(
+            train, resources={"cpu": 10, "gpu": 0}
         )
 
+    tuner = tune.Tuner(
+        train_with_resources,
+        param_space=search_space,
+        tune_config=TuneConfig(
+            # max_concurrent_trials=4,
+            scheduler=scheduler,
+            num_samples=1,
+        ),
+        run_config=RunConfig(
+            checkpoint_config=CheckpointConfig(
+                num_to_keep=2,
+                # *Best* checkpoints are determined by these params:
+                # checkpoint_score_attribute="AnalogiesScore",
+                # checkpoint_score_order="max",
+            )
+        ),
+    )
     results = tuner.fit()
 
     # Write the best result to a file, best_result.txt
@@ -357,7 +335,7 @@ if __name__ == "__main__":
         source_file = os.path.join(best_checkpoint_path, file_name)
         # Copy the .ckpt file to the outfile path
         shutil.copy(source_file, outfile)
-        print(f"Copied: {file_name} to the path {outfile}")
+        # print(f"Copied: {file_name} to the path {outfile}")
 
         embeddings_path = os.path.join(
             index_dir,

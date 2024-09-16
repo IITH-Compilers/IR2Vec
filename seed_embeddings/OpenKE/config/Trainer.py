@@ -167,7 +167,9 @@ class Trainer(object):
                     # self.model => Negative Sampling object
                     # self.mode.model => Transe model
 
-                    ent_embeddings = self.model.model.ent_embeddings.weight.data.numpy()
+                    ent_embeddings = (
+                        self.model.model.ent_embeddings.weight.data.cpu().numpy()
+                    )
                     entity_dict = self.getEntityDict(ent_embeddings, self.index_dir)
                     analogy_score = analogy.getAnalogyScoreFromDict(
                         entity_dict, self.index_dir
