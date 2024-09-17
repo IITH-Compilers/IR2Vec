@@ -42,9 +42,17 @@ The [`OpenKE`](./OpenKE) directory is a modified version of OpenKE repository (h
 Please see [OpenKE/README.md](./OpenKE/README.md) for further information on OpenKE.
 
 #### Requirements
-Create `conda` environment and install the packages given in [openKE.yaml](./OpenKE/openKE.yaml)
-* `conda create -f ./OpenKE/openKE.yaml`
-* `conda activate openKE`
+You will need to set up a Conda environment with dependencies. There are separate environments for CPU and GPU configurations in [openKE.yaml](./OpenKE/openKE.yaml) and [openKE_gpu.yaml](./OpenKE/openKE-gpu.yaml) respectively:
+* For CPU:
+```bash
+conda env create -f ./OpenKE/openKE.yaml
+conda activate openKE
+```
+* For GPU:
+```bash
+conda env create -f ./OpenKE/openKE_gpu.yaml
+conda activate openKE-gpu
+```
 
 #### Preprocessing the triplets
 We preprocess the generated triplets from the [previous step](#step-2-generating-triplets) in a form suitable for training TransE.
@@ -62,10 +70,11 @@ All the arguments have default values unless provided:
 -  `--link_pred`: Boolean flag to report link prediction scores. Requires testing files (`test2id.txt`,` valid2id.txt`) in the ``--index_dir`. Link prediction scores include hit@1, hit@3, hit@10, mean rank (MR), and mean reciprocal rank (MRR). Default is `False`.
 -  `--nbatches`: Specifies the batch size. Default is `100`.
 -  `--margin`: Specifies the margin size for training. Default is `1.0`.
+- `--use_gpu` : Use GPUs for training. Default `False`.
 ##### Example Command
 To train a model with analogy scoring enabled and a batch size of 200, you can run:
 ```
-python generate_embedding_ray.py --index_dir "../seed_embeddings/preprocessed/" --epoch 1500 --is_analogy True --nbatches 200 --margin 1.5
+python generate_embedding_ray.py --index_dir "../seed_embeddings/preprocessed/" --epoch 1500 --is_analogy True --nbatches 200 --margin 1.5 --use_gpu False
 ```
 ##### TensorBoard Tracking
 Once training begins, you can monitor the progress using TensorBoard by running the following command:
