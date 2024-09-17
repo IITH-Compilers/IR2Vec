@@ -27,18 +27,48 @@ float IR2Vec::WO;
 float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
+bool IR2Vec::cpp_input;
+
+static std::string temp_ll_file = "/tmp/temp_ir.ll";
+
 std::map<std::string, Vector> IR2Vec::opcMap =
     IR2Vec::Vocabulary::getVocabulary();
-std::unique_ptr<Module> IR2Vec::getLLVMIR() {
+
+std::string generateTempFileName(const std::string &cppFile) {
+  std::string baseName =
+      cppFile.substr(cppFile.find_last_of('/'), cppFile.find_last_of('.'));
+  return "/tmp/" + baseName + ".ll";
+}
+
+std::unique_ptr<Module> IR2Vec::readIR() {
+  std::string filename = cpp_input ? generateTempFileName(iname) : iname;
   SMDiagnostic err;
   static LLVMContext context;
-  auto M = parseIRFile(iname, err, context);
+  auto M = parseIRFile(filename, err, context);
 
   if (!M) {
-    err.print(iname.c_str(), outs());
+    err.print(filename.c_str(), outs());
     exit(1);
   }
+
   return M;
+}
+
+std::unique_ptr<llvm::Module> IR2Vec::readCPP() {
+  std::string command = "clang++-17 -S -emit-llvm " + iname + " -o " +
+                        generateTempFileName(iname);
+  int result = std::system(command.c_str());
+
+  if (result != 0) {
+    errs() << "Error compiling the C++ file.\n";
+    exit(1);
+  }
+
+  return readIR();
+}
+
+std::unique_ptr<Module> IR2Vec::getLLVMIR() {
+  return cpp_input ? readCPP() : readIR();
 }
 
 void IR2Vec::scaleVector(Vector &vec, float factor) {

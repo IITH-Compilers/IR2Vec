@@ -38,6 +38,10 @@ cl::opt<bool> cl_collectIR(
 cl::opt<std::string> cl_iname(cl::Positional, cl::desc("Input file path"),
                               cl::Required, cl::cat(category));
 
+cl::opt<bool> cl_cpp("cpp", cl::Optional,
+                     cl::desc("Input file is a .cpp file?"), cl::init(false),
+                     cl::cat(category));
+
 cl::opt<std::string> cl_oname("o", cl::Required, cl::desc("Output file path"),
                               cl::cat(category));
 // for on demand generation of embeddings taking function name
@@ -183,6 +187,7 @@ void setGlobalVars(int argc, char **argv) {
   WT = cl_WT;
   debug = cl_debug;
   printTime = cl_printTime;
+  cpp_input = cl_cpp;
 }
 
 void checkFailureConditions() {

@@ -46,8 +46,11 @@ extern float WO;
 extern float WA;
 extern float WT;
 extern bool debug;
+extern bool cpp_input;
 extern std::map<std::string, Vector> opcMap;
 std::unique_ptr<llvm::Module> getLLVMIR();
+std::unique_ptr<llvm::Module> readCPP();
+std::unique_ptr<llvm::Module> readIR();
 void scaleVector(Vector &vec, float factor);
 // newly added
 std::string getDemagledName(const llvm::Function *function);
