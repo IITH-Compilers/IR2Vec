@@ -12,7 +12,6 @@
 #include "Symbolic.h"
 #include "version.h"
 #include "llvm/Support/CommandLine.h"
-#include <omp.h>
 #include <stdio.h>
 #include <time.h>
 
