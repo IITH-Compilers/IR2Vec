@@ -3,5 +3,5 @@
 source sanity_check.sh
 
 perform_program_vector_comparison
-perform_vector_comparison "f" "f"
-perform_vector_comparison "f" "onDemand"
+perform_function_vector_comparison "f" "f"
+perform_function_vector_comparison "f" "onDemand"
