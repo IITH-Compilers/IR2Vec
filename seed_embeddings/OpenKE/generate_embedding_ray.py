@@ -230,6 +230,7 @@ if __name__ == "__main__":
             metric="AnalogiesScore",
             mode="max",
         )
+        optuna = OptunaSearch(metric="AnalogiesScore", mode="max")
     elif arg_conf.link_pred:
         scheduler = ASHAScheduler(
             time_attr="training_iteration",
@@ -239,6 +240,7 @@ if __name__ == "__main__":
             metric="hit1",
             mode="max",
         )
+        optuna = OptunaSearch(metric="hit1", mode="max")
     else:
         scheduler = ASHAScheduler(
             time_attr="training_iteration",
@@ -248,6 +250,7 @@ if __name__ == "__main__":
             metric="loss",
             mode="min",
         )
+        optuna = OptunaSearch(metric="loss", mode="min")
     if arg_conf.use_gpu:
         train_with_resources = tune.with_resources(
             train, resources={"cpu": 0, "gpu": 0.0625}
@@ -261,7 +264,7 @@ if __name__ == "__main__":
         train_with_resources,
         param_space=search_space,
         tune_config=TuneConfig(
-            search_alg=OptunaSearch(metric="loss", mode="min"),
+            search_alg=optuna,
             max_concurrent_trials=16,
             scheduler=scheduler,
             num_samples=512,
