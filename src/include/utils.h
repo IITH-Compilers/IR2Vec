@@ -13,12 +13,30 @@
 #include "llvm/Demangle/Demangle.h" //for getting function base name
 #include "llvm/IR/Module.h"
 #include "llvm/IRReader/IRReader.h"
+#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/Support/Host.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/Path.h>
+#include <llvm/Support/TargetSelect.h>
+
+#include <clang/CodeGen/CodeGenAction.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Frontend/FrontendActions.h>
+#include <clang/Tooling/Tooling.h>
+
+#include <clang/ASTMatchers/ASTMatchers.h>
+#include <clang/Rewrite/Core/Rewriter.h>
 
 #include <cxxabi.h>
-
+#include <fstream>
+#include <iostream>
 #include <map>
+#include <memory>
 
 namespace IR2Vec {
 
@@ -48,8 +66,9 @@ extern float WT;
 extern bool debug;
 extern bool cpp_input;
 extern std::map<std::string, Vector> opcMap;
+// std::unique_ptr<llvm::Module> readCPPtoIR(const std::string &fileName);
 std::unique_ptr<llvm::Module> getLLVMIR();
-std::unique_ptr<llvm::Module> readCPP();
+// std::unique_ptr<llvm::Module> readCPP();
 std::unique_ptr<llvm::Module> readIR();
 void scaleVector(Vector &vec, float factor);
 // newly added

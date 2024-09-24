@@ -11,9 +11,20 @@
 #include "FlowAware.h"
 #include "Symbolic.h"
 #include "version.h"
-#include "llvm/Support/CommandLine.h"
 #include <stdio.h>
 #include <time.h>
+
+#include "llvm/Support/CommandLine.h"
+#include <llvm/Analysis/MemoryDependenceAnalysis.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/Module.h>
+#include <llvm/Passes/PassBuilder.h>
+#include <llvm/Support/raw_ostream.h>
+
+#include <llvm/Analysis/AliasAnalysis.h>
+#include <llvm/Analysis/BasicAliasAnalysis.h> // For BasicAA
 
 using namespace llvm;
 using namespace IR2Vec;
@@ -218,6 +229,123 @@ void checkFailureConditions() {
     exit(1);
 }
 
+// void analyzeMemoryDependence(Function &F) {
+//   std::cout << "Analyzing memory dependency" << std::endl;
+//   // Create an AnalysisManager for MemoryDependenceAnalysis
+//   auto FAM = FunctionAnalysisManager();
+//   auto MDA = MemoryDependenceAnalysis();
+
+//   std::cout << "TESTING FOR MEMDEPRESULTS :: FUNCTION" << std::endl;
+
+//   // Create a MemoryDependenceAnalysis pass
+//   MemoryDependenceResults MDR = MDA.run(F, FAM);
+
+//   std::cout << "TESTING FOR MEMDEPRESULTS :: MDR ready" << std::endl;
+//   std::cout << "getDefaultBlockScanLimit() "  <<
+//   MDR.getDefaultBlockScanLimit() << std::endl;
+
+// Iterate over each basic block and instruction
+// for (BasicBlock &BB : F) {
+//   std::cout << "TESTING FOR MEMDEPRESULTS :: BASIC BLOCK" << std::endl;
+//   for (Instruction &I : BB) {
+//     std::cout << "TESTING FOR MEMDEPRESULTS" << std::endl;
+//     // Get the memory dependence information for the instruction
+//     MemDepResult memdep = MDA.getDependency(&I);
+
+//     if(!memdep.getInst()) {
+//       std::cout << "No memory dependence found for " << I.getOpcodeName() <<
+//       std::endl; continue;
+//     }
+
+//     // Check if the instruction has a memory dependence
+//     if (memdep.isDef()) {
+//       std::cout << "Memory Dependence found for " << I.getOpcodeName() << "ON
+//       " << memdep.getInst()->getOpcodeName() << std::endl;
+//     } else if (memdep.isClobber()) {
+//       std::cout << "Memory Clobber found for " << I.getOpcodeName() << "ON "
+//       << memdep.getInst()->getOpcodeName() << std::endl;
+//     } else if (memdep.isUnknown()) {
+//       std::cout << "Unknown memory dependence for " << I.getOpcodeName() <<
+//       std::endl;
+//     }
+//   }
+// }
+// }
+
+void checkModuleFunctions(llvm::Module &M) {
+
+  // std::cout << "MDA: Module loaded successfully " << (M.getName()).data() <<
+  // std::endl;
+
+  // std::cout << "Instruction Count " << M.getInstructionCount() << std::endl;
+
+  int count = 0;
+
+  PassBuilder PB;
+  FunctionAnalysisManager FAM;
+
+  // We need to initialize the other pass managers even if we don't directly use
+  // them
+  LoopAnalysisManager LAM;
+  CGSCCAnalysisManager CGAM;
+  ModuleAnalysisManager MAM;
+
+  // Register all the passes with the PassBuilder
+  PB.registerModuleAnalyses(MAM);
+  PB.registerCGSCCAnalyses(CGAM);
+  PB.registerLoopAnalyses(LAM);
+  PB.registerFunctionAnalyses(FAM);
+
+  PB.crossRegisterProxies(LAM, FAM, CGAM, MAM);
+
+  // Register required alias analyses and memory dependence analysis
+  FAM.registerPass([] { return MemoryDependenceAnalysis(); });
+  FAM.registerPass([] { return BasicAA(); }); // Basic Alias Analysis
+
+  for (auto &F : M) {
+    count += 1;
+    if (!F.isDeclaration()) {
+      // std::cout << "ENTERING FOR MEMDEPRESULTS" << std::endl;
+      auto &MDR = FAM.getResult<llvm::MemoryDependenceAnalysis>(F);
+
+      // std::cout << "TESTING FOR MEMDEPRESULTS :: MDR ready" << std::endl;
+      // std::cout << "getDefaultBlockScanLimit() "  <<
+      // MDR.getDefaultBlockScanLimit() << std::endl;
+
+      for (BasicBlock &BB : F) {
+        // std::cout << "TESTING FOR MEMDEPRESULTS :: BASIC BLOCK" << std::endl;
+        for (Instruction &I : BB) {
+          // std::cout << "TESTING FOR MEMDEPRESULTS" << std::endl;
+          // Get the memory dependence information for the instruction
+          MemDepResult memdep = MDR.getDependency(&I);
+
+          if (!memdep.getInst()) {
+            // std::cout << "No memory dependence found for " <<
+            // I.getOpcodeName() << std::endl;
+            continue;
+          } else {
+            std::cout << "Found Dependency - " << I.getOpcodeName() << " ON "
+                      << memdep.getInst()->getOpcodeName() << std::endl;
+          }
+        }
+      }
+    }
+  }
+  // std::cout << "Total functions: " << count << std::endl;
+}
+
+void runMDA() {
+  auto M = getLLVMIR();
+
+  // check if M is a vaid module or not
+  if (!M) {
+    std::cout << "Invalid module" << std::endl;
+    return;
+  }
+
+  checkModuleFunctions(*M);
+}
+
 int main(int argc, char **argv) {
   cl::SetVersionPrinter(printVersion);
   cl::HideUnrelatedOptions(category);
@@ -225,6 +353,11 @@ int main(int argc, char **argv) {
   setGlobalVars(argc, argv);
 
   checkFailureConditions();
+
+  // return 0;
+
+  runMDA();
+  return 0;
 
   // newly added
   if (sym && !(funcName.empty())) {

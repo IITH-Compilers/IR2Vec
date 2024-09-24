@@ -10,7 +10,10 @@
 #include "IR2Vec.h"
 #include "vocabulary.h"
 #include <fstream>
+#include <iostream>
+#include <sstream> // for std::stringstream
 #include <string>
+
 using namespace llvm;
 using namespace IR2Vec;
 
@@ -29,46 +32,115 @@ float IR2Vec::WT;
 bool IR2Vec::debug;
 bool IR2Vec::cpp_input;
 
-static std::string temp_ll_file = "/tmp/temp_ir.ll";
+// static std::string temp_ll_file = "/tmp/temp_ir.ll";
 
 std::map<std::string, Vector> IR2Vec::opcMap =
     IR2Vec::Vocabulary::getVocabulary();
 
-std::string generateTempFileName(const std::string &cppFile) {
-  std::string baseName =
-      cppFile.substr(cppFile.find_last_of('/'), cppFile.find_last_of('.'));
-  return "/tmp/" + baseName + ".ll";
-}
-
-std::unique_ptr<Module> IR2Vec::readIR() {
-  std::string filename = cpp_input ? generateTempFileName(iname) : iname;
+std::unique_ptr<llvm::Module> IR2Vec::readIR() {
+  static llvm::LLVMContext context;
   SMDiagnostic err;
-  static LLVMContext context;
-  auto M = parseIRFile(filename, err, context);
+  auto M = parseIRFile(iname, err, context);
 
   if (!M) {
-    err.print(filename.c_str(), outs());
+    err.print(iname.c_str(), outs());
     exit(1);
   }
 
   return M;
 }
 
-std::unique_ptr<llvm::Module> IR2Vec::readCPP() {
-  std::string command = "clang++-17 -S -emit-llvm " + iname + " -o " +
-                        generateTempFileName(iname);
-  int result = std::system(command.c_str());
+// std::string readFileContent(const std::string &fileName) {
+//     std::ifstream file(fileName);
+//     if (!file) {
+//         std::cerr << "Error: Could not open file " << fileName << std::endl;
+//         return "";
+//     }
+//     std::stringstream buffer;
+//     buffer << file.rdbuf();
+//     return buffer.str();
+// }
 
-  if (result != 0) {
-    errs() << "Error compiling the C++ file.\n";
+// std::string getTempFileName(const std::string &cppFilePath) {
+//   // get last part of the file path < ../../x/y/z/name.cpp => name
+//   std::string fileName = cppFilePath.substr(cppFilePath.find_last_of("/\\") +
+//   1);
+
+//   // remove .cpp extension
+//   fileName = fileName.substr(0, fileName.find_last_of("."));
+
+//   return fileName;
+// }
+
+// std::unique_ptr<llvm::Module> IR2Vec::readCPPtoIR(const std::string
+// &sourceFilePath) {
+//   // Create a new compiler instance
+//   clang::CompilerInstance instance;
+
+//   // Create a compiler invocation
+//   clang::CompilerInvocation invocation;
+//   invocation.setInvocationForCommandLineArgs(std::vector<std::string>{sourceFilePath});
+
+//   // Create a diagnostic manager
+//   clang::DiagnosticOptions diagnosticOptions;
+//   clang::IntrusiveRefCntPtr<clang::Diagnostic> diagnostics =
+//       clang::Diagnostic::CreateDiagnosticEngine(diagnosticOptions, new
+//       clang::FileManager());
+
+//   // Set up the compiler instance
+//   instance.setFileManager(new clang::FileManager());
+//   instance.setDiagnostics(diagnostics);
+//   instance.setCompilerInvocation(invocation);
+
+//   // Parse the source code
+//   if (!instance.hasASTContext()) {
+//       instance.createASTContext();
+//   }
+//   clang::ParseAST(instance.getASTContext(), instance.getSourceManager(),
+//   instance.getDiagnostics());
+
+//   // Create a code generation module
+//   clang::CodeGen::CodeGenModule codegen(instance.getASTContext(),
+//   instance.getCompilerInstance(),
+//                                         instance.getModuleManager(),
+//                                         instance.getDiagnostics(),
+//                                         /* codegenOptions */ nullptr);
+
+//   // Generate LLVM-IR
+//   codegen.emitLLVM();
+
+//   // Get the module
+//   llvm::Module *module = codegen.getModule();
+//   module->print(llvm::outs(), /* isAssembly */ true); // Print the LLVM-IR
+//   for debugging
+
+//   // return std::unique_ptr<llvm::Module>(module);
+//   return std::unique_ptr<llvm::Module>(module);
+// }
+
+// std::unique_ptr<llvm::Module> IR2Vec::readCPP() {
+//   // Use the function to read the C++ file and convert it to LLVM IR
+//   auto M = readCPPtoIR(iname);
+
+//   if (!M) {
+//       std::cerr << "Error: Failed to read the C++ file and generate LLVM IR."
+//       << std::endl; return nullptr;
+//   }
+
+//   return M;
+// }
+
+std::unique_ptr<llvm::Module> IR2Vec::getLLVMIR() {
+
+  // auto M = cpp_input ? readCPP() : readIR();
+  auto M = readIR();
+
+  if (!M) {
+    errs() << "Error generating LLVM IR. \n";
     exit(1);
   }
 
-  return readIR();
-}
-
-std::unique_ptr<Module> IR2Vec::getLLVMIR() {
-  return cpp_input ? readCPP() : readIR();
+  return M;
 }
 
 void IR2Vec::scaleVector(Vector &vec, float factor) {
