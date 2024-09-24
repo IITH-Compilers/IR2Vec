@@ -1,4 +1,4 @@
-name: mir2vec
+name: openKE_GPU
 channels:
   - pytorch
   - nvidia

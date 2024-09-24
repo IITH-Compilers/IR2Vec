@@ -65,7 +65,7 @@ All the arguments have default values unless provided:
 ##### Example Command
 To train a model with analogy scoring enabled and a batch size of 200, you can run:
 ```
-python generate_embedding_ray.py --index_dir "../seed_embeddings/preprocessed/" --epoch 1500 --use_gpu true
+python generate_embedding_ray.py --index_dir "../seed_embeddings/preprocessed/" --epoch 1500 --is_analogy True --use_gpu true
 ```
 ##### TensorBoard Tracking
 Once training begins, you can monitor the progress using TensorBoard by running the following command:
