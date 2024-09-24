@@ -166,7 +166,7 @@ Training TransE to generate embeddings</h4>
 </ul>
 <h5><a class="anchor" id="autotoc_md64"></a>
 Example Command</h5>
-<p>To train a model with analogy scoring enabled and a batch size of 200, you can run: </p><div class="fragment"><div class="line">python generate_embedding_ray.py --index_dir &quot;../seed_embeddings/preprocessed/&quot; --epoch 1500 --is_analogy True --nbatches 200 --margin 1.5</div>
+<p>To train a model with analogy scoring enabled and a batch size of 200, you can run: </p><div class="fragment"><div class="line">python generate_embedding_ray.py --index_dir &quot;../seed_embeddings/preprocessed/&quot; --epoch 1500 --is_analogy True --use_gpu true</div>
 </div><!-- fragment --> <h5><a class="anchor" id="autotoc_md65"></a>
 TensorBoard Tracking</h5>
 <p>Once training begins, you can monitor the progress using TensorBoard by running the following command: </p><div class="fragment"><div class="line">tensorboard --logdir=~/ray_results</div>
