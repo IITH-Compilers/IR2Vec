@@ -41,6 +41,17 @@ if(NOT LLVM_IR2VEC)
     clangSema
     clangAST
     clangCodeGen
+    clangSerialization
+    clangParse
+    clangStaticAnalyzerFrontend
+    clangStaticAnalyzerCheckers
+    clangStaticAnalyzerCore
+    clangAnalysis
+    clangARCMigrate
+    clangRewriteFrontend
+    clangASTMatchers
+    clangEdit
+    clangLex
     LLVM
     objlib
   )

@@ -23,14 +23,17 @@
 #include <llvm/Support/Path.h>
 #include <llvm/Support/TargetSelect.h>
 
+#include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/FrontendActions.h>
+#include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Tooling/Tooling.h>
 
-#include <clang/ASTMatchers/ASTMatchers.h>
-#include <clang/Rewrite/Core/Rewriter.h>
+#include <clang/Basic/DiagnosticOptions.h>
+#include <clang/Frontend/TextDiagnosticPrinter.h>
+#include <llvm/ADT/IntrusiveRefCntPtr.h>
 
 #include <cxxabi.h>
 #include <fstream>

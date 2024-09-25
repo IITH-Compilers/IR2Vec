@@ -10,6 +10,7 @@
 #include "CollectIR.h"
 #include "FlowAware.h"
 #include "Symbolic.h"
+#include "utils.h"
 #include "version.h"
 #include <stdio.h>
 #include <time.h>
@@ -229,49 +230,6 @@ void checkFailureConditions() {
     exit(1);
 }
 
-// void analyzeMemoryDependence(Function &F) {
-//   std::cout << "Analyzing memory dependency" << std::endl;
-//   // Create an AnalysisManager for MemoryDependenceAnalysis
-//   auto FAM = FunctionAnalysisManager();
-//   auto MDA = MemoryDependenceAnalysis();
-
-//   std::cout << "TESTING FOR MEMDEPRESULTS :: FUNCTION" << std::endl;
-
-//   // Create a MemoryDependenceAnalysis pass
-//   MemoryDependenceResults MDR = MDA.run(F, FAM);
-
-//   std::cout << "TESTING FOR MEMDEPRESULTS :: MDR ready" << std::endl;
-//   std::cout << "getDefaultBlockScanLimit() "  <<
-//   MDR.getDefaultBlockScanLimit() << std::endl;
-
-// Iterate over each basic block and instruction
-// for (BasicBlock &BB : F) {
-//   std::cout << "TESTING FOR MEMDEPRESULTS :: BASIC BLOCK" << std::endl;
-//   for (Instruction &I : BB) {
-//     std::cout << "TESTING FOR MEMDEPRESULTS" << std::endl;
-//     // Get the memory dependence information for the instruction
-//     MemDepResult memdep = MDA.getDependency(&I);
-
-//     if(!memdep.getInst()) {
-//       std::cout << "No memory dependence found for " << I.getOpcodeName() <<
-//       std::endl; continue;
-//     }
-
-//     // Check if the instruction has a memory dependence
-//     if (memdep.isDef()) {
-//       std::cout << "Memory Dependence found for " << I.getOpcodeName() << "ON
-//       " << memdep.getInst()->getOpcodeName() << std::endl;
-//     } else if (memdep.isClobber()) {
-//       std::cout << "Memory Clobber found for " << I.getOpcodeName() << "ON "
-//       << memdep.getInst()->getOpcodeName() << std::endl;
-//     } else if (memdep.isUnknown()) {
-//       std::cout << "Unknown memory dependence for " << I.getOpcodeName() <<
-//       std::endl;
-//     }
-//   }
-// }
-// }
-
 void checkModuleFunctions(llvm::Module &M) {
 
   // std::cout << "MDA: Module loaded successfully " << (M.getName()).data() <<
@@ -346,6 +304,119 @@ void runMDA() {
   checkModuleFunctions(*M);
 }
 
+bool check_file(std::string filename) {
+  std::ifstream file(filename);
+  return file.good();
+}
+
+using namespace clang;
+std::unique_ptr<llvm::Module> testCppInput() {
+  // iname has the file path
+  llvm::LLVMContext *llvmcx;
+  static llvm::LLVMContext MyGlobalContext;
+  llvmcx = &MyGlobalContext;
+
+  std::cout << "Creating CompilerInstance" << std::endl;
+
+  bool file_status = check_file(iname);
+
+  if (!file_status) {
+    std::cout << "File not found - returning NULL" << std::endl;
+    return nullptr;
+  } else {
+    std::cout << "File found - proceeding" << std::endl;
+  }
+
+  const char *args[] = {"-x", "c++", iname.c_str(), "-std=c++17", "-emit-llvm"};
+  llvm::ArrayRef<const char *> commandLineArgs(args, 5);
+
+  std::cout << "Command line args created" << std::endl;
+
+  // The compiler invocation needs a DiagnosticsEngine so it can report problems
+  llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> opt(
+      new clang::DiagnosticOptions());
+  opt->ShowColors = 1;
+  opt->ShowOptionNames = 1;
+  opt->VerifyDiagnostics = 1;
+  opt->ShowCarets = 1;
+
+  clang::DiagnosticConsumer *client(new DiagnosticConsumer());
+  llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> DiagID(
+      new clang::DiagnosticIDs());
+  clang::DiagnosticsEngine Diags(DiagID, opt, client);
+
+  std::cout << "Creating Diagnostics" << std::endl;
+
+  // Create the compiler invocation
+  std::shared_ptr<clang::CompilerInvocation> CI(
+      new clang::CompilerInvocation());
+
+  std::cout << "Creating Compiler Invocation" << std::endl;
+
+  bool status =
+      clang::CompilerInvocation::CreateFromArgs(*CI, commandLineArgs, Diags);
+
+  if (!status) {
+    std::cout << "Error in CreateFromArgs : Returning NULL" << std::endl;
+    return NULL;
+  }
+  std::cout << "Reading from args done Status = " << status << std::endl;
+
+  // Create the compiler instance
+  clang::CompilerInstance Clang;
+  Clang.setInvocation(CI);
+
+  std::cout << "Creating Instance" << std::endl;
+
+  // Get ready to report problems
+  Clang.createDiagnostics();
+  if (!Clang.hasDiagnostics()) {
+    std::cout << "No Diagnostics : Returning Null" << std::endl;
+    return NULL;
+  }
+
+  std::cout << "Checking diagnostics validity" << std::endl;
+
+  // Create an action and make the compiler instance carry it out
+  clang::CodeGenAction *Act = new clang::EmitLLVMOnlyAction(llvmcx);
+  if (!Clang.ExecuteAction(*Act)) {
+    std::cout << "Error in ExecuteAction : Returning NULL" << std::endl;
+
+    return NULL;
+  }
+
+  std::cout << "Executing Action" << std::endl;
+
+  // Check if the module is generated and return it
+  std::unique_ptr<llvm::Module> Mod = Act->takeModule();
+  if (!Mod) {
+    std::cerr << "Failed to generate the LLVM module!" << std::endl;
+    return NULL;
+  }
+
+  std::cout << "LLVM module successfully generated." << std::endl;
+  // You can return the Action or the module for further processing
+  return Mod;
+}
+
+void writeModuleToFile(llvm::Module *module, const std::string &filename) {
+  // Create a raw file output stream
+  std::error_code EC;
+  llvm::raw_fd_ostream out(filename, EC, llvm::sys::fs::OF_None);
+
+  if (EC) {
+    std::cerr << "Error opening file: " << EC.message() << std::endl;
+    return;
+  }
+
+  // Print the module to the file
+  module->print(out, nullptr);
+  std::cout << "Module IR written to " << filename << std::endl;
+
+  // Close the file stream
+  out.close();
+}
+
 int main(int argc, char **argv) {
   cl::SetVersionPrinter(printVersion);
   cl::HideUnrelatedOptions(category);
@@ -356,20 +427,37 @@ int main(int argc, char **argv) {
 
   // return 0;
 
-  runMDA();
-  return 0;
+  // runMDA();
+  // return 0;
 
-  // newly added
-  if (sym && !(funcName.empty())) {
-    generateSymEncodingsFunction(funcName);
-  } else if (fa && !(funcName.empty())) {
-    generateFAEncodingsFunction(funcName);
-  } else if (fa) {
-    generateFAEncodings();
-  } else if (sym) {
-    generateSYMEncodings();
-  } else if (collectIR) {
-    collectIRfunc();
+  auto mod = testCppInput();
+  if (mod == NULL) {
+    std::cout << "Error in testCPPInput" << std::endl;
+    return 0;
+  } else {
+    std::cout << "Success in testCPPInput. Writing to test.ll" << std::endl;
+    writeModuleToFile(mod.get(), "test.ll");
+    return 0;
   }
+
+  // auto module = Act->getModule();
+
+  // if (module == NULL) {
+  //   std::cout << "Error in getModule" << std::endl;
+  //   return 0;
+  // }
+
+  // // newly added
+  // if (sym && !(funcName.empty())) {
+  //   generateSymEncodingsFunction(funcName);
+  // } else if (fa && !(funcName.empty())) {
+  //   generateFAEncodingsFunction(funcName);
+  // } else if (fa) {
+  //   generateFAEncodings();
+  // } else if (sym) {
+  //   generateSYMEncodings();
+  // } else if (collectIR) {
+  //   collectIRfunc();
+  // }
   return 0;
 }
