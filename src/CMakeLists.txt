@@ -33,11 +33,17 @@ if(NOT LLVM_IR2VEC)
   target_link_libraries (
     ${PROJECT_NAME}
     PRIVATE
+    clangFormat
+    clangIndex
+    clangDirectoryWatcher
+    clangFrontendTool
+    clangRewrite
+    clangCrossTU
+    clangASTMatchers
     clangTooling
     clangBasic
     clangFrontend
     clangDriver
-    clangParse
     clangSema
     clangAST
     clangCodeGen
@@ -49,7 +55,6 @@ if(NOT LLVM_IR2VEC)
     clangAnalysis
     clangARCMigrate
     clangRewriteFrontend
-    clangASTMatchers
     clangEdit
     clangLex
     LLVM

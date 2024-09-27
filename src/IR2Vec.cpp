@@ -327,8 +327,9 @@ std::unique_ptr<llvm::Module> testCppInput() {
     std::cout << "File found - proceeding" << std::endl;
   }
 
-  const char *args[] = {"-x", "c++", iname.c_str(), "-std=c++17", "-emit-llvm"};
-  llvm::ArrayRef<const char *> commandLineArgs(args, 5);
+  const char *args[] = {"-x",          "c++",        "-stdlib=libstdc++",
+                        iname.c_str(), "-std=c++17", "-emit-llvm"};
+  llvm::ArrayRef<const char *> commandLineArgs(args, 6);
 
   std::cout << "Command line args created" << std::endl;
 
