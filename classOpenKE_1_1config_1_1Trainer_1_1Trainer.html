@@ -121,11 +121,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aba789758806415dea27f2ee1a571e6c0" id="r_aba789758806415dea27f2ee1a571e6c0"><td class="memItemLeft" align="right" valign="top"><a id="aba789758806415dea27f2ee1a571e6c0" name="aba789758806415dea27f2ee1a571e6c0"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, model=None, data_loader=None, train_times=1000, alpha=0.5, use_gpu=False, opt_method=&quot;sgd&quot;, save_steps=None, checkpoint_dir=None, index_dir=None, out_path=None)</td></tr>
 <tr class="separator:aba789758806415dea27f2ee1a571e6c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e245919346342181c63e6716dff841d" id="r_a9e245919346342181c63e6716dff841d"><td class="memItemLeft" align="right" valign="top"><a id="a9e245919346342181c63e6716dff841d" name="a9e245919346342181c63e6716dff841d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>load_entity_names</b> (self, index_dir)</td></tr>
+<tr class="separator:a9e245919346342181c63e6716dff841d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8f9781494e999ba5973cea3b9be6f37" id="r_ae8f9781494e999ba5973cea3b9be6f37"><td class="memItemLeft" align="right" valign="top"><a id="ae8f9781494e999ba5973cea3b9be6f37" name="ae8f9781494e999ba5973cea3b9be6f37"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>train_one_step</b> (self, data)</td></tr>
 <tr class="separator:ae8f9781494e999ba5973cea3b9be6f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17595efeef0d666d84c4a2abb5272a17" id="r_a17595efeef0d666d84c4a2abb5272a17"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a17595efeef0d666d84c4a2abb5272a17">getEntityDict</a> (self, ent_embeddings, index_dir)</td></tr>
-<tr class="separator:a17595efeef0d666d84c4a2abb5272a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34f3dc22ea73ce927a0b7e5efcc32b7f" id="r_a34f3dc22ea73ce927a0b7e5efcc32b7f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34f3dc22ea73ce927a0b7e5efcc32b7f">getEntityDict</a> (self, ent_embeddings)</td></tr>
+<tr class="separator:a34f3dc22ea73ce927a0b7e5efcc32b7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3167743f8682e36e689d2986f2124266" id="r_a3167743f8682e36e689d2986f2124266"><td class="memItemLeft" align="right" valign="top"><a id="a3167743f8682e36e689d2986f2124266" name="a3167743f8682e36e689d2986f2124266"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (self, link_prediction=False, test_dataloader=None, model=None, is_analogy=False, ray=True, freq=10)</td></tr>
 <tr class="separator:a3167743f8682e36e689d2986f2124266"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -201,10 +204,19 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>save_steps</b> = save_
 <tr class="memitem:a1b6561a1723cda2b8f8a6661d97b1dfb" id="r_a1b6561a1723cda2b8f8a6661d97b1dfb"><td class="memItemLeft" align="right" valign="top"><a id="a1b6561a1723cda2b8f8a6661d97b1dfb" name="a1b6561a1723cda2b8f8a6661d97b1dfb"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>checkpoint_dir</b> = checkpoint_dir</td></tr>
 <tr class="separator:a1b6561a1723cda2b8f8a6661d97b1dfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac21f2fd8fe5e4644899fd27a2c45c03b" id="r_ac21f2fd8fe5e4644899fd27a2c45c03b"><td class="memItemLeft" align="right" valign="top"><a id="ac21f2fd8fe5e4644899fd27a2c45c03b" name="ac21f2fd8fe5e4644899fd27a2c45c03b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>entity_names</b> = self.load_entity_names(index_dir)</td></tr>
+<tr class="separator:ac21f2fd8fe5e4644899fd27a2c45c03b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb514291e818139250a1b7e44214b7b6" id="r_adb514291e818139250a1b7e44214b7b6"><td class="memItemLeft" align="right" valign="top"><a id="adb514291e818139250a1b7e44214b7b6" name="adb514291e818139250a1b7e44214b7b6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>analogies</b> = <a class="el" href="classOpenKE_1_1analogy_1_1AnalogyScorer.html">analogy.AnalogyScorer</a>(analogy_file=&quot;analogies.txt&quot;)</td></tr>
+<tr class="separator:adb514291e818139250a1b7e44214b7b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15052bfef4167c8d0e2ceb5e0cf83ab6" id="r_a15052bfef4167c8d0e2ceb5e0cf83ab6"><td class="memItemLeft" align="right" valign="top"><a id="a15052bfef4167c8d0e2ceb5e0cf83ab6" name="a15052bfef4167c8d0e2ceb5e0cf83ab6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>entity_dict</b></td></tr>
+<tr class="separator:a15052bfef4167c8d0e2ceb5e0cf83ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a17595efeef0d666d84c4a2abb5272a17" name="a17595efeef0d666d84c4a2abb5272a17"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17595efeef0d666d84c4a2abb5272a17">&#9670;&#160;</a></span>getEntityDict()</h2>
+<a id="a34f3dc22ea73ce927a0b7e5efcc32b7f" name="a34f3dc22ea73ce927a0b7e5efcc32b7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34f3dc22ea73ce927a0b7e5efcc32b7f">&#9670;&#160;</a></span>getEntityDict()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -217,12 +229,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>save_steps</b> = save_
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>ent_embeddings</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>index_dir</em></span>&#160;)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>ent_embeddings</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">

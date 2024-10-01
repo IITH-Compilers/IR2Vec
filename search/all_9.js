@@ -9,7 +9,7 @@ var searchData=
   ['generating_20training_20triplets_6',['Generating Training Triplets',['../md_docs_2version__upgrade__process.html#autotoc_md6',1,'']]],
   ['generating_20triplets_7',['Step 2: Generating Triplets',['../md_seed__embeddings_2README.html#autotoc_md57',1,'']]],
   ['generation_20of_20seed_20embedding_20vocabulary_8',['Generation of Seed Embedding Vocabulary',['../md_seed__embeddings_2README.html#autotoc_md55',1,'']]],
-  ['getentitydict_9',['getEntityDict',['../classOpenKE_1_1config_1_1Trainer_1_1Trainer.html#a17595efeef0d666d84c4a2abb5272a17',1,'OpenKE::config::Trainer::Trainer']]],
+  ['getentitydict_9',['getEntityDict',['../classOpenKE_1_1config_1_1Trainer_1_1Trainer.html#a34f3dc22ea73ce927a0b7e5efcc32b7f',1,'OpenKE::config::Trainer::Trainer']]],
   ['getfunctionvectors_10',['getFunctionVectors',['../md_README.html#autotoc_md41',1,'']]],
   ['getinstructionvectors_11',['getInstructionVectors',['../md_README.html#autotoc_md42',1,'']]],
   ['getprogramvector_12',['getProgramVector',['../md_README.html#autotoc_md40',1,'']]],
