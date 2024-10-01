@@ -52,6 +52,25 @@ class Trainer(object):
         self.save_steps = save_steps
         self.checkpoint_dir = checkpoint_dir
         # self.out_path = out_path
+        
+        self.entity_names = self.load_entity_names(index_dir)
+        self.analogies = analogy.AnalogyScorer(analogy_file="analogies.txt")
+        
+    def load_entity_names(self, index_dir):
+        with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
+            content = fEntity.read()
+
+        entities = content.split("\n")
+        entity_dict = {}
+
+        for i in range(1, int(entities[0])):
+            entity_name = entities[i].split("\t")[0].upper()
+            entity_dict[entity_name] = None  # Placeholder for embeddings
+
+        last_entity_name = entities[int(entities[0])].split("\t")[0].upper()
+        entity_dict[last_entity_name] = None
+
+        return entity_dict
 
     def train_one_step(self, data):
         self.optimizer.zero_grad()
@@ -68,25 +87,15 @@ class Trainer(object):
         self.optimizer.step()
         return loss.item()
 
-    def getEntityDict(self, ent_embeddings, index_dir):
+    def getEntityDict(self, ent_embeddings):
         """
         Reads the entity embeddings and returns an dictionary
         mapping entity names to their corresponding embeddings.
         """
-        rep = ent_embeddings
-
-        with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
-            content = fEntity.read()
-
-        entities = content.split("\n")
         entity_dict = {}
-
-        for i in range(1, int(entities[0])):
-            entity_name = entities[i].split("\t")[0]
-            entity_dict[entity_name.upper()] = rep[i - 1].tolist()
-
-        last_entity_name = entities[int(entities[0])].split("\t")[0]
-        entity_dict[last_entity_name.upper()] = rep[int(entities[0]) - 1].tolist()
+        
+        for i, entity_name in enumerate(self.entity_dict):
+            entity_dict[entity_name] = ent_embeddings[i].tolist()
 
         return entity_dict
 
@@ -168,10 +177,8 @@ class Trainer(object):
                     # self.mode.model => Transe model
 
                     ent_embeddings = self.model.model.ent_embeddings.weight.data.numpy()
-                    entity_dict = self.getEntityDict(ent_embeddings, self.index_dir)
-                    analogy_score = analogy.getAnalogyScoreFromDict(
-                        entity_dict, self.index_dir
-                    )
+                    entity_dict = self.getEntityDict(ent_embeddings)
+                    analogy_score = self.analogies.get_analogy_score(entity_dict)
                     metrics.update({"AnalogiesScore": analogy_score})
                     print("Analogy Score Completed")
 
