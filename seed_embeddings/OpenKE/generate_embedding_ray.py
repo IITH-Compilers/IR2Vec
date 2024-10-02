@@ -25,7 +25,7 @@ from ray.train import RunConfig, CheckpointConfig
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.search.optuna import OptunaSearch
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 
 
 def test_files(index_dir):
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
     search_space = {
         "epoch": arg_conf.epoch,
-        "dim": tune.sample_from(lambda spec: 100 * np.random.randint(1, 6)),
+        "dim": arg_conf.dim,
         "index_dir": arg_conf.index_dir,
         "nbatches": tune.sample_from(lambda spec: 2 ** np.random.randint(8, 12)),
         "margin": tune.quniform(3, 6, 0.5),
@@ -222,38 +222,28 @@ if __name__ == "__main__":
         raise Exception("Error in files")
 
     if arg_conf.is_analogy:
-        scheduler = ASHAScheduler(
-            time_attr="training_iteration",
-            max_t=arg_conf.epoch,
-            grace_period=15,
-            reduction_factor=3,
-            metric="AnalogiesScore",
-            mode="max",
-        )
-        optuna = OptunaSearch(metric="AnalogiesScore", mode="max")
+        metric = "AnalogiesScore"
+        mode = "max"
     elif arg_conf.link_pred:
-        scheduler = ASHAScheduler(
-            time_attr="training_iteration",
-            max_t=arg_conf.epoch,
-            grace_period=15,
-            reduction_factor=3,
-            metric="hit1",
-            mode="max",
-        )
-        optuna = OptunaSearch(metric="hit1", mode="max")
+        metric = "hit1"
+        mode = "max"
     else:
-        scheduler = ASHAScheduler(
-            time_attr="training_iteration",
-            max_t=arg_conf.epoch,
-            grace_period=15,
-            reduction_factor=3,
-            metric="loss",
-            mode="min",
-        )
-        optuna = OptunaSearch(metric="loss", mode="min")
+        metric = "loss"
+        mode = "min"
+        
+    scheduler = ASHAScheduler(
+        time_attr="training_iteration",
+        max_t=arg_conf.epoch,
+        grace_period=15,
+        reduction_factor=3,
+        metric=metric,
+        mode=mode,
+    )
+    optuna = OptunaSearch(metric=metric, mode=mode)
+
     if arg_conf.use_gpu:
         train_with_resources = tune.with_resources(
-            train, resources={"cpu": 0, "gpu": 0.0625}
+            train, resources={"cpu": 8, "gpu": 0.15}
         )
     else:
         train_with_resources = tune.with_resources(
@@ -265,60 +255,47 @@ if __name__ == "__main__":
         param_space=search_space,
         tune_config=TuneConfig(
             search_alg=optuna,
-            max_concurrent_trials=16,
+            max_concurrent_trials=12,
             scheduler=scheduler,
             num_samples=512,
         ),
         run_config=RunConfig(
+            storage_path="/lfs1/usrscratch/staff/nvk1tb/ray_results/",
             checkpoint_config=CheckpointConfig(
                 num_to_keep=1,
                 # *Best* checkpoints are determined by these params:
-                checkpoint_score_attribute="loss",
-                checkpoint_score_order="min",
+                checkpoint_score_attribute=metric,
+                checkpoint_score_order=mode,
             )
         ),
     )
     results = tuner.fit()
 
     # Write the best result to a file, best_result.txt
-    best_result = None
+    fin_res = results.get_best_result(metric=metric, mode=mode)
+    with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
+        f.write(
+            "\n" + str(fin_res)
+        )
+
     if arg_conf.is_analogy:
-
-        with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
-            f.write(
-                "\n" + str(results.get_best_result(metric="AnalogiesScore", mode="max"))
-            )
-
         print(
             "Best Config Based on Analogy Score : ",
-            results.get_best_result(metric="AnalogiesScore", mode="max"),
+            fin_res,
         )
-
-        best_result = results.get_best_result(metric="AnalogiesScore", mode="max")
-
     elif arg_conf.link_pred:
-
-        with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
-            f.write("\n" + str(results.get_best_result(metric="hit1", mode="max")))
-
         print(
             "Best Config Based on Hit1 : ",
-            results.get_best_result(metric="hit1", mode="max"),
+            fin_res,
         )
-        best_result = results.get_best_result(metric="hit1", mode="max")
     else:
-
-        with open(os.path.join(search_space["index_dir"], "best_result.txt"), "a") as f:
-            f.write("\n" + str(results.get_best_result(metric="loss", mode="min")))
-
         print(
             "Best Config Based on Loss : ",
-            results.get_best_result(metric="loss", mode="min"),
+            fin_res,
         )
-        best_result = results.get_best_result(metric="loss", mode="min")
-
+    
     # Get the best configuration
-    best_config = best_result.config
+    best_config = fin_res.config
 
     # Extract the values for constructing the file name
     epoch = best_config["epoch"]
@@ -337,7 +314,7 @@ if __name__ == "__main__":
             margin,
         ),
     )
-    best_checkpoint_path = best_result.checkpoint.path
+    best_checkpoint_path = fin_res.checkpoint.path
     print("best_checkpoint_path is: ", best_checkpoint_path)
     file_name = os.listdir(best_checkpoint_path)[0]
     print("file_name is: ", file_name)

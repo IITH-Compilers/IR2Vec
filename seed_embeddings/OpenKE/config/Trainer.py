@@ -54,7 +54,7 @@ class Trainer(object):
         # self.out_path = out_path
         
         self.entity_names = self.load_entity_names(index_dir)
-        self.analogies = analogy.AnalogyScorer(analogy_file="analogies.txt")
+        self.analogies = analogy.AnalogyScorer(analogy_file="/lfs1/usrscratch/staff/nvk1tb/IR2Vec/seed_embeddings/OpenKE/analogies.txt")
         
     def load_entity_names(self, index_dir):
         with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
@@ -94,7 +94,7 @@ class Trainer(object):
         """
         entity_dict = {}
         
-        for i, entity_name in enumerate(self.entity_dict):
+        for i, entity_name in enumerate(self.entity_names):
             entity_dict[entity_name] = ent_embeddings[i].tolist()
 
         return entity_dict
@@ -139,7 +139,7 @@ class Trainer(object):
                 weight_decay=self.weight_decay,
             )
         print("Finish initializing...")
-
+        best_metric_val = 0.0
         training_range = tqdm(range(self.train_times))
         for epoch in training_range:
             res = 0.0
@@ -148,6 +148,7 @@ class Trainer(object):
                 res += loss
             training_range.set_description("Epoch %d | loss: %f" % (epoch, res))
             checkpoint = None
+            save_ckpt = False
             if ray and epoch % freq == 0:
                 metrics = {"loss": res}
                 # Link Prediction
@@ -170,27 +171,43 @@ class Trainer(object):
                             "hit1": hit1,
                         }
                     )
+                    if best_metric_val <= hit1:
+                        best_metric_val = hit1
+                        save_ckpt = True
                     print("Link Prediction Scores Completed")
 
-                if is_analogy:
+                elif is_analogy:
                     # self.model => Negative Sampling object
                     # self.mode.model => Transe model
 
-                    ent_embeddings = self.model.model.ent_embeddings.weight.data.numpy()
+                    ent_embeddings = self.model.model.ent_embeddings.weight.data.cpu().numpy()
                     entity_dict = self.getEntityDict(ent_embeddings)
                     analogy_score = self.analogies.get_analogy_score(entity_dict)
                     metrics.update({"AnalogiesScore": analogy_score})
-                    print("Analogy Score Completed")
+                    print("Analogy Score completed")
+                    
+                    del entity_dict
+                    
+                    if best_metric_val <= analogy_score:
+                        best_metric_val = analogy_score
+                        save_ckpt = True
 
+                else: # loss
+                    if best_metric_val >= res:
+                        best_metric_val = res
+                        save_ckpt = True
+                
                 with tempfile.TemporaryDirectory() as temp_checkpoint_dir:
-                    # Save the checkpoint...
-                    self.model.save_checkpoint(
-                        os.path.join(
-                            temp_checkpoint_dir,
-                            "checkpoint" + "-" + str(epoch) + ".ckpt",
+                        # Save the checkpoint...
+                    checkpoint = None
+                    if save_ckpt:
+                        self.model.save_checkpoint(
+                            os.path.join(
+                                temp_checkpoint_dir,
+                                "checkpoint" + "-" + str(epoch) + ".ckpt",
+                            )
                         )
-                    )
-                    checkpoint = Checkpoint.from_directory(temp_checkpoint_dir)
+                        checkpoint = Checkpoint.from_directory(temp_checkpoint_dir)
 
                     train.report(metrics, checkpoint=checkpoint)
 
