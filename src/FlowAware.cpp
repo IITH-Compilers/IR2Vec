@@ -46,13 +46,11 @@ void IR2Vec_FA::getTransitiveUse(
     if (auto use = dyn_cast<Instruction>(U)) {
       if (std::find(visitedList.begin(), visitedList.end(), use) ==
           visitedList.end()) {
-        IR2VEC_DEBUG(outs() << "\nDef " << /* def << */ " ";
-                     def->print(outs(), true); outs() << "\n";);
-        IR2VEC_DEBUG(outs() << "Use " << /* use << */ " ";
-                     use->print(outs(), true); outs() << "\n";);
         if (isMemOp(use->getOpcodeName(), operandNum, memWriteOps) &&
             use->getOperand(operandNum) == def) {
           writeDefsMap[root].push_back(use);
+          std::cout << "Found dependency - " << use->getOpcodeName() << " ON "
+                    << root->getOpcodeName() << std::endl;
         } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOps) &&
                    use->getOperand(operandNum) == def) {
           getTransitiveUse(root, use, visitedList, toAppend);
@@ -77,8 +75,6 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
               std::find(visitedList.begin(), visitedList.end(), &I) ==
                   visitedList.end()) {
             if (I.getNumOperands() > 0) {
-              IR2VEC_DEBUG(I.print(outs()); outs() << "\n");
-              IR2VEC_DEBUG(outs() << "operandnum = " << operandNum << "\n");
               if (auto parent =
                       dyn_cast<Instruction>(I.getOperand(operandNum))) {
                 if (std::find(visitedList.begin(), visitedList.end(), parent) ==
