@@ -31,6 +31,7 @@ float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
 bool IR2Vec::cpp_input;
+bool IR2Vec::memdep;
 
 // static std::string temp_ll_file = "/tmp/temp_ir.ll";
 
@@ -49,86 +50,6 @@ std::unique_ptr<llvm::Module> IR2Vec::readIR() {
 
   return M;
 }
-
-// std::string readFileContent(const std::string &fileName) {
-//     std::ifstream file(fileName);
-//     if (!file) {
-//         std::cerr << "Error: Could not open file " << fileName << std::endl;
-//         return "";
-//     }
-//     std::stringstream buffer;
-//     buffer << file.rdbuf();
-//     return buffer.str();
-// }
-
-// std::string getTempFileName(const std::string &cppFilePath) {
-//   // get last part of the file path < ../../x/y/z/name.cpp => name
-//   std::string fileName = cppFilePath.substr(cppFilePath.find_last_of("/\\") +
-//   1);
-
-//   // remove .cpp extension
-//   fileName = fileName.substr(0, fileName.find_last_of("."));
-
-//   return fileName;
-// }
-
-// std::unique_ptr<llvm::Module> IR2Vec::readCPPtoIR(const std::string
-// &sourceFilePath) {
-//   // Create a new compiler instance
-//   clang::CompilerInstance instance;
-
-//   // Create a compiler invocation
-//   clang::CompilerInvocation invocation;
-//   invocation.setInvocationForCommandLineArgs(std::vector<std::string>{sourceFilePath});
-
-//   // Create a diagnostic manager
-//   clang::DiagnosticOptions diagnosticOptions;
-//   clang::IntrusiveRefCntPtr<clang::Diagnostic> diagnostics =
-//       clang::Diagnostic::CreateDiagnosticEngine(diagnosticOptions, new
-//       clang::FileManager());
-
-//   // Set up the compiler instance
-//   instance.setFileManager(new clang::FileManager());
-//   instance.setDiagnostics(diagnostics);
-//   instance.setCompilerInvocation(invocation);
-
-//   // Parse the source code
-//   if (!instance.hasASTContext()) {
-//       instance.createASTContext();
-//   }
-//   clang::ParseAST(instance.getASTContext(), instance.getSourceManager(),
-//   instance.getDiagnostics());
-
-//   // Create a code generation module
-//   clang::CodeGen::CodeGenModule codegen(instance.getASTContext(),
-//   instance.getCompilerInstance(),
-//                                         instance.getModuleManager(),
-//                                         instance.getDiagnostics(),
-//                                         /* codegenOptions */ nullptr);
-
-//   // Generate LLVM-IR
-//   codegen.emitLLVM();
-
-//   // Get the module
-//   llvm::Module *module = codegen.getModule();
-//   module->print(llvm::outs(), /* isAssembly */ true); // Print the LLVM-IR
-//   for debugging
-
-//   // return std::unique_ptr<llvm::Module>(module);
-//   return std::unique_ptr<llvm::Module>(module);
-// }
-
-// std::unique_ptr<llvm::Module> IR2Vec::readCPP() {
-//   // Use the function to read the C++ file and convert it to LLVM IR
-//   auto M = readCPPtoIR(iname);
-
-//   if (!M) {
-//       std::cerr << "Error: Failed to read the C++ file and generate LLVM IR."
-//       << std::endl; return nullptr;
-//   }
-
-//   return M;
-// }
 
 std::unique_ptr<llvm::Module> IR2Vec::getLLVMIR() {
 
@@ -196,4 +117,195 @@ std::string IR2Vec::updatedRes(IR2Vec::Vector tmp, llvm::Function *f,
   }
 
   return res;
+}
+
+std::string GetExecutablePath(const char *Argv0, void *MainAddr) {
+  return llvm::sys::fs::getMainExecutable(Argv0, MainAddr);
+}
+
+void testReturnAddrFunction() { return; }
+llvm::ExitOnError ExitOnErr;
+
+using namespace clang;
+std::unique_ptr<llvm::Module> IR2Vec::readCPPtoIR(const char *fileName) {
+
+  llvm::LLVMContext llvmContext;
+  // This just needs to be some symbol in the binary; C++ doesn't
+  // allow taking the address of ::main however.
+  void *MainAddr = (void *)(intptr_t)testReturnAddrFunction;
+  // std::string Path = GetExecutablePath(fileName, MainAddr);
+  std::string Path = fileName;
+  std::cout << "ExecutablePath " << Path << std::endl;
+
+  llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> DiagOpts(
+      new clang::DiagnosticOptions());
+  DiagOpts->ShowColors = true;
+  DiagOpts->ShowCarets = true;
+  DiagOpts->ShowOptionNames = true;
+  DiagOpts->VerifyDiagnostics = true;
+  DiagOpts->ShowFixits = true;
+
+  TextDiagnosticPrinter *DiagClient =
+      new TextDiagnosticPrinter(llvm::errs(), DiagOpts.get());
+
+  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  DiagnosticsEngine Diags(DiagID, DiagOpts.get(), DiagClient);
+
+  const std::string TripleStr = llvm::sys::getProcessTriple();
+  llvm::Triple T(TripleStr);
+
+  ExitOnErr.setBanner("clang interpreter");
+
+  clang::driver::Driver TheDriver(Path, T.str(), Diags);
+  TheDriver.setTitle("clang interpreter");
+  TheDriver.setCheckInputsExist(false);
+
+  // FIXME: This is a hack to try to force the driver to do something we can
+  // recognize. We need to extend the driver library to support this use model
+  // (basically, exactly one input, and the operation mode is hard wired).
+
+  const char *cmd_args[] = {"clang++-17", fileName, "-std=c++17", "-v",
+                            "-fsanitize=address"};
+  int cmd_size = sizeof(cmd_args) / sizeof(cmd_args[0]);
+
+  SmallVector<const char *, 16> Args(cmd_args, cmd_args + cmd_size);
+  std::unique_ptr<clang::driver::Compilation> C(
+      TheDriver.BuildCompilation(Args));
+  if (!C) {
+    std::cerr << "Unable to build compilation" << std::endl;
+    return nullptr;
+  }
+
+  // FIXME: This is copied from ASTUnit.cpp; simplify and eliminate.
+
+  // We expect to get back exactly one command job, if we didn't something
+  // failed. Extract that job from the compilation.
+  const driver::JobList &Jobs = C->getJobs();
+
+  auto actions = C->getActions();
+  std::cout << "actions.size() : " << actions.size() << std::endl;
+  std::cout << "Jobs.size() : " << Jobs.size() << std::endl;
+  for (auto job : Jobs) {
+    bool isCommand = isa<driver::Command>(job);
+    std::cout << "isCommand : " << isCommand << std::endl;
+    std::cout << "job : " << job.getCreator().getName() << std::endl;
+  }
+
+  if (actions.size() != 1) {
+    std::cerr << "Expected a single action : " << actions.size() << std::endl;
+    return nullptr;
+  }
+
+  if (Jobs.size() != 1 || !isa<driver::Command>(*Jobs.begin())) {
+
+    std::cerr << "is command driver : " << isa<driver::Command>(*Jobs.begin())
+              << std::endl;
+
+    SmallString<256> Msg;
+    llvm::raw_svector_ostream OS(Msg);
+    Jobs.Print(OS, "; ", true);
+
+    std::cerr << Msg.c_str() << std::endl;
+
+    std::cerr << "Unable to get a single command job from the driver"
+              << std::endl;
+    return nullptr;
+  }
+
+  const driver::Command &Cmd = cast<driver::Command>(*Jobs.begin());
+  if (llvm::StringRef(Cmd.getCreator().getName()) != "clang") {
+    std::cout << "Not a clang command: " << Cmd.getCreator().getName()
+              << std::endl;
+    return nullptr;
+  }
+
+  // Initialize a compiler invocation object from the clang (-cc1) arguments.
+  const llvm::opt::ArgStringList &CCArgs = Cmd.getArguments();
+
+  for (const auto &arg : CCArgs) {
+    std::cout << "arg : " << arg << std::endl;
+  }
+
+  std::unique_ptr<CompilerInvocation> CI(new CompilerInvocation);
+  CompilerInvocation::CreateFromArgs(*CI, CCArgs, Diags);
+
+  std::cout << "Command Created" << std::endl;
+
+  // Show the invocation, with -v.
+  if (CI->getHeaderSearchOpts().Verbose) {
+    llvm::errs() << "clang invocation:\n";
+    Jobs.Print(llvm::errs(), "\n", true);
+    llvm::errs() << "\n";
+  }
+
+  std::cout << "Header invocation generated" << std::endl;
+
+  // FIXME: This is copied from cc1_main.cpp; simplify and eliminate.
+
+  // Create a compiler instance to handle the actual work.
+  CompilerInstance Clang;
+  Clang.setInvocation(std::move(CI));
+
+  std::cout << "Compiler instance created" << std::endl;
+
+  // Create the compilers actual diagnostics engine.
+  Clang.createDiagnostics();
+  if (!Clang.hasDiagnostics()) {
+    std::cerr << "Error in Clang Diagnostics" << std::endl;
+    return nullptr;
+  }
+
+  std::cout << "Diagnostics created" << std::endl;
+
+  // Infer the builtin include path if unspecified.
+  if (Clang.getHeaderSearchOpts().UseBuiltinIncludes &&
+      Clang.getHeaderSearchOpts().ResourceDir.empty()) {
+    std::cout
+        << "Resource Directory empty. Reading from env. CLANG_RESOURCE_DIR"
+        << std::endl;
+    const char *CP = ::getenv("CLANG_RESOURCE_DIR");
+
+    if (!CP) {
+      std::cerr << "Error in getting CLANG_RESOURCE_DIR" << std::endl;
+      return nullptr;
+    }
+    Clang.getHeaderSearchOpts().ResourceDir = CP;
+
+    std::cout << "Resource Directory set to " << CP << std::endl;
+  }
+  // Clang.getHeaderSearchOpts().ResourceDir =
+  //   CompilerInvocation::GetResourcesPath(fileName, MainAddr);
+
+  std::cout << "Header search options set" << std::endl;
+
+  Clang.createTarget();
+  if (!Clang.hasTarget()) {
+    llvm::errs() << "Failed to create target\n";
+    return nullptr;
+  }
+
+  Clang.createFileManager();
+  Clang.createSourceManager(Clang.getFileManager());
+
+  // Create and execute the frontend to generate an LLVM bitcode module.
+  std::unique_ptr<CodeGenAction> Act(new EmitLLVMOnlyAction(&llvmContext));
+  std::cout << "CodeGenAction created" << std::endl;
+
+  auto result = Clang.ExecuteAction(*Act);
+  std::cout << "CodeGenAction executed " << result << std::endl;
+
+  if (!result) {
+    std::cerr << "Error generating LLVM IR" << std::endl;
+    return nullptr;
+  }
+
+  std::cout << "LLVM IR generated" << std::endl;
+
+  std::unique_ptr<llvm::Module> Module = Act->takeModule();
+  if (!Module) {
+    std::cerr << "Error generating LLVM IR - Nullptr" << std::endl;
+    return nullptr;
+  }
+
+  return Module;
 }

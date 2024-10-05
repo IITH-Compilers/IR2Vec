@@ -49,9 +49,8 @@ void IR2Vec_FA::getTransitiveUse(
         if (isMemOp(use->getOpcodeName(), operandNum, memWriteOps) &&
             use->getOperand(operandNum) == def) {
           writeDefsMap[root].push_back(use);
-          // std::cout << "Found dependency - " << use->getOpcodeName() << " ON
-          // "
-          //           << root->getOpcodeName() << std::endl;
+          std::cout << "Found dependency - " << use->getOpcodeName() << " ON "
+                    << root->getOpcodeName() << std::endl;
         } else if (isMemOp(use->getOpcodeName(), operandNum, memAccessOps) &&
                    use->getOperand(operandNum) == def) {
           getTransitiveUse(root, use, visitedList, toAppend);

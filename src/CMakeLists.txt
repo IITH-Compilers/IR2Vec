@@ -33,6 +33,7 @@ if(NOT LLVM_IR2VEC)
   target_link_libraries (
     ${PROJECT_NAME}
     PRIVATE
+    clangHandleCXX
     clangFormat
     clangIndex
     clangDirectoryWatcher

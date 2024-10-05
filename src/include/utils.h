@@ -31,9 +31,16 @@
 #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Tooling/Tooling.h>
 
+#include "clang/Driver/Compilation.h"
+#include "clang/Driver/Driver.h"
+#include "clang/Driver/Tool.h"
+
 #include <clang/Basic/DiagnosticOptions.h>
 #include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <llvm/ADT/IntrusiveRefCntPtr.h>
+
+#include <clang/Lex/PreprocessorOptions.h>
+#include <llvm/Option/Option.h>
 
 #include <cxxabi.h>
 #include <fstream>
@@ -68,8 +75,9 @@ extern float WA;
 extern float WT;
 extern bool debug;
 extern bool cpp_input;
+extern bool memdep;
 extern std::map<std::string, Vector> opcMap;
-// std::unique_ptr<llvm::Module> readCPPtoIR(const std::string &fileName);
+std::unique_ptr<llvm::Module> readCPPtoIR(const char *FileName);
 std::unique_ptr<llvm::Module> getLLVMIR();
 // std::unique_ptr<llvm::Module> readCPP();
 std::unique_ptr<llvm::Module> readIR();

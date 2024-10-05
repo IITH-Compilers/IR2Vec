@@ -53,6 +53,10 @@ cl::opt<bool> cl_cpp("cpp", cl::Optional,
                      cl::desc("Input file is a .cpp file?"), cl::init(false),
                      cl::cat(category));
 
+cl::opt<bool> cl_memdep("memdep", cl::Optional,
+                        cl::desc("Running mem dep analysis on input .ll file"),
+                        cl::init(false), cl::cat(category));
+
 cl::opt<std::string> cl_oname("o", cl::Required, cl::desc("Output file path"),
                               cl::cat(category));
 // for on demand generation of embeddings taking function name
@@ -199,6 +203,7 @@ void setGlobalVars(int argc, char **argv) {
   debug = cl_debug;
   printTime = cl_printTime;
   cpp_input = cl_cpp;
+  memdep = cl_memdep;
 }
 
 void checkFailureConditions() {
@@ -304,119 +309,103 @@ void runMDA() {
   checkModuleFunctions(*M);
 }
 
-bool check_file(std::string filename) {
-  std::ifstream file(filename);
-  return file.good();
-}
+// bool check_file(std::string filename) {
+//   std::ifstream file(filename);
+//   return file.good();
+// }
 
-using namespace clang;
-std::unique_ptr<llvm::Module> testCppInput() {
-  // iname has the file path
-  llvm::LLVMContext *llvmcx;
-  static llvm::LLVMContext MyGlobalContext;
-  llvmcx = &MyGlobalContext;
+// using namespace clang;
+// void generateLLVMIR(const std::string &cppFilePath) {
+//     // Initialize targets
+//     InitializeNativeTarget();
+//     InitializeNativeTargetAsmPrinter();
 
-  std::cout << "Creating CompilerInstance" << std::endl;
+//     // Create the compiler instance
+//     CompilerInstance compiler;
+//     llvm::LLVMContext context;
+// // Diagnostics
+//     auto diagOpts = std::make_shared<DiagnosticOptions>();
+//     auto diagID = new DiagnosticIDs();
+//     auto diagClient = new TextDiagnosticPrinter(llvm::errs(), &*diagOpts);
+//     DiagnosticsEngine diags(diagID, &*diagOpts, diagClient);
 
-  bool file_status = check_file(iname);
+//     // Create the driver
+//     std::string tripleStr = llvm::sys::getDefaultTargetTriple();
+//     driver::Driver driver("clang", tripleStr, diags);
 
-  if (!file_status) {
-    std::cout << "File not found - returning NULL" << std::endl;
-    return nullptr;
-  } else {
-    std::cout << "File found - proceeding" << std::endl;
-  }
+//     // Build the compilation
+//     std::vector<const char *> args = {
+//         "clang",           // Dummy executable name
+//         "-emit-llvm",
+//         "-O0",
+//         "-c",
+//         cppFilePath.c_str()
+//     };
 
-  const char *args[] = {"-x",          "c++",        "-stdlib=libstdc++",
-                        iname.c_str(), "-std=c++17", "-emit-llvm"};
-  llvm::ArrayRef<const char *> commandLineArgs(args, 6);
+//     std::unique_ptr<driver::Compilation>
+//     compilation(driver.BuildCompilation(args)); if (!compilation) {
+//         std::cerr << "Error building compilation" << std::endl;
+//         return;
+//     }
 
-  std::cout << "Command line args created" << std::endl;
+//     const driver::JobList &jobs = compilation->getJobs();
+//     if (jobs.size() != 1) {
+//         std::cerr << "Expected a single job, but got " << jobs.size() <<
+//         std::endl; return;
+//     }
 
-  // The compiler invocation needs a DiagnosticsEngine so it can report problems
-  llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> opt(
-      new clang::DiagnosticOptions());
-  opt->ShowColors = 1;
-  opt->ShowOptionNames = 1;
-  opt->VerifyDiagnostics = 1;
-  opt->ShowCarets = 1;
+//     const driver::Command &cmd = llvm::cast<driver::Command>(*jobs.begin());
 
-  clang::DiagnosticConsumer *client(new DiagnosticConsumer());
-  llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> DiagID(
-      new clang::DiagnosticIDs());
-  clang::DiagnosticsEngine Diags(DiagID, opt, client);
+//     // Create compiler invocation from the job's arguments
+//     std::shared_ptr<CompilerInvocation> invocation =
+//     std::make_shared<CompilerInvocation>();
+//     CompilerInvocation::CreateFromArgs(*invocation, cmd.getArguments(),
+//     diags); compiler.setInvocation(invocation);
 
-  std::cout << "Creating Diagnostics" << std::endl;
+//     // Set up the target options (this part can be expanded for
+//     cross-compilation) compiler.getTargetOpts().Triple =
+//     llvm::sys::getDefaultTargetTriple();
 
-  // Create the compiler invocation
-  std::shared_ptr<clang::CompilerInvocation> CI(
-      new clang::CompilerInvocation());
+//     // Create and execute the action (generating LLVM IR)
+//     auto codeGenAction = std::make_unique<EmitLLVMOnlyAction>(&context);
 
-  std::cout << "Creating Compiler Invocation" << std::endl;
+//     if (!compiler.ExecuteAction(*codeGenAction)) {
+//         std::cerr << "Error generating LLVM IR" << std::endl;
+//         return;
+//     }
 
-  bool status =
-      clang::CompilerInvocation::CreateFromArgs(*CI, commandLineArgs, Diags);
+//     // Get the generated LLVM module
+//     std::unique_ptr<llvm::Module> module = codeGenAction->takeModule();
+//     if (!module) {
+//         std::cerr << "Error: Failed to take LLVM module" << std::endl;
+//         return;
+//     }
 
-  if (!status) {
-    std::cout << "Error in CreateFromArgs : Returning NULL" << std::endl;
-    return NULL;
-  }
-  std::cout << "Reading from args done Status = " << status << std::endl;
+//     // Output the LLVM IR to a file or stdout
+//     std::error_code EC;
+//     llvm::raw_fd_ostream output("output.ll", EC, llvm::sys::fs::OF_None);
+//     if (EC) {
+//         std::cerr << "Error: " << EC.message() << std::endl;
+//         return;
+//     }
 
-  // Create the compiler instance
-  clang::CompilerInstance Clang;
-  Clang.setInvocation(CI);
+//     module->print(output, nullptr);
+//     std::cout << "LLVM IR has been generated and saved to output.ll" <<
+//     std::endl;
+// }
 
-  std::cout << "Creating Instance" << std::endl;
+// void writeModuleToFile(llvm::Module *M, const std::string &filename) {
+//     std::error_code EC;
+//     llvm::raw_fd_ostream OS(filename, EC, llvm::sys::fs::OF_TextWithCRLF);
 
-  // Get ready to report problems
-  Clang.createDiagnostics();
-  if (!Clang.hasDiagnostics()) {
-    std::cout << "No Diagnostics : Returning Null" << std::endl;
-    return NULL;
-  }
+//     if (EC) {
+//         llvm::errs() << "Could not open file: " << EC.message() << "\n";
+//         return;
+//     }
 
-  std::cout << "Checking diagnostics validity" << std::endl;
-
-  // Create an action and make the compiler instance carry it out
-  clang::CodeGenAction *Act = new clang::EmitLLVMOnlyAction(llvmcx);
-  if (!Clang.ExecuteAction(*Act)) {
-    std::cout << "Error in ExecuteAction : Returning NULL" << std::endl;
-
-    return NULL;
-  }
-
-  std::cout << "Executing Action" << std::endl;
-
-  // Check if the module is generated and return it
-  std::unique_ptr<llvm::Module> Mod = Act->takeModule();
-  if (!Mod) {
-    std::cerr << "Failed to generate the LLVM module!" << std::endl;
-    return NULL;
-  }
-
-  std::cout << "LLVM module successfully generated." << std::endl;
-  // You can return the Action or the module for further processing
-  return Mod;
-}
-
-void writeModuleToFile(llvm::Module *module, const std::string &filename) {
-  // Create a raw file output stream
-  std::error_code EC;
-  llvm::raw_fd_ostream out(filename, EC, llvm::sys::fs::OF_None);
-
-  if (EC) {
-    std::cerr << "Error opening file: " << EC.message() << std::endl;
-    return;
-  }
-
-  // Print the module to the file
-  module->print(out, nullptr);
-  std::cout << "Module IR written to " << filename << std::endl;
-
-  // Close the file stream
-  out.close();
-}
+//     M->print(OS, nullptr);  // Use the print function to write the LLVM IR in
+//     text form OS.flush();
+// }
 
 int main(int argc, char **argv) {
   cl::SetVersionPrinter(printVersion);
@@ -428,18 +417,16 @@ int main(int argc, char **argv) {
 
   // return 0;
 
+  if (memdep) {
+    runMDA();
+    return 0;
+  }
   // runMDA();
   // return 0;
 
-  auto mod = testCppInput();
-  if (mod == NULL) {
-    std::cout << "Error in testCPPInput" << std::endl;
-    return 0;
-  } else {
-    std::cout << "Success in testCPPInput. Writing to test.ll" << std::endl;
-    writeModuleToFile(mod.get(), "test.ll");
-    return 0;
-  }
+  // generateLLVMIR(iname.c_str());
+
+  // std::cout << "Code reached beyond llvm ir output" << std::endl;
 
   // auto module = Act->getModule();
 
@@ -449,16 +436,16 @@ int main(int argc, char **argv) {
   // }
 
   // // newly added
-  // if (sym && !(funcName.empty())) {
-  //   generateSymEncodingsFunction(funcName);
-  // } else if (fa && !(funcName.empty())) {
-  //   generateFAEncodingsFunction(funcName);
-  // } else if (fa) {
-  //   generateFAEncodings();
-  // } else if (sym) {
-  //   generateSYMEncodings();
-  // } else if (collectIR) {
-  //   collectIRfunc();
-  // }
-  return 0;
+  if (sym && !(funcName.empty())) {
+    generateSymEncodingsFunction(funcName);
+  } else if (fa && !(funcName.empty())) {
+    generateFAEncodingsFunction(funcName);
+  } else if (fa) {
+    generateFAEncodings();
+  } else if (sym) {
+    generateSYMEncodings();
+  } else if (collectIR) {
+    collectIRfunc();
+  }
+  // return 0;
 }
