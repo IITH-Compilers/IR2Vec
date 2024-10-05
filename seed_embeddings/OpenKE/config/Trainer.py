@@ -34,7 +34,7 @@ class Trainer(object):
         save_steps=None,
         checkpoint_dir=None,
         index_dir=None,
-        out_path=None,
+        analogy_file="analogies.txt",
     ):
 
         self.work_threads = 8
@@ -54,7 +54,7 @@ class Trainer(object):
         # self.out_path = out_path
         
         self.entity_names = self.load_entity_names(index_dir)
-        self.analogies = analogy.AnalogyScorer(analogy_file="/lfs1/usrscratch/staff/nvk1tb/IR2Vec/seed_embeddings/OpenKE/analogies.txt")
+        self.analogies = analogy.AnalogyScorer(analogy_file=analogy_file)
         
     def load_entity_names(self, index_dir):
         with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
