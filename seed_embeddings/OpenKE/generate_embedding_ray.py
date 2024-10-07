@@ -9,6 +9,7 @@ import sys
 import json
 import argparse
 import shutil
+import re
 
 from config import Trainer, Tester
 from module.model import TransE
@@ -115,39 +116,31 @@ def findRep(src, index_dir, src_type="json"):
     )
     return toTxt
 
-def reformat_embeddings(data):
-    result = []
-    current_line = ""
-    is_inside_brackets = False  
-
-    for line in data.splitlines():
-        line = line.strip()
+def reformat_embeddings(input_str):
+    # Split the string by '],' to isolate each object
+    entries = input_str.split('],')
     
-        if '[' in line:
-            is_inside_brackets = True
+    formatted_entries = []
     
-            opening_bracket_index = line.index('[')
-            current_line += line[:opening_bracket_index + 1] + line[opening_bracket_index + 1:].lstrip()
+    for entry in entries:
+        # Remove any newline characters
+        cleaned_entry = entry.replace('\n', ' ')
+        
+        # Split the object name from the values part
+        obj_name, values = cleaned_entry.split(':[')
+        
+        # Remove extra spaces and replace multiple spaces with a single one using regex
+        values = re.sub(r'\s+', ' ', values.split(']')[0].strip())
+        
+        # Replace spaces between numbers with commas and add the closing bracket
+        formatted_values = values.replace(' ', ', ') + ']'
+        
+        # Recombine the object name with the formatted values
+        formatted_entry = f"{obj_name.strip()}:[{formatted_values}"
+        formatted_entries.append(formatted_entry)
     
-            numbers_part = current_line.split('[')[1].strip()  
-            if numbers_part:
-                numbers = numbers_part.split()  
-                current_line = current_line.split('[')[0] + '[' + ', '.join(numbers)  
-    
-        elif ']' in line:
-    
-            numbers = line.split(']')[0].split()  
-            current_line += ', '.join(numbers) + ']' 
-            is_inside_brackets = False
-            result.append(current_line)
-            current_line = ""  
-    
-        elif is_inside_brackets:
-            numbers = line.split() 
-            current_line += ', ' + ', '.join(numbers)  
-    
-    return '\n'.join(result)
-
+    # Join all entries back into one string, separated by newline
+    return '\n'.join(formatted_entries)
 
 if __name__ == "__main__":
     ray.init()
@@ -274,7 +267,7 @@ if __name__ == "__main__":
         metric=metric,
         mode=mode,
     )
-    optuna = OptunaSearch(metric=metric, mode=mode)
+    optuna = OptunaSearch(metric="loss", mode="min")
 
     if arg_conf.use_gpu:
         train_with_resources = tune.with_resources(
