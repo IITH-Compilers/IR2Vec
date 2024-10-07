@@ -38,7 +38,8 @@ cl::opt<bool> cl_collectIR(
 cl::opt<std::string> cl_iname(cl::Positional, cl::desc("Input file path"),
                               cl::Required, cl::cat(category));
 cl::opt<unsigned> cl_dim("dim", cl::Optional, cl::init(300),
-                         cl::desc("Dimension of the embeddings"), cl::cat(category));                           
+                         cl::desc("Dimension of the embeddings"),
+                         cl::cat(category));
 cl::opt<std::string> cl_oname("o", cl::Required, cl::desc("Output file path"),
                               cl::cat(category));
 // for on demand generation of embeddings taking function name

@@ -28,6 +28,7 @@ from ray.tune.search.optuna import OptunaSearch
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 
+
 def test_files(index_dir):
     entities = os.path.join(index_dir, "entity2id.txt")
     relations = os.path.join(index_dir, "relation2id.txt")
@@ -40,6 +41,7 @@ def test_files(index_dir):
         raise Exception("relation2id.txt not found")
     if not os.path.exists(train):
         raise Exception("train2id.txt not found")
+
 
 def train(config, args=None):
     # dataloader for training
@@ -110,37 +112,37 @@ def findRep(src, index_dir, src_type="json"):
     for i in range(1, int(entities[0])):
         toTxt += entities[i].split("\t")[0] + ":" + str(rep[i - 1]) + ",\n"
     toTxt += (
-        entities[int(entities[0])].split("\t")[0]
-        + ":"
-        + str(rep[int(entities[0]) - 1])
+        entities[int(entities[0])].split("\t")[0] + ":" + str(rep[int(entities[0]) - 1])
     )
     return toTxt
 
+
 def reformat_embeddings(input_str):
     # Split the string by '],' to isolate each object
-    entries = input_str.split('],')
-    
+    entries = input_str.split("],")
+
     formatted_entries = []
-    
+
     for entry in entries:
         # Remove any newline characters
-        cleaned_entry = entry.replace('\n', ' ')
-        
+        cleaned_entry = entry.replace("\n", " ")
+
         # Split the object name from the values part
-        obj_name, values = cleaned_entry.split(':[')
-        
+        obj_name, values = cleaned_entry.split(":[")
+
         # Remove extra spaces and replace multiple spaces with a single one using regex
-        values = re.sub(r'\s+', ' ', values.split(']')[0].strip())
-        
+        values = re.sub(r"\s+", " ", values.split("]")[0].strip())
+
         # Replace spaces between numbers with commas and add the closing bracket
-        formatted_values = values.replace(' ', ', ') + ']'
-        
+        formatted_values = values.replace(" ", ", ") + "]"
+
         # Recombine the object name with the formatted values
         formatted_entry = f"{obj_name.strip()}:[{formatted_values}"
         formatted_entries.append(formatted_entry)
-    
+
     # Join all entries back into one string, separated by newline
-    return '\n'.join(formatted_entries)
+    return "\n".join(formatted_entries)
+
 
 if __name__ == "__main__":
     ray.init()
@@ -220,10 +222,10 @@ if __name__ == "__main__":
         type=str,
         default="./analogies.txt",
     )
-    
+
     arg_conf = parser.parse_args()
     arg_conf.index_dir = arg_conf.index_dir + "/"
-    
+
     try:
         test_files(arg_conf.index_dir)
         print("Files are OK")
@@ -239,7 +241,7 @@ if __name__ == "__main__":
         # "neg_ent": tune.randint(1, 30),
         # "neg_rel": tune.randint(1, 30),
         # "bern": tune.randint(0, 2),
-        "opt_method": "Adam", #tune.choice(["SGD", "Adam"]),
+        "opt_method": "Adam",  # tune.choice(["SGD", "Adam"]),
     }
 
     try:
@@ -258,7 +260,7 @@ if __name__ == "__main__":
     else:
         metric = "loss"
         mode = "min"
-        
+
     scheduler = ASHAScheduler(
         time_attr="training_iteration",
         max_t=arg_conf.epoch,
@@ -271,13 +273,12 @@ if __name__ == "__main__":
 
     if arg_conf.use_gpu:
         train_with_resources = tune.with_resources(
-            tune.with_parameters(train, args = arg_conf),
-            resources={"cpu": 8, "gpu": 0.15}
+            tune.with_parameters(train, args=arg_conf),
+            resources={"cpu": 8, "gpu": 0.15},
         )
     else:
         train_with_resources = tune.with_resources(
-            tune.with_parameters(train, args = arg_conf),
-            resources={"cpu": 10, "gpu": 0}
+            tune.with_parameters(train, args=arg_conf), resources={"cpu": 10, "gpu": 0}
         )
 
     tuner = tune.Tuner(
@@ -296,7 +297,7 @@ if __name__ == "__main__":
                 # *Best* checkpoints are determined by these params:
                 checkpoint_score_attribute=metric,
                 checkpoint_score_order=mode,
-            )
+            ),
         ),
     )
     results = tuner.fit()
@@ -304,9 +305,7 @@ if __name__ == "__main__":
     # Write the best result to a file, best_result.txt
     fin_res = results.get_best_result(metric=metric, mode=mode)
     with open(os.path.join(arg_conf.index_dir, "best_result.txt"), "a") as f:
-        f.write(
-            "\n" + str(fin_res)
-        )
+        f.write("\n" + str(fin_res))
 
     if arg_conf.is_analogy:
         print(
@@ -323,7 +322,7 @@ if __name__ == "__main__":
             "Best Config Based on Loss : ",
             fin_res,
         )
-    
+
     # Get the best configuration
     best_config = fin_res.config
     print("best_config: ", best_config)
@@ -366,10 +365,10 @@ if __name__ == "__main__":
                 margin,
             ),
         )
-        
+
         data = findRep(outfile, index_dir, src_type="ckpt")
         formatted_data = reformat_embeddings(data)
-        
+
         # Write the embeddings to outfile
         embeddings_path = embeddings_path.replace(".ckpt", ".txt")
         print("embeddings_path: ", embeddings_path)

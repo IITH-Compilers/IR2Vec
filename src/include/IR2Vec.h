@@ -42,8 +42,8 @@ public:
   // file. Analogous to the command line options that are being used in IR2Vec
   // binary.
   Embeddings(llvm::Module &M, IR2VecMode mode, char level, std::ostream *o,
-             unsigned dim = 300, std::string funcName = "",
-             float WO = 1, float WA = 0.2, float WT = 0.5) {
+             unsigned dim = 300, std::string funcName = "", float WO = 1,
+             float WA = 0.2, float WT = 0.5) {
     vocabulary = VocabularyFactory::createVocabulary(dim)->getVocabulary();
     generateEncodings(M, mode, level, funcName, dim, o, -1, WO, WA, WT);
   }
