@@ -29,8 +29,8 @@ namespace IR2Vec {
     }                                                                          \
   })
 
-#define DIM 300
-using Vector = llvm::SmallVector<double, DIM>;
+using Vector = std::vector<double>;
+using VocabTy = std::map<std::string, Vector>;
 using abi::__cxa_demangle;
 
 extern bool fa;
@@ -46,7 +46,7 @@ extern float WO;
 extern float WA;
 extern float WT;
 extern bool debug;
-extern std::map<std::string, Vector> opcMap;
+extern unsigned DIM;
 std::unique_ptr<llvm::Module> getLLVMIR();
 void scaleVector(Vector &vec, float factor);
 // newly added

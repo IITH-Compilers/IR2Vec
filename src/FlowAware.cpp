@@ -97,11 +97,11 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
 
 Vector IR2Vec_FA::getValue(std::string key) {
   Vector vec(DIM, 0);
-  if (opcMap.find(key) == opcMap.end()) {
+  if (vocabulary.find(key) == vocabulary.end()) {
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
     dataMissCounter++;
   } else
-    vec = opcMap[key];
+    vec = vocabulary[key];
   return vec;
 }
 
@@ -493,7 +493,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     outs() << sets << " ";
   } outs() << "\n";);
 
-  SmallVector<double, DIM> prevVec;
+  Vector prevVec;
   Instruction *argToKill = nullptr;
 
   while (stack.size() != 0) {

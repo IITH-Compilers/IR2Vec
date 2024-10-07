@@ -24,6 +24,7 @@ class IR2Vec_Symbolic {
 
 private:
   llvm::Module &M;
+  IR2Vec::VocabTy &vocabulary;
   IR2Vec::Vector pgmVector;
 
   IR2Vec::Vector getValue(std::string key);
@@ -37,8 +38,9 @@ private:
       instVecMap;
 
 public:
-  IR2Vec_Symbolic(llvm::Module &M) : M{M} {
-    pgmVector = IR2Vec::Vector(DIM, 0);
+  IR2Vec_Symbolic(llvm::Module &M, IR2Vec::VocabTy &vocab)
+      : M{M}, vocabulary{vocab} {
+    pgmVector = IR2Vec::Vector(IR2Vec::DIM, 0);
     res = "";
   }
 
