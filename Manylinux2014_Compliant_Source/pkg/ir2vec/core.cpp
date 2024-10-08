@@ -20,7 +20,6 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SmallSet.h"
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/IR/CFG.h"
@@ -87,7 +86,7 @@ public:
   std::string getLevel() { return level; }
 
   // Function to get Program Vector List
-  PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvmPgmVec) {
+  PyObject *createProgramVectorList(IR2Vec::Vector llvmPgmVec) {
     // for PgmVector
     PyObject *PgmList = PyList_New(0);
     for (auto &Pgm_it : llvmPgmVec)
@@ -138,7 +137,7 @@ public:
     PyObject *instructionVectorList = PyList_New(0);
     for (auto &Inst_it : llvmInstVecMap) {
       PyObject *instructionVector = PyList_New(0);
-      // copy this SmallVector into c++ Vector
+      // copy this IR2Vec::Vector into c++ Vector
       for (auto &Vec_it : Inst_it.second) {
         PyList_Append(instructionVector, PyFloat_FromDouble(Vec_it));
       }
@@ -178,7 +177,7 @@ public:
     }
 
     if (type == OpType::Program) {
-      llvm::SmallVector<double, DIM> progVector = emb->getProgramVector();
+      IR2Vec::Vector progVector = emb->getProgramVector();
       return this->createProgramVectorList(progVector);
     } else if (type == OpType::Function) {
       llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
