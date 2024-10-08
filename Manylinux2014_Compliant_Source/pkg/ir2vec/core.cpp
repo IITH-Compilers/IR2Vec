@@ -74,11 +74,13 @@ private:
   std::string outputFile;
   std::string mode;
   std::string level;
+  uint dim;
 
 public:
   IR2VecHandler(std::string fileName, std::string outputFile, std::string mode,
-                std::string level)
-      : fileName(fileName), outputFile(outputFile), mode(mode), level(level) {}
+                std::string level, uint dim)
+      : fileName(fileName), outputFile(outputFile), mode(mode), level(level),
+        dim(dim) {}
 
   std::string getFile() { return fileName; }
   std::string getOutputFile() { return outputFile; }
@@ -165,10 +167,10 @@ public:
       ofstream output;
       output.open(outFile, ios_base::app);
       emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], &output, funcName));
+          *Module, ir2vecMode, (this->level)[0], &output, funcName, this->dim));
     } else {
       emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], nullptr, funcName));
+          *Module, ir2vecMode, (this->level)[0], nullptr, funcName, this->dim));
     }
 
     if (!emb) {
@@ -292,9 +294,10 @@ PyObject *getFunctionVectors(PyObject *self, PyObject *args) {
 
 IR2VecHandlerObject *createIR2VECObject(const char *filename,
                                         const char *output_file,
-                                        const char *mode, const char *level) {
+                                        const char *mode, const char *level,
+                                        uint dim) {
   IR2VecHandler *ir2vecObj =
-      new IR2VecHandler(filename, output_file, mode, level);
+      new IR2VecHandler(filename, output_file, mode, level, dim);
   if (!ir2vecObj) {
     return nullptr;
   }
@@ -313,9 +316,10 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
   const char *mode = "\0";
   const char *level = "\0";
   const char *output_file = "\0";
+  uint dim = 300;
 
-  if (!PyArg_ParseTuple(args, "sss|s", &filename, &mode, &level,
-                        &output_file)) {
+  if (!PyArg_ParseTuple(args, "sss|si", &filename, &mode, &level, &output_file,
+                        &dim)) {
     // raise error here
     PyErr_SetString(PyExc_TypeError, "Invalid Arguments");
     Py_RETURN_NONE;
@@ -347,7 +351,7 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
   }
 
   IR2VecHandlerObject *ir2vecObj =
-      createIR2VECObject(filename, output_file, mode, level);
+      createIR2VECObject(filename, output_file, mode, level, dim);
 
   if (!ir2vecObj) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
