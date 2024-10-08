@@ -315,11 +315,11 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
   const char *filename = "\0";
   const char *mode = "\0";
   const char *level = "\0";
-  const char *output_file = "\0";
+  const char *output_file = nullptr;
   uint dim = 300;
 
-  if (!PyArg_ParseTuple(args, "sss|si", &filename, &mode, &level, &output_file,
-                        &dim)) {
+  if (!PyArg_ParseTuple(args, "sss|Is", &filename, &mode, &level, &dim,
+                        &output_file)) {
     // raise error here
     PyErr_SetString(PyExc_TypeError, "Invalid Arguments");
     Py_RETURN_NONE;
@@ -328,6 +328,16 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
   if (fileNotValid(filename)) {
     PyErr_SetString(PyExc_TypeError, "Invalid File Path");
     Py_RETURN_NONE;
+  }
+
+  if (output_file == nullptr) {
+    // Regular case : initObj = ir2vec.initEmbedding(full_path, "fa", "f") sets
+    // output file to default value
+
+    // This is to cover for the case
+    // initObj = ir2vec.initEmbedding(full_path, "fa", "f", None, 300)
+
+    output_file = "\0";
   }
 
   if (string(output_file).empty() == false) {
