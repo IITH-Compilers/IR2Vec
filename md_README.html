@@ -215,7 +215,7 @@ Generating program representations</h1>
 <h2><a class="anchor" id="autotoc_md33"></a>
 Using Binary</h2>
 <blockquote class="doxtable">
-<p>&zwj;ir2vec -&lt;mode&gt; -o &lt;output-file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; -funcName=&lt;function-name&gt; &lt;input-ll-file&gt; </p>
+<p>&zwj;ir2vec -&lt;mode&gt; -dim &lt;dimensions&gt; -o &lt;output-file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; -funcName=&lt;function-name&gt; &lt;input-ll-file&gt; </p>
 </blockquote>
 <h3><a class="anchor" id="autotoc_md34"></a>
 Command-Line options</h3>
@@ -223,6 +223,11 @@ Command-Line options</h3>
 <li><code>mode</code> - can be one of <code>sym</code>/<code>fa</code><ul>
 <li><code>sym</code> denotes Symbolic representation</li>
 <li><code>fa</code> denotes Flow-Aware representation</li>
+</ul>
+</li>
+<li><code>dim</code> - Dimensions of embeddings<ul>
+<li>This is an optional argument. Defaults to <code>300</code>.</li>
+<li>Other supported dimensions are <code>75</code> and <code>100</code></li>
 </ul>
 </li>
 <li><code>o</code> - file in which the embeddings are to be appended; (Note : If file doesn’t exist, new file would be created, else embeddings would be appended)</li>
@@ -250,16 +255,16 @@ Command-Line options</h3>
 <h3><a class="anchor" id="autotoc_md35"></a>
 Flow-Aware Embeddings</h3>
 <p>For all functions</p><ul>
-<li><code>ir2vec -fa -o &lt;output_file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; &lt;input_ll_file&gt;</code></li>
+<li><code>ir2vec -fa -dim &lt;dimension&gt; -o &lt;output_file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; &lt;input_ll_file&gt;</code></li>
 </ul>
 <p>For a specific function</p><ul>
-<li><code>ir2vec -fa -o &lt;output_file&gt; -level f -class &lt;class-number&gt; -funcName=\&lt;function-name\&gt;&lt;input_ll_file&gt;</code></li>
+<li><code>ir2vec -fa -dim &lt;dimension&gt; -o &lt;output_file&gt; -level f -class &lt;class-number&gt; -funcName=\&lt;function-name\&gt;&lt;input_ll_file&gt;</code></li>
 </ul>
 <h3><a class="anchor" id="autotoc_md36"></a>
 Symbolic Embeddings</h3>
 <p>For all functions</p><ul>
-<li><code>ir2vec -sym -o &lt;output_file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; &lt;input_ll_file&gt;</code> For a specific function</li>
-<li><code>ir2vec -sym -o &lt;output_file&gt; -level f -class &lt;class-number&gt; -funcName=\&lt;function-name\&gt; &lt;input_ll_file&gt;</code></li>
+<li><code>ir2vec -sym -dim &lt;dimension&gt; -o &lt;output_file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; &lt;input_ll_file&gt;</code> For a specific function</li>
+<li><code>ir2vec -sym -dim &lt;dimension&gt; -o &lt;output_file&gt; -level f -class &lt;class-number&gt; -funcName=\&lt;function-name\&gt; &lt;input_ll_file&gt;</code></li>
 </ul>
 <h1><a class="anchor" id="autotoc_md37"></a>
 Using Libraries</h1>
@@ -282,7 +287,7 @@ Using Libraries</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Creating object to generate FlowAware representation</span></div>
 <div class="line"><span class="keyword">auto</span> ir2vec =</div>
-<div class="line">      <a class="code hl_class" href="classIR2Vec_1_1Embeddings.html">IR2Vec::Embeddings</a>(&lt;LLVM Module&gt;, IR2Vec::IR2VecMode::FlowAware);</div>
+<div class="line">      <a class="code hl_class" href="classIR2Vec_1_1Embeddings.html">IR2Vec::Embeddings</a>(&lt;LLVM Module&gt;, IR2Vec::IR2VecMode::FlowAware, &lt;DIM&gt;);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Getting Instruction vectors corresponding to the instructions in &lt;LLVM Module&gt;</span></div>
 <div class="line"><span class="keyword">auto</span> instVecMap = ir2vec.getInstVecMap();</div>
@@ -310,7 +315,7 @@ Using Libraries</h1>
 <div class="line"><span class="comment">// Access the generated vector</span></div>
 <div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span> val : pgmVec)</div>
 <div class="line">    outs() &lt;&lt; val &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>;</div>
-<div class="ttc" id="aclassIR2Vec_1_1Embeddings_html"><div class="ttname"><a href="classIR2Vec_1_1Embeddings.html">IR2Vec::Embeddings</a></div><div class="ttdef"><b>Definition</b> IR2Vec.h:23</div></div>
+<div class="ttc" id="aclassIR2Vec_1_1Embeddings_html"><div class="ttname"><a href="classIR2Vec_1_1Embeddings.html">IR2Vec::Embeddings</a></div><div class="ttdef"><b>Definition</b> IR2Vec.h:21</div></div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md38"></a>
 Using Python package (IR2Vec-Wheels)</h1>
 <h2><a class="anchor" id="autotoc_md39"></a>
@@ -321,6 +326,8 @@ Initialization -ir2vec.initEmbedding</h2>
 <li><code>file_path</code>: str - Path to the <code>.ll</code> or <code>.bc</code> file.</li>
 <li><code>encoding_type</code>: str - Choose <code>fa</code> (Flow-Aware) or <code>sym</code> (Symbolic).</li>
 <li><code>level</code>: str - Choose <code>p</code> for program-level or <code>f</code> for function-level.</li>
+<li><code>dim</code>: uint - Choose from <code>[300, 100, 75]</code>. Default value is <code>300</code></li>
+<li><code>output_file</code>: str - If provided, embeddings are saved to this file. Default is an empty string.</li>
 </ul>
 <p><b>Returns:</b></p>
 <ul>
@@ -329,7 +336,14 @@ Initialization -ir2vec.initEmbedding</h2>
 <p><b>Example:</b></p>
 <div class="fragment"><div class="line"><span class="keyword">import</span> ir2vec</div>
 <div class="line"> </div>
+<div class="line"><span class="comment"># Approach 1</span></div>
 <div class="line">initObj = ir2vec.initEmbedding(<span class="stringliteral">&quot;/path/to/file.ll&quot;</span>, <span class="stringliteral">&quot;fa&quot;</span>, <span class="stringliteral">&quot;p&quot;</span>)</div>
+<div class="line"> </div>
+<div class="line"><span class="comment"># Approach 2</span></div>
+<div class="line">initObj = ir2vec.initEmbedding(<span class="stringliteral">&quot;/path/to/file.ll&quot;</span>, <span class="stringliteral">&quot;fa&quot;</span>, <span class="stringliteral">&quot;p&quot;</span>, 100)</div>
+<div class="line"> </div>
+<div class="line"><span class="comment"># Approach 3</span></div>
+<div class="line">initObj = ir2vec.initEmbedding(<span class="stringliteral">&quot;/path/to/file.ll&quot;</span>, <span class="stringliteral">&quot;fa&quot;</span>, <span class="stringliteral">&quot;p&quot;</span>, 100, <span class="stringliteral">&quot;output.txt&quot;</span>)</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md40"></a>
 getProgramVector</h2>
 <p><b>Description:</b> Gets the program-level vector representation.</p>

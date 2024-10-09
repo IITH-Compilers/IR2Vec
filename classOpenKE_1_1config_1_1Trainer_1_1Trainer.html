@@ -118,9 +118,9 @@ Collaboration diagram for OpenKE.config.Trainer.Trainer:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aba789758806415dea27f2ee1a571e6c0" id="r_aba789758806415dea27f2ee1a571e6c0"><td class="memItemLeft" align="right" valign="top"><a id="aba789758806415dea27f2ee1a571e6c0" name="aba789758806415dea27f2ee1a571e6c0"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, model=None, data_loader=None, train_times=1000, alpha=0.5, use_gpu=False, opt_method=&quot;sgd&quot;, save_steps=None, checkpoint_dir=None, index_dir=None, out_path=None)</td></tr>
-<tr class="separator:aba789758806415dea27f2ee1a571e6c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c0ca376275b0dd3bf13faa3b443f18d" id="r_a6c0ca376275b0dd3bf13faa3b443f18d"><td class="memItemLeft" align="right" valign="top"><a id="a6c0ca376275b0dd3bf13faa3b443f18d" name="a6c0ca376275b0dd3bf13faa3b443f18d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, model=None, data_loader=None, train_times=1000, alpha=0.5, use_gpu=False, opt_method=&quot;sgd&quot;, save_steps=None, checkpoint_dir=None, index_dir=None, analogy_file=&quot;analogies.txt&quot;)</td></tr>
+<tr class="separator:a6c0ca376275b0dd3bf13faa3b443f18d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e245919346342181c63e6716dff841d" id="r_a9e245919346342181c63e6716dff841d"><td class="memItemLeft" align="right" valign="top"><a id="a9e245919346342181c63e6716dff841d" name="a9e245919346342181c63e6716dff841d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>load_entity_names</b> (self, index_dir)</td></tr>
 <tr class="separator:a9e245919346342181c63e6716dff841d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -208,11 +208,11 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>save_steps</b> = save_
 &#160;</td><td class="memItemRight" valign="bottom"><b>entity_names</b> = self.load_entity_names(index_dir)</td></tr>
 <tr class="separator:ac21f2fd8fe5e4644899fd27a2c45c03b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb514291e818139250a1b7e44214b7b6" id="r_adb514291e818139250a1b7e44214b7b6"><td class="memItemLeft" align="right" valign="top"><a id="adb514291e818139250a1b7e44214b7b6" name="adb514291e818139250a1b7e44214b7b6"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>analogies</b> = <a class="el" href="classOpenKE_1_1analogy_1_1AnalogyScorer.html">analogy.AnalogyScorer</a>(analogy_file=&quot;analogies.txt&quot;)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><b>analogies</b> = <a class="el" href="classOpenKE_1_1analogy_1_1AnalogyScorer.html">analogy.AnalogyScorer</a>(analogy_file=analogy_file)</td></tr>
 <tr class="separator:adb514291e818139250a1b7e44214b7b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15052bfef4167c8d0e2ceb5e0cf83ab6" id="r_a15052bfef4167c8d0e2ceb5e0cf83ab6"><td class="memItemLeft" align="right" valign="top"><a id="a15052bfef4167c8d0e2ceb5e0cf83ab6" name="a15052bfef4167c8d0e2ceb5e0cf83ab6"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>entity_dict</b></td></tr>
-<tr class="separator:a15052bfef4167c8d0e2ceb5e0cf83ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa22668c0eb5519f02d703652da8a6b8b" id="r_aa22668c0eb5519f02d703652da8a6b8b"><td class="memItemLeft" align="right" valign="top"><a id="aa22668c0eb5519f02d703652da8a6b8b" name="aa22668c0eb5519f02d703652da8a6b8b"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>optimizer</b> = 0.0</td></tr>
+<tr class="separator:aa22668c0eb5519f02d703652da8a6b8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a34f3dc22ea73ce927a0b7e5efcc32b7f" name="a34f3dc22ea73ce927a0b7e5efcc32b7f"></a>

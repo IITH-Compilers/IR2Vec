@@ -89,6 +89,7 @@ $(function(){ initResizable(false); });
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="autotoc_md54"></a></p>
 <p>If you do not want to train the model to generate seed embeddings, and want to use the pretrained vocabulary, please use the vocabulary given <a href="../vocabulary">here</a> and skip the following.</p>
+<p>Currently we support three different embedding dimensions (<code>75</code>, <code>100</code>, <code>300</code>). If you want to use embeddings of different dimensions, you can follow the below steps and copy the resultant vocabulary to the <a href="../vocabulary">vocabulary</a> directory with the following naming convention. <code>seedEmbeddingVocab&lt;DIM&gt;D.txt</code>. Such vocabularies would be automatically used during the build process of IR2Vec.</p>
 <h1><a class="anchor" id="autotoc_md55"></a>
 Generation of Seed Embedding Vocabulary</h1>
 <p>This directory helps in generating seed embedding vocabulary in 3 steps.</p><ol type="1">
