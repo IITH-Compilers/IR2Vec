@@ -3,96 +3,58 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 
-import heapq
-import sys, re
 import numpy as np
-import pandas as pd
-from collections import OrderedDict
-from scipy import spatial
+from sklearn.metrics.pairwise import euclidean_distances
 
 
-def findVec(str1, src):
-    with open(src) as f:
-        content = f.read()
-        # print("searching for ", str1)
-        start = content.upper().find("\n" + str1.upper() + ":[") + len(str1) + 3
-        if start == -1:
-            print(str1, " not found")
-            return
-        else:
-            end = content.find("]", start)
-            vecstr = content[start:end].split(", ")
-            vec = [float(element) for element in vecstr]
-            # print(vec)
-            return vec
+class AnalogyScorer:
+    def __init__(self, analogy_file="analogies.txt"):
+        self.entity_dict = {}
+        self.analogies = self._load_analogies(analogy_file)
 
+    def _load_analogies(self, file_path):
+        with open(file_path, "r") as f:
+            return [tuple(line.strip().split()) for line in f if line.strip()]
 
-def genSimilarityTable(vec, src):
-    # opcVec = findVec(opc, src)
-    with open(src) as f:
-        lines = [line.strip("\n\t") for line in f]
-        cosineDict = {}
-        euclDict = {}
-        for line in lines:
-            opcode = line[0 : line.find(":[")].upper()
-            valueStr = line[line.find(":[") + 2 : -2].split(", ")
-            value = [float(element) for element in valueStr]
-            cosineDict[opcode] = spatial.distance.cosine(vec, value)
-            euclDict[opcode] = spatial.distance.euclidean(vec, value)
-        return cosineDict, euclDict
+    def find_vec(self, str1):
+        return np.array(self.entity_dict.get(str1.upper(), None))
 
+    def gen_similarity_table(self, vec):
+        keys = list(self.entity_dict.keys())
+        entity_matrix = np.array(list(self.entity_dict.values()))
+        vec = vec.reshape(1, -1)
 
-def findTopk(dict1, k, values):
-    # print(sorted(dict.items(), key=lambda x: x[1]))
-    # k_keys_sorted_by_values = heapq.nsmallest(k+1, dict1, key=dict1.get)
-    # topKDict = OrderedDict((keys, dict1[keys]) for keys in k_keys_sorted_by_values)
+        # Calculate distances using euclidean_distances
+        distances = euclidean_distances(vec, entity_matrix)[0]
 
-    sortedByVal = dict(sorted(dict1.items(), key=lambda x: x[1]))
-    # sortedByVal.pop('AND')
-    del sortedByVal[values[0].upper()]
-    del sortedByVal[values[1].upper()]
-    del sortedByVal[values[2].upper()]
-    return {k: sortedByVal[k] for k in list(sortedByVal)[:k]}
+        return dict(zip(keys, distances))
 
+    def findTopk(self, dict1, k, values):
+        sortedByVal = dict(sorted(dict1.items(), key=lambda x: x[1]))
+        del sortedByVal[values[0].upper()]
+        del sortedByVal[values[1].upper()]
+        del sortedByVal[values[2].upper()]
+        return {k: sortedByVal[k] for k in list(sortedByVal)[:k]}
 
-def getAnalogyScore(fileName):
-    refFile = "analogies.txt"
-    with open(refFile) as f:
-        analogies = [line.strip("\n") for line in f]
-        totalCnt = 0
-        fileCorrectCnt = {}
+    def get_analogy_score(self, entity_dict):
+        self.entity_dict = entity_dict
+        total_count = len(self.analogies)
+        correct_count = 0
 
-        avg = []
-        correctCnt = 0
-        for analogy in analogies:
-            totalCnt = totalCnt + 1
-            # values = [val for val in analogy.strip('\t')]
-            values = analogy.split(" ")
-            # print(values)
-            # fileName = argv[0]
+        for values in self.analogies:
+            vecA = self.find_vec(values[0])
+            vecB = self.find_vec(values[1])
+            vecC = self.find_vec(values[2])
 
-            vecA = findVec(values[0], fileName)
-            vecB = findVec(values[1], fileName)
-            vecC = findVec(values[2], fileName)
-            # vecD = np.asarray(vecA) - np.asarray(vecB) + np.asarray(vecC)
-            vecD = np.asarray(vecB) - np.asarray(vecA) + np.asarray(vecC)
+            if vecA is None or vecB is None or vecC is None:
+                print(f"Skipping analogy due to missing vector: {values}")
+                continue
 
-            del vecA
-            del vecB
-            del vecC
+            # Calculate vecD based on the analogy
+            vecD = vecB - vecA + vecC
+            similarity_dict = self.gen_similarity_table(vecD)
+            top_k_dict = self.findTopk(similarity_dict, 5, values)
 
-            # print(vecD)
-            cosineDict, euclDict = genSimilarityTable(vecD, fileName)
-            topKCosineDict = findTopk(cosineDict, 5, values)
-
-            if values[3].upper() in topKCosineDict:
-                correctCnt = correctCnt + 1
-                # print(values, ' : ', '\033[92m' + u'\u2713' + '\033[0m', topKCosineDict[values[3].upper()])
-                avg.append(topKCosineDict[values[3].upper()])
-            else:
-                # print(values, ' : ', '\033[91m' + u'\u00D7' + '\033[0m', topKCosineDict.keys())
-                pass
-            fileCorrectCnt[fileName] = correctCnt
-            # fileCorrectCnt['averagedist_'+fileName] = sum(avg)/len(avg)
-
-        return fileCorrectCnt[fileName]
+            if values[3].upper() in top_k_dict:
+                correct_count += 1
+        return correct_count

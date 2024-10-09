@@ -8,7 +8,7 @@
 
 #include "utils.h"
 #include "IR2Vec.h"
-#include "vocabulary.h"
+#include "Vocabulary.h"
 #include <fstream>
 #include <string>
 using namespace llvm;
@@ -27,8 +27,8 @@ float IR2Vec::WO;
 float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
-std::map<std::string, Vector> IR2Vec::opcMap =
-    IR2Vec::Vocabulary::getVocabulary();
+unsigned IR2Vec::DIM;
+
 std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   SMDiagnostic err;
   static LLVMContext context;

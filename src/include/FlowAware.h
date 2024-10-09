@@ -28,6 +28,7 @@ class IR2Vec_FA {
 private:
   llvm::Module &M;
   std::string res;
+  IR2Vec::VocabTy &vocabulary;
   IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
@@ -131,9 +132,9 @@ private:
   void updateFuncVecMapWithCallee(const llvm::Function *function);
 
 public:
-  IR2Vec_FA(llvm::Module &M) : M{M} {
+  IR2Vec_FA(llvm::Module &M, IR2Vec::VocabTy &vocab) : M{M}, vocabulary{vocab} {
 
-    pgmVector = IR2Vec::Vector(DIM, 0);
+    pgmVector = IR2Vec::Vector(IR2Vec::DIM, 0);
     res = "";
 
     memWriteOps.try_emplace("store", 1);
