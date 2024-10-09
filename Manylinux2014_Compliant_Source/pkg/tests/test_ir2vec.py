@@ -160,7 +160,7 @@ def test_fa_f():
         path = (TEST_SUITE_DIR / file).resolve()
         full_path = str(path).strip()
 
-        initObj = ir2vec.initEmbedding(full_path, "fa", "f")
+        initObj = ir2vec.initEmbedding(full_path, "fa", "f", 300)
         assert initObj is not None
 
         functionVectorMap = ir2vec.getFunctionVectors(initObj)

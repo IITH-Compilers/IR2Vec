@@ -1,6 +1,10 @@
 # Pretrained Embeddings
 If you do not want to train the model to generate seed embeddings, and want to use the pretrained vocabulary, please use the vocabulary given [here](../vocabulary) and skip the following.
 
+Currently we support three different embedding dimensions (`75`, `100`, `300`). If you want to use embeddings of different dimensions, you can follow the below steps and copy the resultant
+vocabulary to the [vocabulary](../vocabulary) directory with the following naming convention. `seedEmbeddingVocab<DIM>D.txt`. Such vocabularies would be automatically used during the build
+process of IR2Vec.
+
 # Generation of Seed Embedding Vocabulary
 This directory helps in generating seed embedding vocabulary in 3 steps.
 1. [Building ir2vec](#step-1-building-ir2vec)

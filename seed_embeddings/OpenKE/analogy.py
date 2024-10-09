@@ -6,13 +6,14 @@
 import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 
+
 class AnalogyScorer:
     def __init__(self, analogy_file="analogies.txt"):
         self.entity_dict = {}
         self.analogies = self._load_analogies(analogy_file)
 
     def _load_analogies(self, file_path):
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             return [tuple(line.strip().split()) for line in f if line.strip()]
 
     def find_vec(self, str1):
@@ -22,12 +23,12 @@ class AnalogyScorer:
         keys = list(self.entity_dict.keys())
         entity_matrix = np.array(list(self.entity_dict.values()))
         vec = vec.reshape(1, -1)
-        
+
         # Calculate distances using euclidean_distances
         distances = euclidean_distances(vec, entity_matrix)[0]
-        
+
         return dict(zip(keys, distances))
-    
+
     def findTopk(self, dict1, k, values):
         sortedByVal = dict(sorted(dict1.items(), key=lambda x: x[1]))
         del sortedByVal[values[0].upper()]
@@ -35,11 +36,11 @@ class AnalogyScorer:
         del sortedByVal[values[2].upper()]
         return {k: sortedByVal[k] for k in list(sortedByVal)[:k]}
 
-    def get_analogy_score(self, entity_dict):        
+    def get_analogy_score(self, entity_dict):
         self.entity_dict = entity_dict
         total_count = len(self.analogies)
         correct_count = 0
-        
+
         for values in self.analogies:
             vecA = self.find_vec(values[0])
             vecB = self.find_vec(values[1])
