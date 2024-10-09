@@ -221,6 +221,8 @@ for (auto val : pgmVec)
 * `file_path`: str - Path to the `.ll` or `.bc` file.
 * `encoding_type`: str - Choose `fa` (Flow-Aware) or `sym` (Symbolic).
 * `level`: str - Choose `p` for program-level or `f` for function-level.
+* `dim`: uint - Choose from `[300, 100, 75]`. Default value is `300`
+* `output_file`: str - If provided, embeddings are saved to this file. Default is an empty string.
 
 **Returns:**
 
@@ -231,7 +233,14 @@ for (auto val : pgmVec)
 ```python
 import ir2vec
 
+# Approach 1
 initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+
+# Approach 2
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p", 100)
+
+# Approach 3
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p", 100, "output.txt")
 ```
 
 ### getProgramVector

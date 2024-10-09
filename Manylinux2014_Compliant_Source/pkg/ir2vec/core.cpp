@@ -20,7 +20,6 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SmallSet.h"
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/IR/CFG.h"
@@ -75,11 +74,13 @@ private:
   std::string outputFile;
   std::string mode;
   std::string level;
+  uint dim;
 
 public:
   IR2VecHandler(std::string fileName, std::string outputFile, std::string mode,
-                std::string level)
-      : fileName(fileName), outputFile(outputFile), mode(mode), level(level) {}
+                std::string level, uint dim)
+      : fileName(fileName), outputFile(outputFile), mode(mode), level(level),
+        dim(dim) {}
 
   std::string getFile() { return fileName; }
   std::string getOutputFile() { return outputFile; }
@@ -87,7 +88,7 @@ public:
   std::string getLevel() { return level; }
 
   // Function to get Program Vector List
-  PyObject *createProgramVectorList(llvm::SmallVector<double, DIM> llvmPgmVec) {
+  PyObject *createProgramVectorList(IR2Vec::Vector llvmPgmVec) {
     // for PgmVector
     PyObject *PgmList = PyList_New(0);
     for (auto &Pgm_it : llvmPgmVec)
@@ -138,7 +139,6 @@ public:
     PyObject *instructionVectorList = PyList_New(0);
     for (auto &Inst_it : llvmInstVecMap) {
       PyObject *instructionVector = PyList_New(0);
-      // copy this SmallVector into c++ Vector
       for (auto &Vec_it : Inst_it.second) {
         PyList_Append(instructionVector, PyFloat_FromDouble(Vec_it));
       }
@@ -166,10 +166,10 @@ public:
       ofstream output;
       output.open(outFile, ios_base::app);
       emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], &output, funcName));
+          *Module, ir2vecMode, (this->level)[0], &output, funcName, this->dim));
     } else {
       emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], nullptr, funcName));
+          *Module, ir2vecMode, (this->level)[0], nullptr, funcName, this->dim));
     }
 
     if (!emb) {
@@ -178,7 +178,7 @@ public:
     }
 
     if (type == OpType::Program) {
-      llvm::SmallVector<double, DIM> progVector = emb->getProgramVector();
+      IR2Vec::Vector progVector = emb->getProgramVector();
       return this->createProgramVectorList(progVector);
     } else if (type == OpType::Function) {
       llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
@@ -293,9 +293,10 @@ PyObject *getFunctionVectors(PyObject *self, PyObject *args) {
 
 IR2VecHandlerObject *createIR2VECObject(const char *filename,
                                         const char *output_file,
-                                        const char *mode, const char *level) {
+                                        const char *mode, const char *level,
+                                        uint dim) {
   IR2VecHandler *ir2vecObj =
-      new IR2VecHandler(filename, output_file, mode, level);
+      new IR2VecHandler(filename, output_file, mode, level, dim);
   if (!ir2vecObj) {
     return nullptr;
   }
@@ -314,8 +315,9 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
   const char *mode = "\0";
   const char *level = "\0";
   const char *output_file = "\0";
+  uint dim = 300;
 
-  if (!PyArg_ParseTuple(args, "sss|s", &filename, &mode, &level,
+  if (!PyArg_ParseTuple(args, "sss|Is", &filename, &mode, &level, &dim,
                         &output_file)) {
     // raise error here
     PyErr_SetString(PyExc_TypeError, "Invalid Arguments");
@@ -348,7 +350,7 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
   }
 
   IR2VecHandlerObject *ir2vecObj =
-      createIR2VECObject(filename, output_file, mode, level);
+      createIR2VECObject(filename, output_file, mode, level, dim);
 
   if (!ir2vecObj) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
