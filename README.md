@@ -27,31 +27,31 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ## Table Of Contents
 - [IR2Vec](#ir2vec)
-  - [LLVM Version Archive](#llvm-version-archive)
-  - [Table Of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Python](#python)
-  - [Cpp](#cpp)
-  - [Requirements](#requirements)
-  - [Building from source](#building-from-source)
-  - [Generating program representations](#generating-program-representations)
-    - [Using Binary](#using-binary)
-      - [Command-Line options](#command-line-options)
-      - [Flow-Aware Embeddings](#flow-aware-embeddings)
-      - [Symbolic Embeddings](#symbolic-embeddings)
-  - [Using Libraries](#using-libraries)
-  - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
-    - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
-    - [getProgramVector](#getprogramvector)
-    - [getFunctionVectors](#getfunctionvectors)
-    - [getInstructionVectors](#getinstructionvectors)
-  - [Example](#example)
-  - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
-  - [Experiments](#experiments)
-    - [Note](#note)
-  - [Citation](#citation)
-  - [Contributions](#contributions)
-  - [License](#license)
+    - [LLVM Version Archive](#llvm-version-archive)
+    - [Table Of Contents](#table-of-contents)
+    - [Installation](#installation)
+    - [Python](#python)
+    - [Cpp](#cpp)
+    - [Requirements](#requirements)
+    - [Building from source](#building-from-source)
+    - [Generating program representations](#generating-program-representations)
+        - [Using Binary](#using-binary)
+            - [Command-Line options](#command-line-options)
+            - [Flow-Aware Embeddings](#flow-aware-embeddings)
+            - [Symbolic Embeddings](#symbolic-embeddings)
+    - [Using Libraries](#using-libraries)
+    - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
+        - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
+        - [getProgramVector](#getprogramvector)
+        - [getFunctionVectors](#getfunctionvectors)
+        - [getInstructionVectors](#getinstructionvectors)
+    - [Example](#example)
+    - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
+    - [Experiments](#experiments)
+        - [Note](#note)
+    - [Citation](#citation)
+    - [Contributions](#contributions)
+    - [License](#license)
 
 ## Installation
 
@@ -218,6 +218,8 @@ for (auto val : pgmVec)
 * `file_path`: str - Path to the `.ll` or `.bc` file.
 * `encoding_type`: str - Choose `fa` (Flow-Aware) or `sym` (Symbolic).
 * `level`: str - Choose `p` for program-level or `f` for function-level.
+* `dim`: uint - Choose from `[300, 100, 75]`. Default value is `300`
+* `output_file`: str - If provided, embeddings are saved to this file. Default is an empty string.
 
 **Returns:**
 
@@ -228,7 +230,14 @@ for (auto val : pgmVec)
 ```python
 import ir2vec
 
+# Approach 1
 initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+
+# Approach 2
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p", 100)
+
+# Approach 3
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p", 100, "output.txt")
 ```
 
 ### getProgramVector
