@@ -139,7 +139,6 @@ public:
     PyObject *instructionVectorList = PyList_New(0);
     for (auto &Inst_it : llvmInstVecMap) {
       PyObject *instructionVector = PyList_New(0);
-      // copy this IR2Vec::Vector into c++ Vector
       for (auto &Vec_it : Inst_it.second) {
         PyList_Append(instructionVector, PyFloat_FromDouble(Vec_it));
       }
