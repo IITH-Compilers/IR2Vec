@@ -74,11 +74,11 @@ private:
   std::string outputFile;
   std::string mode;
   std::string level;
-  uint dim;
+  unsigned dim;
 
 public:
   IR2VecHandler(std::string fileName, std::string outputFile, std::string mode,
-                std::string level, uint dim)
+                std::string level, unsigned dim)
       : fileName(fileName), outputFile(outputFile), mode(mode), level(level),
         dim(dim) {}
 
@@ -166,10 +166,10 @@ public:
       ofstream output;
       output.open(outFile, ios_base::app);
       emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], &output, funcName, this->dim));
+          *Module, ir2vecMode, (this->level)[0], &output, this->dim, funcName));
     } else {
       emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], nullptr, funcName, this->dim));
+          *Module, ir2vecMode, (this->level)[0], nullptr, this->dim, funcName));
     }
 
     if (!emb) {
@@ -294,7 +294,7 @@ PyObject *getFunctionVectors(PyObject *self, PyObject *args) {
 IR2VecHandlerObject *createIR2VECObject(const char *filename,
                                         const char *output_file,
                                         const char *mode, const char *level,
-                                        uint dim) {
+                                        unsigned dim) {
   IR2VecHandler *ir2vecObj =
       new IR2VecHandler(filename, output_file, mode, level, dim);
   if (!ir2vecObj) {
@@ -315,7 +315,7 @@ PyObject *initEmbedding(PyObject *self, PyObject *args) {
   const char *mode = "\0";
   const char *level = "\0";
   const char *output_file = "\0";
-  uint dim = 300;
+  unsigned dim = 300;
 
   if (!PyArg_ParseTuple(args, "sss|Is", &filename, &mode, &level, &dim,
                         &output_file)) {
