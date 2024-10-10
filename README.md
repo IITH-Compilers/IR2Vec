@@ -104,7 +104,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
 
 This process would generate `ir2vec` binary under `build/bin` directory, `libIR2Vec.a` and `libIR2Vec.so` under `build/lib` directory.
 
-To ensure the correctness, run `make check`
+To ensure the correctness, run `make check_ir2vec`
 
 
 

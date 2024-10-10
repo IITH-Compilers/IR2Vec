@@ -31,6 +31,7 @@
 
 #include <functional>
 #include <regex>
+#include <string>
 
 using namespace llvm;
 using namespace IR2Vec;
@@ -534,7 +535,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
                        bbVector.begin(), std::plus<double>());
       }
     }
-
+    bbVecMap[b] = bbVector;
     IR2VEC_DEBUG(outs() << "-------------------------------------------\n");
     for (auto i : bbVector) {
       if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {

@@ -122,6 +122,7 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
     std::transform(funcVector.begin(), funcVector.end(),
                    weightedBBVector.begin(), funcVector.begin(),
                    std::plus<double>());
+    bbVecMap[b] = weightedBBVector;
   }
 
   funcStack.pop_back();
@@ -130,6 +131,10 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
 
 Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
                                SmallVector<Function *, 15> &funcStack) {
+  auto It = bbVecMap.find(&B);
+  if (It != bbVecMap.end()) {
+    return It->second;
+  }
   Vector bbVector(DIM, 0);
 
   for (auto &I : B) {
