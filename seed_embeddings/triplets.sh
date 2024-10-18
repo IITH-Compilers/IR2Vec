@@ -70,12 +70,14 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		DEBUG echo "opt from $opt"
-		${LLVM_BUILD}/bin/opt-14 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt-17 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
 	done &
 	if [ $counter == 100 ]; then
+		echo "Current Triplet Count at "
+		cat $4 | wc -l
 		sleep 20
 		counter=0
 	fi
