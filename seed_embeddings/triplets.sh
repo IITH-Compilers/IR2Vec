@@ -53,7 +53,7 @@ while read p; do
 	a=0
 	USED_OPT=()
 	while [ "$a" -lt "$NO_OF_OPT_FILES" ]; do # this is loop1
-		tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXXXXXX)
+		tmpfile=$(mktemp ${PATH_VAR}/tmp/IR2Vec-CollectIR.XXXXXXXXXX)
 		opt_index=$((RANDOM % 6))
 		DEBUG echo "opt_index from $opt_index"
 		opt=${OPT_LEVELS[$opt_index]}
@@ -73,12 +73,12 @@ while read p; do
 		${LLVM_BUILD}/bin/opt-17 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
-		rm "$tmpfile"
+		# rm -rf "$tmpfile"
 	done &
 	if [ $counter == 100 ]; then
-		echo "Current Triplet Count at "
-		cat $4 | wc -l
-		sleep 20
+		echo  "========= PAUSE ========="
+		rm -rf ${PATH_VAR}/tmp/IR2Vec-CollectIR*
+		sleep 3
 		counter=0
 	fi
 
