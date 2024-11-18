@@ -76,7 +76,7 @@ while read p; do
 		# rm -rf "$tmpfile"
 	done &
 	if [ $counter == 100 ]; then
-		echo  "========= PAUSE ========="
+		echo "========= PAUSE ========="
 		rm -rf ${PATH_VAR}/tmp/IR2Vec-CollectIR*
 		sleep 3
 		counter=0

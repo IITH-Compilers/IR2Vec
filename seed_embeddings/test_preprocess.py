@@ -22,7 +22,7 @@ def getEntityDict(config):
                 for line in file:
                     words = line.strip().split()
                     uniqueWords.update(words)
-    
+
     uniqueWords = sorted(uniqueWords)
     print(f"Unique entities found {len(uniqueWords)}")
 
@@ -65,15 +65,16 @@ def getRelationDict(config):
 
     return relationDict
 
+
 def create_write_str(a, b, c):
     return f"{a}\t{b}\t{c}\n"
+
 
 def createTrain2ID(entityDict, relationDict, config):
     print("Generating train set")
     opc = ""
     nol = 0
     temp_file_path = os.path.join(config.preprocessed_dir, "train2id_temp.txt")
-
 
     for filename in sorted(os.listdir(config.tripletFolder)):
         filepath = os.path.join(config.tripletFolder, filename)
@@ -91,23 +92,29 @@ def createTrain2ID(entityDict, relationDict, config):
                                 print(s[0] + " not found in entitiyDict")
                             if "Next" not in relationDict:
                                 print("Next not found in relationDict")
-                            temp_file.write(create_write_str(
-                                entityDict[opc], entityDict[s[0]], relationDict["Next"]
-                            ))
+                            temp_file.write(
+                                create_write_str(
+                                    entityDict[opc],
+                                    entityDict[s[0]],
+                                    relationDict["Next"],
+                                )
+                            )
                             nol += 1
                         opc = s[0]
-                        temp_file.write(create_write_str(
-                            entityDict[opc], 
-                            entityDict[s[1]], 
-                            relationDict["Type"]
-                        ))
+                        temp_file.write(
+                            create_write_str(
+                                entityDict[opc], entityDict[s[1]], relationDict["Type"]
+                            )
+                        )
                         nol += 1
                         for i, arg in enumerate(range(2, s_len)):
-                            temp_file.write(create_write_str(
-                                entityDict[opc],
-                                entityDict[s[arg]],
-                                relationDict[f"Arg{i}"]
-                            ))
+                            temp_file.write(
+                                create_write_str(
+                                    entityDict[opc],
+                                    entityDict[s[arg]],
+                                    relationDict[f"Arg{i}"],
+                                )
+                            )
                             nol += 1
 
     final_file_path = os.path.join(config.preprocessed_dir, "train2id.txt")
@@ -121,7 +128,7 @@ def createTrain2ID(entityDict, relationDict, config):
                         final_file.write(line)
             # Remove the temporary file to clean up
             os.remove(temp_file_path)
-    
+
     shutil.rmtree(config.tempDir)
 
 
@@ -151,11 +158,9 @@ if __name__ == "__main__":
             i += 1
             config.preprocessed_dir = config.preprocessed_dir + str(i)
         os.makedirs(config.preprocessed_dir)
-    
+
     # create a temp folder to store train-temp-ids
-    config.tempDir = os.path.join(
-        os.path.dirname(config.tripletFolder), "temp_train"
-    )
+    config.tempDir = os.path.join(os.path.dirname(config.tripletFolder), "temp_train")
     i = 0
     while os.path.exists(config.tempDir):
         i += 1
