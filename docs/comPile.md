@@ -29,7 +29,7 @@ The following guide details the steps followed in training IR2Vec with the ComPi
 
 # Preprocesing the data
    - In our previous version, we were using the `openKE` folder, where the script `IR2Vec/seed_embeddings/OpenKE/preprocess.py` was being used to preprocess the data from `triplets.txt`.
-   - A new script has been provided at `IR2Vec/seed_embeddings/test_preprocess.py`. This script takes as input, the folder of broken up triplets file, as created in the previous step. The script takes in the folder, and iterates over all the files in the folder, to generate the Entities, Relation and the Training sets, in a safe manner, so as to not cause any RAM overshoots
+   - A new script has been provided at `IR2Vec/seed_embeddings/OpenKE/preprocess_hybrid.py`. This script takes as input, the folder of broken up triplets file, as created in the previous step. The script takes in the folder, and iterates over all the files in the folder, to generate the Entities, Relation and the Training sets, in a safe manner, so as to not cause any RAM overshoots
    - This script can be used as it-is with the previous approach as well. Previously, a single `triplets.txt` file was sufficient to generate the requisite preprocessed information. To run with a single triplets file, just place it in a folder, and pass the folder path to this script.
 
 # Train IDs
@@ -39,4 +39,4 @@ The following guide details the steps followed in training IR2Vec with the ComPi
    - To solve this, a script, `ComPile/get_uniq_train.sh` is supplied. The user needs to copy this to the site of the `train2id.txt`, and run with the appropriate path changes. This will give an output of much reduced size, with unique train sets.
    - This will can then straight away be used with the regular training path.
 
-Once this step is reached, the user can then resume training, from the original path [here](https://github.com/IITH-Compilers/IR2Vec/wiki/version_upgrade_process#training). A helper script, `run_training_ray.sh` has been provided with the main codebase to help the user provide log paths, and specify properly formatted parameters and run the training accordingly.
+Once this step is reached, the user can then resume training, from the original path [here](https://github.com/IITH-Compilers/IR2Vec/wiki/version_upgrade_process#training). A helper script, `ComPile/run_training_ray.sh` has been provided to help the user provide log paths, and specify properly formatted parameters and run the training accordingly.
