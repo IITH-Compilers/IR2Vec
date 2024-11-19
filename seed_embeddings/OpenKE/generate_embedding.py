@@ -180,7 +180,7 @@ if __name__ == "__main__":
     arg_conf = parser.parse_args()
 
     outfile = train(arg_conf)
-    print("Train function exits")
+
     seedfile = os.path.join(
         arg_conf.index_dir,
         "embeddings/seedEmbedding_{}E_{}D_{}batches{}margin.txt".format(
