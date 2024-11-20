@@ -5,8 +5,8 @@ The following guide details the steps followed in training IR2Vec with the ComPi
    - The repo is available [here](https://github.com/IITH-Compilers/IR2Vec-Version-Upgrade-Checks/)
    - Our relevant scripts and files will be present in the folder `ComPile`.
       - `ComPile/collect_dataset_info.py` - This script will generate the list of all the unique C/C++ files in the dataset.
-      - `ComPile/save_ir.py` - This script will download the ByteCode files for all the C/C++ files in the dataset, generate the IR files and save them in the `ir_paths.txt` file.
-      - `ComPile/prep_ir_list.py` - This script will take the `ir_paths.txt` file and generate the list of all the IR paths.
+      - `ComPile/save_ir.py` - This script will download the ByteCode files for all the C/C++ files in the dataset, generate the IR files and save them in the specified location, following which it will save the file_names to `ir_paths.txt` file.
+      - `ComPile/prep_ir_list.py` - This script will take the `ir_paths.txt` file and generate the list of paths of all the IR files in the downloaded dataset.
 
 - Once we have generated the list of all the `.ll` file paths, we go to the seed_embedding folder in the main IR2Vec repository. Here, our process will have to involve the following tasks.
    - Generating Training Triplets

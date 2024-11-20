@@ -220,7 +220,7 @@ if __name__ == "__main__":
         help="Path to the analogy file",
         required=False,
         type=str,
-        default="/home/intern23002/iitH/ir2vec/IR2Vec/seed_embeddings/OpenKE/analogies.txt",
+        default="./analogies.txt",
     )
 
     arg_conf = parser.parse_args()
