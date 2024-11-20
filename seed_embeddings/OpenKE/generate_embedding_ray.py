@@ -36,11 +36,11 @@ def test_files(index_dir):
 
     print(entities, relations, train)
     if not os.path.exists(entities):
-        raise Exception("entity2id.txt not found")
+        raise Exception(f"{entities} not found")
     if not os.path.exists(relations):
-        raise Exception("relation2id.txt not found")
+        raise Exception(f"{relations} not found")
     if not os.path.exists(train):
-        raise Exception("train2id.txt not found")
+        raise Exception(f"{train} not found")
 
 
 def train(config, args=None):
@@ -286,7 +286,7 @@ if __name__ == "__main__":
         param_space=search_space,
         tune_config=TuneConfig(
             search_alg=optuna,
-            max_concurrent_trials=12,
+            max_concurrent_trials=3,
             scheduler=scheduler,
             num_samples=128,
         ),
