@@ -88,12 +88,12 @@ $(function(){ initResizable(false); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The following guide details the steps followed in upgrading the LLVM version supported by IR2Vec</p>
-<h1><a class="anchor" id="autotoc_md4"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Compile the IR2Vec binary</h1>
 <ul>
 <li>Instructions for the same are present <a href="https://github.com/IITH-Compilers/IR2Vec/blob/main/README.md">here</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<h1><a class="anchor" id="autotoc_md10"></a>
 Generating .ll files for re-training.</h1>
 <ul>
 <li>The git repo <code>IR2Vec-Version-Upgrade-Checks</code> has the required scripts to be run for this process.</li>
@@ -128,12 +128,12 @@ Generating .ll files for re-training.</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md11"></a>
 Generating Training Triplets</h1>
 <ul>
 <li>Run the <code>triplets.sh</code> bash file with relevant changes to update the llvm version. Instructions to run the same are available at <code>seed_embeddings/README.md</code>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md7"></a>
+<h1><a class="anchor" id="autotoc_md12"></a>
 Preprocesing the data</h1>
 <ul>
 <li>In this same README.md file, we also have the instructions to run this next step.</li>
@@ -141,7 +141,9 @@ Preprocesing the data</h1>
 <li>Once the file has been run, we should have a <code>preprocessed</code> folder. Inside this folder, we should have the relevant preprocessed data generated.</li>
 <li>Go ahead and create an empty <code>embeddings</code> folder here. This will be relevant for the next step.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md8"></a>
+<p>We have recently retrained the IR2Vec embeddings with a larger dataset. This is the <a href="https://huggingface.co/datasets/llvm-ml/ComPile">ComPile</a> dataset. This dataset is a collection of LLVM IR files from open-source projects, and is considerably larger than the current dataset used in the original IR2Vec paper. Further details about the retraining process can be found <a href="https://github.com/IITH-Compilers/IR2Vec/wiki/comPile.md">here</a>.</p>
+<p>Once the trainIDs, relations and entities files are generated, we can use them, as it is, in the training process as described before.</p>
+<h1><a class="anchor" id="autotoc_md13"></a>
 Training</h1>
 <ul>
 <li>The next file to run is the <code>generate_embeddings_ray.py</code> file in the <code>openKE</code> folder.<ul>
@@ -154,7 +156,7 @@ Training</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md9"></a>
+<h1><a class="anchor" id="autotoc_md14"></a>
 Generate Test Oracle</h1>
 <ul>
 <li>For this, we now move to the <code>src</code> folder. This folder contains the <code>test-suite</code> folder as well.</li>
@@ -164,13 +166,13 @@ Generate Test Oracle</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md10"></a>
+<h1><a class="anchor" id="autotoc_md15"></a>
 Verification</h1>
 <ul>
 <li>Go to the <code>build</code> folder. Regenerate the contents using the CMAKE call from the build process</li>
 <li>Run <code>make check</code>. This should compile successfully.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md11"></a>
+<h1><a class="anchor" id="autotoc_md16"></a>
 Cosmetics</h1>
 <ul>
 <li>At this point, most of the code works as expected, however, for complete online testing and evaluation, we need to ensure that the appropriate llvm version is used throughout the code.</li>
@@ -184,7 +186,7 @@ Cosmetics</h1>
 <li>The docker images for running the Github tests are available <a href="https://github.com/IITH-Compilers/manylinux2014-llvm/tree/main">here</a>.</li>
 <li>The instructions to generate a new Docker image for the updated version are available <a href="https://github.com/IITH-Compilers/IR2Vec/wiki/docker_update">here</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md12"></a>
+<h1><a class="anchor" id="autotoc_md17"></a>
 Pushing commits</h1>
 <ul>
 <li>Update <code>test.yml</code> in github workflows.</li>

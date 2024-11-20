@@ -87,7 +87,7 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">IR2Vec</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md24"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md29"></a></p>
 <p><code>IR2Vec</code> is a LLVM IR based framework to generate distributed representations for the source code in an unsupervised manner, which can be used to represent programs as input to solve machine learning tasks that take programs as inputs.</p>
 <p>This repo contains the source code and relevant information described in the <a href="https://doi.org/10.1145/3418463">paper</a> (<a href="https://arxiv.org/abs/1909.06228">arXiv</a>). Please see <a href="https://compilers.cse.iith.ac.in/projects/ir2vec/">here</a> for more details.</p>
 <blockquote class="doxtable">
@@ -95,7 +95,7 @@ $(function(){ initResizable(false); });
 </blockquote>
 <p><a href="https://github.com/llvm/llvm-project/releases/tag/llvmorg-17.0.6"><img src="https://img.shields.io/badge/LLVM-v17.0.6-blue" alt="LLVM" class="inline"/></a> <a href="https://pypi.org/project/IR2Vec/"><img src="https://img.shields.io/pypi/v/IR2Vec" alt="PyPI Version" class="inline"/></a> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg" alt="Tests" style="pointer-events: none;" class="inline"/> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg" alt="Publish" style="pointer-events: none;" class="inline"/> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/pre-commit%20checks/badge.svg" alt="pre-commit checks" style="pointer-events: none;" class="inline"/></p>
 <p><img src="images/ir2vec.jpg" alt="Image" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md30"></a>
 LLVM Version Archive</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -113,7 +113,7 @@ LLVM Version Archive</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">LLVM 8.0.1   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm8">llvm8</a>   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md26"></a>
+<h1><a class="anchor" id="autotoc_md31"></a>
 Table Of Contents</h1>
 <ul>
 <li>IR2Vec<ul>
@@ -153,19 +153,19 @@ Table Of Contents</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md27"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Installation</h1>
 <p><code>IR2Vec</code> can be installed in different ways to accommodate individual preferences and requirements effectively. You may select to install via a user-friendly Python wheel setup if you are a Python user, or opt for a C++ based installation if you are looking to integrate with a compiler pass or necessitate advanced control and enhanced integration capabilities. The detailed setup steps are mentioned in the following sections.</p>
-<h1><a class="anchor" id="autotoc_md28"></a>
+<h1><a class="anchor" id="autotoc_md33"></a>
 Python</h1>
 <p>If you prefer working with Python, you can easily install <code>IR2Vec</code> using <code>pip</code>.</p>
 <div class="fragment"><div class="line">pip install -U ir2vec</div>
 </div><!-- fragment --><p> Now, you can import and use IR2Vec in your Python projects. Make sure you have a good understanding of Python and its package management system.</p>
 <p>We are actively working on improving the Python interfaces and providing better support. If you find any good-to-have interfaces that you may need for your use case missing, please feel free to raise a request.</p>
-<h1><a class="anchor" id="autotoc_md29"></a>
+<h1><a class="anchor" id="autotoc_md34"></a>
 Cpp</h1>
 <p>If you're a C++ developer and require low-level control, optimization, or integration with C++ projects, you can build <code>IR2Vec</code> from source. First, ensure the below requirements are satisfied, then follow the steps mentioned in the Building from source section.</p>
-<h1><a class="anchor" id="autotoc_md30"></a>
+<h1><a class="anchor" id="autotoc_md35"></a>
 Requirements</h1>
 <ul>
 <li>cmake (&gt;= 3.13.4)</li>
@@ -189,7 +189,7 @@ Requirements</h1>
 </li>
 </ul>
 <p>(Experiments are done on an Ubuntu 20.04 machine)</p>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md36"></a>
 Building from source</h1>
 <ol type="1">
 <li><code>mkdir build &amp;&amp; cd build</code></li>
@@ -209,15 +209,15 @@ Building from source</h1>
 </ol>
 <p>This process would generate <code>ir2vec</code> binary under <code>build/bin</code> directory, <code>libIR2Vec.a</code> and <code>libIR2Vec.so</code> under <code>build/lib</code> directory.</p>
 <p>To ensure the correctness, run <code>make check_ir2vec</code></p>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md37"></a>
 Generating program representations</h1>
 <p><code>IR2Vec</code> can be used either as a stand-alone tool using binary or can be integrated with any third-party tools using libraries. Please see below for the usage instructions.</p>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md38"></a>
 Using Binary</h2>
 <blockquote class="doxtable">
 <p>&zwj;ir2vec -&lt;mode&gt; -dim &lt;dimensions&gt; -o &lt;output-file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; -funcName=&lt;function-name&gt; &lt;input-ll-file&gt; </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md34"></a>
+<h3><a class="anchor" id="autotoc_md39"></a>
 Command-Line options</h3>
 <ul>
 <li><code>mode</code> - can be one of <code>sym</code>/<code>fa</code><ul>
@@ -252,7 +252,7 @@ Command-Line options</h3>
 <blockquote class="doxtable">
 <p>&zwj; &lt;function-name&gt; = &lt;Embeddings&gt; </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md35"></a>
+<h3><a class="anchor" id="autotoc_md40"></a>
 Flow-Aware Embeddings</h3>
 <p>For all functions</p><ul>
 <li><code>ir2vec -fa -dim &lt;dimension&gt; -o &lt;output_file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; &lt;input_ll_file&gt;</code></li>
@@ -260,13 +260,13 @@ Flow-Aware Embeddings</h3>
 <p>For a specific function</p><ul>
 <li><code>ir2vec -fa -dim &lt;dimension&gt; -o &lt;output_file&gt; -level f -class &lt;class-number&gt; -funcName=\&lt;function-name\&gt;&lt;input_ll_file&gt;</code></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md36"></a>
+<h3><a class="anchor" id="autotoc_md41"></a>
 Symbolic Embeddings</h3>
 <p>For all functions</p><ul>
 <li><code>ir2vec -sym -dim &lt;dimension&gt; -o &lt;output_file&gt; -level &lt;p|f&gt; -class &lt;class-number&gt; &lt;input_ll_file&gt;</code> For a specific function</li>
 <li><code>ir2vec -sym -dim &lt;dimension&gt; -o &lt;output_file&gt; -level f -class &lt;class-number&gt; -funcName=\&lt;function-name\&gt; &lt;input_ll_file&gt;</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md37"></a>
+<h1><a class="anchor" id="autotoc_md42"></a>
 Using Libraries</h1>
 <p>The libraries can be installed by passing the installation location to the <code>CMAKE_INSTALL_PREFIX</code> flag during <code>cmake</code> followed by <code>make install</code>. The interfaces are available in <a href="./src/include/IR2Vec.h"><code>IR2Vec.h</code></a>. External projects that would like to use <code>IR2Vec</code> can access the functionality using these exposed interfaces on including <code><a class="el" href="IR2Vec_8h_source.html">IR2Vec.h</a></code> from the installed location after linking statically or dynamically.</p>
 <ul>
@@ -316,9 +316,9 @@ Using Libraries</h1>
 <div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span> val : pgmVec)</div>
 <div class="line">    outs() &lt;&lt; val &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>;</div>
 <div class="ttc" id="aclassIR2Vec_1_1Embeddings_html"><div class="ttname"><a href="classIR2Vec_1_1Embeddings.html">IR2Vec::Embeddings</a></div><div class="ttdef"><b>Definition</b> IR2Vec.h:21</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md38"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md43"></a>
 Using Python package (IR2Vec-Wheels)</h1>
-<h2><a class="anchor" id="autotoc_md39"></a>
+<h2><a class="anchor" id="autotoc_md44"></a>
 Initialization -ir2vec.initEmbedding</h2>
 <p><b>Description:</b> Initialize IR2Vec embedding for an LLVM IR file.</p>
 <p><b>Parameters:</b></p>
@@ -344,7 +344,7 @@ Initialization -ir2vec.initEmbedding</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment"># Approach 3</span></div>
 <div class="line">initObj = ir2vec.initEmbedding(<span class="stringliteral">&quot;/path/to/file.ll&quot;</span>, <span class="stringliteral">&quot;fa&quot;</span>, <span class="stringliteral">&quot;p&quot;</span>, 100, <span class="stringliteral">&quot;output.txt&quot;</span>)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md40"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md45"></a>
 getProgramVector</h2>
 <p><b>Description:</b> Gets the program-level vector representation.</p>
 <p><b>Parameters:</b> optional</p>
@@ -355,7 +355,7 @@ getProgramVector</h2>
 <p><b>Example:</b></p>
 <div class="fragment"><div class="line"><span class="comment"># Getting the program-level vector</span></div>
 <div class="line">progVector = initObj.getProgramVector()</div>
-</div><!-- fragment --> <h2><a class="anchor" id="autotoc_md41"></a>
+</div><!-- fragment --> <h2><a class="anchor" id="autotoc_md46"></a>
 getFunctionVectors</h2>
 <p><b>Description:</b> Gets function-level vectors for all functions in the LLVM IR file.</p>
 <p><b>Parameters:</b> optional</p>
@@ -366,7 +366,7 @@ getFunctionVectors</h2>
 <p><b>Example:</b></p>
 <div class="fragment"><div class="line"><span class="comment"># Getting function-level vectors</span></div>
 <div class="line">functionVectorMap = initObj.getFunctionVectors()</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md42"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md47"></a>
 getInstructionVectors</h2>
 <p><b>Description:</b> Gets instruction-level vectors for all instructions in the LLVM IR file.</p>
 <p><b>Parameters:</b> optional</p>
@@ -377,7 +377,7 @@ getInstructionVectors</h2>
 <p><b>Example:</b></p>
 <div class="fragment"><div class="line"><span class="comment"># Getting instruction-level vectors</span></div>
 <div class="line">instructionVectorsList = initObj.getInstructionVectors()</div>
-</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md43"></a>
+</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md48"></a>
 Example</h1>
 <ul>
 <li>The following code snippet contains an example to demonstrate the usage of the package.</li>
@@ -411,12 +411,12 @@ Example</h1>
 <div class="line">        funcObj[<span class="stringliteral">&quot;actualName&quot;</span>]</div>
 <div class="line">    )</div>
 <div class="line">    assert(np.allclose(functionOutput1[fun][<span class="stringliteral">&quot;vector&quot;</span>],functionOutput2[fun][<span class="stringliteral">&quot;vector&quot;</span>]))</div>
-</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md44"></a>
+</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md49"></a>
 Binaries, Libraries and Wheels - Artifacts</h1>
 <p>Binaries, Libraries (.a and .so), and whl files are autogenerated for every relevant check-in using GitHub Actions. Such generated artifacts are tagged along with the successful runs of <a href="https://github.com/IITH-Compilers/IR2Vec/actions?query=workflow%3APublish"><code>Publish</code></a> and <a href="https://github.com/IITH-Compilers/IR2Vec/actions/workflows/wheel.yml"><code>Build Wheels</code></a> actions.</p>
-<h1><a class="anchor" id="autotoc_md45"></a>
+<h1><a class="anchor" id="autotoc_md50"></a>
 Experiments</h1>
-<h2><a class="anchor" id="autotoc_md46"></a>
+<h2><a class="anchor" id="autotoc_md51"></a>
 Note</h2>
 <p><code> The results mentioned in the experiment's scripts/the published version are not updated for this branch. The experimental results for this branch would be different when compared to the published version. For comparison, use the release corresponding to <a href="https://github.com/IITH-Compilers/IR2Vec/releases/tag/v0.1.0">v0.1.0</a>. </code></p>
 <ul>
@@ -425,7 +425,7 @@ Note</h2>
 <li><a href="./experiments/Out_Of_Vocabulary">OOV</a></li>
 <li><a href="./experiments/TimeTaken">Time Taken</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md47"></a>
+<h1><a class="anchor" id="autotoc_md52"></a>
 Citation</h1>
 <div class="fragment"><div class="line">@article{VenkataKeerthy-2020-IR2Vec,</div>
 <div class="line">author = {VenkataKeerthy, S. and Aggarwal, Rohit and Jain, Shalini and Desarkar, Maunendra Sankar and Upadrasta, Ramakrishna and Srikant, Y. N.},</div>
@@ -445,10 +445,10 @@ Citation</h1>
 <div class="line">numpages = {27},</div>
 <div class="line">keywords = {heterogeneous systems, representation learning, compiler optimizations, LLVM, intermediate representations}</div>
 <div class="line">}</div>
-</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md48"></a>
+</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md53"></a>
 Contributions</h1>
 <p>Please feel free to raise issues to file a bug, pose a question, or initiate any related discussions. Pull requests are welcome :)</p>
-<h1><a class="anchor" id="autotoc_md49"></a>
+<h1><a class="anchor" id="autotoc_md54"></a>
 License</h1>
 <p>IR2Vec is released under a Apache License v2.0 with LLVM Exceptions License. See the LICENSE file for more details. </p>
 </div></div><!-- contents -->

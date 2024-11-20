@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['pretrained_20embeddings_0',['Pretrained Embeddings',['../md_seed__embeddings_2README.html',1,'']]]
+  ['openke_0',['OpenKE',['../md_seed__embeddings_2OpenKE_2README.html',1,'']]]
 ];
