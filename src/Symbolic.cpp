@@ -5,6 +5,7 @@
 // file in the top-level directory for more details.
 //
 #include "Symbolic.h"
+#include "include/utils.h"
 
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PostOrderIterator.h"
@@ -26,7 +27,7 @@ using namespace IR2Vec;
 using abi::__cxa_demangle;
 
 Vector IR2Vec_Symbolic::getValue(std::string key) {
-  Vector vec;
+  Vector vec(DIM, 0);
   if (opcMap.find(key) == opcMap.end())
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
   else
