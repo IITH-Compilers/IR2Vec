@@ -18,7 +18,7 @@ cd ..
 cmake -DCMAKE_BUILD_TYPE=Release .. && make -j"$(nproc)" && make install
 
 cd ..
-cp build/vocabulary.h Manylinux2014_Compliant_Source/pkg/ir2vec/
+cp build/include/Vocabulary*.h Manylinux2014_Compliant_Source/pkg/ir2vec/
 cp src/include/utils.h Manylinux2014_Compliant_Source/pkg/ir2vec/
 cp src/include/IR2Vec.h Manylinux2014_Compliant_Source/pkg/ir2vec/
 cp build/src/version.h Manylinux2014_Compliant_Source/pkg/ir2vec/

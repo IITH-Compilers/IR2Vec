@@ -1,14 +1,17 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- IR2Vec.cpp - Top-level driver utility --------------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
-#include "IR2Vec.h"
+//===----------------------------------------------------------------------===//
+
 #include "CollectIR.h"
 #include "FlowAware.h"
 #include "Symbolic.h"
+#include "Vocabulary.h"
 #include "version.h"
+
 #include "llvm/Support/CommandLine.h"
 #include <stdio.h>
 #include <time.h>
@@ -34,7 +37,9 @@ cl::opt<bool> cl_collectIR(
     cl::init(false), cl::cat(category));
 cl::opt<std::string> cl_iname(cl::Positional, cl::desc("Input file path"),
                               cl::Required, cl::cat(category));
-
+cl::opt<unsigned> cl_dim("dim", cl::Optional, cl::init(300),
+                         cl::desc("Dimension of the embeddings"),
+                         cl::cat(category));
 cl::opt<std::string> cl_oname("o", cl::Required, cl::desc("Output file path"),
                               cl::cat(category));
 // for on demand generation of embeddings taking function name
@@ -78,7 +83,7 @@ int main(int argc, char **argv) {
   collectIR = cl_collectIR;
   iname = cl_iname;
   oname = cl_oname;
-  // newly added
+  DIM = cl_dim;
   funcName = cl_funcName;
   level = cl_level;
   cls = cl_cls;
@@ -111,9 +116,11 @@ int main(int argc, char **argv) {
     exit(1);
 
   auto M = getLLVMIR();
+  auto vocabulary = VocabularyFactory::createVocabulary(DIM)->getVocabulary();
+
   // newly added
   if (sym && !(funcName.empty())) {
-    IR2Vec_Symbolic SYM(*M);
+    IR2Vec_Symbolic SYM(*M, vocabulary);
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     if (printTime) {
@@ -130,7 +137,7 @@ int main(int argc, char **argv) {
     }
     o.close();
   } else if (fa && !(funcName.empty())) {
-    IR2Vec_FA FA(*M);
+    IR2Vec_FA FA(*M, vocabulary);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);
     missCount.open("missCount_" + oname, std::ios_base::app);
@@ -151,7 +158,7 @@ int main(int argc, char **argv) {
     }
     o.close();
   } else if (fa) {
-    IR2Vec_FA FA(*M);
+    IR2Vec_FA FA(*M, vocabulary);
     std::ofstream o, missCount, cyclicCount;
     o.open(oname, std::ios_base::app);
     missCount.open("missCount_" + oname, std::ios_base::app);
@@ -170,7 +177,7 @@ int main(int argc, char **argv) {
     }
     o.close();
   } else if (sym) {
-    IR2Vec_Symbolic SYM(*M);
+    IR2Vec_Symbolic SYM(*M, vocabulary);
     std::ofstream o;
     o.open(oname, std::ios_base::app);
     if (printTime) {

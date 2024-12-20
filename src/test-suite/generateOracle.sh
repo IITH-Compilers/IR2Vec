@@ -1,11 +1,10 @@
-# Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-# Department of Computer Science and Engineering, IIT Hyderabad
-
-# This software is available under the BSD 4-Clause License. Please see LICENSE
-# file in the top-level directory for more details.
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
+
 SEED_VERSION="llvm17"
-# SRC_WD="PE-benchmarks-llfiles-llvm17
+SQLITE_INPUT=./sqlite3.ll
 DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}_p"
 DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}_p"
 
@@ -52,6 +51,10 @@ while IFS= read -r d; do
 	${IR2VEC_PATH} -fa -level p -o ${DEST_FOLDER_FA_P}/ir2vec.txt ${d} &>/dev/null
 done <index-${SEED_VERSION}.files
 wait
+
+echo "Generating SQL level files"
+${IR2VEC_PATH} -sym -level p -o ${DEST_FOLDER_SYM_P}/sqlite3.txt ${SQLITE_INPUT} &>/dev/null
+${IR2VEC_PATH} -fa -level p -o ${DEST_FOLDER_FA_P}/sqlite3.txt ${SQLITE_INPUT} &>/dev/null
 
 echo "generating F level files"
 while IFS= read -r d; do

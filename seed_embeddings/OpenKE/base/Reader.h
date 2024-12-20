@@ -3,6 +3,7 @@
 #include "Setting.h"
 #include "Triple.h"
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
 
@@ -11,6 +12,7 @@ INT *lefHead, *rigHead;
 INT *lefTail, *rigTail;
 INT *lefRel, *rigRel;
 REAL *left_mean, *right_mean;
+REAL *prob;
 
 Triple *trainList;
 Triple *trainHead;
@@ -20,44 +22,58 @@ Triple *trainRel;
 INT *testLef, *testRig;
 INT *validLef, *validRig;
 
+extern "C" void importProb(REAL temp) {
+  if (prob != NULL)
+    free(prob);
+  FILE *fin;
+  fin = fopen((inPath + "kl_prob.txt").c_str(), "r");
+  printf("Current temperature:%f\n", temp);
+  prob = (REAL *)calloc(relationTotal * (relationTotal - 1), sizeof(REAL));
+  INT tmp;
+  for (INT i = 0; i < relationTotal * (relationTotal - 1); ++i) {
+    tmp = fscanf(fin, "%f", &prob[i]);
+  }
+  REAL sum = 0.0;
+  for (INT i = 0; i < relationTotal; ++i) {
+    for (INT j = 0; j < relationTotal - 1; ++j) {
+      REAL tmp = exp(-prob[i * (relationTotal - 1) + j] / temp);
+      sum += tmp;
+      prob[i * (relationTotal - 1) + j] = tmp;
+    }
+    for (INT j = 0; j < relationTotal - 1; ++j) {
+      prob[i * (relationTotal - 1) + j] /= sum;
+    }
+    sum = 0;
+  }
+  fclose(fin);
+}
+
 extern "C" void importTrainFiles() {
 
   printf("The toolkit is importing datasets.\n");
   FILE *fin;
   int tmp;
 
-  fin = fopen((inPath + "relation2id.txt").c_str(), "r");
-
-  if (fin == nullptr) {
-    std::cout << '`' << inPath << "relation2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
+  if (rel_file == "")
+    fin = fopen((inPath + "relation2id.txt").c_str(), "r");
+  else
+    fin = fopen(rel_file.c_str(), "r");
   tmp = fscanf(fin, "%ld", &relationTotal);
   printf("The total of relations is %ld.\n", relationTotal);
   fclose(fin);
 
-  fin = fopen((inPath + "entity2id.txt").c_str(), "r");
-
-  if (fin == nullptr) {
-    std::cout << '`' << inPath << "entity2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
+  if (ent_file == "")
+    fin = fopen((inPath + "entity2id.txt").c_str(), "r");
+  else
+    fin = fopen(ent_file.c_str(), "r");
   tmp = fscanf(fin, "%ld", &entityTotal);
   printf("The total of entities is %ld.\n", entityTotal);
   fclose(fin);
 
-  fin = fopen((inPath + "train2id.txt").c_str(), "r");
-
-  if (fin == nullptr) {
-    std::cout << '`' << inPath << "train2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
+  if (train_file == "")
+    fin = fopen((inPath + "train2id.txt").c_str(), "r");
+  else
+    fin = fopen(train_file.c_str(), "r");
   tmp = fscanf(fin, "%ld", &trainTotal);
   trainList = (Triple *)calloc(trainTotal, sizeof(Triple));
   trainHead = (Triple *)calloc(trainTotal, sizeof(Triple));
@@ -153,48 +169,33 @@ extern "C" void importTestFiles() {
   FILE *fin;
   INT tmp;
 
-  fin = fopen((inPath + "relation2id.txt").c_str(), "r");
-  if (fin == nullptr) {
-    std::cout << '`' << inPath << "relation2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
+  if (rel_file == "")
+    fin = fopen((inPath + "relation2id.txt").c_str(), "r");
+  else
+    fin = fopen(rel_file.c_str(), "r");
   tmp = fscanf(fin, "%ld", &relationTotal);
   fclose(fin);
 
-  fin = fopen((inPath + "entity2id.txt").c_str(), "r");
-  if (fin == nullptr) {
-    std::cout << '`' << inPath << "entity2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
+  if (ent_file == "")
+    fin = fopen((inPath + "entity2id.txt").c_str(), "r");
+  else
+    fin = fopen(ent_file.c_str(), "r");
   tmp = fscanf(fin, "%ld", &entityTotal);
   fclose(fin);
 
-  FILE *f_kb1 = fopen((inPath + "test2id.txt").c_str(), "r");
-
-  if (f_kb1 == nullptr) {
-    std::cout << '`' << inPath << "test2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
-  FILE *f_kb2 = fopen((inPath + "train2id.txt").c_str(), "r");
-  if (f_kb2 == nullptr) {
-    std::cout << '`' << inPath << "train2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
-  FILE *f_kb3 = fopen((inPath + "valid2id.txt").c_str(), "r");
-  if (f_kb3 == nullptr) {
-    std::cout << '`' << inPath << "valid2id.txt" << '`' << " does not exist"
-              << std::endl;
-    return;
-  }
-
+  FILE *f_kb1, *f_kb2, *f_kb3;
+  if (train_file == "")
+    f_kb2 = fopen((inPath + "train2id.txt").c_str(), "r");
+  else
+    f_kb2 = fopen(train_file.c_str(), "r");
+  if (test_file == "")
+    f_kb1 = fopen((inPath + "test2id.txt").c_str(), "r");
+  else
+    f_kb1 = fopen(test_file.c_str(), "r");
+  if (valid_file == "")
+    f_kb3 = fopen((inPath + "valid2id.txt").c_str(), "r");
+  else
+    f_kb3 = fopen(valid_file.c_str(), "r");
   tmp = fscanf(f_kb1, "%ld", &testTotal);
   tmp = fscanf(f_kb2, "%ld", &trainTotal);
   tmp = fscanf(f_kb3, "%ld", &validTotal);
@@ -264,21 +265,14 @@ INT *head_type;
 INT *tail_type;
 
 extern "C" void importTypeFiles() {
+
   head_lef = (INT *)calloc(relationTotal, sizeof(INT));
   head_rig = (INT *)calloc(relationTotal, sizeof(INT));
   tail_lef = (INT *)calloc(relationTotal, sizeof(INT));
   tail_rig = (INT *)calloc(relationTotal, sizeof(INT));
-
   INT total_lef = 0;
   INT total_rig = 0;
   FILE *f_type = fopen((inPath + "type_constrain.txt").c_str(), "r");
-
-  if (f_type == nullptr) {
-    std::cout << '`' << inPath << "type_constrain.txt" << '`'
-              << " does not exist" << std::endl;
-    return;
-  }
-
   INT tmp;
   tmp = fscanf(f_type, "%ld", &tmp);
   for (INT i = 0; i < relationTotal; i++) {
@@ -295,19 +289,11 @@ extern "C" void importTypeFiles() {
     }
   }
   fclose(f_type);
-
   head_type = (INT *)calloc(total_lef, sizeof(INT));
   tail_type = (INT *)calloc(total_rig, sizeof(INT));
   total_lef = 0;
   total_rig = 0;
   f_type = fopen((inPath + "type_constrain.txt").c_str(), "r");
-
-  if (f_type == nullptr) {
-    std::cout << '`' << inPath << "type_constrain.txt" << '`'
-              << " does not exist" << std::endl;
-    return;
-  }
-
   tmp = fscanf(f_type, "%ld", &tmp);
   for (INT i = 0; i < relationTotal; i++) {
     INT rel, tot;

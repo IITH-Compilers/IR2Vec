@@ -1,9 +1,11 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- FlowAware.h - Flow-aware embeddings of IR2Vec ------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #ifndef __IR2Vec_FA_H__
 #define __IR2Vec_FA_H__
 
@@ -26,6 +28,7 @@ class IR2Vec_FA {
 private:
   llvm::Module &M;
   std::string res;
+  IR2Vec::VocabTy &vocabulary;
   IR2Vec::Vector pgmVector;
   unsigned dataMissCounter;
   unsigned cyclicCounter;
@@ -36,6 +39,7 @@ private:
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16> bbVecMap;
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
 
   llvm::SmallMapVector<const llvm::Function *,
@@ -128,9 +132,9 @@ private:
   void updateFuncVecMapWithCallee(const llvm::Function *function);
 
 public:
-  IR2Vec_FA(llvm::Module &M) : M{M} {
+  IR2Vec_FA(llvm::Module &M, IR2Vec::VocabTy &vocab) : M{M}, vocabulary{vocab} {
 
-    pgmVector = IR2Vec::Vector(DIM, 0);
+    pgmVector = IR2Vec::Vector(IR2Vec::DIM, 0);
     res = "";
 
     memWriteOps.try_emplace("store", 1);
@@ -178,6 +182,11 @@ public:
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {
     return instVecMap;
+  }
+
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16>
+  getBBVecMap() {
+    return bbVecMap;
   }
 
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>

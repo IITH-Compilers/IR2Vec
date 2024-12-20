@@ -1,16 +1,69 @@
-
 configure_file (./include/version.h.cmake version.h @ONLY)
 include_directories(./include ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_BINARY_DIR})
-set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp)
+
+option(LLVM_IR2VEC "where to enable IR2Vec as subproject for LLVM" OFF)
+
+set(GENERATED_HEADERS_DIR "${CMAKE_BINARY_DIR}/include")
+file(MAKE_DIRECTORY ${GENERATED_HEADERS_DIR})
+
+file(GLOB VOCAB_FILES "../vocabulary/seedEmbeddingVocab*D.txt")
+
+# List to hold supported dimensions
+set(DIMENSIONS "")
+
+foreach(VOCAB_FILE IN LISTS VOCAB_FILES)
+    get_filename_component(VOCAB_NAME ${VOCAB_FILE} NAME_WE)  # Extract just the file name
+    string(REGEX MATCH "[0-9]+" DIM ${VOCAB_NAME})
+    execute_process(
+        COMMAND python3 generate_vocabulary.py vocab ${VOCAB_FILE} ${GENERATED_HEADERS_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        RESULT_VARIABLE GENERATE_VOCABULARY_RESULT
+        OUTPUT_VARIABLE GENERATE_VOCABULARY_OUTPUT
+        ERROR_VARIABLE GENERATE_VOCABULARY_ERROR
+    )
+
+    if(NOT GENERATE_VOCABULARY_RESULT EQUAL 0)
+      message(FATAL_ERROR "Failed to generate vocabulary files: ${GENERATE_VOCABULARY_ERROR}")
+    else()
+      message(STATUS "Generated vocabulary file: Vocabulary${DIM}D.h")
+    endif()
+
+    list(APPEND DIMENSIONS ${DIM})
+endforeach()
+
+# Check if DIMENSIONS is not empty
+if(NOT DIMENSIONS)
+  message(FATAL_ERROR "No vocabulary files generated")
+endif()
+
+foreach(DIM ${DIMENSIONS})
+  list(APPEND GENERATED_VOCAB_HEADERS "${GENERATED_HEADERS_DIR}/Vocabulary${DIM}D.h")
+endforeach()
+
+string(REPLACE ";" "," DIMENSIONS "${DIMENSIONS}")
+execute_process(
+    COMMAND python3 generate_vocabulary.py base ${DIMENSIONS} ${GENERATED_HEADERS_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE GENERATE_BASE_RESULT
+    OUTPUT_VARIABLE GENERATE_BASE_OUTPUT
+    ERROR_VARIABLE GENERATE_BASE_ERROR
+)
+
+if(NOT GENERATE_BASE_RESULT EQUAL 0)
+  message(FATAL_ERROR "Failed to generate base vocabulary file: ${GENERATE_BASE_ERROR}")
+else()
+  message(STATUS "Generated base vocabulary file")
+endif()
+
+list(APPEND GENERATED_VOCAB_HEADERS "${GENERATED_HEADERS_DIR}/Vocabulary.h")
+
+include_directories(${GENERATED_HEADERS_DIR})
+
+set(commonsrc FlowAware.cpp Symbolic.cpp utils.cpp ${GENERATED_HEADERS_DIR}/VocabularyFactory.cpp)
 set(libsrc libIR2Vec.cpp ${commonsrc})
 set(binsrc CollectIR.cpp IR2Vec.cpp)
-option(LLVM_IR2VEC "where to enable IR2Vec as subproject for LLVM" OFF)
-execute_process(
-    COMMAND python3 generate_vocabulary.py -o ${CMAKE_BINARY_DIR}/vocabulary.h
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMAND echo "Vocabulary file generated."
-)
+
 if(NOT LLVM_IR2VEC)
 
   set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
@@ -36,10 +89,12 @@ if(NOT LLVM_IR2VEC)
 
   add_library(${IR2VEC_LIB} SHARED $<TARGET_OBJECTS:objlib>)
   add_library(${IR2VEC_LIB_STATIC} STATIC $<TARGET_OBJECTS:objlib>)
+
   set_target_properties(${IR2VEC_LIB} ${IR2VEC_LIB_STATIC} PROPERTIES
       VERSION ${PROJECT_VERSION}
       SOVERSION 1
       PUBLIC_HEADER "./include/IR2Vec.h"
+      PUBLIC_HEADER "${GENERATED_VOCAB_HEADERS}"
       OUTPUT_NAME ${IR2VEC_LIB}
       LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
       ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
@@ -52,7 +107,7 @@ if(NOT LLVM_IR2VEC)
 
   add_subdirectory(test-suite)
 
-  add_custom_target(check
+  add_custom_target(check_ir2vec
     COMMAND python3 test-lit.py -a .
     COMMENT "Running LIT based test-suite"
     WORKING_DIRECTORY ./test-suite

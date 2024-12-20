@@ -1,9 +1,11 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- utils.h - Helper utilities  -----------------------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #ifndef __IR2Vec_Utils__
 #define __IR2Vec_Utils__
 
@@ -27,8 +29,8 @@ namespace IR2Vec {
     }                                                                          \
   })
 
-#define DIM 300
-using Vector = llvm::SmallVector<double, DIM>;
+using Vector = std::vector<double>;
+using VocabTy = std::map<std::string, Vector>;
 using abi::__cxa_demangle;
 
 extern bool fa;
@@ -44,7 +46,7 @@ extern float WO;
 extern float WA;
 extern float WT;
 extern bool debug;
-extern std::map<std::string, Vector> opcMap;
+extern unsigned DIM;
 std::unique_ptr<llvm::Module> getLLVMIR();
 void scaleVector(Vector &vec, float factor);
 // newly added

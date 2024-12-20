@@ -1,9 +1,11 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- Symbolic.cpp - Symbolic Encodings of IR2Vec  -------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #include "Symbolic.h"
 #include "include/utils.h"
 
@@ -28,10 +30,11 @@ using abi::__cxa_demangle;
 
 Vector IR2Vec_Symbolic::getValue(std::string key) {
   Vector vec(DIM, 0);
-  if (opcMap.find(key) == opcMap.end())
+
+  if (vocabulary.find(key) == vocabulary.end())
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
   else
-    vec = opcMap[key];
+    vec = vocabulary[key];
   return vec;
 }
 
@@ -121,6 +124,7 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
     std::transform(funcVector.begin(), funcVector.end(),
                    weightedBBVector.begin(), funcVector.begin(),
                    std::plus<double>());
+    bbVecMap[b] = weightedBBVector;
   }
 
   funcStack.pop_back();
@@ -129,6 +133,10 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
 
 Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
                                SmallVector<Function *, 15> &funcStack) {
+  auto It = bbVecMap.find(&B);
+  if (It != bbVecMap.end()) {
+    return It->second;
+  }
   Vector bbVector(DIM, 0);
 
   for (auto &I : B) {

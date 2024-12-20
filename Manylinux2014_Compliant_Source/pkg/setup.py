@@ -1,7 +1,6 @@
-# Copyright (c) 2023, The Contributors of IR2Vec.
-#
-# Part of the IR2Vec project. This software is available under the BSD 4-Clause
-# License. Please see LICENSE file in the top-level directory for more details.
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 
 from setuptools import setup, Extension
@@ -62,12 +61,12 @@ setup(
     long_description=DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/IITH-Compilers/IR2Vec",
-    license="BSD 4-Clause",
+    license="Apache License v2.0 with LLVM Exceptions",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: Apache Software License",
         "Programming Language :: C++",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",

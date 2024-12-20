@@ -6,16 +6,6 @@ struct Triple {
 
   INT h, r, t;
 
-  static INT minimal(INT a, INT b) {
-    if (a > b)
-      return b;
-    return a;
-  }
-
-  static bool cmp_list(const Triple &a, const Triple &b) {
-    return (minimal(a.h, a.t) > minimal(b.h, b.t));
-  }
-
   static bool cmp_head(const Triple &a, const Triple &b) {
     return (a.h < b.h) || (a.h == b.h && a.r < b.r) ||
            (a.h == b.h && a.r == b.r && a.t < b.t);

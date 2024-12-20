@@ -1,7 +1,6 @@
-# Copyright (c) 2023, The Contributors of IR2Vec.
-#
-# Part of the IR2Vec project. This software is available under the BSD 4-Clause
-# License. Please see LICENSE file in the top-level directory for more details.
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 
 import pathlib as pl
@@ -161,7 +160,7 @@ def test_fa_f():
         path = (TEST_SUITE_DIR / file).resolve()
         full_path = str(path).strip()
 
-        initObj = ir2vec.initEmbedding(full_path, "fa", "f")
+        initObj = ir2vec.initEmbedding(full_path, "fa", "f", 300)
         assert initObj is not None
 
         functionVectorMap = ir2vec.getFunctionVectors(initObj)

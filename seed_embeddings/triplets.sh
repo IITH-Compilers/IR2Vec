@@ -1,8 +1,7 @@
-# Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-# Department of Computer Science and Engineering, IIT Hyderabad
+# Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+# Exceptions. See the LICENSE file for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
-# This software is available under the BSD 4-Clause License. Please see LICENSE
-# file in the top-level directory for more details.
 #
 #Usage: bash triplets.sh <build dir> <No of opt> <llFile alist> <output FileNme> <llvm_build>
 
@@ -54,7 +53,7 @@ while read p; do
 	a=0
 	USED_OPT=()
 	while [ "$a" -lt "$NO_OF_OPT_FILES" ]; do # this is loop1
-		tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXXXXXX)
+		tmpfile=$(mktemp ${PATH_VAR}/tmp/IR2Vec-CollectIR.XXXXXXXXXX)
 		opt_index=$((RANDOM % 6))
 		DEBUG echo "opt_index from $opt_index"
 		opt=${OPT_LEVELS[$opt_index]}
@@ -71,13 +70,15 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		DEBUG echo "opt from $opt"
-		${LLVM_BUILD}/bin/opt-14 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt-17 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
-		rm "$tmpfile"
+		# rm -rf "$tmpfile"
 	done &
 	if [ $counter == 100 ]; then
-		sleep 20
+		echo "========= PAUSE ========="
+		rm -rf ${PATH_VAR}/tmp/IR2Vec-CollectIR*
+		sleep 3
 		counter=0
 	fi
 

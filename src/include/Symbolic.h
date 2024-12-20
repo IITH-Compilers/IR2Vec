@@ -1,9 +1,11 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- Symbolic.h - Symbolic Encodings of IR2Vec  ---------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #ifndef __IR2Vec_Symbolic_H__
 #define __IR2Vec_Symbolic_H__
 
@@ -22,6 +24,7 @@ class IR2Vec_Symbolic {
 
 private:
   llvm::Module &M;
+  IR2Vec::VocabTy &vocabulary;
   IR2Vec::Vector pgmVector;
 
   IR2Vec::Vector getValue(std::string key);
@@ -31,12 +34,14 @@ private:
                           llvm::SmallVector<llvm::Function *, 15> &funcStack);
   std::string res;
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcVecMap;
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16> bbVecMap;
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
 
 public:
-  IR2Vec_Symbolic(llvm::Module &M) : M{M} {
-    pgmVector = IR2Vec::Vector(DIM, 0);
+  IR2Vec_Symbolic(llvm::Module &M, IR2Vec::VocabTy &vocab)
+      : M{M}, vocabulary{vocab} {
+    pgmVector = IR2Vec::Vector(IR2Vec::DIM, 0);
     res = "";
   }
 
@@ -46,6 +51,11 @@ public:
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {
     return instVecMap;
+  }
+
+  llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16>
+  getBBVecMap() {
+    return bbVecMap;
   }
 
   llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>

@@ -1,12 +1,14 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- utils.cpp - Helper utilities  ---------------------------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #include "utils.h"
 #include "IR2Vec.h"
-#include "vocabulary.h"
+#include "Vocabulary.h"
 #include <fstream>
 #include <string>
 using namespace llvm;
@@ -25,8 +27,8 @@ float IR2Vec::WO;
 float IR2Vec::WA;
 float IR2Vec::WT;
 bool IR2Vec::debug;
-std::map<std::string, Vector> IR2Vec::opcMap =
-    IR2Vec::Vocabulary::getVocabulary();
+unsigned IR2Vec::DIM;
+
 std::unique_ptr<Module> IR2Vec::getLLVMIR() {
   SMDiagnostic err;
   static LLVMContext context;

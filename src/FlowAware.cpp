@@ -1,9 +1,11 @@
-// Copyright (c) 2021, S. VenkataKeerthy, Rohit Aggarwal
-// Department of Computer Science and Engineering, IIT Hyderabad
+//===- FlowAware.cpp - Flow-aware embeddings of IR2Vec ----------*- C++ -*-===//
 //
-// This software is available under the BSD 4-Clause License. Please see LICENSE
-// file in the top-level directory for more details.
+// Part of the IR2Vec Project, under the Apache License v2.0 with LLVM
+// Exceptions. See the LICENSE file for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
+//===----------------------------------------------------------------------===//
+
 #include "FlowAware.h"
 #ifdef EIGEN_FOUND
 #include "VectorSolverEigen.h"
@@ -29,6 +31,7 @@
 
 #include <functional>
 #include <regex>
+#include <string>
 
 using namespace llvm;
 using namespace IR2Vec;
@@ -95,11 +98,11 @@ void IR2Vec_FA::collectWriteDefsMap(Module &M) {
 
 Vector IR2Vec_FA::getValue(std::string key) {
   Vector vec(DIM, 0);
-  if (opcMap.find(key) == opcMap.end()) {
+  if (vocabulary.find(key) == vocabulary.end()) {
     IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
     dataMissCounter++;
   } else
-    vec = opcMap[key];
+    vec = vocabulary[key];
   return vec;
 }
 
@@ -491,7 +494,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     outs() << sets << " ";
   } outs() << "\n";);
 
-  SmallVector<double, DIM> prevVec;
+  Vector prevVec;
   Instruction *argToKill = nullptr;
 
   while (stack.size() != 0) {
@@ -532,7 +535,7 @@ Vector IR2Vec_FA::func2Vec(Function &F,
                        bbVector.begin(), std::plus<double>());
       }
     }
-
+    bbVecMap[b] = bbVector;
     IR2VEC_DEBUG(outs() << "-------------------------------------------\n");
     for (auto i : bbVector) {
       if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {

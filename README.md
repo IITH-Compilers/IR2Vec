@@ -104,7 +104,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
 
 This process would generate `ir2vec` binary under `build/bin` directory, `libIR2Vec.a` and `libIR2Vec.so` under `build/lib` directory.
 
-To ensure the correctness, run `make check`
+To ensure the correctness, run `make check_ir2vec`
 
 
 
@@ -113,13 +113,16 @@ To ensure the correctness, run `make check`
 instructions.
 
 ### Using Binary
-> ir2vec -\<mode\> -o \<output-file\> -level \<p|f\> -class \<class-number\> -funcName=\<function-name\> \<input-ll-file\>
+> ir2vec -\<mode\> -dim \<dimensions\> -o \<output-file\> -level \<p|f\> -class \<class-number\> -funcName=\<function-name\> \<input-ll-file\>
 
 #### Command-Line options
 
 - `mode` - can be one of `sym`/`fa`
     - `sym` denotes Symbolic representation
     - `fa` denotes Flow-Aware representation
+- `dim` - Dimensions of embeddings
+    - This is an optional argument. Defaults to `300`.
+    - Other supported dimensions are `75` and `100`
 -  `o` - file in which the embeddings are to be appended;     (Note : If  file doesn’t exist, new file would be created, else embeddings would be appended)
 - `level` - can be one of chars `p`/`f`.
     - `p` denotes `program level` encoding
@@ -141,16 +144,16 @@ Please use `--help` for further details.
 
 #### Flow-Aware Embeddings
 For all functions
-* `` ir2vec -fa -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
+* `` ir2vec -fa -dim <dimension> -o <output_file> -level <p|f>  -class <class-number> <input_ll_file>``
 
 For a specific function
-* `` ir2vec -fa -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
+* `` ir2vec -fa -dim <dimension> -o <output_file> -level f  -class <class-number> -funcName=\<function-name\><input_ll_file>``
 
 #### Symbolic Embeddings
 For all functions
- * `` ir2vec -sym -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
+ * `` ir2vec -sym -dim <dimension> -o <output_file> -level <p|f> -class <class-number> <input_ll_file>``
 For a specific function
- * `` ir2vec -sym -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
+ * `` ir2vec -sym -dim <dimension> -o <output_file> -level f -class <class-number> -funcName=\<function-name\> <input_ll_file>``
 
 ## Using Libraries
 The libraries can be installed by passing the installation location to the `CMAKE_INSTALL_PREFIX` flag during `cmake` followed by `make install`.
@@ -178,7 +181,7 @@ The following example snippet shows how to query the exposed vector representati
 
 // Creating object to generate FlowAware representation
 auto ir2vec =
-      IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware);
+      IR2Vec::Embeddings(<LLVM Module>, IR2Vec::IR2VecMode::FlowAware, <DIM>);
 
 // Getting Instruction vectors corresponding to the instructions in <LLVM Module>
 auto instVecMap = ir2vec.getInstVecMap();
@@ -218,6 +221,8 @@ for (auto val : pgmVec)
 * `file_path`: str - Path to the `.ll` or `.bc` file.
 * `encoding_type`: str - Choose `fa` (Flow-Aware) or `sym` (Symbolic).
 * `level`: str - Choose `p` for program-level or `f` for function-level.
+* `dim`: uint - Choose from `[300, 100, 75]`. Default value is `300`
+* `output_file`: str - If provided, embeddings are saved to this file. Default is an empty string.
 
 **Returns:**
 
@@ -228,7 +233,14 @@ for (auto val : pgmVec)
 ```python
 import ir2vec
 
+# Approach 1
 initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p")
+
+# Approach 2
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p", 100)
+
+# Approach 3
+initObj = ir2vec.initEmbedding("/path/to/file.ll", "fa", "p", 100, "output.txt")
 ```
 
 ### getProgramVector
@@ -355,4 +367,4 @@ keywords = {heterogeneous systems, representation learning, compiler optimizatio
 Please feel free to raise issues to file a bug, pose a question, or initiate any related discussions. Pull requests are welcome :)
 
 ## License
-IR2Vec is released under a BSD 4-Clause License. See the LICENSE file for more details.
+IR2Vec is released under a Apache License v2.0 with LLVM Exceptions License. See the LICENSE file for more details.
