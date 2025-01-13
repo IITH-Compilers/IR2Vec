@@ -19,6 +19,18 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Analysis/CFG.h"
 #include "llvm/Analysis/CallGraph.h"
+#include "llvm/IR/Function.h"
+#include "llvm/Pass.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Analysis/BranchProbabilityInfo.h"
+#include "llvm/Analysis/BlockFrequencyInfo.h"
+#include "llvm/Analysis/AliasAnalysis.h"
+#include "llvm/IR/Dominators.h"
+#include "llvm/Analysis/LoopInfo.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/Passes/PassPlugin.h"
+#include "llvm/InitializePasses.h"
+#include "llvm/Analysis/DependenceAnalysis.h"
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
@@ -32,9 +44,146 @@
 #include <functional>
 #include <regex>
 #include <string>
+#include <iostream>
 
 using namespace llvm;
+using namespace std;
 using namespace IR2Vec;
+
+BranchProbabilityInfo *IR2Vec_FA::getBPI(Function *F, FunctionAnalysisManager &FAM) {
+  auto It = bpiMap.find(F);
+  if (It != bpiMap.end())
+  {
+    return It->second;
+  }
+
+  BranchProbabilityInfo *BPI = &FAM.getResult<BranchProbabilityAnalysis>(*F);
+  bpiMap[F] = BPI;
+  return bpiMap[F];
+}
+
+
+/**/
+double IR2Vec_FA::getRDProb(const Instruction *src, const Instruction *tgt,
+                            llvm::SmallVector<const Instruction *, 10> writeSet) {
+
+  auto srcParent = src->getParent();
+  auto tgtParent = tgt->getParent();
+
+  SmallPtrSet<const BasicBlock *, 20> writingBB;
+
+  for (auto I : writeSet)
+  {
+    writingBB.insert(I->getParent());
+    
+    // llvm::errs() << "Writing BB here which won't be considered:"<< I->getParent()->getName().str() << "\n";
+  }
+
+  if (srcParent == tgtParent) {
+    
+
+    cout << "Source and Target are in the same BasicBlock\n";
+    return 1;
+  }
+
+  SmallVector<const BasicBlock *, 20> stack;
+
+  SmallMapVector<const BasicBlock *, bool, 16> visited;
+  SmallMapVector<const Instruction *, unsigned, 16> last_seen;
+
+  auto curNode = srcParent;
+  auto curNodeTerminatorInst = curNode->getTerminator();
+  bool flag = false;
+  double prob = 1;
+  // cout << "Starting traversal from: " << srcParent->getName().str() << "\n";
+  do {
+    visited[curNode] = true;
+    if (flag) {
+      stack.pop_back();
+      if (stack.empty())
+        break;
+      curNode = stack.back();
+      curNodeTerminatorInst = curNode->getTerminator();
+    } else {
+      stack.push_back(curNode);
+    }
+    flag = true;
+    if (!last_seen[curNodeTerminatorInst]) {
+      last_seen[curNodeTerminatorInst] = 0;
+    }
+    for (unsigned i = last_seen[curNodeTerminatorInst];
+         i < curNodeTerminatorInst->getNumSuccessors(); i++) {
+      last_seen[curNodeTerminatorInst]++;
+      auto succ = curNodeTerminatorInst->getSuccessor(i);
+      if (succ == tgtParent) {
+
+        Function* parent = (const_cast<BasicBlock*>(stack.front())->getParent());
+        auto it = bpiMap.find(parent);
+        cout<<"parent here : "<<parent<<"\n";
+        llvm::errs() << "Found path to target BasicBlock: " << tgtParent->getName() << "\n";
+        // auto bpi;
+        BranchProbabilityInfo *bpi;
+        if(it!=bpiMap.end()){
+          cout<<"MEANS IT IS NOT EMPTY HERE"<<"\n";
+          bpi = bpiMap[parent];
+        }
+        else{
+          cout<<"THIS ZONE IS DANGEROUS ?"<< "\n";
+          break;
+          // llvm::FunctionAnalysisManager FAM;
+          // FAM.add(new BranchProbabilityAnalysis());
+          
+          // FAM.addPass(BranchProbabilityAnalysis());
+
+          // llvm::PassBuilder PB;
+          // PB.registerFunctionAnalyses(FAM);
+          // bpiMap[parent]=getBPI(parent, FAM);
+          // bpi = bpiMap[parent];
+        }
+        cout<<"value of bpi :"<<bpi<<"\n";
+        
+        bool init = true;
+        const BasicBlock *prev;
+
+        for (auto BB : stack) {
+          if (init) {
+            init = false;
+            prev = BB;
+            continue;
+          }
+          auto bp = bpi->getEdgeProbability(prev, BB);
+          // cout<<"is bp coming correctly :"<<&bp<<"\n";
+          // llvm::errs() << "Edge Probability " << prev->getName() << " -> " << BB->getName() << " : " << double(bp.getNumerator()) / bp.getDenominator() << "\n";
+          prob = prob * double(bp.getNumerator()) / double(bp.getDenominator());
+          prev = BB;
+          // LLVM_DEBUG(BB->dump());
+        }
+        auto bp = bpi->getEdgeProbability(prev, succ);
+        // llvm::errs() << "Final Edge Probability " << prev->getName() << " -> " << succ->getName() << " : " << double(bp.getNumerator()) / bp.getDenominator() << "\n";
+        prob = prob * double(bp.getNumerator()) / double(bp.getDenominator());
+        
+        curNode = succ;
+        curNodeTerminatorInst = curNode->getTerminator();
+        flag = false;
+        break;
+      } else if (!visited[succ] && writingBB.find(succ) == writingBB.end()) {
+        // llvm::errs() << "Traversing to successor BasicBlock: " << succ->getName() << "\n";
+        curNode = succ;
+        curNodeTerminatorInst = curNode->getTerminator();
+        flag = false;
+        break;
+      }
+    }
+  } while (!stack.empty());
+
+  // LLVM_DEBUG(dbgs() << "Returning from RD Value\n");
+  // cout << "Returning from getRDProb method" << "\n";
+  // cout << "Computed Probability: " << prob << "\n";
+  // cout<<"value of prob here , going out successfully :" << prob <<"\n";
+  return prob;
+}
+
+/**/
 
 void IR2Vec_FA::getTransitiveUse(
     const Instruction *root, const Instruction *def,
@@ -132,11 +281,25 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
                                            std::ostream *cyclicCount) {
 
   int noOfFunc = 0;
+  llvm::errs() << "is it starting from here?\n";
+
+  llvm::FunctionAnalysisManager FAM;
+  llvm::PassBuilder PB;
+  PB.registerFunctionAnalyses(FAM);
+
+  for(auto &f: M){
+    if (!f.isDeclaration()){
+      getBPI(&f,FAM);
+      // llvm::errs() << "printing bpiMap" << "\n";
+      // llvm::errs() << bpiMap[&f] << "\n";
+    }
+  }
+
 
   for (auto &f : M) {
     if (!f.isDeclaration()) {
       SmallVector<Function *, 15> funcStack;
-      auto tmp = func2Vec(f, funcStack);
+      auto tmp = func2Vec(f, funcStack, bpiMap[&f]);
       funcVecMap[&f] = tmp;
     }
   }
@@ -199,7 +362,7 @@ void IR2Vec_FA::updateFuncVecMap(
   visitedFunctions.insert(function);
   SmallVector<Function *, 15> funcStack;
   funcStack.clear();
-  auto tmpParent = func2Vec(*function, funcStack);
+  auto tmpParent = func2Vec(*function, funcStack, bpiMap[function]);
   // funcVecMap is updated with vectors returned by func2Vec
   funcVecMap[function] = tmpParent;
   auto calledFunctions = funcCallMap[function];
@@ -342,7 +505,8 @@ IR2Vec_FA::createKilllist(Instruction *Arg, Instruction *writeInst) {
 }
 
 Vector IR2Vec_FA::func2Vec(Function &F,
-                           SmallVector<Function *, 15> &funcStack) {
+                           SmallVector<Function *, 15> &funcStack,
+                           BranchProbabilityInfo *bpi) {
   auto It = funcVecMap.find(&F);
   if (It != funcVecMap.end()) {
     return It->second;
@@ -357,8 +521,40 @@ Vector IR2Vec_FA::func2Vec(Function &F,
 
   Vector funcVector(DIM, 0);
 
+  // Find successors
+  SmallMapVector<const BasicBlock *, SmallMapVector<BasicBlock *, double, 16>, 16> succMap;
+  SmallMapVector<const BasicBlock *, double, 16> cumulativeScore;
+
+  for (auto &b : F) {
+    SmallMapVector<BasicBlock *, double, 16> succs;
+    for (auto it = succ_begin(&b), et = succ_end(&b); it != et; ++it) {
+      BasicBlock *t = *it;
+      auto bp = bpi->getEdgeProbability(&b, t);
+      double prob = double(bp.getNumerator()) / double(bp.getDenominator());
+      // llvm::errs() << "what is prob here:"<< prob<< "\n";
+      succs[*it] = prob;
+    }
+    succMap[&b] = succs;
+    cumulativeScore[&b] = 0;
+  }
+
   ReversePostOrderTraversal<Function *> RPOT(&F);
 
+  bool isHeader = true;
+  for (auto *b : RPOT) {
+    if (isHeader)
+      cumulativeScore[b] = 1;
+    if (succMap.find(b) != succMap.end()) {
+      for (auto element : succMap[b]) {
+        auto currentPtr = cumulativeScore[b];
+        cumulativeScore[element.first] =
+            (currentPtr * element.second) + cumulativeScore[element.first];
+      }
+    }
+    isHeader = false;
+  }
+
+  // creates the killMap
   for (auto *b : RPOT) {
     unsigned opnum;
     SmallVector<Instruction *, 16> lists;
@@ -376,6 +572,8 @@ Vector IR2Vec_FA::func2Vec(Function &F,
     }
   }
 
+  
+  // constructs the reaching defintions for instructions
   for (auto *b : RPOT) {
     for (auto &I : *b) {
       for (int i = 0; i < I.getNumOperands(); i++) {
@@ -543,8 +741,18 @@ Vector IR2Vec_FA::func2Vec(Function &F,
       }
     }
 
+    // recheck this portion once
+    // auto prob = cumulativeScore[b];
+    // Vector weightedBBVector;
+    // for(auto p : bbVector){
+    //   weightedBBVector.push_back(prob * p);
+    // }
+
     std::transform(funcVector.begin(), funcVector.end(), bbVector.begin(),
                    funcVector.begin(), std::plus<double>());
+    // std::transform(funcVector.begin(), funcVector.end(),
+    //               weightedBBVector.begin(), funcVector.begin(),
+    //               std::plus<double>());
   }
 
   funcStack.pop_back();
@@ -855,6 +1063,8 @@ bool IR2Vec_FA::isMemOp(StringRef opcode, unsigned &operand,
   Function to get Partial Vector of an instruction
   ----------------------------------------------------------------------------------
 */
+
+// multiplying the types with WT
 void IR2Vec_FA::getPartialVec(
     const Instruction &I,
     SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
@@ -918,6 +1128,8 @@ void IR2Vec_FA::getPartialVec(
   Function to solve circular dependencies in Instructions
   ----------------------------------------------------------------------------------
 */
+
+// solving  the system of linear equations
 void IR2Vec_FA::solveInsts(
     llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 16>
         &partialInstValMap) {
@@ -1002,12 +1214,15 @@ void IR2Vec_FA::solveInsts(
                 }
                 if (RDValMap.find(inst) == RDValMap.end()) {
                   SmallMapVector<const Instruction *, double, 16> tmp;
-                  tmp[i] = WA;
+                  // tmp[i] = WA;
+                  tmp[i] = WA * getRDProb(i, inst, RD);
                   RDValMap[inst] = tmp;
                 } else {
-                  RDValMap[inst][i] = WA;
+                  // RDValMap[inst][i] = WA;
+                  RDValMap[inst][i] = WA * getRDProb(i, inst, RD);
                 }
               } else {
+                auto prob = getRDProb(i, inst, RD);
                 auto svtmp = instVecMap[i];
                 scaleVector(svtmp, WA);
                 std::vector<double> vtmp(svtmp.begin(), svtmp.end());
@@ -1119,7 +1334,8 @@ void IR2Vec_FA::solveSingleComponent(
     SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
 
   if (instVecMap.find(&I) != instVecMap.end()) {
-    IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
+    // IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
+    llvm::errs() << "Returning from solveSingelComp because I found in instVecMap" << "\n";
     return;
   }
 
@@ -1182,12 +1398,14 @@ void IR2Vec_FA::solveSingleComponent(
 
         /*Some phi instructions reach themselves and hence may not be in
         the instVecMap but should be in the partialInstValMap*/
-
+        // previously used to recursively solve this
         if (partialInstValMap.find(i) == partialInstValMap.end()) {
           assert(partialInstValMap.find(i) != partialInstValMap.end() &&
                  "Should have been in instvecmap or partialmap");
         }
       } else {
+        auto prob = getRDProb(i, &I, RDList);
+        scaleVector(instVecMap[i], prob);
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
       }
@@ -1233,7 +1451,8 @@ void IR2Vec_FA::inst2Vec(
     SmallMapVector<const Instruction *, Vector, 16> &partialInstValMap) {
 
   if (instVecMap.find(&I) != instVecMap.end()) {
-    IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
+    // IR2VEC_DEBUG(outs() << "Returning from inst2Vec() I found in Map\n");
+    llvm::errs() << "Instruction I already found in instVecMap" << "\n";
     return;
   }
 
@@ -1340,6 +1559,9 @@ void IR2Vec_FA::inst2Vec(
         assert(instVecMap.find(i) != instVecMap.end() &&
                "All RDs should have been solved by Topo Order!");
       } else {
+        // recheck this logic here
+        auto prob = getRDProb(i, &I, RDList);
+        scaleVector(instVecMap[i], prob);
         std::transform(instVecMap[i].begin(), instVecMap[i].end(),
                        vecInst.begin(), vecInst.begin(), std::plus<double>());
       }

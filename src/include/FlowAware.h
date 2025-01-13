@@ -36,6 +36,7 @@ private:
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memWriteOps;
   llvm::SmallDenseMap<const llvm::Instruction *, bool> livelinessMap;
   llvm::SmallDenseMap<llvm::StringRef, unsigned> memAccessOps;
+  llvm::SmallDenseMap<llvm::Function *, llvm::BranchProbabilityInfo*> bpiMap;
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
       instVecMap;
@@ -111,7 +112,8 @@ private:
   void bb2Vec(llvm::BasicBlock &B,
               llvm::SmallVector<llvm::Function *, 15> &funcStack);
   IR2Vec::Vector func2Vec(llvm::Function &F,
-                          llvm::SmallVector<llvm::Function *, 15> &funcStack);
+                          llvm::SmallVector<llvm::Function *, 15> &funcStack,
+                          llvm::BranchProbabilityInfo* bpi = nullptr);
 
   bool isMemOp(llvm::StringRef opcode, unsigned &operand,
                llvm::SmallDenseMap<llvm::StringRef, unsigned> map);
@@ -193,6 +195,12 @@ public:
   getFuncVecMap() {
     return funcVecMap;
   }
+
+  llvm::BranchProbabilityInfo* getBPI(llvm::Function *F, llvm::FunctionAnalysisManager &FAM);
+
+  double getRDProb(const llvm::Instruction *src, const llvm::Instruction *tgt,
+                            llvm::SmallVector<const llvm::Instruction *, 10> writeSet);
+
 
   IR2Vec::Vector getProgramVector() { return pgmVector; }
 };

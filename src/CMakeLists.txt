@@ -75,7 +75,7 @@ if(NOT LLVM_IR2VEC)
 
   include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
   # llvm_map_components_to_libnames(llvm_libs all)
-  llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
+  llvm_map_components_to_libnames(llvm_libs support core passes irreader analysis TransformUtils)
 
   add_executable(${PROJECT_NAME} ${binsrc})
   target_link_libraries (${PROJECT_NAME} ${llvm_libs} objlib)
