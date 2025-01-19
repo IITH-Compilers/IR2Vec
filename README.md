@@ -18,7 +18,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 | LLVM Version | Branch |
 | ------------ | ------ |
-| LLVM 18.1.8 | [llvm18](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 18.1.8 | [main](https://github.com/IITH-Compilers/IR2Vec) |
 | LLVM 17.0.6 | [llvm17](https://github.com/IITH-Compilers/IR2Vec/tree/llvm17) |
 | LLVM 16.0.1 | [llvm16](https://github.com/IITH-Compilers/IR2Vec/tree/llvm16) |
 | LLVM 14.0.1 | [llvm14](https://github.com/IITH-Compilers/IR2Vec/tree/llvm14) |
