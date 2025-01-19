@@ -53,7 +53,7 @@ while read p; do
 	a=0
 	USED_OPT=()
 	while [ "$a" -lt "$NO_OF_OPT_FILES" ]; do # this is loop1
-		tmpfile=$(mktemp /tmp/IR2Vec-CollectIR.XXXXXXXXXX)
+		tmpfile=$(mktemp ${PATH_VAR}/tmp/IR2Vec-CollectIR.XXXXXXXXXX)
 		opt_index=$((RANDOM % 6))
 		DEBUG echo "opt_index from $opt_index"
 		opt=${OPT_LEVELS[$opt_index]}
@@ -70,7 +70,7 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		DEBUG echo "opt from $opt"
-		${LLVM_BUILD}/bin/opt-14 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt-18 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
