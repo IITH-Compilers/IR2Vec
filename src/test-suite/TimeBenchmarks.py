@@ -10,7 +10,7 @@ import subprocess
 from pathlib import Path
 
 
-SEED_VERSION = "llvm17"
+SEED_VERSION = "llvm19"
 # IR2Vec binary relative to this script: "../../build/bin/ir2vec"
 IR2VEC_PATH = (Path(__file__).parents[2] / "build/bin/ir2vec").resolve()
 
