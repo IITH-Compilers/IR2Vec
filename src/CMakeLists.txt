@@ -73,7 +73,7 @@ if(NOT LLVM_IR2VEC)
   message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
   message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
   message(STATUS "Using LLVM_TOOLS_BINARY_DIR in: ${LLVM_TOOLS_BINARY_DIR}")
-  
+
 
   # find_package(Clang 19.1.7 REQUIRED CONFIG)
   # if (Clang_FOUND)
@@ -84,7 +84,7 @@ if(NOT LLVM_IR2VEC)
   #     message(STATUS "Clang binary location: ${CLANG_BINARY}")
   # else()
   #     message(FATAL_ERROR "Clang package not found.")
-  # endif() 
+  # endif()
 
   include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
   # llvm_map_components_to_libnames(llvm_libs all)

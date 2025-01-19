@@ -1,1 +1,0 @@
-/home/cs23btech11001/IR2Vec/new2-build-19/src/test-suite/sqlite-amalgamation-3460000/sqlite3.c	4115

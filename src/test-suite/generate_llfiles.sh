@@ -16,7 +16,7 @@ LLVM_BUILD="/home/cs23btech11001/llvm-project/build_19_latest"
 # fi
 
 for d in ${SRC_WD}/*.cpp; do
-		name=$(basename ${d}) && oname=${name%.*} && ${LLVM_BUILD}/bin/clang++ -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER}/${oname}.ll &
+	name=$(basename ${d}) && oname=${name%.*} && ${LLVM_BUILD}/bin/clang++ -S -emit-llvm -Xclang -disable-O0-optnone ${d} -o ${DEST_FOLDER}/${oname}.ll &
 
 done
 wait
@@ -40,9 +40,9 @@ wait
 
 # # Compile each .cpp file into LLVM IR, suppress warnings
 # for d in ${SRC_WD}/*.cpp; do
-# 	name=$(basename ${d}) 
-# 	oname=${name%.*} 
-	
+# 	name=$(basename ${d})
+# 	oname=${name%.*}
+
 # 	# Add warning suppression flags here
 # 	${LLVM_BUILD}/bin/clang++ \
 # 		-S -emit-llvm \
@@ -57,4 +57,3 @@ wait
 
 # # Wait for all background processes to complete
 # wait
-

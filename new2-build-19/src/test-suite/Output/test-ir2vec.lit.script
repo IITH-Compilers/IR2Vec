@@ -1,2 +1,0 @@
-set -o pipefail;set -x;{ { set +x; } 2>/dev/null && echo 'RUN: at line 1': 'bash /home/cs23btech11001/IR2Vec/src/test-suite/test-ir2vec.lit FA llvm19' >&2 && { set -x; } 2>/dev/null && {   bash /home/cs23btech11001/IR2Vec/src/test-suite/test-ir2vec.lit FA llvm19; }; } &&
-{ { set +x; } 2>/dev/null && echo 'RUN: at line 2': 'bash /home/cs23btech11001/IR2Vec/src/test-suite/test-ir2vec.lit SYM llvm19' >&2 && { set -x; } 2>/dev/null && {   bash /home/cs23btech11001/IR2Vec/src/test-suite/test-ir2vec.lit SYM llvm19; }; }
