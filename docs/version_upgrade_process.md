@@ -35,10 +35,6 @@ The following guide details the steps followed in upgrading the LLVM version sup
    - Once the file has been run, we should have a `preprocessed` folder. Inside this folder, we should have the relevant preprocessed data generated.
    - Go ahead and create an empty `embeddings` folder here. This will be relevant for the next step.
 
-We have recently retrained the IR2Vec embeddings with a larger dataset. This is the [ComPile](https://huggingface.co/datasets/llvm-ml/ComPile) dataset. This dataset is a collection of LLVM IR files from open-source projects, and is considerably larger than the current dataset used in the original IR2Vec paper. Further details about the retraining process can be found [here](https://github.com/IITH-Compilers/IR2Vec/wiki/comPile.md).
-
-Once the trainIDs, relations and entities files are generated, we can use them, as it is, in the training process as described before.
-
 # Training
 - The next file to run is the `generate_embeddings_ray.py` file in the `openKE` folder.
    - Use the `openKE.yaml` file to create the conda environment.

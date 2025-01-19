@@ -6,6 +6,13 @@ set(SQLITE_LLVM_IR
 
 # SQLite IR file is added along side other PE-benchmarks for this version
 if(NOT EXISTS ${SQLITE_LLVM_IR} AND ENABLE_SQLITE)
+    find_program(CLANG_EXECUTABLE clang HINTS "${LLVM_TOOLS_BINARY_DIR}")
+    if (CLANG_EXECUTABLE)
+        message(STATUS "Clang executable found at: ${CLANG_EXECUTABLE}")
+    else()
+        message(FATAL_ERROR "Clang executable not found.")
+    endif()
+
     # The downloaded Zip file and source files directory are located at the
     # build directory since its already gitignore anyways.
     set(SQLITE_ZIP ${CMAKE_CURRENT_BINARY_DIR}/sqlite-amalgamation-3460000.zip)
@@ -48,13 +55,8 @@ if(NOT EXISTS ${SQLITE_LLVM_IR} AND ENABLE_SQLITE)
         endif()
     endif()
 
-    find_program(CLANG_BIN NAMES clang-17 clang)
-    if(NOT CLANG_BIN)
-        message(FATAL_ERROR "Clang not found. Please install it.")
-    endif()
-
     execute_process(
-        COMMAND ${CLANG_BIN} -S -emit-llvm ${SQLITE_COMPILE_FLAGS}
+        COMMAND ${CLANG_EXECUTABLE} -S -emit-llvm ${SQLITE_COMPILE_FLAGS}
             -Xclang -disable-O0-optnone
             -o ${SQLITE_LLVM_IR}
             ${SQLITE_SOURCE}/sqlite3.c
@@ -68,11 +70,11 @@ endif()
 
 # sanity checks and lit configs
 configure_file(sanity_check.sh.cmake sanity_check.sh @ONLY)
-file(COPY PE-benchmarks-llfiles-llvm17 DESTINATION ./)
+file(COPY PE-benchmarks-llfiles-llvm18 DESTINATION ./)
 file(COPY sqlite3.ll DESTINATION ./)
 file(COPY oracle DESTINATION ./)
 file(COPY ../../vocabulary DESTINATION ./)
-file(COPY index-llvm17.files DESTINATION ./)
+file(COPY index-llvm18.files DESTINATION ./)
 
 
 configure_file(lit.site.cfg.py.in lit.site.cfg.py @ONLY)

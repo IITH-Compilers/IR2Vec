@@ -1,6 +1,6 @@
 build/
 .ipynb_checkpoints/
-__pycache__/
+_pycache_/
 .vscode
 experiments/*/output
 seed_embeddings/triplets.txt

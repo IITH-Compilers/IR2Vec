@@ -25,7 +25,7 @@ else
 fi
 
 SEED_VERSION=$2
-VOCAB_PATH="./vocabulary/seedEmbeddingVocab.txt"
+VOCAB_PATH="./vocabulary/seedEmbeddingVocab75D.txt"
 IR2VEC_PATH="../../bin/ir2vec"
 
 functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" "insertionSort" "binomialCoeff" "find" "countParenth" "boruvkaMST" "maxStackHeight" "badCharHeuristic" "bpm"

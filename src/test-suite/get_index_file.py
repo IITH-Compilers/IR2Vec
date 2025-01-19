@@ -8,8 +8,8 @@ import sys
 
 
 def get_index_file():
-    index_file = open("index-llvm17.files", "w")
-    for root, _, files in os.walk("./PE-benchmarks-llfiles-llvm17/"):
+    index_file = open("index-llvm18.files", "w")
+    for root, _, files in os.walk("./PE-benchmarks-llfiles-llvm18/"):
         for file in files:
             if file.endswith(".ll"):
                 index_file.write(os.path.join(root, file) + "\n")
