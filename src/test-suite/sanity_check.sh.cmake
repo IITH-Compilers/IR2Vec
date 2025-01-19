@@ -38,7 +38,6 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 perform_vector_comparison() {
     LEVEL=$1
     FILE_PREFIX=$2
-    echo -e "${LEVEL} hello ${FILE_PREFIX}"
 
     echo -e "${BLUE}${BOLD}Running ir2vec on ${FILE_PREFIX}-level for ${EncodingType} encoding type"
 

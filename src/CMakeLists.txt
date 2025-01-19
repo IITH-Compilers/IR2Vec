@@ -70,9 +70,6 @@ if(NOT LLVM_IR2VEC)
   list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
   find_package(LLVM 19.1.7 REQUIRED CONFIG)
-  message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-  message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-  message(STATUS "Using LLVM_TOOLS_BINARY_DIR in: ${LLVM_TOOLS_BINARY_DIR}")
 
 
   # find_package(Clang 19.1.7 REQUIRED CONFIG)
