@@ -25,7 +25,7 @@ else
 fi
 
 SEED_VERSION=$2
-VOCAB_PATH="./vocabulary/seedEmbeddingVocab.txt"
+VOCAB_PATH="./vocabulary/seedEmbeddingVocab75.txt"
 IR2VEC_PATH="../../bin/ir2vec"
 
 functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" "insertionSort" "binomialCoeff" "find" "countParenth" "boruvkaMST" "maxStackHeight" "badCharHeuristic" "bpm"
@@ -38,6 +38,7 @@ functions=("main" "buildMatchingMachine" "search" "BellamFord" "BFS" "isBCUtil" 
 perform_vector_comparison() {
     LEVEL=$1
     FILE_PREFIX=$2
+    echo -e "${LEVEL} hello ${FILE_PREFIX}"
 
     echo -e "${BLUE}${BOLD}Running ir2vec on ${FILE_PREFIX}-level for ${EncodingType} encoding type"
 
