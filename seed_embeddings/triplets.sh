@@ -70,7 +70,7 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		DEBUG echo "opt from $opt"
-		${LLVM_BUILD}/bin/opt-18 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt-19 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
