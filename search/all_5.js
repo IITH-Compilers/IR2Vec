@@ -1,10 +1,10 @@
 var searchData=
 [
   ['citation_0',['Citation',['../md_README.html#autotoc_md52',1,'']]],
-  ['coarsening_1',['Thread Coarsening',['../md_experiments_2README.html#autotoc_md24',1,'']]],
-  ['collect_20the_20triplets_2',['Steps to collect the triplets',['../md_seed__embeddings_2README.html#autotoc_md63',1,'']]],
+  ['coarsening_1',['Thread Coarsening',['..//github/workspace/experiments/README.md#autotoc_md24',1,'']]],
+  ['collect_20the_20triplets_2',['Steps to collect the triplets',['..//github/workspace/seed_embeddings/README.md#autotoc_md63',1,'']]],
   ['collectir_3',['CollectIR',['../classCollectIR.html',1,'']]],
-  ['command_4',['Example Command',['../md_seed__embeddings_2README.html#autotoc_md69',1,'']]],
+  ['command_4',['Example Command',['..//github/workspace/seed_embeddings/README.md#autotoc_md69',1,'']]],
   ['command_20line_20options_5',['Command-Line options',['../md_README.html#autotoc_md39',1,'']]],
   ['commits_6',['Pushing commits',['../md_docs_2version__upgrade__process.html#autotoc_md17',1,'']]],
   ['compile_7',['comPile',['../md_docs_2comPile.html',1,'']]],

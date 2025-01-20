@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['instructions_0',['Instructions',['../md_docs_2docker__update.html',1,'']]],
-  ['ir2vec_1',['IR2Vec',['../md_README.html',1,'']]]
+  ['md_0',['README.md',['../md_docs_2spec__compilation.html',1,'']]]
 ];

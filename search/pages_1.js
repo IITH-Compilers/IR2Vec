@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['embeddings_0',['Pretrained Embeddings',['../md_seed__embeddings_2README.html',1,'']]],
-  ['experiments_1',['Experiments',['../md_experiments_2README.html',1,'']]]
+  ['instructions_0',['Instructions',['../md_docs_2docker__update.html',1,'']]],
+  ['ir2vec_1',['IR2Vec',['../md_README.html',1,'']]]
 ];

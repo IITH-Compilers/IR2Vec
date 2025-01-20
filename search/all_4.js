@@ -7,5 +7,5 @@ var searchData=
   ['box_4',['Box',['../structBox.html',1,'']]],
   ['breaking_20triplets_20txt_5',['Breaking triplets.txt',['../md_docs_2comPile.html#autotoc_md2',1,'']]],
   ['building_20from_20source_6',['Building from source',['../md_README.html#autotoc_md36',1,'']]],
-  ['building_20tt_20ir2vec_20tt_7',['Step 1: Building &lt;tt&gt;ir2vec&lt;/tt&gt;',['../md_seed__embeddings_2README.html#autotoc_md61',1,'']]]
+  ['building_20tt_20ir2vec_20tt_7',['Step 1: Building &lt;tt&gt;ir2vec&lt;/tt&gt;',['..//github/workspace/seed_embeddings/README.md#autotoc_md61',1,'']]]
 ];
