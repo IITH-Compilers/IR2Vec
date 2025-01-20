@@ -36,11 +36,11 @@ def test_files(index_dir):
 
     print(entities, relations, train)
     if not os.path.exists(entities):
-        raise Exception(f"{entities} not found")
+        raise Exception("entity2id.txt not found")
     if not os.path.exists(relations):
-        raise Exception(f"{relations} not found")
+        raise Exception("relation2id.txt not found")
     if not os.path.exists(train):
-        raise Exception(f"{train} not found")
+        raise Exception("train2id.txt not found")
 
 
 def train(config, args=None):
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         metavar="DIRECTORY",
         help="Location of the directory entity2id.txt, train2id.txt and relation2id.txt",
         required=False,
-        default="../seed_embeddings/preprocessed/",
+        default="../preprocessed",
     )
     parser.add_argument(
         "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1000
@@ -286,7 +286,7 @@ if __name__ == "__main__":
         param_space=search_space,
         tune_config=TuneConfig(
             search_alg=optuna,
-            max_concurrent_trials=3,
+            max_concurrent_trials=12,
             scheduler=scheduler,
             num_samples=128,
         ),

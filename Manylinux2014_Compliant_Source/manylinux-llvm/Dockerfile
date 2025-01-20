@@ -36,7 +36,7 @@ RUN cmake -DCMAKE_BUILD_TYPE=Release -G Ninja -B build \
 	&& cmake --install build --prefix /root/destdir
 
 WORKDIR /root/llvm
-ARG LLVM_VERSION="17.0.6"
+ARG LLVM_VERSION="18.1.8"
 RUN wget -q "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz" \
 	&& tar -xf "llvm-project-${LLVM_VERSION}.src.tar.xz"
 WORKDIR /root/llvm/llvm-project-${LLVM_VERSION}.src/build

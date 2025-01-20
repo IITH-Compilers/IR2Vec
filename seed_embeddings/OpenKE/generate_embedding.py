@@ -188,7 +188,7 @@ if __name__ == "__main__":
         ),
     )
 
-    findRep(outfile, seedfile, arg_conf.index_dir)
+    findRep(outfilejson, seedfile, arg_conf.index_dir)
 
     print("Training finished...")
     print("seed file : ", seedfile)
