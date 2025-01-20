@@ -18,7 +18,8 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 | LLVM Version | Branch |
 | ------------ | ------ |
-| LLVM 18.1.8 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 19.1.7 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 18.1.8 | [llvm18](https://github.com/IITH-Compilers/IR2Vec/tree/llvm18) |
 | LLVM 17.0.6 | [llvm17](https://github.com/IITH-Compilers/IR2Vec/tree/llvm17) |
 | LLVM 16.0.1 | [llvm16](https://github.com/IITH-Compilers/IR2Vec/tree/llvm16) |
 | LLVM 14.0.1 | [llvm14](https://github.com/IITH-Compilers/IR2Vec/tree/llvm14) |
@@ -76,7 +77,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-* LLVM (18.1.8) - [src](https://github.com/llvm/llvm-project/tree/release/18.x), [release](https://releases.llvm.org/download.html#18.1.8)
+* LLVM (19.1.7) - [src](https://github.com/llvm/llvm-project/tree/release/17.x), [release](https://releases.llvm.org/download.html#19.1.7)
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7) (Optional)
 * Python (3.6.7)

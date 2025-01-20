@@ -69,9 +69,21 @@ if(NOT LLVM_IR2VEC)
   set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
   list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
-  find_package(LLVM 18.1.8 REQUIRED CONFIG)
+  find_package(LLVM 19.1.7 REQUIRED CONFIG)
   message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
   message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+
+  # find_package(Clang 19.1.7 REQUIRED CONFIG)
+  # if (Clang_FOUND)
+  #     message(STATUS "Clang package found.")
+  #     message(STATUS "Clang executable: ${CLANG_EXECUTABLE}")
+  #     message(STATUS "TEST -- ${CLANG_EXPORTED_TARGETS}")
+  #     get_target_property(CLANG_BINARY clang IMPORTED_LOCATION)
+  #     message(STATUS "Clang binary location: ${CLANG_BINARY}")
+  # else()
+  #     message(FATAL_ERROR "Clang package not found.")
+  # endif()
 
   include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
   # llvm_map_components_to_libnames(llvm_libs all)
