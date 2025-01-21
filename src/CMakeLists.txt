@@ -69,9 +69,11 @@ if(NOT LLVM_IR2VEC)
   set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
   list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
-  find_package(LLVM 18.1.8 REQUIRED CONFIG)
+  find_package(LLVM 19.1.7 REQUIRED CONFIG)
   message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
   message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+
 
   include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
   # llvm_map_components_to_libnames(llvm_libs all)
