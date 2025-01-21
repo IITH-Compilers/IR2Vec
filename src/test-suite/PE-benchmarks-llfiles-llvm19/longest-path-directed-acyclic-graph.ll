@@ -335,15 +335,12 @@ define dso_local void @_ZN5GraphD2Ev(ptr noundef nonnull align 8 dereferenceable
   br i1 %15, label %16, label %12
 
 16:                                               ; preds = %12, %7
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/longest-path-directed-acyclic-graph.ll
   call void @_ZdaPv(ptr noundef %8) #15
   br label %17
-========
   %17 = mul i64 24, %9
   %18 = add i64 %17, 8
   call void @_ZdaPvm(ptr noundef %8, i64 noundef %18) #15
   br label %19
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/longest-path-directed-acyclic-graph.ll
 
 19:                                               ; preds = %16, %1
   ret void
@@ -997,12 +994,9 @@ define linkonce_odr dso_local noundef i32 @_ZN11AdjListNode9getWeightEv(ptr noun
 declare noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8), ptr noundef) #7
 
 declare noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEi(ptr noundef nonnull align 8 dereferenceable(8), i32 noundef) #7
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/longest-path-directed-acyclic-graph.ll
-========
 
 ; Function Attrs: nobuiltin nounwind
 declare void @_ZdaPv(ptr noundef) #4
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/longest-path-directed-acyclic-graph.ll
 
 ; Function Attrs: nocallback nofree nosync nounwind willreturn
 declare void @llvm.stackrestore.p0(ptr) #6
@@ -1334,13 +1328,10 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorISt10_List_nodeI11AdjL
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/longest-path-directed-acyclic-graph.ll
   call void @_ZdlPv(ptr noundef %8) #15
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 24
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #15
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/longest-path-directed-acyclic-graph.ll
   ret void
 }
 
@@ -1651,13 +1642,10 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorIiE10deallocateEPim(pt
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/longest-path-directed-acyclic-graph.ll
   call void @_ZdlPv(ptr noundef %8) #15
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 4
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #15
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/longest-path-directed-acyclic-graph.ll
   ret void
 }
 
@@ -1699,13 +1687,10 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorIPiE10deallocateEPS0_m
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/longest-path-directed-acyclic-graph.ll
   call void @_ZdlPv(ptr noundef %8) #15
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 8
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #15
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/longest-path-directed-acyclic-graph.ll
   ret void
 }
 
@@ -3479,11 +3464,7 @@ attributes #17 = { noreturn }
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/longest-path-directed-acyclic-graph.ll
-!5 = !{!"clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)"}
-========
 !5 = !{!"clang version 19.1.7 (https://github.com/llvm/llvm-project.git cd708029e0b2869e80abe31ddb175f7c35361f90)"}
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/longest-path-directed-acyclic-graph.ll
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}

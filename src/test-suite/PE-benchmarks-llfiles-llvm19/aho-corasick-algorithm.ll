@@ -854,7 +854,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
 49:                                               ; preds = %45
   store i1 false, ptr %30, align 1
   store ptr %29, ptr %15, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %51 = load ptr, ptr %15, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %51) #11
   store ptr %28, ptr %13, align 8
@@ -866,7 +865,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   store ptr %24, ptr %9, align 8
   %54 = load ptr, ptr %9, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %54) #11
-========
   %50 = load ptr, ptr %15, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %50) #11
   store ptr %28, ptr %13, align 8
@@ -878,7 +876,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   store ptr %24, ptr %9, align 8
   %53 = load ptr, ptr %9, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %53) #11
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
   store ptr %32, ptr %16, align 8
   %54 = load ptr, ptr %16, align 8
   store ptr %54, ptr %5, align 8
@@ -888,13 +885,10 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
 
 56:                                               ; preds = %49
   store ptr %32, ptr %7, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %58 = load ptr, ptr %7, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %58) #11
-========
   %57 = load ptr, ptr %7, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %57) #11
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
   store i32 4, ptr %33, align 4
   %58 = getelementptr inbounds [4 x %"class.std::__cxx11::basic_string"], ptr %22, i64 0, i64 0
   %59 = load i32, ptr %33, align 4
@@ -905,7 +899,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   invoke void @_Z11searchWordsPNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEiS4_(ptr noundef %58, i32 noundef %59, ptr noundef %34)
           to label %61 unwind label %106
 
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
 62:                                               ; preds = %61
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %34) #11
   store i32 0, ptr %21, align 4
@@ -913,7 +906,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   %63 = getelementptr inbounds [4 x %"class.std::__cxx11::basic_string"], ptr %22, i32 0, i32 0
   %64 = getelementptr inbounds %"class.std::__cxx11::basic_string", ptr %63, i64 4
   br label %112
-========
 61:                                               ; preds = %60
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %34) #11
   store i32 0, ptr %21, align 4
@@ -921,7 +913,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   %62 = getelementptr inbounds [4 x %"class.std::__cxx11::basic_string"], ptr %22, i32 0, i32 0
   %63 = getelementptr inbounds %"class.std::__cxx11::basic_string", ptr %62, i64 4
   br label %111
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 64:                                               ; preds = %0
   %65 = landingpad { ptr, i32 }
@@ -958,74 +949,59 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   %79 = extractvalue { ptr, i32 } %77, 1
   store i32 %79, ptr %26, align 4
   store ptr %29, ptr %14, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %81 = load ptr, ptr %14, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %81) #11
   br label %82
-========
   %80 = load ptr, ptr %14, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %80) #11
   br label %81
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 81:                                               ; preds = %76, %72
   store ptr %28, ptr %12, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %83 = load ptr, ptr %12, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %83) #11
   br label %84
-========
   %82 = load ptr, ptr %12, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %82) #11
   br label %83
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 83:                                               ; preds = %81, %68
   store ptr %27, ptr %10, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %85 = load ptr, ptr %10, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %85) #11
   br label %86
-========
   %84 = load ptr, ptr %10, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %84) #11
   br label %85
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 85:                                               ; preds = %83, %64
   store ptr %24, ptr %8, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %87 = load ptr, ptr %8, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %87) #11
   %88 = load i1, ptr %30, align 1
   br i1 %88, label %89, label %97
-========
   %86 = load ptr, ptr %8, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %86) #11
   %87 = load i1, ptr %30, align 1
   br i1 %87, label %88, label %96
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 88:                                               ; preds = %85
   %89 = load ptr, ptr %23, align 8
   %90 = icmp eq ptr %22, %89
   br i1 %90, label %95, label %91
 
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
 92:                                               ; preds = %92, %89
   %93 = phi ptr [ %90, %89 ], [ %94, %92 ]
   %94 = getelementptr inbounds %"class.std::__cxx11::basic_string", ptr %93, i64 -1
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %94) #11
   %95 = icmp eq ptr %94, %35
   br i1 %95, label %96, label %92
-========
 91:                                               ; preds = %91, %88
   %92 = phi ptr [ %89, %88 ], [ %93, %91 ]
   %93 = getelementptr inbounds %"class.std::__cxx11::basic_string", ptr %92, i64 -1
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %93) #11
   %94 = icmp eq ptr %93, %22
   br i1 %94, label %95, label %91
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 95:                                               ; preds = %91, %88
   br label %96
@@ -1041,15 +1017,12 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   %100 = extractvalue { ptr, i32 } %98, 1
   store i32 %100, ptr %26, align 4
   store ptr %32, ptr %6, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %102 = load ptr, ptr %6, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %102) #11
   br label %118
-========
   %101 = load ptr, ptr %6, align 8
   call void @_ZNSt15__new_allocatorIcED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %101) #11
   br label %117
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 102:                                              ; preds = %56
   %103 = landingpad { ptr, i32 }
@@ -1063,7 +1036,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
 106:                                              ; preds = %60
   %107 = landingpad { ptr, i32 }
           cleanup
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   %109 = extractvalue { ptr, i32 } %108, 0
   store ptr %109, ptr %25, align 8
   %110 = extractvalue { ptr, i32 } %108, 1
@@ -1081,7 +1053,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %114) #11
   %115 = icmp eq ptr %114, %63
   br i1 %115, label %116, label %112
-========
   %108 = extractvalue { ptr, i32 } %107, 0
   store ptr %108, ptr %25, align 8
   %109 = extractvalue { ptr, i32 } %107, 1
@@ -1099,7 +1070,6 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %113) #11
   %114 = icmp eq ptr %113, %62
   br i1 %114, label %115, label %111
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 115:                                              ; preds = %111
   %116 = load i32, ptr %21, align 4
@@ -1110,21 +1080,18 @@ define dso_local noundef i32 @main() #5 personality ptr @__gxx_personality_v0 {
   %119 = getelementptr inbounds %"class.std::__cxx11::basic_string", ptr %118, i64 4
   br label %120
 
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
 121:                                              ; preds = %121, %118
   %122 = phi ptr [ %120, %118 ], [ %123, %121 ]
   %123 = getelementptr inbounds %"class.std::__cxx11::basic_string", ptr %122, i64 -1
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %123) #11
   %124 = icmp eq ptr %123, %119
   br i1 %124, label %125, label %121
-========
 120:                                              ; preds = %120, %117
   %121 = phi ptr [ %119, %117 ], [ %122, %120 ]
   %122 = getelementptr inbounds %"class.std::__cxx11::basic_string", ptr %121, i64 -1
   call void @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev(ptr noundef nonnull align 8 dereferenceable(32) %122) #11
   %123 = icmp eq ptr %122, %118
   br i1 %123, label %124, label %120
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 124:                                              ; preds = %120
   br label %125
@@ -1512,22 +1479,16 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorIiE10deallocateEPim(pt
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   call void @_ZdlPv(ptr noundef %8) #14
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 4
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #14
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
   ret void
 }
 
 ; Function Attrs: nobuiltin nounwind
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
 declare void @_ZdlPv(ptr noundef) #7
-========
 declare void @_ZdlPvm(ptr noundef, i64 noundef) #7
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
 define linkonce_odr dso_local void @_ZNKSt11_Deque_baseIiSaIiEE20_M_get_map_allocatorEv(ptr dead_on_unwind noalias writable sret(%"class.std::allocator.3") align 1 %0, ptr noundef nonnull align 8 dereferenceable(80) %1) #3 comdat align 2 {
@@ -1567,13 +1528,10 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorIPiE10deallocateEPS0_m
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
   call void @_ZdlPv(ptr noundef %8) #14
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 8
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #14
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
   ret void
 }
 
@@ -3253,11 +3211,7 @@ attributes #15 = { builtin allocsize(0) }
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/aho-corasick-algorithm.ll
-!5 = !{!"clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)"}
-========
 !5 = !{!"clang version 19.1.7 (https://github.com/llvm/llvm-project.git cd708029e0b2869e80abe31ddb175f7c35361f90)"}
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/aho-corasick-algorithm.ll
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}

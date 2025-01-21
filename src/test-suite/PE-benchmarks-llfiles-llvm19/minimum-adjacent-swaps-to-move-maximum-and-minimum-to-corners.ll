@@ -154,10 +154,6 @@ attributes #3 = { nocallback nofree nounwind willreturn memory(argmem: readwrite
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/minimum-adjacent-swaps-to-move-maximum-and-minimum-to-corners.ll
-!5 = !{!"clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)"}
-========
 !5 = !{!"clang version 19.1.7 (https://github.com/llvm/llvm-project.git cd708029e0b2869e80abe31ddb175f7c35361f90)"}
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/minimum-adjacent-swaps-to-move-maximum-and-minimum-to-corners.ll
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}

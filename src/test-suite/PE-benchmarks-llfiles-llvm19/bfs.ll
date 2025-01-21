@@ -743,22 +743,16 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorISt10_List_nodeIiEE10d
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/bfs.ll
   call void @_ZdlPv(ptr noundef %8) #14
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 24
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #14
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/bfs.ll
   ret void
 }
 
 ; Function Attrs: nobuiltin nounwind
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/bfs.ll
 declare void @_ZdlPv(ptr noundef) #8
-========
 declare void @_ZdlPvm(ptr noundef, i64 noundef) #8
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/bfs.ll
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
 define linkonce_odr dso_local void @_ZNSt15__new_allocatorISt10_List_nodeIiEED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #3 comdat align 2 {
@@ -1093,11 +1087,7 @@ attributes #15 = { noreturn }
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/bfs.ll
-!5 = !{!"clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)"}
-========
 !5 = !{!"clang version 19.1.7 (https://github.com/llvm/llvm-project.git cd708029e0b2869e80abe31ddb175f7c35361f90)"}
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/bfs.ll
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}

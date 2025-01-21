@@ -165,11 +165,8 @@ define dso_local void @_ZN14SuffixTrieNode12insertSuffixENSt7__cxx1112basic_stri
   store ptr %34, ptr %8, align 8
   %35 = extractvalue { ptr, i32 } %33, 1
   store i32 %35, ptr %9, align 4
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/trie-suffixes.ll
   call void @_ZdlPv(ptr noundef %26) #12
-========
   call void @_ZdlPvm(ptr noundef %26, i64 noundef 2056) #12
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/trie-suffixes.ll
   br label %50
 
 36:                                               ; preds = %27, %16
@@ -274,11 +271,8 @@ define linkonce_odr dso_local void @_ZN14SuffixTrieNodeC2Ev(ptr noundef nonnull 
 declare i32 @__gxx_personality_v0(...)
 
 ; Function Attrs: nobuiltin nounwind
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/trie-suffixes.ll
 declare void @_ZdlPv(ptr noundef) #4
-========
 declare void @_ZdlPvm(ptr noundef, i64 noundef) #4
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/trie-suffixes.ll
 
 declare void @_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE6substrEmm(ptr dead_on_unwind writable sret(%"class.std::__cxx11::basic_string") align 8, ptr noundef nonnull align 8 dereferenceable(32), i64 noundef, i64 noundef) #2
 
@@ -1334,13 +1328,10 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorISt10_List_nodeIiEE10d
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/trie-suffixes.ll
   call void @_ZdlPv(ptr noundef %8) #12
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 24
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #12
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/trie-suffixes.ll
   ret void
 }
 
@@ -1569,11 +1560,7 @@ attributes #14 = { noreturn nounwind }
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/trie-suffixes.ll
-!5 = !{!"clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)"}
-========
 !5 = !{!"clang version 19.1.7 (https://github.com/llvm/llvm-project.git cd708029e0b2869e80abe31ddb175f7c35361f90)"}
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/trie-suffixes.ll
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}

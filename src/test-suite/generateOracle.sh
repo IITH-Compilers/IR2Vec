@@ -25,7 +25,7 @@ mkdir -p ${DEST_FOLDER_FA_ONDEMAND}
 LLVM_BUILD="/home/cs23btech11001/llvm-project/build_19_latest"
 
 #Update IR2Vec Path to use
-IR2VEC_PATH="/home/cs23btech11001/IR2Vec/new-build-19/bin/ir2vec"
+IR2VEC_PATH="../../build/bin/ir2vec"
 
 if [ -z ${LLVM_BUILD} ]; then
 	echo "Enter the llvm build path.."

@@ -3303,22 +3303,16 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorIiE10deallocateEPim(pt
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/construction-of-lcp-array-from-suffix-array.ll
   call void @_ZdlPv(ptr noundef %8) #16
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 4
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #16
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/construction-of-lcp-array-from-suffix-array.ll
   ret void
 }
 
 ; Function Attrs: nobuiltin nounwind
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/construction-of-lcp-array-from-suffix-array.ll
 declare void @_ZdlPv(ptr noundef) #10
-========
 declare void @_ZdlPvm(ptr noundef, i64 noundef) #10
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/construction-of-lcp-array-from-suffix-array.ll
 
 ; Function Attrs: mustprogress noinline uwtable
 define linkonce_odr dso_local void @_ZNSt6vectorIiSaIiEE17_M_realloc_insertIJRKiEEEvN9__gnu_cxx17__normal_iteratorIPiS1_EEDpOT_(ptr noundef nonnull align 8 dereferenceable(24) %0, ptr %1, ptr noundef nonnull align 4 dereferenceable(4) %2) #2 comdat align 2 {
@@ -4482,11 +4476,7 @@ attributes #17 = { builtin allocsize(0) }
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/construction-of-lcp-array-from-suffix-array.ll
-!5 = !{!"clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)"}
-========
 !5 = !{!"clang version 19.1.7 (https://github.com/llvm/llvm-project.git cd708029e0b2869e80abe31ddb175f7c35361f90)"}
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/construction-of-lcp-array-from-suffix-array.ll
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}

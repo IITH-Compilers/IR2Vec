@@ -343,11 +343,8 @@ define linkonce_odr dso_local void @_ZNSt14priority_queueIiSt6vectorIiSaIiEESt7g
   store ptr %13, ptr %7, align 8
   %26 = load ptr, ptr %7, align 8
   call void @_ZNSt15__new_allocatorIiED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %26) #10
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/Nearly_sorted_Algo.ll
   %27 = getelementptr inbounds %"class.std::priority_queue", ptr %19, i32 0, i32 1
-========
   %27 = getelementptr inbounds i8, ptr %19, i64 24
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/Nearly_sorted_Algo.ll
   %28 = load ptr, ptr %12, align 8
   %29 = getelementptr inbounds %"class.std::priority_queue", ptr %19, i32 0, i32 0
   %30 = call ptr @_ZNSt6vectorIiSaIiEE5beginEv(ptr noundef nonnull align 8 dereferenceable(24) %29) #10
@@ -727,22 +724,16 @@ define linkonce_odr dso_local void @_ZNSt15__new_allocatorIiE10deallocateEPim(pt
   store i64 %2, ptr %6, align 8
   %7 = load ptr, ptr %4, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/Nearly_sorted_Algo.ll
   call void @_ZdlPv(ptr noundef %8) #12
-========
   %9 = load i64, ptr %6, align 8
   %10 = mul i64 %9, 4
   call void @_ZdlPvm(ptr noundef %8, i64 noundef %10) #12
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/Nearly_sorted_Algo.ll
   ret void
 }
 
 ; Function Attrs: nobuiltin nounwind
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/Nearly_sorted_Algo.ll
 declare void @_ZdlPv(ptr noundef) #7
-========
 declare void @_ZdlPvm(ptr noundef, i64 noundef) #7
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/Nearly_sorted_Algo.ll
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
 define linkonce_odr dso_local void @_ZNSt15__new_allocatorIiED2Ev(ptr noundef nonnull align 1 dereferenceable(1) %0) unnamed_addr #1 comdat align 2 {
@@ -1636,18 +1627,15 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops15_Iter_com
   store ptr %2, ptr %8, align 8
   store ptr %0, ptr %6, align 8
   %9 = load ptr, ptr %6, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/Nearly_sorted_Algo.ll
   %10 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_iter", ptr %9, i32 0, i32 0
   %11 = call noundef nonnull align 4 dereferenceable(4) ptr @_ZNK9__gnu_cxx17__normal_iteratorIPiSt6vectorIiSaIiEEEdeEv(ptr noundef nonnull align 8 dereferenceable(8) %4) #10
   %12 = call noundef nonnull align 4 dereferenceable(4) ptr @_ZNK9__gnu_cxx17__normal_iteratorIPiSt6vectorIiSaIiEEEdeEv(ptr noundef nonnull align 8 dereferenceable(8) %5) #10
   %13 = call noundef zeroext i1 @_ZNKSt7greaterIiEclERKiS2_(ptr noundef nonnull align 1 dereferenceable(1) %10, ptr noundef nonnull align 4 dereferenceable(4) %11, ptr noundef nonnull align 4 dereferenceable(4) %12)
   ret i1 %13
-========
   %10 = call noundef nonnull align 4 dereferenceable(4) ptr @_ZNK9__gnu_cxx17__normal_iteratorIPiSt6vectorIiSaIiEEEdeEv(ptr noundef nonnull align 8 dereferenceable(8) %4) #10
   %11 = call noundef nonnull align 4 dereferenceable(4) ptr @_ZNK9__gnu_cxx17__normal_iteratorIPiSt6vectorIiSaIiEEEdeEv(ptr noundef nonnull align 8 dereferenceable(8) %5) #10
   %12 = call noundef zeroext i1 @_ZNKSt7greaterIiEclERKiS2_(ptr noundef nonnull align 1 dereferenceable(1) %9, ptr noundef nonnull align 4 dereferenceable(4) %10, ptr noundef nonnull align 4 dereferenceable(4) %11)
   ret i1 %12
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/Nearly_sorted_Algo.ll
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
@@ -1765,18 +1753,15 @@ define linkonce_odr dso_local noundef zeroext i1 @_ZN9__gnu_cxx5__ops14_Iter_com
   store ptr %0, ptr %5, align 8
   store ptr %2, ptr %6, align 8
   %8 = load ptr, ptr %5, align 8
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/Nearly_sorted_Algo.ll
   %9 = getelementptr inbounds %"struct.__gnu_cxx::__ops::_Iter_comp_val", ptr %8, i32 0, i32 0
   %10 = call noundef nonnull align 4 dereferenceable(4) ptr @_ZNK9__gnu_cxx17__normal_iteratorIPiSt6vectorIiSaIiEEEdeEv(ptr noundef nonnull align 8 dereferenceable(8) %4) #10
   %11 = load ptr, ptr %6, align 8
   %12 = call noundef zeroext i1 @_ZNKSt7greaterIiEclERKiS2_(ptr noundef nonnull align 1 dereferenceable(1) %9, ptr noundef nonnull align 4 dereferenceable(4) %10, ptr noundef nonnull align 4 dereferenceable(4) %11)
   ret i1 %12
-========
   %9 = call noundef nonnull align 4 dereferenceable(4) ptr @_ZNK9__gnu_cxx17__normal_iteratorIPiSt6vectorIiSaIiEEEdeEv(ptr noundef nonnull align 8 dereferenceable(8) %4) #10
   %10 = load ptr, ptr %6, align 8
   %11 = call noundef zeroext i1 @_ZNKSt7greaterIiEclERKiS2_(ptr noundef nonnull align 1 dereferenceable(1) %8, ptr noundef nonnull align 4 dereferenceable(4) %9, ptr noundef nonnull align 4 dereferenceable(4) %10)
   ret i1 %11
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/Nearly_sorted_Algo.ll
 }
 
 ; Function Attrs: mustprogress noinline nounwind uwtable
@@ -2451,11 +2436,7 @@ attributes #14 = { builtin allocsize(0) }
 !2 = !{i32 7, !"PIE Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 2}
 !4 = !{i32 7, !"frame-pointer", i32 2}
-<<<<<<<< HEAD:src/test-suite/PE-benchmarks-llfiles-llvm18/Nearly_sorted_Algo.ll
-!5 = !{!"clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)"}
-========
 !5 = !{!"clang version 19.1.7 (https://github.com/llvm/llvm-project.git cd708029e0b2869e80abe31ddb175f7c35361f90)"}
->>>>>>>> llvm19.1.7:src/test-suite/PE-benchmarks-llfiles-llvm19/Nearly_sorted_Algo.ll
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}
