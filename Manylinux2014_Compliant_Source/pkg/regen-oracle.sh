@@ -6,7 +6,7 @@ cd src/test-suite
 
 rm -rf oracle
 
-SEED_VERSION="llvm17"
+SEED_VERSION="llvm19"
 SRC_WD="PE-benchmarks"
 DEST_FOLDER_LL="PE-benchmarks-llfiles-${SEED_VERSION}"
 DEST_FOLDER_SYM="oracle/SYM_${SEED_VERSION}_f"

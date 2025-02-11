@@ -41,10 +41,10 @@ fi
 
 if [ $EncodingType = "SYM" ]; then
 	PASS="sym"
-	Trans_type="${TASK_DIR}_Symbolic_llvm17"
+	Trans_type="${TASK_DIR}_Symbolic_llvm19"
 elif [ $EncodingType = "FA" ]; then
 	PASS="fa"
-	Trans_type="${TASK_DIR}_FlowAware_llvm17"
+	Trans_type="${TASK_DIR}_FlowAware_llvm19"
 else
 	echo "Please enter SYM or FA for EncodingType"
 	exit
