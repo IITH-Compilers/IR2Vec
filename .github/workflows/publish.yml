@@ -41,7 +41,7 @@ jobs:
       run: cd build && cmake -DEigen3_DIR=./eigen-build ..
     - name: make
       run: cd build && make -j8
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: ir2vec
         path: |
