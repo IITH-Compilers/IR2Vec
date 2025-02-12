@@ -34,6 +34,7 @@ Device_Mapping
 |   |-- embeddings
 |   |   |-- Device_Mapping_Symbolic_llvm19.txt
 |   |   |-- Device_Mapping_FlowAware_llvm19.txt
+
 |-- DevMap.ipynb
 ```
 ## Thread Coarsening
@@ -62,6 +63,7 @@ Thread_Coarsening
 |   |-- embeddings
 |   |   |-- Thread_Coarsening_Symbolic_llvm19.txt
 |   |   |-- Thread_Coarsening_FlowAware_llvm19.txt
+
 |-- ThreadCoarsening.ipynb
 ```
 ## Out_Of_Vocabulary
