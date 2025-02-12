@@ -12,7 +12,7 @@ from collections import defaultdict
 ABS_ACCURACY = 1e-4
 
 TEST_SUITE_DIR = pl.Path(__file__).resolve().parents[3] / "src" / "test-suite"
-SEED_VERSION = "llvm17"
+SEED_VERSION = "llvm18"
 
 ll_files = []
 path = TEST_SUITE_DIR / f"index-{SEED_VERSION}.files"

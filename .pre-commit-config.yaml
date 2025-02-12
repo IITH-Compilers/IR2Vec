@@ -14,7 +14,7 @@ repos:
     rev: v1.1.1
     hooks:
         - id: clang-format
-          args: [-i]
+          args: [-i, --version=14]
 # -   repo: https://github.com/dfm/black_nbconvert
 #     rev: v0.4.0
 #     hooks:

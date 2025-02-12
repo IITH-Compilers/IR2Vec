@@ -21,8 +21,9 @@ jobs:
 
 
   build_sdist:
-    runs-on: ubuntu-20.04
-    container: ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86-llvm17
+    runs-on: ubuntu-latest
+    container: ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86-llvm18
+
     steps:
       - uses: actions/checkout@v3
 
