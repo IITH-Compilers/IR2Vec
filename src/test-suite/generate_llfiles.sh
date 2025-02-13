@@ -3,12 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 SRC_WD="PE-benchmarks"
-DEST_FOLDER="PE-benchmarks-llfiles-llvm18"
+DEST_FOLDER="PE-benchmarks-llfiles-llvm19"
 
 mkdir -p ${DEST_FOLDER}
 
 # Update the BUILD to use
-LLVM_BUILD="/home/cs23btech11037/llvm-project/build_18"
+LLVM_BUILD="/home/cs23btech11001/llvm-project/build_19_latest"
 
 # if [ -z ${LLVM_BUILD} ]; then
 # 	echo "Enter the llvm build path.."
