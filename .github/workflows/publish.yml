@@ -20,10 +20,10 @@ jobs:
       run: |
         sudo python3 -m pip install lit
         sudo python3 -m pip install filecheck
-    - name: Install LLVM-18
+    - name: Install LLVM-20
       run: |
         wget https://apt.llvm.org/llvm.sh
-        sudo bash llvm.sh 18
+        sudo bash llvm.sh 20
     - uses: actions/checkout@v2
     - name: Eigen-setup
       run: |

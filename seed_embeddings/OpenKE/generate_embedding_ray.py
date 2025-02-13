@@ -261,6 +261,8 @@ if __name__ == "__main__":
         metric = "loss"
         mode = "min"
 
+    print(metric, mode)
+
     scheduler = ASHAScheduler(
         time_attr="training_iteration",
         max_t=arg_conf.epoch,
@@ -270,11 +272,12 @@ if __name__ == "__main__":
         mode=mode,
     )
     optuna = OptunaSearch(metric="loss", mode="min")
+    print("GPU usage ", arg_conf.use_gpu)
 
     if arg_conf.use_gpu:
         train_with_resources = tune.with_resources(
             tune.with_parameters(train, args=arg_conf),
-            resources={"cpu": 8, "gpu": 0.15},
+            resources={"cpu": 2, "gpu": 0.11},
         )
     else:
         train_with_resources = tune.with_resources(
@@ -286,9 +289,9 @@ if __name__ == "__main__":
         param_space=search_space,
         tune_config=TuneConfig(
             search_alg=optuna,
-            max_concurrent_trials=12,
+            max_concurrent_trials=4,
             scheduler=scheduler,
-            num_samples=128,
+            num_samples=16,
         ),
         run_config=RunConfig(
             storage_path=arg_conf.storage_path,
@@ -336,6 +339,7 @@ if __name__ == "__main__":
     # Construct the output file name using the best hyperparameters
     outfile = os.path.join(
         index_dir,
+        "embeddings/",
         "seedEmbedding_{}_{}Dim_{}Alpha_{}batchsize_{}margin.ckpt".format(
             metric,
             dim,
@@ -357,6 +361,7 @@ if __name__ == "__main__":
 
         embeddings_path = os.path.join(
             index_dir,
+            "embeddings/",
             "seedEmbedding_{}_{}Dim_{}Alpha_{}batchsize_{}margin.ckpt".format(
                 metric,
                 dim,

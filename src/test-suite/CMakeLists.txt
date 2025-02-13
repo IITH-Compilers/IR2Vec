@@ -70,11 +70,11 @@ endif()
 
 # sanity checks and lit configs
 configure_file(sanity_check.sh.cmake sanity_check.sh @ONLY)
-file(COPY PE-benchmarks-llfiles-llvm19 DESTINATION ./)
+file(COPY PE-benchmarks-llfiles-llvm20 DESTINATION ./)
 file(COPY sqlite3.ll DESTINATION ./)
 file(COPY oracle DESTINATION ./)
 file(COPY ../../vocabulary DESTINATION ./)
-file(COPY index-llvm19.files DESTINATION ./)
+file(COPY index-llvm20.files DESTINATION ./)
 
 
 configure_file(lit.site.cfg.py.in lit.site.cfg.py @ONLY)

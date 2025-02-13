@@ -6,7 +6,7 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 > IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant
 
-[![LLVM](https://img.shields.io/badge/LLVM-v19.1.7-blue)](https://github.com/llvm/llvm-project/releases/tag/llvmorg-19.1.7)
+[![LLVM](https://img.shields.io/badge/LLVM-v20.1.0-blue)](https://github.com/llvm/llvm-project/releases/tag/llvmorg-20.1.0)
 [![PyPI Version](https://img.shields.io/pypi/v/IR2Vec)](https://pypi.org/project/IR2Vec/)
 ![Tests](https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg)
 ![Publish](https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg)
@@ -18,7 +18,8 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 | LLVM Version | Branch |
 | ------------ | ------ |
-| LLVM 19.1.7 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 20.1.0 | [main](https://github.com/IITH-Compilers/IR2Vec) |
+| LLVM 19.1.7 | [main](https://github.com/IITH-Compilers/IR2Vec/tree/llvm19) |
 | LLVM 18.1.8 | [llvm18](https://github.com/IITH-Compilers/IR2Vec/tree/llvm18) |
 | LLVM 17.0.6 | [llvm17](https://github.com/IITH-Compilers/IR2Vec/tree/llvm17) |
 | LLVM 16.0.1 | [llvm16](https://github.com/IITH-Compilers/IR2Vec/tree/llvm16) |
@@ -29,31 +30,31 @@ Please see [here](https://compilers.cse.iith.ac.in/projects/ir2vec/) for more de
 
 ## Table Of Contents
 - [IR2Vec](#ir2vec)
-  - [LLVM Version Archive](#llvm-version-archive)
-  - [Table Of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Python](#python)
-  - [Cpp](#cpp)
-  - [Requirements](#requirements)
-  - [Building from source](#building-from-source)
-  - [Generating program representations](#generating-program-representations)
-    - [Using Binary](#using-binary)
-      - [Command-Line options](#command-line-options)
-      - [Flow-Aware Embeddings](#flow-aware-embeddings)
-      - [Symbolic Embeddings](#symbolic-embeddings)
-  - [Using Libraries](#using-libraries)
-  - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
-    - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
-    - [getProgramVector](#getprogramvector)
-    - [getFunctionVectors](#getfunctionvectors)
-    - [getInstructionVectors](#getinstructionvectors)
-  - [Example](#example)
-  - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
-  - [Experiments](#experiments)
-    - [Note](#note)
-  - [Citation](#citation)
-  - [Contributions](#contributions)
-  - [License](#license)
+    - [LLVM Version Archive](#llvm-version-archive)
+    - [Table Of Contents](#table-of-contents)
+    - [Installation](#installation)
+    - [Python](#python)
+    - [Cpp](#cpp)
+    - [Requirements](#requirements)
+    - [Building from source](#building-from-source)
+    - [Generating program representations](#generating-program-representations)
+        - [Using Binary](#using-binary)
+            - [Command-Line options](#command-line-options)
+            - [Flow-Aware Embeddings](#flow-aware-embeddings)
+            - [Symbolic Embeddings](#symbolic-embeddings)
+    - [Using Libraries](#using-libraries)
+    - [Using Python package (IR2Vec-Wheels)](#using-python-package-ir2vec-wheels)
+        - [Initialization -ir2vec.initEmbedding](#initialization--ir2vecinitembedding)
+        - [getProgramVector](#getprogramvector)
+        - [getFunctionVectors](#getfunctionvectors)
+        - [getInstructionVectors](#getinstructionvectors)
+    - [Example](#example)
+    - [Binaries, Libraries and Wheels - Artifacts](#binaries-libraries-and-wheels---artifacts)
+    - [Experiments](#experiments)
+        - [Note](#note)
+    - [Citation](#citation)
+    - [Contributions](#contributions)
+    - [License](#license)
 
 ## Installation
 
@@ -77,7 +78,11 @@ If you're a C++ developer and require low-level control, optimization, or integr
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
+<<<<<<< HEAD
 * LLVM (19.1.7) - [src](https://github.com/llvm/llvm-project/tree/release/17.x), [release](https://releases.llvm.org/download.html#19.1.7)
+=======
+* LLVM (20.1.0) - [src](https://github.com/llvm/llvm-project/tree/release/20.x), [release](https://releases.llvm.org/download.html#20.1.0)
+>>>>>>> initial commit - change from llvm18 to llvm20
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7) (Optional)
 * Python (3.6.7)

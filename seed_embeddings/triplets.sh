@@ -34,7 +34,7 @@ if [ -z $4 ]; then
 	exit
 fi
 
-LLVM_BUILD=$5
+LLVM_BUILD=/usr
 
 if [ -z $LLVM_BUILD ]; then
 	echo "5st arg should have a valid Build path"
@@ -70,13 +70,13 @@ while read p; do
 		fi
 		USED_OPT[$a]=$opt
 		DEBUG echo "opt from $opt"
-		${LLVM_BUILD}/bin/opt-19 -S -$opt $p -o $tmpfile
+		${LLVM_BUILD}/bin/opt-20 -S -$opt $p -o $tmpfile
 		$COLLECT_BUILD/bin/ir2vec -collectIR -o $4 $tmpfile &>/dev/null
 		let "a++"
 		rm "$tmpfile"
 	done &
 	if [ $counter == 100 ]; then
-		sleep 20
+		sleep 3
 		counter=0
 	fi
 

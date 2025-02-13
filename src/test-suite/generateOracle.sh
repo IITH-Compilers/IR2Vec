@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 
-SEED_VERSION="llvm19"
+SEED_VERSION="llvm20"
 SQLITE_INPUT=./sqlite3.ll
 DEST_FOLDER_SYM_P="oracle/SYM_${SEED_VERSION}_p"
 DEST_FOLDER_FA_P="oracle/FA_${SEED_VERSION}_p"
@@ -22,7 +22,7 @@ mkdir -p ${DEST_FOLDER_SYM_ONDEMAND}
 mkdir -p ${DEST_FOLDER_FA_ONDEMAND}
 
 # Update the BUILD to use
-LLVM_BUILD="/home/cs23btech11001/llvm-project/build_19_latest"
+LLVM_BUILD="/usr"
 
 #Update IR2Vec Path to use
 IR2VEC_PATH="../../build/bin/ir2vec"
