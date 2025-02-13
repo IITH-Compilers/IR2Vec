@@ -57,6 +57,7 @@ class Trainer(object):
         self.analogies = analogy.AnalogyScorer(analogy_file=analogy_file)
 
     def load_entity_names(self, index_dir):
+        print("Loading entity names...", index_dir)
         with open(os.path.join(index_dir, "entity2id.txt")) as fEntity:
             content = fEntity.read()
 

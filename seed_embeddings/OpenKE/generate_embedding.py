@@ -95,6 +95,7 @@ def train(arg_conf):
         alpha=0.00729,
         opt_method="Adam",
         checkpoint_dir=checkpoint_dir,
+        index_dir=arg_conf.index_dir,
     )
     trainer.run(
         link_prediction=False,
@@ -137,10 +138,10 @@ if __name__ == "__main__":
         metavar="DIRECTORY",
         help="Location of the directory entity2id.txt, train2id.txt and relation2id.txt",
         required=False,
-        default="../seed_embeddings/preprocessed/",
+        default="../preprocessed/",
     )
     parser.add_argument(
-        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=1000
+        "--epoch", dest="epoch", help="Epochs", required=False, type=int, default=20
     )
 
     parser.add_argument(
@@ -188,7 +189,7 @@ if __name__ == "__main__":
         ),
     )
 
-    findRep(outfilejson, seedfile, arg_conf.index_dir)
+    findRep(outfile, seedfile, arg_conf.index_dir)
 
     print("Training finished...")
     print("seed file : ", seedfile)
