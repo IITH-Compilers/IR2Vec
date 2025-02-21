@@ -78,11 +78,7 @@ If you're a C++ developer and require low-level control, optimization, or integr
 ## Requirements
 * cmake (>= 3.13.4)
 * GNU Make (4.2.1)
-<<<<<<< HEAD
-* LLVM (19.1.7) - [src](https://github.com/llvm/llvm-project/tree/release/17.x), [release](https://releases.llvm.org/download.html#19.1.7)
-=======
 * LLVM (20.1.0) - [src](https://github.com/llvm/llvm-project/tree/release/20.x), [release](https://releases.llvm.org/download.html#20.1.0)
->>>>>>> initial commit - change from llvm18 to llvm20
     * Support for latest LLVM versions would be added soon
 * Eigen library (3.3.7) (Optional)
 * Python (3.6.7)
