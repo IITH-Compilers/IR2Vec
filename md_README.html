@@ -93,7 +93,7 @@ $(function(){ initResizable(false); });
 <blockquote class="doxtable">
 <p>IR2Vec: LLVM IR Based Scalable Program Embeddings, S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar, Ramakrishna Upadrasta, and Y. N. Srikant </p>
 </blockquote>
-<p><a href="https://github.com/llvm/llvm-project/releases/tag/llvmorg-19.1.7"><img src="https://img.shields.io/badge/LLVM-v19.1.7-blue" alt="LLVM" class="inline"/></a> <a href="https://pypi.org/project/IR2Vec/"><img src="https://img.shields.io/pypi/v/IR2Vec" alt="PyPI Version" class="inline"/></a> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg" alt="Tests" style="pointer-events: none;" class="inline"/> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg" alt="Publish" style="pointer-events: none;" class="inline"/> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/pre-commit%20checks/badge.svg" alt="pre-commit checks" style="pointer-events: none;" class="inline"/></p>
+<p><a href="https://github.com/llvm/llvm-project/releases/tag/llvmorg-20.1.0"><img src="https://img.shields.io/badge/LLVM-v20.1.0-blue" alt="LLVM" class="inline"/></a> <a href="https://pypi.org/project/IR2Vec/"><img src="https://img.shields.io/pypi/v/IR2Vec" alt="PyPI Version" class="inline"/></a> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/Tests/badge.svg" alt="Tests" style="pointer-events: none;" class="inline"/> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/Publish/badge.svg" alt="Publish" style="pointer-events: none;" class="inline"/> <img src="https://github.com/IITH-Compilers/IR2Vec/workflows/pre-commit%20checks/badge.svg" alt="pre-commit checks" style="pointer-events: none;" class="inline"/></p>
 <p><img src="images/ir2vec.jpg" alt="Image" class="inline"/></p>
 <h1><a class="anchor" id="autotoc_md30"></a>
 LLVM Version Archive</h1>
@@ -101,20 +101,22 @@ LLVM Version Archive</h1>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">LLVM Version   </th><th class="markdownTableHeadNone">Branch    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">LLVM 19.1.7   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec">main</a>    </td></tr>
+<td class="markdownTableBodyNone">LLVM 20.1.0   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec">main</a>    </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">LLVM 19.1.7   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm19">llvm19</a>    </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">LLVM 18.1.8   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm18">llvm18</a>    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">LLVM 17.0.6   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm17">llvm17</a>    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">LLVM 16.0.1   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm16">llvm16</a>    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">LLVM 14.0.1   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm14">llvm14</a>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">LLVM 12.0.0   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm12">llvm12</a>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">LLVM 10.0.1   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm10">llvm10</a>    </td></tr>
+<td class="markdownTableBodyNone">LLVM 12.0.0   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm12">llvm12</a>    </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">LLVM 10.0.1   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm10">llvm10</a>    </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">LLVM 8.0.1   </td><td class="markdownTableBodyNone"><a href="https://github.com/IITH-Compilers/IR2Vec/tree/llvm8">llvm8</a>   </td></tr>
 </table>
 <h1><a class="anchor" id="autotoc_md31"></a>
@@ -174,7 +176,7 @@ Requirements</h1>
 <ul>
 <li>cmake (&gt;= 3.13.4)</li>
 <li>GNU Make (4.2.1)</li>
-<li>LLVM (19.1.7) - <a href="https://github.com/llvm/llvm-project/tree/release/17.x">src</a>, <a href="https://releases.llvm.org/download.html#19.1.7">release</a><ul>
+<li>LLVM (20.1.0) - <a href="https://github.com/llvm/llvm-project/tree/release/20.x">src</a>, <a href="https://releases.llvm.org/download.html#20.1.0">release</a><ul>
 <li>Support for latest LLVM versions would be added soon</li>
 </ul>
 </li>
