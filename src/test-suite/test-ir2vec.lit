@@ -1,5 +1,5 @@
-// RUN: bash %s FA llvm19
-// RUN: bash %s SYM llvm19
+// RUN: bash %s FA llvm20
+// RUN: bash %s SYM llvm20
 
 source sanity_check.sh
 
