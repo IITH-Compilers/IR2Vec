@@ -37,9 +37,9 @@ RUN cmake -DCMAKE_BUILD_TYPE=Release -G Ninja -B build \
 
 WORKDIR /root/llvm
 ARG LLVM_VERSION="20.1.0"
-RUN wget -q "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz" \
-	&& tar -xf "llvm-project-${LLVM_VERSION}.src.tar.xz"
-WORKDIR /root/llvm/llvm-project-${LLVM_VERSION}.src/build
+RUN wget -q "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}-rc2/llvm-project-${LLVM_VERSION}-rc2.src.tar.xz" \
+	&& tar -xf "llvm-project-${LLVM_VERSION}-rc2.src.tar.xz"
+WORKDIR /root/llvm/llvm-project-${LLVM_VERSION}-rc2.src/build
 RUN cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
 	-DLLVM_ENABLE_PROJECTS='clang' \
 	-DCLANG_ENABLE_BOOTSTRAP=On \
