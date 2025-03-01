@@ -5,7 +5,8 @@ The following guide details the steps followed in training IR2Vec with the ComPi
    - The repo is available [here](https://github.com/IITH-Compilers/IR2Vec-Version-Upgrade-Checks/)
    - Our relevant scripts and files will be present in the folder `ComPile`.
       - `ComPile/collect_dataset_info.py` - This script will generate the list of all the unique C/C++ files in the dataset.
-      - `ComPile/save_ir.py` - This script will download the ByteCode files for all the C/C++ files in the dataset, generate the IR files and save them in the specified location, following which it will save the file_names to `ir_paths.txt` file.
+      - `ComPile/save_ir.py` - This script will download the bitcode files for all the C/C++ files in the dataset, generate the IR files and save them in the specified location, following which it will save the file_names to `ir_paths.txt` file.
+         - Note: Bitcode files are generated for particular versions of llvm/clang. When generating the IR files, we need to make sure that the version of llvm/clang used to generate the IR files is the same as the one used to generate the bitcode files. Otherwise, the disassembly is likely to fail, since the LLVM IR/Bitcode specs are not backward compatible. To this end, make sure the `llvm-dis` command is run with the appropriate version.
       - `ComPile/prep_ir_list.py` - This script will take the `ir_paths.txt` file and generate the list of paths of all the IR files in the downloaded dataset.
 
 - Once we have generated the list of all the `.ll` file paths, we go to the seed_embedding folder in the main IR2Vec repository. Here, our process will have to involve the following tasks.
