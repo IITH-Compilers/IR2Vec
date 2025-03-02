@@ -26,6 +26,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Upgrade GLIBC
+        run: |
+          curl -LO http://ftp.gnu.org/gnu/libc/glibc-2.28.tar.gz
+          tar -xvzf glibc-2.28.tar.gz
+          cd glibc-2.28
+          mkdir build
+          cd build
+          ../configure --prefix=/opt/glibc-2.28
+          make -j$(nproc)
+          make install
+          echo "/opt/glibc-2.28/lib" > /etc/ld.so.conf.d/glibc-2.28.conf
+          ldconfig
+          echo "LD_LIBRARY_PATH=/opt/glibc-2.28/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
       - name: Build IR2Vec
         run: bash Manylinux2014_Compliant_Source/pkg/build.sh
 
