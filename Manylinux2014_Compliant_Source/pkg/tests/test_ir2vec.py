@@ -154,61 +154,13 @@ def test_sym_p():
         assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
 
 
-def test_fa_f():
-    f_vecs = defaultdict(dict)
-    for file in ll_files:
-        path = (TEST_SUITE_DIR / file).resolve()
-        full_path = str(path).strip()
-
-        initObj = ir2vec.initEmbedding(full_path, "fa", "f", 300)
-        assert initObj is not None
-
-        functionVectorMap = ir2vec.getFunctionVectors(initObj)
-        assert_valid_functionVector(functionVectorMap)
-
-        functionVectorMap2 = initObj.getFunctionVectors()
-        assert_valid_functionVector(functionVectorMap2)
-
-        for fun, funcObj in functionVectorMap.items():
-            assert fun == funcObj["demangledName"]
-
-            f_vecs[path.name.strip()][fun] = funcObj["vector"]
-
-            functionOutput1 = ir2vec.getFunctionVectors(
-                initObj,
-                funcObj["actualName"],
-            )
-            assert_valid_functionVector(functionOutput1)
-
-            functionOutput2 = initObj.getFunctionVectors(funcObj["actualName"])
-            assert_valid_functionVector(functionOutput2)
-
-            assert functionOutput1[fun]["vector"] == pytest.approx(
-                functionOutput2[fun]["vector"], abs=ABS_ACCURACY
-            )
-
-            assert funcObj["vector"] == pytest.approx(
-                functionOutput1[fun]["vector"], abs=ABS_ACCURACY
-            )
-
-    print(TEST_SUITE_DIR)
-    f_vecs_oracle = read_f_file(
-        TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_f" / "ir2vec.txt"
-    )
-    for pname, funs in f_vecs_oracle.items():
-        for fname, vec in funs.items():
-            assert vec == pytest.approx(
-                f_vecs[pname][fname], abs=ABS_ACCURACY
-            ), f"Checking {pname}: {fname}"
-
-
-# def test_sym_f():
+# def test_fa_f():
 #     f_vecs = defaultdict(dict)
 #     for file in ll_files:
 #         path = (TEST_SUITE_DIR / file).resolve()
 #         full_path = str(path).strip()
 
-#         initObj = ir2vec.initEmbedding(full_path, "sym", "f")
+#         initObj = ir2vec.initEmbedding(full_path, "fa", "f", 300)
 #         assert initObj is not None
 
 #         functionVectorMap = ir2vec.getFunctionVectors(initObj)
@@ -241,10 +193,58 @@ def test_fa_f():
 
 #     print(TEST_SUITE_DIR)
 #     f_vecs_oracle = read_f_file(
-#         TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}_f" / "ir2vec.txt"
+#         TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_f" / "ir2vec.txt"
 #     )
 #     for pname, funs in f_vecs_oracle.items():
 #         for fname, vec in funs.items():
 #             assert vec == pytest.approx(
 #                 f_vecs[pname][fname], abs=ABS_ACCURACY
 #             ), f"Checking {pname}: {fname}"
+
+
+def test_sym_f():
+    f_vecs = defaultdict(dict)
+    for file in ll_files:
+        path = (TEST_SUITE_DIR / file).resolve()
+        full_path = str(path).strip()
+
+        initObj = ir2vec.initEmbedding(full_path, "sym", "f")
+        assert initObj is not None
+
+        functionVectorMap = ir2vec.getFunctionVectors(initObj)
+        assert_valid_functionVector(functionVectorMap)
+
+        functionVectorMap2 = initObj.getFunctionVectors()
+        assert_valid_functionVector(functionVectorMap2)
+
+        for fun, funcObj in functionVectorMap.items():
+            assert fun == funcObj["demangledName"]
+
+            f_vecs[path.name.strip()][fun] = funcObj["vector"]
+
+            functionOutput1 = ir2vec.getFunctionVectors(
+                initObj,
+                funcObj["actualName"],
+            )
+            assert_valid_functionVector(functionOutput1)
+
+            functionOutput2 = initObj.getFunctionVectors(funcObj["actualName"])
+            assert_valid_functionVector(functionOutput2)
+
+            assert functionOutput1[fun]["vector"] == pytest.approx(
+                functionOutput2[fun]["vector"], abs=ABS_ACCURACY
+            )
+
+            assert funcObj["vector"] == pytest.approx(
+                functionOutput1[fun]["vector"], abs=ABS_ACCURACY
+            )
+
+    print(TEST_SUITE_DIR)
+    f_vecs_oracle = read_f_file(
+        TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}_f" / "ir2vec.txt"
+    )
+    for pname, funs in f_vecs_oracle.items():
+        for fname, vec in funs.items():
+            assert vec == pytest.approx(
+                f_vecs[pname][fname], abs=ABS_ACCURACY
+            ), f"Checking {pname}: {fname}"
