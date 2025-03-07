@@ -51,7 +51,7 @@ RUN cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
 	-DBOOTSTRAP_LLVM_USE_LINKER=mold \
 	-DCMAKE_INSTALL_PREFIX=/root/destdir \
 	../llvm
-RUN ninja stage2 -j "$(nproc)" 
+RUN ninja stage2 -j "$(nproc)"
 RUN ninja stage2-install -j "$(nproc)"
 
 FROM quay.io/pypa/manylinux_2_28_x86_64
