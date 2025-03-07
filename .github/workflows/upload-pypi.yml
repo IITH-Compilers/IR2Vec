@@ -25,7 +25,7 @@ jobs:
     container: ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86-llvm20
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build IR2Vec
         run: bash Manylinux2014_Compliant_Source/pkg/build.sh
@@ -33,7 +33,7 @@ jobs:
       - name: Build sdist
         run: cd Manylinux2014_Compliant_Source/pkg && pipx run build --sdist
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: Manylinux2014_Compliant_Source/pkg/dist/*.tar.gz
 
