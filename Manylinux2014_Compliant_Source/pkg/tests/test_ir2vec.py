@@ -211,11 +211,11 @@ def test_sym_f():
         initObj = ir2vec.initEmbedding(full_path, "sym", "f")
         assert initObj is not None
 
-        functionVectorMap = ir2vec.getFunctionVectors(initObj)
-        assert_valid_functionVector(functionVectorMap)
-
         functionVectorMap2 = initObj.getFunctionVectors()
         assert_valid_functionVector(functionVectorMap2)
+
+        functionVectorMap = ir2vec.getFunctionVectors(initObj)
+        assert_valid_functionVector(functionVectorMap)
 
         for fun, funcObj in functionVectorMap.items():
             assert fun == funcObj["demangledName"]
