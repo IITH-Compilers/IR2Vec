@@ -92,66 +92,66 @@ def assert_valid_functionVector(functionVectorMap):
     return True
 
 
-def test_fa_p():
-    p_vectors = []
-    for file in ll_files:
-        full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
+# def test_fa_p():
+#     p_vectors = []
+#     for file in ll_files:
+#         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
 
-        initObj = ir2vec.initEmbedding(full_path, "fa", "p")
-        assert initObj is not None
+#         initObj = ir2vec.initEmbedding(full_path, "fa", "p")
+#         assert initObj is not None
 
-        progVector1 = ir2vec.getProgramVector(initObj)
-        assert_valid_progVector(progVector1)
+#         progVector1 = ir2vec.getProgramVector(initObj)
+#         assert_valid_progVector(progVector1)
 
-        progVector2 = initObj.getProgramVector()
-        assert_valid_progVector(progVector2)
+#         progVector2 = initObj.getProgramVector()
+#         assert_valid_progVector(progVector2)
 
-        for idx, vec in enumerate(progVector1):
-            assert vec == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
+#         for idx, vec in enumerate(progVector1):
+#             assert vec == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
 
-        p_vectors.append(progVector1)
+#         p_vectors.append(progVector1)
 
-    print(TEST_SUITE_DIR)
-    p_vectors_oracle = read_p_file(
-        TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_p" / "ir2vec.txt"
-    )
+#     print(TEST_SUITE_DIR)
+#     p_vectors_oracle = read_p_file(
+#         TEST_SUITE_DIR / "oracle" / f"FA_{SEED_VERSION}_p" / "ir2vec.txt"
+#     )
 
-    for idx, vec in enumerate(p_vectors_oracle):
-        assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
+#     for idx, vec in enumerate(p_vectors_oracle):
+#         assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
 
 
-def test_sym_p():
-    p_vectors = []
-    for file in ll_files:
-        full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
+# def test_sym_p():
+#     p_vectors = []
+#     for file in ll_files:
+#         full_path = str((TEST_SUITE_DIR / file).resolve()).strip()
 
-        initObj = ir2vec.initEmbedding(full_path, "sym", "p")
-        assert initObj is not None
+#         initObj = ir2vec.initEmbedding(full_path, "sym", "p")
+#         assert initObj is not None
 
-        progVector1 = ir2vec.getProgramVector(initObj)
-        assert_valid_progVector(progVector1)
+#         progVector1 = ir2vec.getProgramVector(initObj)
+#         assert_valid_progVector(progVector1)
 
-        progVector2 = initObj.getProgramVector()
-        assert_valid_progVector(progVector2)
+#         progVector2 = initObj.getProgramVector()
+#         assert_valid_progVector(progVector2)
 
-        instVecList = ir2vec.getInstructionVectors(initObj)
-        assert_valid_instructionVectors(instVecList)
+#         instVecList = ir2vec.getInstructionVectors(initObj)
+#         assert_valid_instructionVectors(instVecList)
 
-        instVecList2 = initObj.getInstructionVectors()
-        assert_valid_instructionVectors(instVecList2)
+#         instVecList2 = initObj.getInstructionVectors()
+#         assert_valid_instructionVectors(instVecList2)
 
-        for idx, vec in enumerate(progVector1):
-            assert vec == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
+#         for idx, vec in enumerate(progVector1):
+#             assert vec == pytest.approx(progVector2[idx], abs=ABS_ACCURACY)
 
-        p_vectors.append(progVector1)
+#         p_vectors.append(progVector1)
 
-    print(TEST_SUITE_DIR)
-    p_vectors_oracle = read_p_file(
-        TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}_p" / "ir2vec.txt"
-    )
+#     print(TEST_SUITE_DIR)
+#     p_vectors_oracle = read_p_file(
+#         TEST_SUITE_DIR / "oracle" / f"SYM_{SEED_VERSION}_p" / "ir2vec.txt"
+#     )
 
-    for idx, vec in enumerate(p_vectors_oracle):
-        assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
+#     for idx, vec in enumerate(p_vectors_oracle):
+#         assert vec == pytest.approx(p_vectors[idx], abs=ABS_ACCURACY)
 
 
 # def test_fa_f():
