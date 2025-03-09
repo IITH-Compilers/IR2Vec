@@ -5,6 +5,7 @@ export CXX=clang++
 export CC=clang
 
 yum -y install gcc gcc-c++ glibc-devel glibc-static libgcc glibc glibc-devel libstdc++-devel
+yum -y install libzstd-devel
 
 rm -rf build || true
 mkdir build
