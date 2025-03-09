@@ -21,7 +21,7 @@ jobs:
 
 
   build_sdist:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86_2_28_llvm17
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +41,7 @@ jobs:
     permissions:
       id-token: write
     needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/download-artifact@v4
         with:
