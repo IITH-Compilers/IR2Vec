@@ -2,6 +2,7 @@ FROM quay.io/pypa/manylinux_2_28_x86_64 AS builder
 LABEL maintainer="Shamil K (noteness@riseup.net)"
 
 RUN yum -y install cmake wget openssl-devel libzstd-devel
+RUN yum -y install gcc gcc-c++ glibc-devel glibc-static libgcc glibc glibc-devel libstdc++-devel
 
 RUN mkdir /root/destdir
 
@@ -49,9 +50,10 @@ RUN cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
 	-DBOOTSTRAP_LLVM_USE_SPLIT_DWARF=On \
 	-DBOOTSTRAP_LLVM_USE_LINKER=mold \
 	-DCMAKE_INSTALL_PREFIX=/root/destdir \
-	../llvm \
-	&& ninja stage2 -j"$(nproc)" \
-	&& ninja stage2-install
+	../llvm
+
+RUN ninja stage2 -j"$(nproc)"
+RUN ninja stage2-install -j"$(nproc)"
 
 FROM quay.io/pypa/manylinux_2_28_x86_64
 COPY --from=builder /root/destdir /usr/local/
