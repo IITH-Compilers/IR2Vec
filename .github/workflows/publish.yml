@@ -11,7 +11,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Install libzstd-dev
@@ -24,7 +24,7 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         sudo bash llvm.sh 17
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Eigen-setup
       run: |
         mkdir build && cd build

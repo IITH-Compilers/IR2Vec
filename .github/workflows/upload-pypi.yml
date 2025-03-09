@@ -21,10 +21,10 @@ jobs:
 
 
   build_sdist:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container: ghcr.io/iith-compilers/manylinux2014-llvm/manylinux2014-llvm:x86-llvm17
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build IR2Vec
         run: bash Manylinux2014_Compliant_Source/pkg/build.sh
