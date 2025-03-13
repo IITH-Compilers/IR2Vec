@@ -217,18 +217,33 @@ PyObject *getProgramVector(IR2VecHandlerObject *self, PyObject *args) {
 }
 
 PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
+  if (!self) {
+    PyErr_SetString(PyExc_TypeError, "Invalid self object passed.");
+    return NULL;
+  }
+
   if (!(self->ir2vecObj)) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
     Py_RETURN_NONE;
   }
 
-  const char *funcName = "\0";
+  const char *funcName = NULL;
   if (!PyArg_ParseTuple(args, "|s", &funcName)) {
     Py_RETURN_NONE;
   }
 
-  return (self->ir2vecObj)
-      ->generateEncodings(OpType::Function, string(funcName));
+  std::string functionName = funcName ? std::string(funcName) : std::string("");
+
+  PyObject *result =
+      self->ir2vecObj->generateEncodings(OpType::Function, functionName);
+  if (!result) {
+    PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
+    return NULL;
+  }
+  return result;
+
+  // return (self->ir2vecObj)
+  //     ->generateEncodings(OpType::Function, string(funcName));
 }
 
 PyMethodDef ir2vecObjMethods[] = {
@@ -251,32 +266,49 @@ static PyTypeObject IR2VecHandlerType = {
 };
 
 PyObject *runEncodings(PyObject *args, OpType type) {
-  const char *funcName = "\0";
+  const char *funcName = NULL; // Set to NULL for better handling
   IR2VecHandlerObject *ir2vecHandlerobj = nullptr;
 
   if (!PyArg_ParseTuple(args, "O|s", &ir2vecHandlerobj, &funcName)) {
-    Py_RETURN_NONE;
+    PyErr_SetString(PyExc_TypeError, "Invalid argument provided. Expected an "
+                                     "object and an optional string.");
+    return NULL;
   }
 
-  if (string(funcName).empty() == false && type != OpType::Function) {
+  if (!ir2vecHandlerobj ||
+      !PyObject_TypeCheck((PyObject *)ir2vecHandlerobj, &IR2VecHandlerType)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid IR2VecHandlerObject provided.");
+    return NULL;
+  }
+
+  string functionName = funcName ? std::string(funcName) : std::string("");
+
+  if (functionName.empty() == false && type != OpType::Function) {
     PyErr_SetString(PyExc_TypeError,
                     "Function name can only be specified for Function "
                     "Vectors");
-    Py_RETURN_NONE;
+    return NULL;
   }
 
   if (!ir2vecHandlerobj) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    Py_RETURN_NONE;
+    return NULL;
   }
 
   if (!(ir2vecHandlerobj->ir2vecObj)) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    Py_RETURN_NONE;
-  } else {
-    IR2VecHandler *ir2vecObj = ir2vecHandlerobj->ir2vecObj;
-    return ir2vecObj->generateEncodings(type, string(funcName));
+    return NULL;
   }
+
+  IR2VecHandler *ir2vecObj = ir2vecHandlerobj->ir2vecObj;
+
+  PyObject *result = ir2vecObj->generateEncodings(type, functionName);
+  if (!result) {
+    PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
+    return NULL;
+  }
+  return result;
+  // return ir2vecObj->generateEncodings(type, string(funcName));
 }
 
 PyObject *getInstructionVectors(PyObject *self, PyObject *args) {
@@ -284,10 +316,20 @@ PyObject *getInstructionVectors(PyObject *self, PyObject *args) {
 }
 
 PyObject *getProgramVector(PyObject *self, PyObject *args) {
+  if (!args || !PyTuple_Check(args)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid arguments. Expected a tuple.");
+    return NULL;
+  }
+
   return runEncodings(args, OpType::Program);
 }
 
 PyObject *getFunctionVectors(PyObject *self, PyObject *args) {
+  if (!args || !PyTuple_Check(args)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid arguments. Expected a tuple.");
+    return NULL;
+  }
+
   return runEncodings(args, OpType::Function);
 }
 
