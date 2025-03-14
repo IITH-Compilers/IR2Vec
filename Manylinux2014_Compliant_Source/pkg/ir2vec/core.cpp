@@ -208,7 +208,8 @@ public:
       result = this->createProgramVectorList(emb->getProgramVector());
       break;
     case OpType::Function:
-      result = this->createFunctionVectorDict(emb->getFunctionVecMap());
+      // result = this->createFunctionVectorDict(emb->getFunctionVecMap());
+      result = this->createProgramVectorList(emb->getProgramVector());
       break;
     case OpType::Instruction:
       result = this->createInstructionVectorList(emb->getInstVecMap());
@@ -263,15 +264,13 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
 
   std::string functionName = funcName ? std::string(funcName) : std::string("");
 
-  return (self->ir2vecObj)->setEncodings(OpType::Program);
-
-  // PyObject *result =
-  //     (self->ir2vecObj)->setEncodings(OpType::Function, functionName);
-  // if (!result) {
-  //   PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
-  //   return NULL;
-  // }
-  // return result;
+  PyObject *result =
+      (self->ir2vecObj)->setEncodings(OpType::Function, functionName);
+  if (!result) {
+    PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
+    return NULL;
+  }
+  return result;
 }
 
 PyMethodDef ir2vecObjMethods[] = {
@@ -334,7 +333,6 @@ PyObject *runEncodings(PyObject *args, OpType type) {
     return NULL;
   }
   return result;
-  // return ir2vecObj->setEncodings(type, string(funcName));
 }
 
 PyObject *getInstructionVectors(PyObject *self, PyObject *args) {
@@ -360,8 +358,7 @@ PyObject *getFunctionVectors(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  // return runEncodings(args, OpType::Function);
-  return runEncodings(args, OpType::Program);
+  return runEncodings(args, OpType::Function);
 }
 
 IR2VecHandlerObject *createIR2VECObject(const char *filename,
