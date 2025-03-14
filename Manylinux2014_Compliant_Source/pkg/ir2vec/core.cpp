@@ -166,9 +166,9 @@ public:
       }
     }
 
-    // return FuncVecDict;
-    PyObject *testFuncDict = PyDict_New();
-    return testFuncDict;
+    return FuncVecDict;
+    // PyObject *testFuncDict = PyDict_New();
+    // return testFuncDict;
   }
 
   // Function to get Instruction Vector Dictionary
