@@ -114,11 +114,6 @@ public:
       }
 
       PyObject *funcDict = PyDict_New();
-      PyDict_SetDefault(funcDict, PyUnicode_FromString("demangledName"),
-                        Py_None);
-      PyDict_SetDefault(funcDict, PyUnicode_FromString("actualName"), Py_None);
-      PyDict_SetDefault(funcDict, PyUnicode_FromString("vector"), Py_None);
-
       PyDict_SetItemString(funcDict, "demangledName",
                            PyUnicode_FromString(demangledName.c_str()));
       PyDict_SetItemString(funcDict, "actualName",
@@ -127,6 +122,7 @@ public:
 
       PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict);
 
+      Py_DECREF(functionVector);
       Py_DECREF(funcDict);
     }
     return FuncVecDict;
@@ -158,40 +154,46 @@ public:
     // The scope of this Module object is extremely crucial
     std::unique_ptr<llvm::Module> Module;
     Module = IR2Vec::getLLVMIR();
+    if (!Module) {
+      PyErr_SetString(PyExc_TypeError, "Module not created");
+      return NULL;
+    }
 
-    IR2Vec::Embeddings *emb = new IR2Vec::Embeddings();
+    IR2Vec::Embeddings *emb = nullptr;
     // if output file is provided
-    if (this->outputFile != "") {
-      string outFile = this->outputFile;
-      ofstream output;
-      output.open(outFile, ios_base::app);
-      emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], &output, this->dim, funcName));
+    if (!this->outputFile.empty()) {
+      std::ofstream output(this->outputFile, ios_base::app);
+      emb = new IR2Vec::Embeddings(*Module, ir2vecMode, (this->level)[0],
+                                   &output, this->dim, funcName);
     } else {
-      emb = std::move(new IR2Vec::Embeddings(
-          *Module, ir2vecMode, (this->level)[0], nullptr, this->dim, funcName));
+      emb = new IR2Vec::Embeddings(*Module, ir2vecMode, (this->level)[0],
+                                   nullptr, this->dim, funcName);
     }
 
     if (!emb) {
       PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-      Py_RETURN_NONE;
+      return NULL;
     }
 
-    if (type == OpType::Program) {
-      IR2Vec::Vector progVector = emb->getProgramVector();
-      return this->createProgramVectorList(progVector);
-    } else if (type == OpType::Function) {
-      llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
-          funcVecMap = emb->getFunctionVecMap();
-      return this->createFunctionVectorDict(funcVecMap);
-    } else if (type == OpType::Instruction) {
-      llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
-          instVecMap = emb->getInstVecMap();
-      return this->createInstructionVectorList(instVecMap);
-    } else {
+    PyObject *result = NULL;
+
+    switch (type) {
+    case OpType::Program:
+      result = this->createProgramVectorList(emb->getProgramVector());
+      break;
+    case OpType::Function:
+      result = this->createFunctionVectorDict(emb->getFunctionVecMap());
+      break;
+    case OpType::Instruction:
+      result = this->createInstructionVectorList(emb->getInstVecMap());
+      break;
+    default:
       PyErr_SetString(PyExc_TypeError, "Invalid OpType");
-      Py_RETURN_NONE;
+      result = NULL;
     }
+
+    delete emb;
+    return result;
   }
 };
 
