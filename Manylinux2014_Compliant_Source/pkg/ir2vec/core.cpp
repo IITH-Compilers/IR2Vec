@@ -114,6 +114,7 @@ public:
 
   // Function to get Function Vector Dictionary
   PyObject *createFunctionVectorDict(
+      std::string baseFuncName,
       llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
           funcMap) {
     PyObject *FuncVecDict = PyDict_New();
@@ -123,6 +124,8 @@ public:
     }
 
     if (funcMap.empty()) {
+      PySys_FormatStdout(
+          ("Empty function vector map for function " + baseFuncName).c_str());
       PyErr_SetString(PyExc_TypeError, "Empty function vector map");
       return NULL;
     }
@@ -164,9 +167,10 @@ public:
         return NULL;
       }
 
-      PySys_FormatStdout(
-          ("Function name demangled " + demangledName + " actual " + actualName)
-              .c_str());
+      // PySys_FormatStdout(
+      //     ("Function name demangled " + demangledName + " actual " +
+      //     actualName)
+      //         .c_str());
 
       // if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
       //     0) {
@@ -260,7 +264,7 @@ public:
       // result = this->createFunctionVectorDict(emb->getFunctionVecMap());
       llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcMap =
           emb->getFunctionVecMap();
-      result = this->createFunctionVectorDict(funcMap);
+      result = this->createFunctionVectorDict(funcName, funcMap);
       // result = this->createProgramVectorList(emb->getProgramVector());
       break;
     }
@@ -273,6 +277,12 @@ public:
     }
 
     delete emb;
+    if (!result) {
+      PyErr_SetString(PyExc_TypeError,
+                      "Error in creating Final Result Encodings");
+      return NULL;
+    }
+
     return result;
   }
 };
@@ -316,14 +326,10 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
   }
 
   string functionName = funcName ? string(funcName) : string();
-  PySys_FormatStdout(("Function name is " + functionName).c_str());
+  // PySys_FormatStdout(("Function name is " + functionName).c_str());
 
   PyObject *result =
       (self->ir2vecObj)->setEncodings(OpType::Function, functionName);
-  if (!result) {
-    PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
-    return NULL;
-  }
   return result;
 }
 
@@ -361,7 +367,8 @@ PyObject *runEncodings(PyObject *args, OpType type) {
   }
 
   string functionName = funcName ? string(funcName) : string();
-  PySys_FormatStdout(("Function name is " + functionName).c_str());
+  // if (type == OpType::Function)
+  //   PySys_FormatStdout(("Function name is " + functionName).c_str());
 
   if (functionName.empty() == false && type != OpType::Function) {
     PyErr_SetString(PyExc_TypeError,
@@ -383,10 +390,6 @@ PyObject *runEncodings(PyObject *args, OpType type) {
   IR2VecHandler *ir2vecObj = ir2vecHandlerobj->ir2vecObj;
 
   PyObject *result = ir2vecObj->setEncodings(type, functionName);
-  if (!result) {
-    PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
-    return NULL;
-  }
   return result;
 }
 
