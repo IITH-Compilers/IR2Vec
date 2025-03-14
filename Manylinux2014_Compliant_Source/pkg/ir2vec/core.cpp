@@ -118,6 +118,11 @@ public:
         PyList_Append(functionVector, PyFloat_FromDouble(Vec_it));
       }
 
+      if (PyList_Size(functionVector) != Func_it.second.size()) {
+        PyErr_SetString(PyExc_TypeError, "Error in creating Function Vector");
+        return NULL;
+      }
+
       PyObject *funcDict = PyDict_New();
       if (!funcDict) {
         PyErr_SetString(PyExc_TypeError, "Error in creating dictionary");
@@ -146,8 +151,6 @@ public:
         return NULL;
       }
     }
-    // Py_DECREF(functionVector);
-    // Py_DECREF(funcDict);
     return FuncVecDict;
   }
 
