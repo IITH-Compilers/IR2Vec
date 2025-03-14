@@ -124,92 +124,105 @@ public:
         return NULL;
       }
 
-      PyDict_SetItemString(funcDict, "demangledName",
-                           PyUnicode_FromString(demangledName.c_str()));
-      PyDict_SetItemString(funcDict, "actualName",
-                           PyUnicode_FromString(actualName.c_str()));
-      PyDict_SetItemString(funcDict, "vector", functionVector);
-
-      PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict);
-
-      Py_DECREF(functionVector);
-      Py_DECREF(funcDict);
-    }
-    return FuncVecDict;
-  }
-
-  // Function to get Instruction Vector Dictionary
-  PyObject *createInstructionVectorList(
-      llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
-          llvmInstVecMap) {
-    PyObject *instructionVectorList = PyList_New(0);
-    for (auto &Inst_it : llvmInstVecMap) {
-      PyObject *instructionVector = PyList_New(0);
-      for (auto &Vec_it : Inst_it.second) {
-        PyList_Append(instructionVector, PyFloat_FromDouble(Vec_it));
-      }
-
-      // add InstVec to instructionVector
-      PyList_Append(instructionVectorList, instructionVector);
-    }
-    return instructionVectorList;
-  }
-
-  // setEncodings
-  PyObject *setEncodings(OpType type, std::string funcName = "") {
-    // Invokinng IR2Vec lib exposed functions
-    IR2Vec::iname = this->fileName;
-    IR2Vec::IR2VecMode ir2vecMode =
-        (this->mode == string("sym") ? IR2Vec::Symbolic : IR2Vec::FlowAware);
-    // The scope of this Module object is extremely crucial
-    std::unique_ptr<llvm::Module> Module;
-    Module = IR2Vec::getLLVMIR();
-    if (!Module) {
-      PyErr_SetString(PyExc_TypeError, "Module not created");
-      return NULL;
-    }
-
-    IR2Vec::Embeddings *emb = nullptr;
-    // if output file is provided
-    if (!(this->outputFile.empty())) {
-      std::ofstream output(this->outputFile, ios_base::app);
-      emb = new IR2Vec::Embeddings(*Module, ir2vecMode, (this->level)[0],
-                                   &output, this->dim, funcName);
-    } else {
-      emb = new IR2Vec::Embeddings(*Module, ir2vecMode, (this->level)[0],
-                                   nullptr, this->dim, funcName);
-    }
-
-    if (!emb) {
-      PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-      return NULL;
-    }
-
-    PyObject *result = NULL;
-
-    switch (type) {
-    case OpType::Program:
-      result = this->createProgramVectorList(emb->getProgramVector());
-      break;
-    case OpType::Function:
-      if (!emb->getFunctionVecMap()) {
-        PyErr_SetString(PyExc_TypeError, "Function Vector Map not created");
+      if (PyDict_SetItemString(funcDict, "demangledName",
+                               PyUnicode_FromString(demangledName.c_str())) !=
+          0) {
+        PyErr_SetString(PyExc_TypeError, "Error in setting demangledName");
         return NULL;
       }
-      result = this->createFunctionVectorDict(emb->getFunctionVecMap());
-      break;
-    case OpType::Instruction:
-      result = this->createInstructionVectorList(emb->getInstVecMap());
-      break;
-    default:
-      PyErr_SetString(PyExc_TypeError, "Invalid OpType");
-      result = NULL;
+    }
+    if (PyDict_SetItemString(funcDict, "actualName",
+                             PyUnicode_FromString(actualName.c_str())) != 0) {
+      PyErr_SetString(PyExc_TypeError, "Error in setting actualName");
+      return NULL;
+    }
+    if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
+      PyErr_SetString(PyExc_TypeError, "Error in setting vector");
+      return NULL;
     }
 
-    delete emb;
-    return result;
+    if (PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict) !=
+        0) {
+      PyErr_SetString(PyExc_TypeError, "Error in setting dictionary");
+      return NULL;
+    }
+
+    // Py_DECREF(functionVector);
+    // Py_DECREF(funcDict);
   }
-};
+  return FuncVecDict;
+}
+
+// Function to get Instruction Vector Dictionary
+PyObject *
+createInstructionVectorList(
+    llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
+        llvmInstVecMap) {
+  PyObject *instructionVectorList = PyList_New(0);
+  for (auto &Inst_it : llvmInstVecMap) {
+    PyObject *instructionVector = PyList_New(0);
+    for (auto &Vec_it : Inst_it.second) {
+      PyList_Append(instructionVector, PyFloat_FromDouble(Vec_it));
+    }
+
+    // add InstVec to instructionVector
+    PyList_Append(instructionVectorList, instructionVector);
+  }
+  return instructionVectorList;
+}
+
+// setEncodings
+PyObject *setEncodings(OpType type, std::string funcName = "") {
+  // Invokinng IR2Vec lib exposed functions
+  IR2Vec::iname = this->fileName;
+  IR2Vec::IR2VecMode ir2vecMode =
+      (this->mode == string("sym") ? IR2Vec::Symbolic : IR2Vec::FlowAware);
+  // The scope of this Module object is extremely crucial
+  std::unique_ptr<llvm::Module> Module;
+  Module = IR2Vec::getLLVMIR();
+  if (!Module) {
+    PyErr_SetString(PyExc_TypeError, "Module not created");
+    return NULL;
+  }
+
+  IR2Vec::Embeddings *emb = nullptr;
+  // if output file is provided
+  if (!(this->outputFile.empty())) {
+    std::ofstream output(this->outputFile, ios_base::app);
+    emb = new IR2Vec::Embeddings(*Module, ir2vecMode, (this->level)[0], &output,
+                                 this->dim, funcName);
+  } else {
+    emb = new IR2Vec::Embeddings(*Module, ir2vecMode, (this->level)[0], nullptr,
+                                 this->dim, funcName);
+  }
+
+  if (!emb) {
+    PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
+    return NULL;
+  }
+
+  PyObject *result = NULL;
+
+  switch (type) {
+  case OpType::Program:
+    result = this->createProgramVectorList(emb->getProgramVector());
+    break;
+  case OpType::Function:
+    result = this->createFunctionVectorDict(emb->getFunctionVecMap());
+    break;
+  case OpType::Instruction:
+    result = this->createInstructionVectorList(emb->getInstVecMap());
+    break;
+  default:
+    PyErr_SetString(PyExc_TypeError, "Invalid OpType");
+    result = NULL;
+  }
+
+  delete emb;
+  return result;
+}
+}
+;
 
 typedef struct {
   PyObject_VAR_HEAD IR2VecHandler *ir2vecObj;
@@ -457,8 +470,8 @@ PyMODINIT_FUNC PyInit_core(void) {
   // Add the IR2VecHandlerType to the module
   if (PyModule_AddObject(modObj, "IR2VecHandler",
                          (PyObject *)&IR2VecHandlerType) < 0) {
-    Py_DECREF(&IR2VecHandlerType);
-    Py_DECREF(modObj);
+    // Py_DECREF(&IR2VecHandlerType);
+    // Py_DECREF(modObj);
     return NULL;
   }
 
