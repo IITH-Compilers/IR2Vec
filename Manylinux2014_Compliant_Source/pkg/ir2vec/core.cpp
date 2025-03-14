@@ -142,7 +142,7 @@ public:
         return NULL;
       }
 
-      PyObject *actualNameObj = PyUnicode_FromString(demangledName.c_str());
+      PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
         PyErr_SetString(PyExc_TypeError,
