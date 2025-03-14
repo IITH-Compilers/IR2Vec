@@ -107,7 +107,7 @@ public:
     }
 
     for (auto &Func_it : funcMap) {
-      const llvm::Function *func = Func_it.first;
+      llvm::Function *func = Func_it.first;
       PyObject *functionVector = PyList_New(0);
       for (auto &Vec_it : Func_it.second) {
         PyList_Append(functionVector, PyFloat_FromDouble(Vec_it));
@@ -134,9 +134,8 @@ public:
         return NULL;
       }
 
-      const char *actualName =
-          IR2Vec::getActualName(const_cast<llvm::Function *>(func));
-      PyObject *actualNameObj = PyUnicode_FromString(demangledName.c_str());
+      string actualName = std::string(IR2Vec::getActualName(func));
+      PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
         PyErr_SetString(PyExc_TypeError,
