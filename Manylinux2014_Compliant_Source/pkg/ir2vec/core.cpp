@@ -209,6 +209,9 @@ public:
       break;
     case OpType::Function:
       // result = this->createFunctionVectorDict(emb->getFunctionVecMap());
+      llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcMap =
+          emb->getFunctionVecMap();
+      // result = this->createFunctionVectorDict(funcMap);
       result = this->createProgramVectorList(emb->getProgramVector());
       break;
     case OpType::Instruction:
