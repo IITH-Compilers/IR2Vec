@@ -108,12 +108,12 @@ public:
 
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
-
       PyObject *functionVector = PyList_New(0);
       for (auto &Vec_it : Func_it.second) {
         PyList_Append(functionVector, PyFloat_FromDouble(Vec_it));
       }
       Py_INCREF(functionVector);
+
       if (PyList_Size(functionVector) != Func_it.second.size()) {
         PyErr_SetString(PyExc_TypeError, "Error in creating Function Vector");
         return NULL;
@@ -134,7 +134,14 @@ public:
         return NULL;
       }
 
-      string actualName = std::string(IR2Vec::getActualName(func));
+      llvm::Function *acFuncObj = const_cast<llvm::Function *>(func);
+      if (!acFuncObj) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to cast const Function to Function*");
+        return NULL;
+      }
+      string actualName = std::string(IR2Vec::getActualName(acFuncObj));
+
       PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
