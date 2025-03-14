@@ -105,7 +105,6 @@ public:
       PyErr_SetString(PyExc_TypeError, "Error in creating FuncVec dictionary");
       return NULL;
     }
-    // return FuncVecDict;
 
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
@@ -129,21 +128,23 @@ public:
         return NULL;
       }
 
-      if (PyDict_SetItemString(funcDict, "demangledName",
-                               PyUnicode_FromString(demangledName.c_str())) !=
-          0) {
-        PyErr_SetString(PyExc_TypeError, "Error in setting demangledName");
-        return NULL;
-      }
-      if (PyDict_SetItemString(funcDict, "actualName",
-                               PyUnicode_FromString(actualName.c_str())) != 0) {
-        PyErr_SetString(PyExc_TypeError, "Error in setting actualName");
-        return NULL;
-      }
-      if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
-        PyErr_SetString(PyExc_TypeError, "Error in setting vector");
-        return NULL;
-      }
+      // if (PyDict_SetItemString(funcDict, "demangledName",
+      //                          PyUnicode_FromString(demangledName.c_str()))
+      //                          !=
+      //     0) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in setting demangledName");
+      //   return NULL;
+      // }
+      // if (PyDict_SetItemString(funcDict, "actualName",
+      //                          PyUnicode_FromString(actualName.c_str())) !=
+      //                          0) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in setting actualName");
+      //   return NULL;
+      // }
+      // if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in setting vector");
+      //   return NULL;
+      // }
 
       if (PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict) !=
           0) {
