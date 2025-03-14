@@ -108,10 +108,6 @@ public:
 
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
-      std::string demangledName = IR2Vec::getDemagledName(func);
-      const char *actualName =
-          IR2Vec::getActualName(const_cast<llvm::Function *>(func));
-
       PyObject *functionVector = PyList_New(0);
       for (auto &Vec_it : Func_it.second) {
         PyList_Append(functionVector, PyFloat_FromDouble(Vec_it));
@@ -129,6 +125,7 @@ public:
         return NULL;
       }
 
+      std::string demangledName = IR2Vec::getDemagledName(func);
       PyObject *demangedNameObj = PyUnicode_FromString(demangledName.c_str());
       Py_INCREF(demangedNameObj);
       if (!demangedNameObj) {
@@ -142,7 +139,9 @@ public:
         return NULL;
       }
 
-      PyObject *actualNameObj = PyUnicode_FromString(actualName);
+      const char *actualName =
+          IR2Vec::getActualName(const_cast<llvm::Function *>(func));
+      PyObject *actualNameObj = PyUnicode_FromString(demangledName.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
         PyErr_SetString(PyExc_TypeError,
@@ -153,6 +152,7 @@ public:
         PyErr_SetString(PyExc_TypeError, "Error in setting actualName");
         return NULL;
       }
+
       if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
         PyErr_SetString(PyExc_TypeError, "Error in setting vector");
         return NULL;
