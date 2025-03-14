@@ -164,10 +164,11 @@ public:
         return NULL;
       }
 
-      PyErr_WarnEx(PyExc_RuntimeWarning,
-                   "Function name demangled " + demangledName + " actual " +
-                       actualName,
-                   1);
+      PyErr_WarnEx(
+          PyExc_RuntimeWarning,
+          ("Function name demangled " + demangledName + " actual " + actualName)
+              .c_str(),
+          1);
 
       // if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
       //     0) {
@@ -310,13 +311,15 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
     return NULL;
   }
 
-  const char *funcName = NULL;
+  const char *funcName = '\0';
   if (!PyArg_ParseTuple(args, "|s", &funcName)) {
     PyErr_SetString(PyExc_TypeError, "Tuple not parsed properly");
     return NULL;
   }
 
-  std::string functionName = funcName ? std::string(funcName) : std::string("");
+  string functionName = string(funcName);
+  PyErr_WarnEx(PyExc_RuntimeWarning,
+               ("Function name is " + functionName).c_str(), 1);
 
   PyObject *result =
       (self->ir2vecObj)->setEncodings(OpType::Function, functionName);
@@ -345,7 +348,7 @@ static PyTypeObject IR2VecHandlerType = {
     .tp_doc = "IR2VecHandlerObject", .tp_methods = ir2vecObjMethods};
 
 PyObject *runEncodings(PyObject *args, OpType type) {
-  const char *funcName = NULL; // Set to NULL for better handling
+  const char *funcName = '\0';
   IR2VecHandlerObject *ir2vecHandlerobj = nullptr;
 
   if (!PyArg_ParseTuple(args, "O|s", &ir2vecHandlerobj, &funcName)) {
@@ -360,7 +363,9 @@ PyObject *runEncodings(PyObject *args, OpType type) {
     return NULL;
   }
 
-  string functionName = funcName ? std::string(funcName) : std::string("");
+  string functionName = string(funcName);
+  PyErr_WarnEx(PyExc_RuntimeWarning,
+               ("Function name is " + functionName).c_str(), 1);
 
   if (functionName.empty() == false && type != OpType::Function) {
     PyErr_SetString(PyExc_TypeError,
