@@ -164,11 +164,9 @@ public:
         return NULL;
       }
 
-      PyErr_WarnEx(
-          PyExc_RuntimeWarning,
+      PySys_FormatStdout(
           ("Function name demangled " + demangledName + " actual " + actualName)
-              .c_str(),
-          1);
+              .c_str());
 
       // if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
       //     0) {
@@ -318,8 +316,7 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
   }
 
   string functionName = funcName ? string(funcName) : string();
-  PyErr_WarnEx(PyExc_RuntimeWarning,
-               ("Function name is " + functionName).c_str(), 1);
+  PySys_FormatStdout(("Function name is " + functionName).c_str());
 
   PyObject *result =
       (self->ir2vecObj)->setEncodings(OpType::Function, functionName);
@@ -364,8 +361,7 @@ PyObject *runEncodings(PyObject *args, OpType type) {
   }
 
   string functionName = funcName ? string(funcName) : string();
-  PyErr_WarnEx(PyExc_RuntimeWarning,
-               ("Function name is " + functionName).c_str(), 1);
+  PySys_FormatStdout(("Function name is " + functionName).c_str());
 
   if (functionName.empty() == false && type != OpType::Function) {
     PyErr_SetString(PyExc_TypeError,
