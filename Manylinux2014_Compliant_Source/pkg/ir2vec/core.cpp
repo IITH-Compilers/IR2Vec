@@ -107,13 +107,13 @@ public:
     }
 
     for (auto &Func_it : funcMap) {
-      llvm::Function *func = Func_it.first;
+      const llvm::Function *func = Func_it.first;
+
       PyObject *functionVector = PyList_New(0);
       for (auto &Vec_it : Func_it.second) {
         PyList_Append(functionVector, PyFloat_FromDouble(Vec_it));
       }
       Py_INCREF(functionVector);
-
       if (PyList_Size(functionVector) != Func_it.second.size()) {
         PyErr_SetString(PyExc_TypeError, "Error in creating Function Vector");
         return NULL;
