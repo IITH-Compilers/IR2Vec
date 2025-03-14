@@ -152,13 +152,13 @@ public:
 
       string actualName = getActualName(func);
 
-      // PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
-      // Py_INCREF(actualNameObj);
-      // if (!actualNameObj) {
-      //   PyErr_SetString(PyExc_TypeError,
-      //                   "Failed to create Python string from demangledName");
-      //   return NULL;
-      // }
+      PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
+      Py_INCREF(actualNameObj);
+      if (!actualNameObj) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to create Python string from demangledName");
+        return NULL;
+      }
 
       // if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
       //     0) {
