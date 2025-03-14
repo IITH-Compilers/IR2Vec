@@ -134,21 +134,22 @@ public:
         return NULL;
       }
 
-      llvm::Function *acFuncObj = const_cast<llvm::Function *>(func);
-      if (!acFuncObj) {
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to cast const Function to Function*");
-        return NULL;
-      }
-      string actualName = std::string(IR2Vec::getActualName(acFuncObj));
+      // llvm::Function *actualFuncNameObj = const_cast<llvm::Function *>(func);
+      // if (!actualFuncNameObj) {
+      //   PyErr_SetString(PyExc_TypeError,
+      //                   "Failed to cast const Function to Function*");
+      //   return NULL;
+      // }
+      // string actualName =
+      // std::string(IR2Vec::getActualName(actualFuncNameObj));
 
-      PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
-      Py_INCREF(actualNameObj);
-      if (!actualNameObj) {
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to create Python string from demangledName");
-        return NULL;
-      }
+      // PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
+      // Py_INCREF(actualNameObj);
+      // if (!actualNameObj) {
+      //   PyErr_SetString(PyExc_TypeError,
+      //                   "Failed to create Python string from demangledName");
+      //   return NULL;
+      // }
 
       // if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
       //     0) {
@@ -168,7 +169,7 @@ public:
       // Py_INCREF(funcDict);
 
       PyObject *funcTup = PyTuple_New(2);
-      PyTuple_SET_ITEM(funcTup, 0, actualNameObj);
+      PyTuple_SET_ITEM(funcTup, 0, demangledNameObj);
       PyTuple_SET_ITEM(funcTup, 1, functionVector);
       Py_INCREF(funcTup);
 
