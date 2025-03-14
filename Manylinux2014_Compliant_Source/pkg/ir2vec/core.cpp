@@ -177,9 +177,10 @@ public:
       // }
       // Py_INCREF(funcDict);
 
-      PyObject *funcTup = PyTuple_New(2);
+      PyObject *funcTup = PyTuple_New(3);
       PyTuple_SET_ITEM(funcTup, 0, demangledNameObj);
-      PyTuple_SET_ITEM(funcTup, 1, functionVector);
+      PyTuple_SET_ITEM(funcTup, 1, actualNameObj);
+      PyTuple_SET_ITEM(funcTup, 2, functionVector);
       Py_INCREF(funcTup);
 
       if (PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcTup) !=
