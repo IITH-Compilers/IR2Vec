@@ -4,6 +4,8 @@ set -eu
 export CXX=clang++
 export CC=clang
 
+yum -y install gcc gcc-c++ glibc-devel glibc-static libgcc glibc glibc-devel libstdc++-devel
+
 rm -rf build || true
 mkdir build
 cd build
