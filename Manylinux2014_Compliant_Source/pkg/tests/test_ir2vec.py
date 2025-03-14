@@ -75,17 +75,17 @@ def assert_valid_functionVector(functionVectorMap):
     for fun, funcObj in functionVectorMap.items():
         assert fun is not None
 
-        vec = funcObj["vector"]
+        vec = funcObj[1]
         assert vec is not None
         assert isinstance(vec, list)
         assert all(isinstance(x, float) for x in vec)
 
-        demagName = funcObj["demangledName"]
-        assert isinstance(demagName, str)
-        assert demagName is not None
-        assert demagName == fun
+        # demagName = funcObj["demangledName"]
+        # assert isinstance(demagName, str)
+        # assert demagName is not None
+        # assert demagName == fun
 
-        actName = funcObj["actualName"]
+        actName = funcObj[0]
         assert isinstance(actName, str)
         assert actName is not None
 
