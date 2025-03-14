@@ -127,7 +127,7 @@ public:
 
       PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict);
 
-      Py_DECREF(funcDict);
+      Py_INCREF(funcDict);
     }
     return FuncVecDict;
   }
