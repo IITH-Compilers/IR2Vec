@@ -109,7 +109,7 @@ public:
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
       std::string demangledName = IR2Vec::getDemagledName(func);
-      std::string actualName =
+      const char *actualName =
           IR2Vec::getActualName(const_cast<llvm::Function *>(func));
 
       PyObject *functionVector = PyList_New(0);
@@ -142,7 +142,7 @@ public:
         return NULL;
       }
 
-      PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
+      PyObject *actualNameObj = PyUnicode_FromString(actualName);
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
         PyErr_SetString(PyExc_TypeError,
