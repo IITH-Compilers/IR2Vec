@@ -116,6 +116,7 @@ public:
       for (auto &Vec_it : Func_it.second) {
         PyList_Append(functionVector, PyFloat_FromDouble(Vec_it));
       }
+      Py_INCREF(functionVector);
 
       if (PyList_Size(functionVector) != Func_it.second.size()) {
         PyErr_SetString(PyExc_TypeError, "Error in creating Function Vector");
@@ -128,21 +129,35 @@ public:
         return NULL;
       }
 
-      if (PyDict_SetItemString(funcDict, "demangledName",
-                               PyUnicode_FromString(demangledName.c_str())) !=
+      PyObject *demangedNameObj = PyUnicode_FromString(demangledName.c_str());
+      Py_INCREF(demangedNameObj);
+      if (!demangedNameObj) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to create Python string from demangledName");
+        return NULL;
+      }
+      if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
           0) {
         PyErr_SetString(PyExc_TypeError, "Error in setting demangledName");
         return NULL;
       }
-      if (PyDict_SetItemString(funcDict, "actualName",
-                               PyUnicode_FromString(actualName.c_str())) != 0) {
+
+      PyObject *actualNameObj = PyUnicode_FromString(demangledName.c_str());
+      Py_INCREF(actualNameObj);
+      if (!actualNameObj) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to create Python string from demangledName");
+        return NULL;
+      }
+      if (PyDict_SetItemString(funcDict, "actualName", actualNameObj) != 0) {
         PyErr_SetString(PyExc_TypeError, "Error in setting actualName");
         return NULL;
       }
-      // if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
-      //   PyErr_SetString(PyExc_TypeError, "Error in setting vector");
-      //   return NULL;
-      // }
+      if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
+        PyErr_SetString(PyExc_TypeError, "Error in setting vector");
+        return NULL;
+      }
+      Py_INCREF(funcDict);
 
       if (PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict) !=
           0) {
