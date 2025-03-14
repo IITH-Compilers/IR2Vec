@@ -322,6 +322,10 @@ PyObject *runEncodings(PyObject *args, OpType type) {
 }
 
 PyObject *getInstructionVectors(PyObject *self, PyObject *args) {
+  if (!args || !PyTuple_Check(args)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid arguments. Expected a tuple.");
+    return NULL;
+  }
   return runEncodings(args, OpType::Instruction);
 }
 
