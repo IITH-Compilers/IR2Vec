@@ -105,6 +105,7 @@ public:
       PyErr_SetString(PyExc_TypeError, "Error in creating FuncVec dictionary");
       return NULL;
     }
+    return FuncVecDict;
 
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
@@ -154,8 +155,8 @@ public:
     return instructionVectorList;
   }
 
-  // generateEncodings
-  PyObject *generateEncodings(OpType type, std::string funcName = "") {
+  // setEncodings
+  PyObject *setEncodings(OpType type, std::string funcName = "") {
     // Invokinng IR2Vec lib exposed functions
     IR2Vec::iname = this->fileName;
     IR2Vec::IR2VecMode ir2vecMode =
@@ -170,7 +171,7 @@ public:
 
     IR2Vec::Embeddings *emb = nullptr;
     // if output file is provided
-    if (!this->outputFile.empty()) {
+    if (!(this->outputFile.empty())) {
       std::ofstream output(this->outputFile, ios_base::app);
       emb = new IR2Vec::Embeddings(*Module, ir2vecMode, (this->level)[0],
                                    &output, this->dim, funcName);
@@ -191,6 +192,10 @@ public:
       result = this->createProgramVectorList(emb->getProgramVector());
       break;
     case OpType::Function:
+      if (!emb->getFunctionVecMap()) {
+        PyErr_SetString(PyExc_TypeError, "Function Vector Map not created");
+        return NULL;
+      }
       result = this->createFunctionVectorDict(emb->getFunctionVecMap());
       break;
     case OpType::Instruction:
@@ -216,7 +221,7 @@ PyObject *getInstructionVectors(IR2VecHandlerObject *self, PyObject *args) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
     return NULL;
   }
-  return (self->ir2vecObj)->generateEncodings(OpType::Instruction);
+  return (self->ir2vecObj)->setEncodings(OpType::Instruction);
 }
 
 PyObject *getProgramVector(IR2VecHandlerObject *self, PyObject *args) {
@@ -224,7 +229,7 @@ PyObject *getProgramVector(IR2VecHandlerObject *self, PyObject *args) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
     return NULL;
   }
-  return (self->ir2vecObj)->generateEncodings(OpType::Program);
+  return (self->ir2vecObj)->setEncodings(OpType::Program);
 }
 
 PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
@@ -247,7 +252,7 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
   std::string functionName = funcName ? std::string(funcName) : std::string("");
 
   PyObject *result =
-      self->ir2vecObj->generateEncodings(OpType::Function, functionName);
+      self->ir2vecObj->setEncodings(OpType::Function, functionName);
   if (!result) {
     PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
     return NULL;
@@ -255,7 +260,7 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
   return result;
 
   // return (self->ir2vecObj)
-  //     ->generateEncodings(OpType::Function, string(funcName));
+  //     ->setEncodings(OpType::Function, string(funcName));
 }
 
 PyMethodDef ir2vecObjMethods[] = {
@@ -312,13 +317,13 @@ PyObject *runEncodings(PyObject *args, OpType type) {
 
   IR2VecHandler *ir2vecObj = ir2vecHandlerobj->ir2vecObj;
 
-  PyObject *result = ir2vecObj->generateEncodings(type, functionName);
+  PyObject *result = ir2vecObj->setEncodings(type, functionName);
   if (!result) {
     PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
     return NULL;
   }
   return result;
-  // return ir2vecObj->generateEncodings(type, string(funcName));
+  // return ir2vecObj->setEncodings(type, string(funcName));
 }
 
 PyObject *getInstructionVectors(PyObject *self, PyObject *args) {
