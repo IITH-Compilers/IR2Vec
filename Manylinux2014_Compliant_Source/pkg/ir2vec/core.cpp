@@ -255,19 +255,18 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
     return NULL;
   }
 
+  const char *funcName = NULL;
+  if (!PyArg_ParseTuple(args, "|s", &funcName)) {
+    PyErr_SetString(PyExc_TypeError, "Tuple not parsed properly");
+    return NULL;
+  }
+
+  std::string functionName = funcName ? std::string(funcName) : std::string("");
+
   return (self->ir2vecObj)->setEncodings(OpType::Program);
 
-  // const char *funcName = NULL;
-  // if (!PyArg_ParseTuple(args, "|s", &funcName)) {
-  //   PyErr_SetString(PyExc_TypeError, "Tuple not parsed properly");
-  //   return NULL;
-  // }
-
-  // std::string functionName = funcName ? std::string(funcName) :
-  // std::string("");
-
   // PyObject *result =
-  //     self->ir2vecObj->setEncodings(OpType::Function, functionName);
+  //     (self->ir2vecObj)->setEncodings(OpType::Function, functionName);
   // if (!result) {
   //   PyErr_SetString(PyExc_RuntimeError, "Failed to generate encodings.");
   //   return NULL;
