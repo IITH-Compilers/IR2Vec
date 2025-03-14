@@ -170,25 +170,25 @@ def test_fa_f():
         assert_valid_functionVector(functionVectorMap2)
 
         for fun, funcObj in functionVectorMap.items():
-            assert fun == funcObj["demangledName"]
+            # assert fun == funcObj["demangledName"]
 
-            f_vecs[path.name.strip()][fun] = funcObj["vector"]
+            f_vecs[path.name.strip()][fun] = funcObj[1]  # vector
 
             functionOutput1 = ir2vec.getFunctionVectors(
                 initObj,
-                funcObj["actualName"],
+                funcObj[0],  # actualName
             )
             assert_valid_functionVector(functionOutput1)
 
-            functionOutput2 = initObj.getFunctionVectors(funcObj["actualName"])
+            functionOutput2 = initObj.getFunctionVectors(funcObj[0])
             assert_valid_functionVector(functionOutput2)
 
-            assert functionOutput1[fun]["vector"] == pytest.approx(
-                functionOutput2[fun]["vector"], abs=ABS_ACCURACY
+            assert functionOutput1[fun][1] == pytest.approx(
+                functionOutput2[fun][1], abs=ABS_ACCURACY
             )
 
-            assert funcObj["vector"] == pytest.approx(
-                functionOutput1[fun]["vector"], abs=ABS_ACCURACY
+            assert funcObj[1] == pytest.approx(
+                functionOutput1[fun][1], abs=ABS_ACCURACY
             )
 
     print(TEST_SUITE_DIR)

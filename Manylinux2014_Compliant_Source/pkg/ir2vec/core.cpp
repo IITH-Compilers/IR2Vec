@@ -119,11 +119,11 @@ public:
         return NULL;
       }
 
-      PyObject *funcDict = PyDict_New();
-      if (!funcDict) {
-        PyErr_SetString(PyExc_TypeError, "Error in creating dictionary");
-        return NULL;
-      }
+      // PyObject *funcDict = PyDict_New();
+      // if (!funcDict) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in creating dictionary");
+      //   return NULL;
+      // }
 
       std::string demangledName = IR2Vec::getDemagledName(func);
       PyObject *demangedNameObj = PyUnicode_FromString(demangledName.c_str());
@@ -131,11 +131,6 @@ public:
       if (!demangedNameObj) {
         PyErr_SetString(PyExc_TypeError,
                         "Failed to create Python string from demangledName");
-        return NULL;
-      }
-      if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
-          0) {
-        PyErr_SetString(PyExc_TypeError, "Error in setting demangledName");
         return NULL;
       }
 
@@ -148,18 +143,30 @@ public:
                         "Failed to create Python string from demangledName");
         return NULL;
       }
-      if (PyDict_SetItemString(funcDict, "actualName", actualNameObj) != 0) {
-        PyErr_SetString(PyExc_TypeError, "Error in setting actualName");
-        return NULL;
-      }
 
-      if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
-        PyErr_SetString(PyExc_TypeError, "Error in setting vector");
-        return NULL;
-      }
-      Py_INCREF(funcDict);
+      // if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
+      //     0) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in setting demangledName");
+      //   return NULL;
+      // }
 
-      if (PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict) !=
+      // if (PyDict_SetItemString(funcDict, "actualName", actualNameObj) != 0) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in setting actualName");
+      //   return NULL;
+      // }
+
+      // if (PyDict_SetItemString(funcDict, "vector", functionVector) != 0) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in setting vector");
+      //   return NULL;
+      // }
+      // Py_INCREF(funcDict);
+
+      PyObject *funcTup = PyTuple_New(2);
+      PyTuple_SET_ITEM(funcTup, 0, actualNameObj);
+      PyTuple_SET_ITEM(funcTup, 1, functionVector);
+      Py_INCREF(funcTup);
+
+      if (PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcTup) !=
           0) {
         PyErr_SetString(PyExc_TypeError, "Error in setting dictionary");
         return NULL;
