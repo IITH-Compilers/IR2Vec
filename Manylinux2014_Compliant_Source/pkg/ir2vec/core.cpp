@@ -361,7 +361,8 @@ PyObject *getFunctionVectors(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  return runEncodings(args, OpType::Function);
+  // return runEncodings(args, OpType::Function);
+  return runEncodings(args, OpType::Program);
 }
 
 IR2VecHandlerObject *createIR2VECObject(const char *filename,
