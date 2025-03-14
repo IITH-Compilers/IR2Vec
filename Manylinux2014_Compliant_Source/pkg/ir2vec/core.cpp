@@ -311,13 +311,13 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
     return NULL;
   }
 
-  char *funcName = '\0';
+  const char *funcName = nullptr;
   if (!PyArg_ParseTuple(args, "|s", &funcName)) {
     PyErr_SetString(PyExc_TypeError, "Tuple not parsed properly");
     return NULL;
   }
 
-  string functionName = string(funcName);
+  string functionName = funcName ? string(funcName) : string();
   PyErr_WarnEx(PyExc_RuntimeWarning,
                ("Function name is " + functionName).c_str(), 1);
 
@@ -348,7 +348,7 @@ static PyTypeObject IR2VecHandlerType = {
     .tp_doc = "IR2VecHandlerObject", .tp_methods = ir2vecObjMethods};
 
 PyObject *runEncodings(PyObject *args, OpType type) {
-  char *funcName = '\0';
+  char *funcName = nullptr;
   IR2VecHandlerObject *ir2vecHandlerobj = nullptr;
 
   if (!PyArg_ParseTuple(args, "O|s", &ir2vecHandlerobj, &funcName)) {
@@ -363,7 +363,7 @@ PyObject *runEncodings(PyObject *args, OpType type) {
     return NULL;
   }
 
-  string functionName = string(funcName);
+  string functionName = funcName ? string(funcName) : string();
   PyErr_WarnEx(PyExc_RuntimeWarning,
                ("Function name is " + functionName).c_str(), 1);
 
