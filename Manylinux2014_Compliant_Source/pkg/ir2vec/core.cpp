@@ -453,5 +453,5 @@ PyMODINIT_FUNC PyInit_core(void) {
     return NULL;
   }
 
-  return module;
+  return modObj;
 }
