@@ -151,7 +151,10 @@ public:
         return NULL;
       }
     }
-    return FuncVecDict;
+
+    // return FuncVecDict;
+    PyObject *testFuncDict = PyDict_New();
+    return testFuncDict;
   }
 
   // Function to get Instruction Vector Dictionary
@@ -211,8 +214,8 @@ public:
       // result = this->createFunctionVectorDict(emb->getFunctionVecMap());
       llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16> funcMap =
           emb->getFunctionVecMap();
-      // result = this->createFunctionVectorDict(funcMap);
-      result = this->createProgramVectorList(emb->getProgramVector());
+      result = this->createFunctionVectorDict(funcMap);
+      // result = this->createProgramVectorList(emb->getProgramVector());
       break;
     }
     case OpType::Instruction:
