@@ -87,6 +87,22 @@ public:
   std::string getMode() { return mode; }
   std::string getLevel() { return level; }
 
+  std::string getActualName(const llvm::Function *function) {
+    std::string functionName = function->getName().str();
+    std::string demangledName = IR2Vec::getDemagledName(function);
+    size_t Size = 1;
+    char *Buf = static_cast<char *>(std::malloc(Size));
+    const char *mangled = functionName.c_str();
+    char *baseName;
+    llvm::ItaniumPartialDemangler Mangler;
+    if (Mangler.partialDemangle(mangled)) {
+      baseName = &demangledName[0];
+    } else {
+      baseName = Mangler.getFunctionBaseName(Buf, &Size);
+    }
+    return std::string(baseName);
+  }
+
   // Function to get Program Vector List
   PyObject *createProgramVectorList(IR2Vec::Vector llvmPgmVec) {
     // for PgmVector
@@ -134,14 +150,7 @@ public:
         return NULL;
       }
 
-      // llvm::Function *actualFuncNameObj = const_cast<llvm::Function *>(func);
-      // if (!actualFuncNameObj) {
-      //   PyErr_SetString(PyExc_TypeError,
-      //                   "Failed to cast const Function to Function*");
-      //   return NULL;
-      // }
-      // string actualName =
-      // std::string(IR2Vec::getActualName(actualFuncNameObj));
+      string actualName = getActualName(func);
 
       // PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
       // Py_INCREF(actualNameObj);
