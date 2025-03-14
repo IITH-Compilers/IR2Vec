@@ -122,6 +122,11 @@ public:
       return NULL;
     }
 
+    if (funcMap.empty()) {
+      PyErr_SetString(PyExc_TypeError, "Empty function vector map");
+      return NULL;
+    }
+
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
       PyObject *functionVector = PyList_New(0);
