@@ -105,7 +105,7 @@ public:
       PyErr_SetString(PyExc_TypeError, "Error in creating FuncVec dictionary");
       return NULL;
     }
-    return FuncVecDict;
+    // return FuncVecDict;
 
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
