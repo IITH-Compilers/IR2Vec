@@ -126,9 +126,9 @@ public:
       // }
 
       std::string demangledName = IR2Vec::getDemagledName(func);
-      PyObject *demangedNameObj = PyUnicode_FromString(demangledName.c_str());
-      Py_INCREF(demangedNameObj);
-      if (!demangedNameObj) {
+      PyObject *demangledNameObj = PyUnicode_FromString(demangledName.c_str());
+      Py_INCREF(demangledNameObj);
+      if (!demangledNameObj) {
         PyErr_SetString(PyExc_TypeError,
                         "Failed to create Python string from demangledName");
         return NULL;
