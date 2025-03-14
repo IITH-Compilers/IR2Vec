@@ -245,8 +245,8 @@ PyObject *getProgramVector(IR2VecHandlerObject *self, PyObject *args) {
 }
 
 PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
-  if (!self) {
-    PyErr_SetString(PyExc_TypeError, "Invalid self object passed.");
+  if (!args || !PyTuple_Check(args)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid arguments. Expected a tuple.");
     return NULL;
   }
 
