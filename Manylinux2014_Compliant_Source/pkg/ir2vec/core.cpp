@@ -101,6 +101,10 @@ public:
       llvm::SmallMapVector<const llvm::Function *, IR2Vec::Vector, 16>
           funcMap) {
     PyObject *FuncVecDict = PyDict_New();
+    if (!FuncVecDict) {
+      PyErr_SetString(PyExc_TypeError, "Error in creating FuncVec dictionary");
+      return NULL;
+    }
 
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
@@ -114,6 +118,11 @@ public:
       }
 
       PyObject *funcDict = PyDict_New();
+      if (!funcDict) {
+        PyErr_SetString(PyExc_TypeError, "Error in creating dictionary");
+        return NULL;
+      }
+
       PyDict_SetItemString(funcDict, "demangledName",
                            PyUnicode_FromString(demangledName.c_str()));
       PyDict_SetItemString(funcDict, "actualName",
@@ -122,7 +131,7 @@ public:
 
       PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict);
 
-      // Py_DECREF(functionVector);
+      Py_DECREF(functionVector);
       Py_DECREF(funcDict);
     }
     return FuncVecDict;
@@ -205,7 +214,7 @@ PyObject *getInstructionVectors(IR2VecHandlerObject *self, PyObject *args) {
   // check for args, and null etc
   if (!(self->ir2vecObj)) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    Py_RETURN_NONE;
+    return NULL;
   }
   return (self->ir2vecObj)->generateEncodings(OpType::Instruction);
 }
@@ -213,7 +222,7 @@ PyObject *getInstructionVectors(IR2VecHandlerObject *self, PyObject *args) {
 PyObject *getProgramVector(IR2VecHandlerObject *self, PyObject *args) {
   if (!(self->ir2vecObj)) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    Py_RETURN_NONE;
+    return NULL;
   }
   return (self->ir2vecObj)->generateEncodings(OpType::Program);
 }
@@ -226,12 +235,13 @@ PyObject *getFunctionVectors(IR2VecHandlerObject *self, PyObject *args) {
 
   if (!(self->ir2vecObj)) {
     PyErr_SetString(PyExc_TypeError, "Embedding Object not created");
-    Py_RETURN_NONE;
+    return NULL;
   }
 
   const char *funcName = NULL;
   if (!PyArg_ParseTuple(args, "|s", &funcName)) {
-    Py_RETURN_NONE;
+    PyErr_SetString(PyExc_TypeError, "Tuple not parsed properly");
+    return NULL;
   }
 
   std::string functionName = funcName ? std::string(funcName) : std::string("");
@@ -262,10 +272,8 @@ static PyTypeObject IR2VecHandlerType = {
     PyVarObject_HEAD_INIT(NULL, 0).tp_name =
         "IR2VecHandler.IR2VecHandlerObject",
     .tp_basicsize = sizeof(IR2VecHandlerObject),
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_doc = "IR2VecHandlerObject",
-    .tp_methods = ir2vecObjMethods,
-};
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_doc = "IR2VecHandlerObject", .tp_methods = ir2vecObjMethods};
 
 PyObject *runEncodings(PyObject *args, OpType type) {
   const char *funcName = NULL; // Set to NULL for better handling
@@ -428,12 +436,22 @@ struct PyModuleDef IR2Vec_def = {
     IR2Vec_core_Methods};
 
 PyMODINIT_FUNC PyInit_core(void) {
-  PyObject *module = PyModule_Create(&IR2Vec_def);
+  PyObject *modObj = PyModule_Create(&IR2Vec_def);
 
   if (PyType_Ready(&IR2VecHandlerType) < 0) {
-    Py_RETURN_NONE;
+    PyErr_SetString(PyExc_TypeError, "Error in type creation");
+    return NULL;
   }
 
   Py_INCREF(&IR2VecHandlerType);
+
+  // Add the IR2VecHandlerType to the module
+  if (PyModule_AddObject(modObj, "IR2VecHandler",
+                         (PyObject *)&IR2VecHandlerType) < 0) {
+    Py_DECREF(&IR2VecHandlerType);
+    Py_DECREF(modObj);
+    return NULL;
+  }
+
   return module;
 }
