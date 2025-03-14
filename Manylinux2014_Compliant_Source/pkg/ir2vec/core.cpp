@@ -156,7 +156,6 @@ public:
       }
 
       string actualName = getActualName(func);
-
       PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
@@ -164,6 +163,11 @@ public:
                         "Failed to create Python string from demangledName");
         return NULL;
       }
+
+      PyErr_WarnEx(PyExc_RuntimeWarning,
+                   "Function name demangled " + demangledName + " actual " +
+                       actualName,
+                   1);
 
       // if (PyDict_SetItemString(funcDict, "demangledName", demangedNameObj) !=
       //     0) {
