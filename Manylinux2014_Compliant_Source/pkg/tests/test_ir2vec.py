@@ -88,6 +88,7 @@ def assert_valid_functionVector(functionVectorMap):
         assert vec is not None
         assert isinstance(vec, list)
         assert all(isinstance(x, float) for x in vec)
+        assert len(vec) > 0
 
     return True
 
