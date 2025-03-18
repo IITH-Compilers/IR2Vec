@@ -179,7 +179,8 @@ public:
       //   return NULL;
       // }
 
-      string actualNameStr = getActualName(func);
+      // string actualNameStr = getActualName(func);
+      string actualNameStr = demangledName;
       if (actualNameStr.empty()) {
         PySys_FormatStdout("Actual name of function not generated");
         PyErr_SetString(PyExc_TypeError,
