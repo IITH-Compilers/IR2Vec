@@ -87,9 +87,9 @@ public:
   std::string getMode() { return mode; }
   std::string getLevel() { return level; }
 
-  std::string getActualName(const llvm::Function *function) {
-    std::string functionName = function->getName().str();
-    std::string demangledName = IR2Vec::getDemagledName(function);
+  char *getActualName(const llvm::Function *function) {
+    auto functionName = function->getName().str();
+    auto demangledName = getDemagledName(function);
     size_t Size = 1;
     char *Buf = static_cast<char *>(std::malloc(Size));
     const char *mangled = functionName.c_str();
@@ -100,7 +100,7 @@ public:
     } else {
       baseName = Mangler.getFunctionBaseName(Buf, &Size);
     }
-    return std::string(baseName);
+    return baseName;
   }
 
   // Function to get Program Vector List
@@ -166,14 +166,14 @@ public:
       // string actualName = getActualName(
       //   const_cast<llvm::Function *>(func)
       // );
-      auto funcObj = const_cast<llvm::Function *>(func);
-      if (!funcObj) {
-        PySys_FormatStdout(
-          ("function object not properly converted".c_str()));
-        PyErr_SetString(PyExc_TypeError, "Error in getting non-cast llvm function");
-        return NULL;
-      }
-      auto actualNameStr = const_cast<const char*>(IR2Vec::getActualName(funcObj));
+      // auto funcObj = const_cast<llvm::Function *>(func);
+      // if (!funcObj) {
+      //   PySys_FormatStdout(
+      //     "function object not properly converted");
+      //   PyErr_SetString(PyExc_TypeError, "Error in getting non-cast llvm function");
+      //   return NULL;
+      // }
+      auto actualNameStr = const_cast<const char*>(getActualName(func));
       if (!actualNameStr) {
         PySys_FormatStdout(
           ("Actual name of function not generated".c_str()));
