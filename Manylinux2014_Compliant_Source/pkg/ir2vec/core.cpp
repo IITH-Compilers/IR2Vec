@@ -88,18 +88,14 @@ public:
   std::string getLevel() { return level; }
 
   char *getActualName(const llvm::Function *function) {
-    if (function == nullptr) {
-      return "";
-    }
-
     std::string functionName = function->getName().str();
-    std::string demangledName = IR2Vec::getDemagledName(function);
     size_t Size = 1;
     char *Buf = static_cast<char *>(std::malloc(Size));
     const char *mangled = functionName.c_str();
     char *baseName;
     llvm::ItaniumPartialDemangler Mangler;
     if (Mangler.partialDemangle(mangled)) {
+      std::string demangledName = IR2Vec::getDemagledName(function);
       baseName = &demangledName[0];
     } else {
       baseName = Mangler.getFunctionBaseName(Buf, &Size);
@@ -183,14 +179,17 @@ public:
       //   return NULL;
       // }
 
-      string actualNameStr = getActualName(func);
-      // string actualNameStr = demangledName;
+      // string actualNameStr = getActualName(func);
+      string actualNameStr = demangledName;
       if (actualNameStr.empty()) {
         PySys_FormatStdout("Actual name of function not generated");
         PyErr_SetString(PyExc_TypeError,
                         "Failed to create Python string from demangledName");
         return NULL;
       }
+
+      string testAcName = IR2Vec::getActualName(static_cast<llvm::function *>(func));
+
       PyObject *actualNameObj = PyUnicode_FromString(actualNameStr.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
