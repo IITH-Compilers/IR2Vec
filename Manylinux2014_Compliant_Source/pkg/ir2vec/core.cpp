@@ -180,16 +180,16 @@ public:
       // }
 
       std::string actualNameStr(1, demangledName[0]);
-      if (const_cast<llvm::Function *>(func)) 
-      {
-        actualNameStr = string(IR2Vec::getActualName(const_cast<llvm::Function *>(func)));
-      }
-      if (actualNameStr.empty()) {
-        PySys_FormatStdout("Actual name of function not generated");
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to create Python string from demangledName");
-        return NULL;
-      }
+      // if (const_cast<llvm::Function *>(func)) 
+      // {
+      //   actualNameStr = string(IR2Vec::getActualName(const_cast<llvm::Function *>(func)));
+      // }
+      // if (actualNameStr.empty()) {
+      //   PySys_FormatStdout("Actual name of function not generated");
+      //   PyErr_SetString(PyExc_TypeError,
+      //                   "Failed to create Python string from demangledName");
+      //   return NULL;
+      // }
 
       PyObject *actualNameObj = PyUnicode_FromString(actualNameStr.c_str());
       Py_INCREF(actualNameObj);
