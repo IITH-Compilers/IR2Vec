@@ -89,17 +89,26 @@ public:
 
   char *getActualName(const llvm::Function *function) {
     std::string functionName = function->getName().str();
+    std::string demangledName = IR2Vec::getDemagledName(function);
     size_t Size = 1;
     char *Buf = static_cast<char *>(std::malloc(Size));
+    if (!Buf) {
+      PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory");
+      return nullptr;
+    }
     const char *mangled = functionName.c_str();
     char *baseName;
     llvm::ItaniumPartialDemangler Mangler;
     if (Mangler.partialDemangle(mangled)) {
-      std::string demangledName = IR2Vec::getDemagledName(function);
       baseName = &demangledName[0];
     } else {
       baseName = Mangler.getFunctionBaseName(Buf, &Size);
     }
+    if (!baseName) {
+      PyErr_SetString(PyExc_TypeError, "Error in demangling function name");
+      return nullptr;
+    }
+  
     return baseName;
   }
 
@@ -180,16 +189,16 @@ public:
       // }
 
       std::string actualNameStr(1, demangledName[0]);
-      // if (const_cast<llvm::Function *>(func)) 
-      // {
-      //   actualNameStr = string(IR2Vec::getActualName(const_cast<llvm::Function *>(func)));
-      // }
-      // if (actualNameStr.empty()) {
-      //   PySys_FormatStdout("Actual name of function not generated");
-      //   PyErr_SetString(PyExc_TypeError,
-      //                   "Failed to create Python string from demangledName");
-      //   return NULL;
-      // }
+      if (const_cast<llvm::Function *>(func)) 
+      {
+        actualNameStr = string(getActualName(func));
+      }
+      if (actualNameStr.empty()) {
+        PySys_FormatStdout("Actual name of function not generated");
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to create Python string from demangledName");
+        return NULL;
+      }
 
       PyObject *actualNameObj = PyUnicode_FromString(actualNameStr.c_str());
       Py_INCREF(actualNameObj);
