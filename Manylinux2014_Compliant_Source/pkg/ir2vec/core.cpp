@@ -89,13 +89,12 @@ public:
 
   char *getActualName(const llvm::Function *function) {
     if (function == nullptr) {
-      return nullptr;
+      return "";
     }
 
     std::string functionName = function->getName().str();
-
     std::string demangledName = IR2Vec::getDemagledName(function);
-    size_t Size = demangledName.size() + 1;
+    size_t Size = 1;
     char *Buf = static_cast<char *>(std::malloc(Size));
     const char *mangled = functionName.c_str();
     char *baseName;
