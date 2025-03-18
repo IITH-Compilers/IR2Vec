@@ -179,7 +179,11 @@ public:
       //   return NULL;
       // }
 
-      string actualNameStr = IR2Vec::getActualName(const_cast<llvm::Function *>(func));
+      string actualNameStr = demangledName[0];
+      if (const_cast<llvm::Function *>(func)) 
+      {
+        actualNameStr = IR2Vec::getActualName(const_cast<llvm::Function *>(func));
+      }
       if (actualNameStr.empty()) {
         PySys_FormatStdout("Actual name of function not generated");
         PyErr_SetString(PyExc_TypeError,
