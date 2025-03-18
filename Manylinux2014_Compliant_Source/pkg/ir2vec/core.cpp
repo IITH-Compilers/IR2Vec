@@ -178,21 +178,22 @@ public:
       //   PyErr_SetString(PyExc_TypeError, "Error in getting non-cast llvm function");
       //   return NULL;
       // }
-      string actualNameStr = getActualName(func);
-      if (actualNameStr.empty()) {
-        PySys_FormatStdout("Actual name of function not generated");
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to create Python string from demangledName");
-        return NULL;
-      }
-      PyObject *actualNameObj = PyUnicode_FromString(actualNameStr.c_str());
-      Py_INCREF(actualNameObj);
-      if (!actualNameObj) {
-        PySys_FormatStdout("Actual name OBJECT not generated");
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to create Python string from demangledName");
-        return NULL;
-      }
+
+      // string actualNameStr = getActualName(func);
+      // if (actualNameStr.empty()) {
+      //   PySys_FormatStdout("Actual name of function not generated");
+      //   PyErr_SetString(PyExc_TypeError,
+      //                   "Failed to create Python string from demangledName");
+      //   return NULL;
+      // }
+      // PyObject *actualNameObj = PyUnicode_FromString(actualNameStr.c_str());
+      // Py_INCREF(actualNameObj);
+      // if (!actualNameObj) {
+      //   PySys_FormatStdout("Actual name OBJECT not generated");
+      //   PyErr_SetString(PyExc_TypeError,
+      //                   "Failed to create Python string from demangledName");
+      //   return NULL;
+      // }
 
       // PySys_FormatStdout(
       //     ("Function name demangled " + demangledName + " actual " +
@@ -218,7 +219,7 @@ public:
 
       PyObject *funcTup = PyTuple_New(3);
       PyTuple_SET_ITEM(funcTup, 0, demangledNameObj);
-      PyTuple_SET_ITEM(funcTup, 1, actualNameObj);
+      // PyTuple_SET_ITEM(funcTup, 1, actualNameObj);
       PyTuple_SET_ITEM(funcTup, 2, functionVector);
       Py_INCREF(funcTup);
 
