@@ -178,14 +178,14 @@ public:
       //   PyErr_SetString(PyExc_TypeError, "Error in getting non-cast llvm function");
       //   return NULL;
       // }
-      auto actualNameStr = const_cast<const char*>(getActualName(func));
-      if (!actualNameStr) {
+      string actualNameStr = getActualName(func);
+      if (actualNameStr.empty()) {
         PySys_FormatStdout("Actual name of function not generated");
         PyErr_SetString(PyExc_TypeError,
                         "Failed to create Python string from demangledName");
         return NULL;
       }
-      PyObject *actualNameObj = PyUnicode_FromString(actualNameStr);
+      PyObject *actualNameObj = PyUnicode_FromString(actualNameStr.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
         PySys_FormatStdout("Actual name OBJECT not generated");
