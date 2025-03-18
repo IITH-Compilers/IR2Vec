@@ -188,18 +188,7 @@ public:
         return NULL;
       }
 
-      if (! (const_cast<llvm::Function *>(func))) {
-        PySys_FormatStdout(
-          "function object not properly converted");
-        PyErr_SetString(PyExc_TypeError, "Error in getting non-cast llvm function");
-        return NULL;
-      } else {
-        string testAcName = IR2Vec::getActualName(const_cast<llvm::Function *>(func));
-
-        PySys_FormatStdout(
-          "function object properly converted");        
-      }
-
+      string actualNameStr = IR2Vec::getActualName(const_cast<llvm::Function *>(func));
       PyObject *actualNameObj = PyUnicode_FromString(actualNameStr.c_str());
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
