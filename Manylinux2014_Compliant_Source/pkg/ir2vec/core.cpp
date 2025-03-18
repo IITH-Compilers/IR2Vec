@@ -179,10 +179,10 @@ public:
       //   return NULL;
       // }
 
-      string actualNameStr = demangledName[0];
+      actualNameStr = std::string(1, demangledName[0]);
       if (const_cast<llvm::Function *>(func)) 
       {
-        actualNameStr = IR2Vec::getActualName(const_cast<llvm::Function *>(func));
+        actualNameStr = string(IR2Vec::getActualName(const_cast<llvm::Function *>(func)));
       }
       if (actualNameStr.empty()) {
         PySys_FormatStdout("Actual name of function not generated");
