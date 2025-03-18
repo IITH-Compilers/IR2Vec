@@ -89,7 +89,7 @@ public:
 
   char *getActualName(const llvm::Function *function) {
     auto functionName = function->getName().str();
-    auto demangledName = getDemagledName(function);
+    auto demangledName = IR2Vec::getDemagledName(function);
     size_t Size = 1;
     char *Buf = static_cast<char *>(std::malloc(Size));
     const char *mangled = functionName.c_str();
@@ -132,6 +132,11 @@ public:
 
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
+      if (!func) {
+        PySys_FormatStdout("Function vector came with NULL");
+        PyErr_SetString(PyExc_TypeError, "Function Vector came with NULL");
+        return NULL;
+      }
       PyObject *functionVector = PyList_New(0);
       for (auto &Vec_it : Func_it.second) {
         PyList_Append(functionVector, PyFloat_FromDouble(Vec_it));
@@ -175,8 +180,7 @@ public:
       // }
       auto actualNameStr = const_cast<const char*>(getActualName(func));
       if (!actualNameStr) {
-        PySys_FormatStdout(
-          ("Actual name of function not generated".c_str()));
+        PySys_FormatStdout("Actual name of function not generated");
         PyErr_SetString(PyExc_TypeError,
                         "Failed to create Python string from demangledName");
         return NULL;
@@ -184,8 +188,7 @@ public:
       PyObject *actualNameObj = PyUnicode_FromString(actualNameStr);
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
-        PySys_FormatStdout(
-          ("Actual name OBJECT not generated".c_str()));
+        PySys_FormatStdout("Actual name OBJECT not generated");
         PyErr_SetString(PyExc_TypeError,
                         "Failed to create Python string from demangledName");
         return NULL;
