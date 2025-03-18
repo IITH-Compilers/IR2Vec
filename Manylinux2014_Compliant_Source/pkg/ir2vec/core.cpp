@@ -90,7 +90,7 @@ public:
   char *getActualName(const llvm::Function *function) {
     auto functionName = function->getName().str();
     auto demangledName = IR2Vec::getDemagledName(function);
-    size_t Size = functionName.size() + 1;
+    size_t Size = demangledName.size() + 1;
     char *Buf = static_cast<char *>(std::malloc(Size));
     const char *mangled = functionName.c_str();
     char *baseName;
