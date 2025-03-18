@@ -158,13 +158,15 @@ public:
         return NULL;
       }
 
-      llvm::function *llvm_func = const_cast<llvm::function *>(func);
-      if (!llvm_func) {
-        PyErr_SetString(PyExc_TypeError, "Error in getting non-cast llvm function");
-        return NULL;
-      }
-      string actualName = getActualName(llvm_func);
-      PyObject *actualNameObj = PyUnicode_FromString(actualName.c_str());
+      // llvm::function *llvm_func = const_cast<llvm::function *>(func);
+      // if (!llvm_func) {
+      //   PyErr_SetString(PyExc_TypeError, "Error in getting non-cast llvm function");
+      //   return NULL;
+      // }
+      // string actualName = getActualName(
+      //   const_cast<llvm::Function *>(func)
+      // );
+      PyObject *actualNameObj = PyUnicode_FromString(IR2Vec::getActualName(const_cast<llvm::Function *>(func)));
       Py_INCREF(actualNameObj);
       if (!actualNameObj) {
         PyErr_SetString(PyExc_TypeError,
