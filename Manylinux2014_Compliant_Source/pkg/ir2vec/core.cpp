@@ -88,8 +88,13 @@ public:
   std::string getLevel() { return level; }
 
   char *getActualName(const llvm::Function *function) {
-    auto functionName = function->getName().str();
-    auto demangledName = IR2Vec::getDemagledName(function);
+    if (function == nullptr) {
+      return nullptr;
+    }
+
+    std::string functionName = function->getName().str();
+
+    std::string demangledName = IR2Vec::getDemagledName(function);
     size_t Size = demangledName.size() + 1;
     char *Buf = static_cast<char *>(std::malloc(Size));
     const char *mangled = functionName.c_str();
@@ -133,8 +138,8 @@ public:
     for (auto &Func_it : funcMap) {
       const llvm::Function *func = Func_it.first;
       if (!func) {
-        PySys_FormatStdout("Function vector came with NULL");
-        PyErr_SetString(PyExc_TypeError, "Function Vector came with NULL");
+        PySys_FormatStdout("Function map came with NULL");
+        PyErr_SetString(PyExc_TypeError, "Function map came with NULL");
         return NULL;
       }
       PyObject *functionVector = PyList_New(0);
@@ -179,8 +184,8 @@ public:
       //   return NULL;
       // }
 
-      // string actualNameStr = getActualName(func);
-      string actualNameStr = demangledName;
+      string actualNameStr = getActualName(func);
+      // string actualNameStr = demangledName;
       if (actualNameStr.empty()) {
         PySys_FormatStdout("Actual name of function not generated");
         PyErr_SetString(PyExc_TypeError,
