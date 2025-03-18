@@ -179,7 +179,7 @@ public:
       //   return NULL;
       // }
 
-      actualNameStr = std::string(1, demangledName[0]);
+      std::string actualNameStr(1, demangledName[0]);
       if (const_cast<llvm::Function *>(func)) 
       {
         actualNameStr = string(IR2Vec::getActualName(const_cast<llvm::Function *>(func)));
