@@ -81,11 +81,13 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
 
 // for generating symbolic encodings for specific function
 void IR2Vec_Symbolic::generateSymbolicEncodingsForFunction(std::ostream *o,
-                                                           std::string name) {
+                                                           llvm::Function *FuncPtr, std::string funcName) {
   int noOfFunc = 0;
+  llvm::errs() << "inside the correct generateSymbolicEncodingsForFunction\n";
   for (auto &f : M) {
     auto Result = getActualName(&f);
-    if (!f.isDeclaration() && Result == name) {
+    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) || (!funcName.empty() && Result == funcName))) {
+      llvm::errs () << "is not match happening in the if condition?"<< "\n";
       Vector tmp;
       SmallVector<Function *, 15> funcStack;
       tmp = func2Vec(f, funcStack);
@@ -104,6 +106,8 @@ void IR2Vec_Symbolic::generateSymbolicEncodingsForFunction(std::ostream *o,
 
 Vector IR2Vec_Symbolic::func2Vec(Function &F,
                                  SmallVector<Function *, 15> &funcStack) {
+
+  llvm::errs () << "is it entering func2Vec?\n";
   auto It = funcVecMap.find(&F);
   if (It != funcVecMap.end()) {
     return It->second;
@@ -131,6 +135,8 @@ Vector IR2Vec_Symbolic::func2Vec(Function &F,
 
 Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
                                SmallVector<Function *, 15> &funcStack) {
+
+  llvm::errs () << "is it entering bb2Vec?\n";
   auto It = bbVecMap.find(&B);
   if (It != bbVecMap.end()) {
     return It->second;

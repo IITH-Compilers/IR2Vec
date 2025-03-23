@@ -17,7 +17,7 @@
 
 int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
                                           IR2Vec::IR2VecMode mode, char level,
-                                          std::string funcName, unsigned dim,
+                                          std::string funcName, llvm::Function* FuncPtr, unsigned dim,
                                           std::ostream *o, int cls, float WO,
                                           float WA, float WT) {
 
@@ -29,32 +29,42 @@ int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
   IR2Vec::funcName = funcName;
   IR2Vec::DIM = dim;
 
-  if (mode == IR2Vec::IR2VecMode::FlowAware && !funcName.empty()) {
+  if (FuncPtr) {
+    llvm::errs() << "FuncPtr detected, using function pointer\n";
+    funcName = FuncPtr->getName().str();
+  }
+
+  if (mode == IR2Vec::IR2VecMode::FlowAware) {
     IR2Vec_FA FA(M, vocabulary);
-    FA.generateFlowAwareEncodingsForFunction(o, funcName);
+
+    if (FuncPtr || !funcName.empty()) {
+      FA.generateFlowAwareEncodingsForFunction(o, FuncPtr, funcName);
+    } else {
+      FA.generateFlowAwareEncodings(o);
+    }
+
     instVecMap = FA.getInstVecMap();
     funcVecMap = FA.getFuncVecMap();
     bbVecMap = FA.getBBVecMap();
-  } else if (mode == IR2Vec::IR2VecMode::FlowAware) {
-    IR2Vec_FA FA(M, vocabulary);
-    FA.generateFlowAwareEncodings(o);
-    instVecMap = FA.getInstVecMap();
-    funcVecMap = FA.getFuncVecMap();
-    bbVecMap = FA.getBBVecMap();
-    pgmVector = FA.getProgramVector();
-  } else if (mode == IR2Vec::IR2VecMode::Symbolic && !funcName.empty()) {
-    IR2Vec_Symbolic SYM(M, vocabulary);
-    SYM.generateSymbolicEncodingsForFunction(0, funcName);
-    instVecMap = SYM.getInstVecMap();
-    funcVecMap = SYM.getFuncVecMap();
-    bbVecMap = SYM.getBBVecMap();
+    if (!FuncPtr && funcName.empty()) {
+      pgmVector = FA.getProgramVector();
+    }
   } else if (mode == IR2Vec::IR2VecMode::Symbolic) {
+    llvm::errs () << "is it correctly entering here?" << "\n";
     IR2Vec_Symbolic SYM(M, vocabulary);
-    SYM.generateSymbolicEncodings(o);
+
+    if (FuncPtr || !funcName.empty()) {
+      SYM.generateSymbolicEncodingsForFunction(o, FuncPtr, funcName);
+    } else {
+      SYM.generateSymbolicEncodings(o);
+    }
+
     instVecMap = SYM.getInstVecMap();
     funcVecMap = SYM.getFuncVecMap();
     bbVecMap = SYM.getBBVecMap();
-    pgmVector = SYM.getProgramVector();
+    if (!FuncPtr && funcName.empty()) {
+      pgmVector = SYM.getProgramVector();
+    }
   }
 
   return 0;

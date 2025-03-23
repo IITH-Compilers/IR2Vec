@@ -20,7 +20,7 @@ enum IR2VecMode { FlowAware, Symbolic };
 
 class Embeddings {
   int generateEncodings(llvm::Module &M, IR2VecMode mode, char level = '\0',
-                        std::string funcName = "", unsigned dim = 300,
+                        std::string funcName = "", llvm::Function* FuncPtr = nullptr, unsigned dim = 300,
                         std::ostream *o = nullptr, int cls = -1, float WO = 1,
                         float WA = 0.2, float WT = 0.5);
 
@@ -32,21 +32,33 @@ class Embeddings {
 
 public:
   Embeddings() = default;
-  Embeddings(llvm::Module &M, IR2VecMode mode, unsigned dim = 300,
-             std::string funcName = "", float WO = 1, float WA = 0.2,
+
+    // Constructor with function pointer
+  Embeddings(llvm::Module &M, IR2VecMode mode, llvm::Function *FuncPtr=nullptr, unsigned dim = 300,
+            float WO = 1, float WA = 0.2,
              float WT = 0.5) {
     vocabulary = VocabularyFactory::createVocabulary(dim)->getVocabulary();
-    generateEncodings(M, mode, '\0', funcName, dim, nullptr, -1, WO, WA, WT);
+    generateEncodings(M, mode, '\0', "", FuncPtr, dim, nullptr, -1, WO, WA, WT);
   }
+
+
+  Embeddings(llvm::Module &M, IR2VecMode mode, std::string funcName="", unsigned dim = 300,
+             float WO = 1, float WA = 0.2,
+             float WT = 0.5) {
+    vocabulary = VocabularyFactory::createVocabulary(dim)->getVocabulary();
+    generateEncodings(M, mode, '\0', funcName, nullptr, dim, nullptr, -1, WO, WA, WT);
+  }
+
+
 
   // Use this constructor if the representations ought to be written to a
   // file. Analogous to the command line options that are being used in IR2Vec
   // binary.
   Embeddings(llvm::Module &M, IR2VecMode mode, char level, std::ostream *o,
-             unsigned dim = 300, std::string funcName = "", float WO = 1,
+             std::string funcName="", unsigned dim = 300, float WO = 1,
              float WA = 0.2, float WT = 0.5) {
     vocabulary = VocabularyFactory::createVocabulary(dim)->getVocabulary();
-    generateEncodings(M, mode, level, funcName, dim, o, -1, WO, WA, WT);
+    generateEncodings(M, mode, level, funcName, nullptr, dim, o, -1, WO, WA, WT);
   }
 
   // Returns a map containing instructions and the corresponding vector
