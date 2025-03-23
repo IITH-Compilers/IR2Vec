@@ -176,8 +176,9 @@ public:
   // newly added
 
   void generateFlowAwareEncodingsForFunction(
-      std::ostream *o = nullptr, llvm::Function *FuncPtr = nullptr, std::string funcName="",
-      std::ostream *missCount = nullptr, std::ostream *cyclicCount = nullptr);
+      std::ostream *o = nullptr, llvm::Function *FuncPtr = nullptr,
+      std::string funcName = "", std::ostream *missCount = nullptr,
+      std::ostream *cyclicCount = nullptr);
 
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {

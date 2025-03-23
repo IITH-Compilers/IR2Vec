@@ -47,7 +47,8 @@ public:
 
   void generateSymbolicEncodings(std::ostream *o = nullptr);
   void generateSymbolicEncodingsForFunction(std::ostream *o = nullptr,
-                                            llvm::Function *FuncPtr = nullptr, std::string funcName = "");
+                                            llvm::Function *FuncPtr = nullptr,
+                                            std::string funcName = "");
   llvm::SmallMapVector<const llvm::Instruction *, IR2Vec::Vector, 128>
   getInstVecMap() {
     return instVecMap;

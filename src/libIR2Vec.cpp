@@ -17,7 +17,8 @@
 
 int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
                                           IR2Vec::IR2VecMode mode, char level,
-                                          std::string funcName, llvm::Function* FuncPtr, unsigned dim,
+                                          std::string funcName,
+                                          llvm::Function *FuncPtr, unsigned dim,
                                           std::ostream *o, int cls, float WO,
                                           float WA, float WT) {
 
@@ -50,7 +51,8 @@ int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
       pgmVector = FA.getProgramVector();
     }
   } else if (mode == IR2Vec::IR2VecMode::Symbolic) {
-    llvm::errs () << "is it correctly entering here?" << "\n";
+    llvm::errs() << "is it correctly entering here?"
+                 << "\n";
     IR2Vec_Symbolic SYM(M, vocabulary);
 
     if (FuncPtr || !funcName.empty()) {

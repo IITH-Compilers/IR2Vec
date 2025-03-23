@@ -216,14 +216,15 @@ void IR2Vec_FA::updateFuncVecMap(
 }
 
 void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
-    std::ostream *o, llvm::Function *FuncPtr, std::string funcName, std::ostream *missCount,
-    std::ostream *cyclicCount) {
+    std::ostream *o, llvm::Function *FuncPtr, std::string funcName,
+    std::ostream *missCount, std::ostream *cyclicCount) {
 
   int noOfFunc = 0;
   for (auto &f : M) {
 
     auto Result = getActualName(&f);
-    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) || (!funcName.empty() && Result == funcName))) {
+    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
+                               (!funcName.empty() && Result == funcName))) {
       // If funcName is matched with one of the functions in module, we
       // will update funcVecMap of it and it's child functions recursively
       llvm::SmallSet<const Function *, 16> visitedFunctions;
@@ -241,7 +242,8 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
 
   for (auto &f : M) {
     auto Result = getActualName(&f);
-    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) || (!funcName.empty() && Result == funcName))) {
+    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
+                               (!funcName.empty() && Result == funcName))) {
       Vector tmp;
       SmallVector<Function *, 15> funcStack;
       tmp = funcVecMap[&f];
