@@ -86,8 +86,9 @@ void IR2Vec_Symbolic::generateSymbolicEncodingsForFunction(
   llvm::errs() << "inside the correct generateSymbolicEncodingsForFunction\n";
   for (auto &f : M) {
     auto Result = getActualName(&f);
-    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
-                               (!funcName.empty() && Result == funcName))) {
+    // if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
+    //                            (!funcName.empty() && Result == funcName))) {
+      if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr))){
       llvm::errs() << "is not match happening in the if condition?"
                    << "\n";
       Vector tmp;

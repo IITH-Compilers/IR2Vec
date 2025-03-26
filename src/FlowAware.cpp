@@ -196,13 +196,40 @@ void IR2Vec_FA::generateFlowAwareEncodings(std::ostream *o,
 void IR2Vec_FA::updateFuncVecMap(
     llvm::Function *function,
     llvm::SmallSet<const llvm::Function *, 16> &visitedFunctions) {
+
+  if (!function) {
+    llvm::errs() << "Received a nullptr function, skipping updateFuncVecMap.\n";
+    return;
+  }
+
+  llvm::errs() << "Processing function: " << function->getName() << "\n";
+
   visitedFunctions.insert(function);
   SmallVector<Function *, 15> funcStack;
   funcStack.clear();
+  llvm::errs () << "reaching updateFuncVecMap?" << "\n";
+
   auto tmpParent = func2Vec(*function, funcStack);
+
+  llvm::errs () << "is there any issue in creating the func2Vec embeddings?" << "\n";
   // funcVecMap is updated with vectors returned by func2Vec
+
+  llvm::errs () << "what is tmpParent here?" << "\n";
+  for(auto v:tmpParent){
+    llvm::errs () << v<< ",";
+  }
+  llvm::errs () << "\n";
   funcVecMap[function] = tmpParent;
   auto calledFunctions = funcCallMap[function];
+
+  llvm::errs () << "vector of calledFunctions: " << "\n";
+  for(auto x:calledFunctions){
+    llvm::errs () << x<< ",";
+  }
+  llvm::errs () << "\n";
+
+  if(calledFunctions.empty()) return;
+
   for (auto &calledFunction : calledFunctions) {
     if (calledFunction && !calledFunction->isDeclaration() &&
         visitedFunctions.count(calledFunction) == 0) {
@@ -210,27 +237,36 @@ void IR2Vec_FA::updateFuncVecMap(
       // llvm::Function* and we need llvm::Function* as argument
       auto *callee = const_cast<Function *>(calledFunction);
       // This function is called recursively to update funcVecMap
+      llvm::errs() << "Calling updateFuncVecMap for function: " << callee->getName() << "\n";
       updateFuncVecMap(callee, visitedFunctions);
     }
   }
+  llvm::errs () << "is it coming out of this loop in updateFVM?" << "\n";
 }
 
 void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
     std::ostream *o, llvm::Function *FuncPtr, std::string funcName,
     std::ostream *missCount, std::ostream *cyclicCount) {
-
+      llvm::errs () << "able to enter genFAforFunc" << "\n";
   int noOfFunc = 0;
   for (auto &f : M) {
-
+    llvm::errs () << "before getActualName" << "\n";
     auto Result = getActualName(&f);
-    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
-                               (!funcName.empty() && Result == funcName))) {
+    llvm::errs () << "what is Result here? "<< "\n";
+
+    // if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
+    //                            (!funcName.empty() && Result == funcName))) {
+      if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr))){
       // If funcName is matched with one of the functions in module, we
       // will update funcVecMap of it and it's child functions recursively
+      llvm::errs () << "able to get a match for the fucn name and ptr" << "\n";
       llvm::SmallSet<const Function *, 16> visitedFunctions;
       updateFuncVecMap(&f, visitedFunctions);
+      llvm:errs () << "just after updateFuncVecMap" << "\n";
     }
   }
+
+  llvm::errs () << "is it going out of the loop1?" << "\n";
   // iterating over all functions in module instead of funcVecMap to preserve
   // order
   for (auto &f : M) {
@@ -240,10 +276,15 @@ void IR2Vec_FA::generateFlowAwareEncodingsForFunction(
     }
   }
 
+  llvm::errs () << "is it coming out of loop2?" << "\n";
+
   for (auto &f : M) {
     auto Result = getActualName(&f);
-    if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
-                               (!funcName.empty() && Result == funcName))) {
+    // if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr) ||
+    //                            (!funcName.empty() && Result == funcName))) {
+
+      if (!f.isDeclaration() && ((FuncPtr && &f == FuncPtr))){
+      llvm::errs () << "able to get a match for the fucn name and ptr part2" << "\n";
       Vector tmp;
       SmallVector<Function *, 15> funcStack;
       tmp = funcVecMap[&f];

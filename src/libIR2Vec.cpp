@@ -37,8 +37,9 @@ int IR2Vec::Embeddings::generateEncodings(llvm::Module &M,
 
   if (mode == IR2Vec::IR2VecMode::FlowAware) {
     IR2Vec_FA FA(M, vocabulary);
-
+    llvm::errs () << "going inside the FA logic" << "\n";
     if (FuncPtr || !funcName.empty()) {
+      llvm::errs () << "able to get the function, so entering FA for function generation" << "\n";
       FA.generateFlowAwareEncodingsForFunction(o, FuncPtr, funcName);
     } else {
       FA.generateFlowAwareEncodings(o);
