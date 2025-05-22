@@ -1,4 +1,15 @@
 # IR2Vec
+> [!NOTE]
+> ### IR2Vec is now part of LLVM! 🎉
+> 
+> We are excited to announce that we have started upstreaming IR2Vec to LLVM:
+> - RFC Discussion: https://discourse.llvm.org/t/rfc-enhancing-mlgo-inlining-with-ir2vec-embeddings
+> - Initial PR: https://github.com/llvm/llvm-project/pull/134004
+>
+> Thanks to all the [contributors](https://github.com/IITH-Compilers/IR2Vec/graphs/contributors)!
+> 
+> This repository contains the original research implementation. In the coming days, we will be porting the contents of this repository to LLVM in an amenable manner. For the latest developments, please follow the LLVM upstream integration.
+> 
 `IR2Vec` is a LLVM IR based framework to generate distributed representations for the source code in an unsupervised manner, which can be used to represent programs as input to solve machine learning tasks that take programs as inputs.
 
 This repo contains the source code and relevant information described in the [paper](https://doi.org/10.1145/3418463) ([arXiv](https://arxiv.org/abs/1909.06228)).
