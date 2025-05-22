@@ -100,22 +100,22 @@ Directories</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>If you do not want to train the model to generate seed embeddings, and want to use the pretrained vocabulary, please use the vocabulary given <a href="../vocabulary">here</a> and skip the following.</p>
 <p>Currently we support three different embedding dimensions (<code>75</code>, <code>100</code>, <code>300</code>). If you want to use embeddings of different dimensions, you can follow the below steps and copy the resultant vocabulary to the <a href="../vocabulary">vocabulary</a> directory with the following naming convention. <code>seedEmbeddingVocab&lt;DIM&gt;D.txt</code>. Such vocabularies would be automatically used during the build process of IR2Vec.</p>
-<h1><a class="anchor" id="autotoc_md60"></a>
+<h1><a class="anchor" id="autotoc_md61"></a>
 Generation of Seed Embedding Vocabulary</h1>
 <p>This directory helps in generating seed embedding vocabulary in 3 steps.</p><ol type="1">
 <li>Building ir2vec</li>
 <li>Generating Triplets</li>
 <li>Training TransE to generate seed embedding vocabulary</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md62"></a>
 Step 1: Building <code>ir2vec</code></h2>
 <p>If you have not done <code>make</code>, follow the following steps to build <code>ir2vec</code> binary.</p><ul>
 <li>Go to the <code>build</code> directory (<code>cd ../build</code>)</li>
 <li><code>make</code></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md62"></a>
+<h2><a class="anchor" id="autotoc_md63"></a>
 Step 2: Generating Triplets</h2>
-<h4><a class="anchor" id="autotoc_md63"></a>
+<h4><a class="anchor" id="autotoc_md64"></a>
 Steps to collect the triplets</h4>
 <p>Run <code>triplets.sh</code> script with the required parameters Usage: <code>bash triplets.sh &lt;build dir&gt; &lt;No of opt&gt; &lt;llFile list&gt; &lt;output FileName&gt;</code></p><ul>
 <li><code>buildDir</code> points to the path of IR2Vec's build folder</li>
@@ -134,7 +134,7 @@ Steps to collect the triplets</h4>
 <p>Example Usage: </p><blockquote class="doxtable">
 <p>bash triplets.sh ../build 2 files_path.txt triplets.txt </p>
 </blockquote>
-<h4><a class="anchor" id="autotoc_md64"></a>
+<h4><a class="anchor" id="autotoc_md65"></a>
 Files used to generate Seed Embedding Vocabulary</h4>
 <p>We generated ll files from <code>Boost</code> libraries and <code>spec cpu 2017</code> benchmarks to generate triplets.</p>
 <table class="markdownTable">
@@ -145,17 +145,17 @@ Files used to generate Seed Embedding Vocabulary</h4>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">SPEC17 CPU   </td><td class="markdownTableBodyNone"><a href="https://www.spec.org/cpu2017/">https://www.spec.org/cpu2017/</a>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md65"></a>
+<h2><a class="anchor" id="autotoc_md66"></a>
 Step 3: Training TransE to generate seed embedding vocabulary</h2>
 <p>The <a href="./OpenKE"><code>OpenKE</code></a> directory is a modified version of OpenKE repository (<a href="https://github.com/thunlp/OpenKE/tree/OpenKE-PyTorch">https://github.com/thunlp/OpenKE/tree/OpenKE-PyTorch</a>) with the necessary changes for training seed embedding vocabulary.</p>
 <p>Please see OpenKE/README.md for further information on OpenKE.</p>
-<h4><a class="anchor" id="autotoc_md66"></a>
+<h4><a class="anchor" id="autotoc_md67"></a>
 Requirements</h4>
 <p>Create <code>conda</code> environment and install the packages given in <a href="./OpenKE/openKE.yaml">openKE.yaml</a></p><ul>
 <li><code>conda create -f ./OpenKE/openKE.yaml</code></li>
 <li><code>conda activate openKE</code></li>
 </ul>
-<h4><a class="anchor" id="autotoc_md67"></a>
+<h4><a class="anchor" id="autotoc_md68"></a>
 Preprocessing the triplets</h4>
 <p>We preprocess the generated triplets from the previous step in a form suitable for training TransE.</p><ul>
 <li><code>cd OpenKE</code></li>
@@ -165,7 +165,7 @@ Preprocessing the triplets</h4>
 </ul>
 </li>
 </ul>
-<h4><a class="anchor" id="autotoc_md68"></a>
+<h4><a class="anchor" id="autotoc_md69"></a>
 Training TransE to generate embeddings</h4>
 <p>Run <code>python generate_embedding_ray.py</code> <b>Possible Arguments:</b> All the arguments have default values unless provided:</p><ul>
 <li><code>--index_dir</code>: Specifies the directory containing the processed files generated from preprocessing the triplets.</li>
@@ -175,13 +175,13 @@ Training TransE to generate embeddings</h4>
 <li><code>--nbatches</code>: Specifies the batch size. Default is <code>100</code>.</li>
 <li><code>--margin</code>: Specifies the margin size for training. Default is <code>1.0</code>. </li>
 </ul>
-<h5><a class="anchor" id="autotoc_md69"></a>
+<h5><a class="anchor" id="autotoc_md70"></a>
 Example Command</h5>
 <p>To train a model with analogy scoring enabled and a batch size of 200, you can run: </p><div class="fragment"><div class="line">python generate_embedding_ray.py --index_dir &quot;../seed_embeddings/preprocessed/&quot; --epoch 1500 --is_analogy True --use_gpu true</div>
-</div><!-- fragment --> <h5><a class="anchor" id="autotoc_md70"></a>
+</div><!-- fragment --> <h5><a class="anchor" id="autotoc_md71"></a>
 TensorBoard Tracking</h5>
 <p>Once training begins, you can monitor the progress using TensorBoard by running the following command: </p><div class="fragment"><div class="line">tensorboard --logdir=~/ray_results</div>
-</div><!-- fragment --> <h5><a class="anchor" id="autotoc_md71"></a>
+</div><!-- fragment --> <h5><a class="anchor" id="autotoc_md72"></a>
 ASHA Scheduler for Hyperparameter Optimization</h5>
 <p>We employ the <a href="https://docs.ray.io/en/latest/tune/api/doc/ray.tune.schedulers.AsyncHyperBandScheduler.html#ray.tune.schedulers.AsyncHyperBandScheduler">ASHA Scheduler</a> to efficiently optimize hyperparameters and terminate suboptimal trials. This scheduler tracks key metrics, which are determined by the following conditions:</p>
 <ul>
@@ -189,7 +189,7 @@ ASHA Scheduler for Hyperparameter Optimization</h5>
 <li>If <code>--link_pred</code> is set to <code>True</code>, the hit@1 will be the key metric.</li>
 <li>If neither flag is set, the default loss will be used as the key metric. </li>
 </ul>
-<h4><a class="anchor" id="autotoc_md72"></a>
+<h4><a class="anchor" id="autotoc_md73"></a>
 Results</h4>
 <p>Once the training completes, the best model will be saved in the specified <code>index_dir</code> with the filename format: </p><div class="fragment"><div class="line">seedEmbedding_{}E_{}D_{}batches_{}margin.ckpt</div>
 </div><!-- fragment --><p> In addition, the entity embeddings will be stored in the <code>index_dir/embeddings</code> subdirectory in the following format: </p><div class="fragment"><div class="line">embeddings/seedEmbedding_{}E_{}D_{}batches_{}margin.txt</div>
