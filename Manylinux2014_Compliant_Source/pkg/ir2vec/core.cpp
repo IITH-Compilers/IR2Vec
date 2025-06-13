@@ -127,7 +127,7 @@ public:
 
       PyDict_SetItemString(FuncVecDict, demangledName.c_str(), funcDict);
 
-      Py_DECREF(funcDict);
+      Py_INCREF(funcDict);
     }
     return FuncVecDict;
   }
@@ -305,7 +305,7 @@ IR2VecHandlerObject *createIR2VECObject(const char *filename,
   if (!ir2vecHandlerObj) {
     return nullptr;
   }
-  ir2vecHandlerObj->ir2vecObj = ir2vecObj;
+  ir2vecHandlerObj->ir2vecObj = std::move(ir2vecObj);
   return ir2vecHandlerObj;
 }
 

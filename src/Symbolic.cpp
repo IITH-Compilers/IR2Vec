@@ -237,7 +237,7 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
     std::transform(instVector.begin(), instVector.end(), vec.begin(),
                    instVector.begin(), std::plus<double>());
     for (unsigned i = 0; i < I.getNumOperands(); i++) {
-      Vector vec;
+      Vector vec(DIM, 0);
       if (isa<Function>(I.getOperand(i))) {
         vec = getValue("function");
       } else if (isa<PointerType>(I.getOperand(i)->getType())) {
