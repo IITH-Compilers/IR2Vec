@@ -42,9 +42,7 @@ std::unique_ptr<Module> IR2Vec::getLLVMIR() {
 }
 
 void IR2Vec::scaleVector(Vector &vec, float factor) {
-  for (unsigned i = 0; i < vec.size(); i++) {
-    vec[i] = vec[i] * factor;
-  }
+  std::for_each(vec.begin(), vec.end(), [factor](auto &x) { x *= factor; });
 }
 
 // Function to get demangled function name
@@ -78,7 +76,7 @@ char *IR2Vec::getActualName(llvm::Function *function) {
 }
 
 // Function to return updated res
-std::string IR2Vec::updatedRes(IR2Vec::Vector tmp, llvm::Function *f,
+std::string IR2Vec::updatedRes(IR2Vec::Vector &tmp, llvm::Function *f,
                                llvm::Module *M) {
   std::string res = "";
   auto demangledName = getDemagledName(f);
@@ -87,9 +85,8 @@ std::string IR2Vec::updatedRes(IR2Vec::Vector tmp, llvm::Function *f,
 
   res += "=\t";
   for (auto i : tmp) {
-    if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+    if (std::abs(i) <= 1e-4f)
       i = 0;
-    }
     res += std::to_string(i) + "\t";
   }
 

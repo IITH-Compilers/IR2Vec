@@ -73,8 +73,6 @@ if(NOT LLVM_IR2VEC)
   message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
   message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
-
-
   include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
   # llvm_map_components_to_libnames(llvm_libs all)
   llvm_map_components_to_libnames(llvm_libs support core irreader analysis TransformUtils)
@@ -91,6 +89,12 @@ if(NOT LLVM_IR2VEC)
 
   add_library(${IR2VEC_LIB} SHARED $<TARGET_OBJECTS:objlib>)
   add_library(${IR2VEC_LIB_STATIC} STATIC $<TARGET_OBJECTS:objlib>)
+
+  # Link LLVM to the libs (PUBLIC so dependents inherit)
+  # target_link_libraries(${IR2VEC_LIB}        PUBLIC ${llvm_libs})
+  # target_link_libraries(${IR2VEC_LIB_STATIC} PUBLIC ${llvm_libs})
+
+  add_subdirectory(bindings)
 
   set_target_properties(${IR2VEC_LIB} ${IR2VEC_LIB_STATIC} PROPERTIES
       VERSION ${PROJECT_VERSION}

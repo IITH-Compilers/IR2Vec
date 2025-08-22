@@ -72,7 +72,7 @@ private:
 
   void getAllSCC();
 
-  IR2Vec::Vector getValue(std::string key);
+  bool getValue(std::string key, IR2Vec::Vector &out);
   void collectWriteDefsMap(llvm::Module &M);
   void getTransitiveUse(
       const llvm::Instruction *root, const llvm::Instruction *def,

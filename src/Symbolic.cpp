@@ -27,13 +27,15 @@ using namespace llvm;
 using namespace IR2Vec;
 using abi::__cxa_demangle;
 
-Vector IR2Vec_Symbolic::getValue(std::string key) {
-  Vector vec(DIM, 0);
-  if (vocabulary.find(key) == vocabulary.end())
-    IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
-  else
-    vec = vocabulary[key];
-  return vec;
+bool IR2Vec_Symbolic::getValue(std::string key, IR2Vec::Vector &out) {
+  if (auto it = vocabulary.find(std::string(key)); it != vocabulary.end()) {
+    out = it->second;
+    return true;
+  }
+
+  out.assign(DIM, 0);
+  IR2VEC_DEBUG(errs() << "cannot find key in map : " << key << "\n");
+  return false;
 }
 
 void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
@@ -49,11 +51,10 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
         noOfFunc++;
       }
 
-      // else if (level == 'p') {
+      // assert(level == 'p' && "This block should only be executed when level
+      // == 'p'");
       std::transform(pgmVector.begin(), pgmVector.end(), tmp.begin(),
                      pgmVector.begin(), std::plus<double>());
-
-      // }
     }
   }
 
@@ -64,9 +65,8 @@ void IR2Vec_Symbolic::generateSymbolicEncodings(std::ostream *o) {
       res += std::to_string(cls) + "\t";
 
     for (auto i : pgmVector) {
-      if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
+      if (std::abs(i) <= 1e-4f)
         i = 0;
-      }
       res += std::to_string(i) + "\t";
     }
     res += "\n";
@@ -138,118 +138,59 @@ Vector IR2Vec_Symbolic::bb2Vec(BasicBlock &B,
   Vector bbVector(DIM, 0);
 
   for (auto &I : B) {
-    Vector instVector(DIM, 0);
-    auto vec = getValue(I.getOpcodeName());
-    // if (isa<CallInst>(I)) {
-    //   auto ci = dyn_cast<CallInst>(&I);
-    //   // ci->dump();
-    //   Function *func = ci->getCalledFunction();
-    //   if (func) {
-    //     // if(!func->isDeclaration())
-    //     //     if(func != I.getParent()->getParent())
-    //     //         errs() << func->getName() << "\t" <<
-    //     //         I.getParent()->getParent()->getName() << "\n";
-    //     if (!func->isDeclaration() &&
-    //         std::find(funcStack.begin(), funcStack.end(), func) ==
-    //             funcStack.end()) {
-    //       auto funcVec = func2Vec(*func, funcStack);
-
-    //       std::transform(vec.begin(), vec.end(), funcVec.begin(),
-    //       vec.begin(),
-    //                      std::plus<double>());
-    //     }
-    //   } else {
-    //     IR2VEC_DEBUG(I.dump());
-    //     IR2VEC_DEBUG(errs() << "==========================Function
-    //     definition
-    //     "
-    //                          "not found==================\n");
-    //   }
-    // }
-    scaleVector(vec, WO);
-    std::transform(instVector.begin(), instVector.end(), vec.begin(),
+    Vector instVector(DIM, 0), opcode_vec;
+    getValue(I.getOpcodeName(), opcode_vec);
+    scaleVector(opcode_vec, WO);
+    std::transform(instVector.begin(), instVector.end(), opcode_vec.begin(),
                    instVector.begin(), std::plus<double>());
-    auto type = I.getType();
 
+    Vector type_vec;
+    auto type = I.getType();
     if (type->isVoidTy()) {
-      vec = getValue("voidTy");
+      getValue("voidTy", type_vec);
     } else if (type->isFloatingPointTy()) {
-      vec = getValue("floatTy");
+      getValue("floatTy", type_vec);
     } else if (type->isIntegerTy()) {
-      vec = getValue("integerTy");
+      getValue("integerTy", type_vec);
     } else if (type->isFunctionTy()) {
-      vec = getValue("functionTy");
+      getValue("functionTy", type_vec);
     } else if (type->isStructTy()) {
-      vec = getValue("structTy");
+      getValue("structTy", type_vec);
     } else if (type->isArrayTy()) {
-      vec = getValue("arrayTy");
+      getValue("arrayTy", type_vec);
     } else if (type->isPointerTy()) {
-      vec = getValue("pointerTy");
+      getValue("pointerTy", type_vec);
     } else if (type->isVectorTy()) {
-      vec = getValue("vectorTy");
+      getValue("vectorTy", type_vec);
     } else if (type->isEmptyTy()) {
-      vec = getValue("emptyTy");
+      getValue("emptyTy", type_vec);
     } else if (type->isLabelTy()) {
-      vec = getValue("labelTy");
+      getValue("labelTy", type_vec);
     } else if (type->isTokenTy()) {
-      vec = getValue("tokenTy");
+      getValue("tokenTy", type_vec);
     } else if (type->isMetadataTy()) {
-      vec = getValue("metadataTy");
+      getValue("metadataTy", type_vec);
     } else {
-      vec = getValue("unknownTy");
+      getValue("unknownTy", type_vec);
     }
 
-    /*switch (I.getType()->getTypeID()) {
-    case 0:
-      vec = getValue("voidTy");
-      break;
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-      vec = getValue("floatTy");
-      break;
-    case 11:
-      vec = getValue("integerTy");
-      break;
-    case 12:
-      vec = getValue("functionTy");
-      break;
-    case 13:
-      vec = getValue("structTy");
-      break;
-    case 14:
-      vec = getValue("arrayTy");
-      break;
-    case 15:
-      vec = getValue("pointerTy");
-      break;
-    case 16:
-      vec = getValue("vectorTy");
-      break;
-    default:
-      vec = getValue("unknownTy");
-    }*/
-
-    scaleVector(vec, WT);
-    std::transform(instVector.begin(), instVector.end(), vec.begin(),
+    scaleVector(type_vec, WT);
+    std::transform(instVector.begin(), instVector.end(), type_vec.begin(),
                    instVector.begin(), std::plus<double>());
     for (unsigned i = 0; i < I.getNumOperands(); i++) {
-      Vector vec;
+      Vector operand_vec;
       if (isa<Function>(I.getOperand(i))) {
-        vec = getValue("function");
+        getValue("function", operand_vec);
       } else if (isa<PointerType>(I.getOperand(i)->getType())) {
-        vec = getValue("pointer");
+        getValue("pointer", operand_vec);
       } else if (isa<Constant>(I.getOperand(i))) {
-        vec = getValue("constant");
+        getValue("constant", operand_vec);
       } else {
-        vec = getValue("variable");
+        getValue("variable", operand_vec);
       }
-      scaleVector(vec, WA);
+      scaleVector(operand_vec, WA);
 
-      std::transform(instVector.begin(), instVector.end(), vec.begin(),
+      std::transform(instVector.begin(), instVector.end(), operand_vec.begin(),
                      instVector.begin(), std::plus<double>());
       instVecMap[&I] = instVector;
     }

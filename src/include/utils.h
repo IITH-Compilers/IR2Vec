@@ -30,7 +30,7 @@ namespace IR2Vec {
   })
 
 using Vector = std::vector<double>;
-using VocabTy = std::map<std::string, Vector>;
+using VocabTy = std::unordered_map<std::string, Vector>;
 using abi::__cxa_demangle;
 
 extern bool fa;
@@ -52,7 +52,7 @@ void scaleVector(Vector &vec, float factor);
 // newly added
 std::string getDemagledName(const llvm::Function *function);
 char *getActualName(llvm::Function *function);
-std::string updatedRes(IR2Vec::Vector tmp, llvm::Function *f, llvm::Module *M);
+std::string updatedRes(IR2Vec::Vector &tmp, llvm::Function *f, llvm::Module *M);
 } // namespace IR2Vec
 
 #endif

@@ -27,7 +27,7 @@ private:
   IR2Vec::VocabTy &vocabulary;
   IR2Vec::Vector pgmVector;
 
-  IR2Vec::Vector getValue(std::string key);
+  bool getValue(std::string key, IR2Vec::Vector &out);
   IR2Vec::Vector bb2Vec(llvm::BasicBlock &B,
                         llvm::SmallVector<llvm::Function *, 15> &funcStack);
   IR2Vec::Vector func2Vec(llvm::Function &F,

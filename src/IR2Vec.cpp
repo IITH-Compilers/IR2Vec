@@ -73,9 +73,102 @@ void printVersion(raw_ostream &ostream) {
   cl::PrintVersionMessage();
 }
 
-int main(int argc, char **argv) {
-  cl::SetVersionPrinter(printVersion);
-  cl::HideUnrelatedOptions(category);
+struct SymOutputs {
+  std::ofstream out;
+};
+
+struct FAOutputs : SymOutputs {
+  std::ofstream miss;
+  std::ofstream cyclic;
+};
+
+inline SymOutputs openSymOutputs(const std::string &baseName) {
+  SymOutputs f;
+  f.out.open(baseName, std::ios_base::app);
+  return f;
+}
+
+inline FAOutputs openFAOutputs(const std::string &baseName) {
+  FAOutputs f;
+  f.out.open(baseName, std::ios_base::app);
+  f.miss.open("missCount_" + baseName, std::ios_base::app);
+  f.cyclic.open("cyclicCount_" + baseName, std::ios_base::app);
+  return f;
+}
+
+template <class F>
+inline void runMaybeTimed(bool shouldTime, const char *timingMsgFmt, F &&job) {
+  if (shouldTime) {
+    const clock_t start = clock();
+    std::forward<F>(job)();
+    const clock_t end = clock();
+    const double elapsed = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+    std::printf(timingMsgFmt, elapsed);
+  } else {
+    std::forward<F>(job)();
+  }
+}
+
+template <class Encoder, class Outputs, class OutputsFactory, class Body>
+inline void executeEncoder(const char *timingMsgFmt, bool shouldTime,
+                           OutputsFactory &&makeOutputs, Body &&body) {
+  auto M = getLLVMIR();
+  auto vocabulary = VocabularyFactory::createVocabulary(DIM)->getVocabulary();
+  Encoder encoder(*M, vocabulary);
+  auto files = std::forward<OutputsFactory>(makeOutputs)(oname);
+
+  auto job = [&] { std::forward<Body>(body)(encoder, files); };
+  runMaybeTimed(shouldTime, timingMsgFmt, job);
+}
+
+void generateFAEncodingsFunction(std::string funcName) {
+  executeEncoder<IR2Vec_FA, FAOutputs>(
+      "Time taken by on-demand generation of flow-aware encodings is: %.6f "
+      "seconds.\n",
+      printTime, openFAOutputs, [&, funcName](IR2Vec_FA &FA, FAOutputs &files) {
+        FA.generateFlowAwareEncodingsForFunction(&files.out, funcName,
+                                                 &files.miss, &files.cyclic);
+      });
+}
+
+void generateFAEncodings() {
+  executeEncoder<IR2Vec_FA, FAOutputs>(
+      "Time taken by normal generation of flow-aware encodings is: %.6f "
+      "seconds.\n",
+      printTime, openFAOutputs, [&](IR2Vec_FA &FA, FAOutputs &files) {
+        FA.generateFlowAwareEncodings(&files.out, &files.miss, &files.cyclic);
+      });
+}
+
+void generateSymEncodingsFunction(std::string funcName) {
+  executeEncoder<IR2Vec_Symbolic, SymOutputs>(
+      "Time taken by on-demand generation of symbolic encodings is: %.6f "
+      "seconds.\n",
+      printTime, openSymOutputs,
+      [&, funcName](IR2Vec_Symbolic &SYM, SymOutputs &files) {
+        SYM.generateSymbolicEncodingsForFunction(&files.out, funcName);
+      });
+}
+
+void generateSYMEncodings() {
+  executeEncoder<IR2Vec_Symbolic, SymOutputs>(
+      "Time taken by normal generation of symbolic encodings is: %.6f "
+      "seconds.\n",
+      printTime, openSymOutputs, [&](IR2Vec_Symbolic &SYM, SymOutputs &files) {
+        SYM.generateSymbolicEncodings(&files.out);
+      });
+}
+
+void collectIRfunc() {
+  auto M = getLLVMIR();
+  CollectIR cir(M);
+  std::ofstream o;
+  o.open(oname, std::ios_base::app);
+  cir.generateTriplets(o);
+  o.close();
+}
+
+void setGlobalVars(int argc, char **argv) {
   cl::ParseCommandLineOptions(argc, argv);
 
   fa = cl_fa;
@@ -92,12 +185,18 @@ int main(int argc, char **argv) {
   WT = cl_WT;
   debug = cl_debug;
   printTime = cl_printTime;
+}
 
+void checkFailureConditions() {
   bool failed = false;
-  if (!((sym ^ fa) ^ collectIR)) {
-    errs() << "Either of sym, fa or collectIR should be specified\n";
+
+  if (!(sym || fa || collectIR)) {
+    errs() << "Either of sym, fa, or collectIR should be specified\n";
     failed = true;
   }
+
+  if (failed)
+    exit(1);
 
   if (sym || fa) {
     if (level != 'p' && level != 'f') {
@@ -105,100 +204,34 @@ int main(int argc, char **argv) {
       failed = true;
     }
   } else {
-    if (!collectIR) {
-      errs() << "Either of sym, fa or collectIR should be specified\n";
-      failed = true;
-    } else if (level)
+    assert(collectIR == true);
+
+    if (collectIR && level) {
       errs() << "[WARNING] level would not be used in collectIR mode\n";
+    }
   }
 
   if (failed)
     exit(1);
+}
 
-  auto M = getLLVMIR();
-  auto vocabulary = VocabularyFactory::createVocabulary(DIM)->getVocabulary();
+int main(int argc, char **argv) {
+  cl::SetVersionPrinter(printVersion);
+  cl::HideUnrelatedOptions(category);
+  setGlobalVars(argc, argv);
+  checkFailureConditions();
 
-  // newly added
   if (sym && !(funcName.empty())) {
-    IR2Vec_Symbolic SYM(*M, vocabulary);
-    std::ofstream o;
-    o.open(oname, std::ios_base::app);
-    if (printTime) {
-      clock_t start = clock();
-      SYM.generateSymbolicEncodingsForFunction(&o, funcName);
-      clock_t end = clock();
-      double elapsed = double(end - start) / CLOCKS_PER_SEC;
-      printf("Time taken by on-demand generation of symbolic encodings "
-             "is: %.6f "
-             "seconds.\n",
-             elapsed);
-    } else {
-      SYM.generateSymbolicEncodingsForFunction(&o, funcName);
-    }
-    o.close();
+    generateSymEncodingsFunction(funcName);
   } else if (fa && !(funcName.empty())) {
-    IR2Vec_FA FA(*M, vocabulary);
-    std::ofstream o, missCount, cyclicCount;
-    o.open(oname, std::ios_base::app);
-    missCount.open("missCount_" + oname, std::ios_base::app);
-    cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
-    if (printTime) {
-      clock_t start = clock();
-      FA.generateFlowAwareEncodingsForFunction(&o, funcName, &missCount,
-                                               &cyclicCount);
-      clock_t end = clock();
-      double elapsed = double(end - start) / CLOCKS_PER_SEC;
-      printf("Time taken by on-demand generation of flow-aware encodings "
-             "is: %.6f "
-             "seconds.\n",
-             elapsed);
-    } else {
-      FA.generateFlowAwareEncodingsForFunction(&o, funcName, &missCount,
-                                               &cyclicCount);
-    }
-    o.close();
+    generateFAEncodingsFunction(funcName);
   } else if (fa) {
-    IR2Vec_FA FA(*M, vocabulary);
-    std::ofstream o, missCount, cyclicCount;
-    o.open(oname, std::ios_base::app);
-    missCount.open("missCount_" + oname, std::ios_base::app);
-    cyclicCount.open("cyclicCount_" + oname, std::ios_base::app);
-    if (printTime) {
-      clock_t start = clock();
-      FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
-      clock_t end = clock();
-      double elapsed = double(end - start) / CLOCKS_PER_SEC;
-      printf("Time taken by normal generation of flow-aware encodings "
-             "is: %.6f "
-             "seconds.\n",
-             elapsed);
-    } else {
-      FA.generateFlowAwareEncodings(&o, &missCount, &cyclicCount);
-    }
-    o.close();
+    generateFAEncodings();
   } else if (sym) {
-    IR2Vec_Symbolic SYM(*M, vocabulary);
-    std::ofstream o;
-    o.open(oname, std::ios_base::app);
-    if (printTime) {
-      clock_t start = clock();
-      SYM.generateSymbolicEncodings(&o);
-      clock_t end = clock();
-      double elapsed = double(end - start) / CLOCKS_PER_SEC;
-      printf("Time taken by normal generation of symbolic encodings is: "
-             "%.6f "
-             "seconds.\n",
-             elapsed);
-    } else {
-      SYM.generateSymbolicEncodings(&o);
-    }
-    o.close();
+    generateSYMEncodings();
   } else if (collectIR) {
-    CollectIR cir(M);
-    std::ofstream o;
-    o.open(oname, std::ios_base::app);
-    cir.generateTriplets(o);
-    o.close();
+    collectIRfunc();
   }
+
   return 0;
 }

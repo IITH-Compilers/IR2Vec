@@ -41,7 +41,7 @@ def generate_base_vocabulary_header():
         f"{HEADER_CLANG_FORMAT_OFF}\n"
         "#ifndef __VOCABULARY_H__\n"
         "#define __VOCABULARY_H__\n\n"
-        "#include <map>\n"
+        "#include <unordered_map>\n"
         "#include <string>\n"
         "#include <vector>\n"
         "#include <memory>\n"
@@ -51,7 +51,7 @@ def generate_base_vocabulary_header():
         "class VocabularyBase {\n"
         "public:\n"
         "    virtual ~VocabularyBase() {}\n"
-        "    virtual const std::map<std::string, IR2Vec::Vector>& getVocabulary() const = 0;\n"
+        "    virtual const std::unordered_map<std::string, IR2Vec::Vector>& getVocabulary() const = 0;\n"
         "};\n\n"
         "class VocabularyFactory {\n"
         "public:\n"
@@ -69,24 +69,22 @@ def generate_vocabulary_class(vocab_file, class_name):
         f"{HEADER_CLANG_FORMAT_OFF}\n"
         f"#ifndef __{class_name.upper()}__\n"
         f"#define __{class_name.upper()}__\n\n"
-        f"#include <map>\n"
+        f"#include <unordered_map>\n"
         f"#include <string>\n"
         f"#include <vector>\n"
         f'#include "Vocabulary.h" // Include the base class\n\n'
         f"namespace IR2Vec {{\n\n"
         f"class {class_name} : public VocabularyBase {{\n"
         f"public:\n"
-        f"    const std::map<std::string, IR2Vec::Vector>& getVocabulary() const override{{\n"
+        f"    const std::unordered_map<std::string, IR2Vec::Vector>& getVocabulary() const override{{\n"
         f"        return vocabulary;\n"
         f"    }}\n"
         f"private:\n"
-        f"    static const std::map<std::string, IR2Vec::Vector> vocabulary;\n"
+        f"    static const std::unordered_map<std::string, IR2Vec::Vector> vocabulary;\n"
         f"}};\n"
     )
 
-    opening = (
-        f"\nconst std::map<std::string, IR2Vec::Vector> {class_name}::vocabulary = {{\n"
-    )
+    opening = f"\nconst std::unordered_map<std::string, IR2Vec::Vector> {class_name}::vocabulary = {{\n"
     closing = """\
 };
 } // namespace IR2Vec

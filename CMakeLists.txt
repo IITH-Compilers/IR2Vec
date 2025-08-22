@@ -17,9 +17,15 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 
+
 # LLVM is normally built without RTTI. Be consistent with that.
-if(NOT LLVM_ENABLE_RTTI)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+if (NOT LLVM_ENABLE_RTTI)
+  if (TARGET IR2Vec)
+    target_compile_options(IR2Vec PRIVATE -fno-rtti)
+  endif()
+  if (TARGET IR2Vec_Static)
+    target_compile_options(IR2Vec_Static PRIVATE -fno-rtti)
+  endif()
 endif()
 
 add_subdirectory(src)

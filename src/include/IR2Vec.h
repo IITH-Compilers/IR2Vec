@@ -11,6 +11,7 @@
 
 #include "llvm/ADT/MapVector.h"
 #include "llvm/IR/Module.h"
+#include <iostream>
 #include <string>
 
 #include "Vocabulary.h"
@@ -21,14 +22,14 @@ enum IR2VecMode { FlowAware, Symbolic };
 class Embeddings {
   int generateEncodings(llvm::Module &M, IR2VecMode mode, char level = '\0',
                         std::string funcName = "", unsigned dim = 300,
-                        std::ostream *o = nullptr, int cls = -1, float WO = 1,
+                        std::string outputFile = "", int cls = -1, float WO = 1,
                         float WA = 0.2, float WT = 0.5);
 
   llvm::SmallMapVector<const llvm::Instruction *, Vector, 128> instVecMap;
   llvm::SmallMapVector<const llvm::BasicBlock *, IR2Vec::Vector, 16> bbVecMap;
   llvm::SmallMapVector<const llvm::Function *, Vector, 16> funcVecMap;
   Vector pgmVector;
-  std::map<std::string, IR2Vec::Vector> vocabulary;
+  std::unordered_map<std::string, IR2Vec::Vector> vocabulary;
 
 public:
   Embeddings() = default;
@@ -36,17 +37,22 @@ public:
              std::string funcName = "", float WO = 1, float WA = 0.2,
              float WT = 0.5) {
     vocabulary = VocabularyFactory::createVocabulary(dim)->getVocabulary();
-    generateEncodings(M, mode, '\0', funcName, dim, nullptr, -1, WO, WA, WT);
+    generateEncodings(M, mode, '\0', funcName, dim, "", -1, WO, WA, WT);
   }
 
   // Use this constructor if the representations ought to be written to a
   // file. Analogous to the command line options that are being used in IR2Vec
   // binary.
-  Embeddings(llvm::Module &M, IR2VecMode mode, char level, std::ostream *o,
-             unsigned dim = 300, std::string funcName = "", float WO = 1,
-             float WA = 0.2, float WT = 0.5) {
+  Embeddings(llvm::Module &M, IR2VecMode mode, char level,
+             std::string outputFile = "", unsigned dim = 300,
+             std::string funcName = "", float WO = 1, float WA = 0.2,
+             float WT = 0.5) {
+    std::cout << "Embeddings constructor called " << std::endl;
     vocabulary = VocabularyFactory::createVocabulary(dim)->getVocabulary();
-    generateEncodings(M, mode, level, funcName, dim, o, -1, WO, WA, WT);
+    std::cout << "Vocabulary constructor called " << std::endl;
+    int ret_val = generateEncodings(M, mode, level, funcName, dim, outputFile,
+                                    -1, WO, WA, WT);
+    std::cout << "Encoding generation done " << ret_val << std::endl;
   }
 
   // Returns a map containing instructions and the corresponding vector
