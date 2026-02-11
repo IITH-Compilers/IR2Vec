@@ -139,7 +139,7 @@ def generate_vocabulary_factory(class_names):
 
     factory_footer = """\
         default:
-            throw std::invalid_argument("Invalid dimension for vocabulary creation.");
+            return nullptr;
     }
 }
 } // namespace IR2Vec\n
